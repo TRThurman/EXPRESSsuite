@@ -1,0 +1,47 @@
+{
+  "name": "express-p-11",
+  "scopeName": "source.express-p-11",
+  "fileTypes": [
+    ".exp"
+  ],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "name": "keyword.control.express-p-11",
+      "match": "\\b(ABS|ABSTRACT|ACOS|AGGREGATE|ALIAS|AND|ANDOR|ARRAY|AS|ASIN|ATAN|BAG|BASED_ON|BEGIN|BINARY|BLENGTH|BOOLEAN|BY|CASE|CONSTANT|CONST_E|COS|DERIVE|DIV|ELSE|END|END_ALIAS|END_CASE|END_CONSTANT|END_ENTITY|END_FUNCTION|END_IF|END_LOCAL|END_PROCEDURE|END_REPEAT|END_RULE|END_SCHEMA|END_SUBTYPE_CONSTRAINT|END_TYPE|ENTITY|ENUMERATION|ESCAPE|EXISTS|EXP|EXTENSIBLE|FALSE|FIXED|FOR|FORMAT|FROM|FUNCTION|GENERIC|GENERIC_ENTITY|HIBOUND|HIINDEX|IF|IN|INSERT|INTEGER|INVERSE|LENGTH|LIKE|LIST|LOBOUND|LOCAL|LOG|LOG10|LOG2|LOGICAL|LOINDEX|MOD|NOT|NUMBER|NVL|ODD|OF|ONEOF|OPTIONAL|OR|OTHERWISE|PI|PROCEDURE|QUERY|REAL|REFERENCE|REMOVE|RENAMED|REPEAT|RETURN|ROLESOF|RULE|SCHEMA|SELECT|SELF|SET|SIN|SIZEOF|SKIP|SQRT|STRING|SUBTYPE|SUBTYPE_CONSTRAINT|SUPERTYPE|TAN|THEN|TO|TOTAL_OVER|TRUE|TYPE|TYPEOF|UNIQUE|UNKNOWN|UNTIL|USE|USEDIN|VALUE|VALUE_IN|VALUE_UNIQUE|VAR|WHERE|WHILE|WITH|XOR|a|b|c|d|e|f)\\b"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "begin": "--",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.whitespace.comment.leading.express-p-11"
+            }
+          },
+          "end": "(?=$)",
+          "name": "comment.line.express-p-11"
+        },
+        {
+          "name": "comment.block.express-p-11",
+          "begin": "\\(\\*",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.express-p-11"
+            }
+          },
+          "end": "\\*\\)",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.express-p-11"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

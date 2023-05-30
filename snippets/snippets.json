@@ -1,0 +1,37 @@
+{
+  "EXPRESS Schema": {
+    "prefix": ["sch"],
+    "body": ["SCHEMA ${1:schema_name};", "$0", "END_SCHEMA;"],
+    "description": "A new EXPRESS schema."
+  },
+  "EXPRESS Entity": {
+    "prefix": ["ent"],
+    "body": ["ENTITY ${1:entity_name};", "$0", "END_ENTITY;"],
+    "description": "A new EXPRESS Entity."
+  },
+  "Entity Attribute": {
+    "prefix": ["attr"],
+    "body": ["${1:attribute_name} : ${2:attribute_type};$0"],
+    "description": "A new EXPRESS Entity."
+  },
+  "Select 2": {
+    "prefix": ["sel2"],
+    "body": ["SELECT($1,$2)$0"],
+    "description": "An EXPRESS Select between 2 types."
+  },
+  "Select 3": {
+    "prefix": ["sel3"],
+    "body": ["SELECT($1,$2,$3)$0"],
+    "description": "An EXPRESS Select between 3 types."
+  },
+  "EXPRESS Function": {
+    "prefix": ["fun"],
+    "body": ["FUNCTION ${1:function_name}", "$0", "END_FUNCTION;"],
+    "description": "A new EXPRESS Function."
+  },
+  "EXPRESS Type": {
+    "prefix": ["type"],
+    "body": ["TYPE ${1:type_name} = $0 ;", "END_TYPE;"],
+    "description": "A new EXPRESS Type."
+  }
+}

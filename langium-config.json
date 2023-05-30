@@ -1,0 +1,14 @@
+{
+  "projectName": "ExpressP11",
+  "languages": [
+    {
+      "id": "express-p-11",
+      "grammar": "src/language-server/express-p-11.langium",
+      "fileExtensions": [".exp"],
+      "textMate": {
+        "out": "syntaxes/express-p-11.tmLanguage.json"
+      }
+    }
+  ],
+  "out": "src/language-server/generated"
+}

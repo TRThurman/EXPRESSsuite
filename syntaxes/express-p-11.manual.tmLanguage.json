@@ -1,0 +1,326 @@
+{
+  "name": "express-p-11",
+  "scopeName": "source.express-p-11",
+  "fileTypes": [".exp"],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#comment"
+    },
+    {
+      "include": "#schema"
+    }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "storage.express",
+          "match": "\\b(AGGREGATE|ARRAY|BAG|BINARY|BOOLEAN|ENUMERATION|GENERIC_ENTITY|INTEGER|LIST|LOGICAL|NUMBER|REAL|SELECT|SET|STRING)\\b"
+        },
+        {
+          "name": "keyword.executable.express",
+          "match": "\\b(ALIAS|BEGIN|CASE|ELSE|END|END_ALIAS|END_CASE|END_IF|END_REPEAT|ESCAPE|FOR|IF|OTHERWISE|REPEAT|SKIP|THEN|TO|UNTIL|WHILE)\\b"
+        },
+        {
+          "name": "keyword.declaration.express",
+          "match": "\\b(ABSTRACT|CONSTANT|END_CONSTANT|END_ENTITY|END_FUNCTION|END_LOCAL|END_PROCEDURE|END_RULE|END_SCHEMA|END_SUBTYPE_CONSTRAINT|END_TYPE|ENTITY|FUNCTION|LOCAL|ONEOF|PROCEDURE|RULE|SCHEMA|SUBTYPE|SUBTYPE_CONSTRAINT|SUPERTYPE|TOTAL_OVER|TYPE)\\b"
+        },
+        {
+          "name": "keyword.control.express",
+          "match": "\\b(REFERENCE|USE|FROM)\\b"
+        },
+        {
+          "name": "keyword.other.express",
+          "match": "\\b(AS|BASED_ON|BY|DERIVE|EXTENSIBLE|FIXED|GENERIC|INVERSE|OF|OPTIONAL|QUERY|RENAMED|UNIQUE|VAR|WHERE|WITH)\\b"
+        },
+        {
+          "name": "keyword.function.builtin.express",
+          "match": "\\b(ABS|ACOS|ASIN|ATAN|BLENGTH|COS|EXISTS|EXP|FORMAT|HIBOUND|HIINDEX|LENGTH|LOBOUND|LOINDEX|LOG|LOG2|LOG10|NVL|ODD|ROLESOF|SIN|SIZEOF|SQRT|TAN|TYPEOF|USEDIN|VALUE|VALUE_IN|VALUE_UNIQUE)\\b"
+        },
+        {
+          "name": "constant.language.builtin.express",
+          "match": "(CONST_E|FALSE|PI|SELF|TRUE|UNKNOWN|\\?)"
+        },
+        {
+          "name": "entity.name.tag",
+          "match": "\\b(RETURN)\\b"
+        },
+        {
+          "name": "keyword.operator.assignment.express",
+          "match": "(:=|:)"
+        },
+        {
+          "name": "keyword.symbol.express",
+          "match": "(,|;|%|/|\\\\|\\.|\\+|\\-|\\*|<\\*|{|}|\\||>|<|>=|<=|<>|=|:<>:|:=:)"
+        },
+
+        {
+          "name": "keyword.operator.word.express",
+          "match": "\\b(AND|ANDOR|DIV|IN|LIKE|MOD|NOT|OR|XOR)\\b"
+        },
+        {
+          "name": "keyword.procedure.express",
+          "match": "(INSERT|REMOVE)"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.express",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.express",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "string": {
+      "match": "'(\\w+\\.*)+'",
+      "name": "string.quoted.single.express"
+    },
+    "comments": {
+      "name": "comment.block.express",
+      "begin": "\\(\\*",
+      "end": "\\*\\)",
+      "patterns": [
+        {
+          "name": "constant.character.escape.express",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "comment": {
+      "name": "comment.line.double-dash.express",
+      "match": "(--.*$)"
+    },
+    "number": {
+      "name": "constant.numeric.express",
+      "match": "(\\b|\\-)\\d+(\\.\\d+)?\\b"
+    },
+    "schema": {
+      "name": "source.express",
+      "begin": "(SCHEMA)\\s+(\\w+)\\s*(\\'{.*}\\')?(;)",
+      "beginCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        },
+        "2": {
+          "name": "entity.name.type.namespace.express"
+        },
+        "3": {
+          "name": "string.quoted.single.express"
+        }
+      },
+      "end": "(END_SCHEMA;)(.*)",
+      "endCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        },
+        "2": {
+          "patterns": [{ "include": "#comment" }]
+        }
+      },
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#comment"
+        },
+
+        {
+          "include": "#reference"
+        },
+        {
+          "include": "#entity"
+        },
+        {
+          "include": "#type"
+        },
+        {
+          "include": "#function"
+        }
+      ]
+    },
+    "reference": {
+      "begin": "(REFERENCE FROM)\\s*(\\w+)",
+      "beginCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        },
+        "2": {
+          "name": "variable.other.readwrite.import.express"
+        }
+      },
+      "end": "(;)",
+      "endCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        }
+      },
+      "patterns": [{ "include": "#comment" }]
+    },
+    "entity": {
+      "begin": "(ENTITY)\\s*(\\w+)",
+      "beginCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        },
+        "2": {
+          "name": "entity.name.type.class.express"
+        }
+      },
+      "end": "(END_ENTITY;)",
+      "endCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        }
+      },
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#keywords"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#string"
+        },
+        {
+          "include": "#number"
+        },
+        {
+          "include": "#assignment"
+        }
+      ]
+    },
+    "type": {
+      "begin": "(TYPE)\\s*(\\w+)",
+      "beginCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        },
+        "2": {
+          "name": "entity.name.type.class.express"
+        }
+      },
+      "end": "(END_TYPE;)",
+      "endCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        }
+      },
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#keywords"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#string"
+        },
+        {
+          "include": "#number"
+        },
+        {
+          "include": "#assignment"
+        }
+      ]
+    },
+    "function": {
+      "name": "function",
+      "begin": "(FUNCTION)\\s*(\\w+)",
+      "beginCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        },
+        "2": {
+          "name": "entity.name.type.function.express"
+        }
+      },
+      "end": "(END_FUNCTION)(;)",
+      "endCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        }
+      },
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#keywords"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#string"
+        },
+        {
+          "include": "#number"
+        },
+        {
+          "include": "#assignment"
+        },
+        {
+          "include": "#functionCall"
+        }
+      ]
+    },
+    "assignment": {
+      "begin": "(^|\\()\\s*(\\w+(\\s*,\\s*\\w+)*)\\s*(:)[^=]\\s*",
+      "beginCaptures": {
+        "2": {
+          "name": "variable.property.express"
+        },
+
+        "4": { "name": "keyword.symbol.express" }
+      },
+      "end": "(;)",
+      "endCaptures": {
+        "0": { "patterns": [{ "include": "#keywords" }] }
+      },
+      "patterns": [
+        {
+          "include": "#string"
+        },
+        { "include": "#keywords" },
+        {
+          "include": "#functionCall"
+        },
+        {
+          "include": "#number"
+        }
+      ]
+    },
+    "functionCall": {
+      "match": "(\\w+)(\\s*\\()",
+      "captures": {
+        "1": {
+          "name": "entity.name.type.function.express"
+        }
+      }
+    }
+  }
+}
