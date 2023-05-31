@@ -42,6 +42,7 @@ Regions of code can be collapsed using the folding functionality.
 - To unfold a region, click the `v` <!-- &#8897; &#8964; --> icon.
 - There are numerous other ways to fold code explained [here](https://code.visualstudio.com/docs/editor/codebasics#_folding)
 ![Example of Folding](./assets/images/Folding.gif)
+
 ## Inlay Hints
 Inlay hints of types and attribute are presented when defining entities based on schemas loaded in the workspace.
 
@@ -89,9 +90,11 @@ The easyEXPRESS extension can be installed directly from the Visual Studio Code 
 1. Install the easyEXPRESS extension.
 2. Load the schema you want to validate against in the active workspace.
 3. Press `Ctrl + P` and select `Apply Recommended Practices`
+
 ![User Interface to load an extension in VSCode](./assets/images/Installation_Apply_Extension_in_VSCode.png)
 
 *Restart may be required after installation of extension?*
+
 ![Reload message from Visual Studio Code](./assets/images/Installation_Reload_VSCode.png)
 
 ## Installation for use with Other Editors
