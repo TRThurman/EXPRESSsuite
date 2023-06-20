@@ -10,7 +10,7 @@ import { ExpressP11Grammar } from './grammar';
 export const ExpressP11LanguageMetaData: LanguageMetaData = {
     languageId: 'express-p-11',
     fileExtensions: ['.exp'],
-    caseInsensitive: false
+    caseInsensitive: true
 };
 
 export const ExpressP11GeneratedSharedModule: Module<LangiumSharedServices, LangiumGeneratedSharedServices> = {

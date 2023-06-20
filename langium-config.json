@@ -5,6 +5,7 @@
       "id": "express-p-11",
       "grammar": "src/language-server/express-p-11.langium",
       "fileExtensions": [".exp"],
+      "caseInsensitive": true,
       "textMate": {
         "out": "syntaxes/express-p-11.tmLanguage.json"
       }
