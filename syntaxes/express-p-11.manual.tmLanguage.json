@@ -58,7 +58,7 @@
         },
 
         {
-          "name": "keyword.operator.word.express",
+          "name": "keyword.operator.expression.express",
           "match": "(?i)\\b(AND|ANDOR|DIV|IN|LIKE|MOD|NOT|OR|XOR)\\b"
         },
         {
