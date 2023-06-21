@@ -136,7 +136,13 @@
           "include": "#reference"
         },
         {
+          "include": "#use"
+        },
+        {
           "include": "#entity"
+        },
+        {
+          "include": "#constant"
         },
         {
           "include": "#type"
@@ -164,6 +170,24 @@
       },
       "patterns": [{ "include": "#comment" }]
     },
+    "use": {
+      "begin": "(?i)(USE FROM)\\s*(\\w+)",
+      "beginCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        },
+        "2": {
+          "name": "variable.other.readwrite.import.express"
+        }
+      },
+      "end": "(;)",
+      "endCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        }
+      },
+      "patterns": [{ "include": "#comment" }]
+    },
     "entity": {
       "begin": "(?i)(ENTITY)\\s*(\\w+)",
       "beginCaptures": {
@@ -175,6 +199,46 @@
         }
       },
       "end": "(?i)(END_ENTITY;)",
+      "endCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        }
+      },
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#keywords"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#string"
+        },
+        {
+          "include": "#number"
+        },
+        {
+          "include": "#assignment"
+        }
+      ]
+    },
+    "constant": {
+      "begin": "(?i)(CONSTANT)",
+      "beginCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        },
+        "2": {
+          "name": "entity.name.type.class.express"
+        }
+      },
+      "end": "(?i)(END_CONSTANT;)",
       "endCaptures": {
         "1": {
           "patterns": [{ "include": "#keywords" }]
