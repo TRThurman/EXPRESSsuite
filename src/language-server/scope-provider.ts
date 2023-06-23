@@ -409,6 +409,18 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
                   break;
               }
             }
+            if (isBuilt_in_constant_or_function(head)) {
+              const builtIn = head as string;
+              switch (builtIn.toLowerCase()) {
+                case "self":
+                  const localEntity = getContainerOfType(qualifiedRep, isEntity_decl);
+                  if (localEntity) {
+                    dataTypesInScope.push(localEntity);
+                    getSuperTypes(localEntity).forEach((e) => dataTypesInScope.push(e.node));
+                  }
+                  break;
+              }
+            }
           }
           if (isAssignment_stmt_core(qualifiedRep)) {
             const statement = qualifiedRep as Assignment_stmt_core;
