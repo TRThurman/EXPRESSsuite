@@ -4,7 +4,7 @@ import { CodeActionParams } from "vscode-languageserver-protocol";
 import { CodeAction, Command } from "vscode-languageserver-types";
 import { ExpressP11Issues, ReferenceStatementData, WrongReferenceLabelData } from "./express-p-11-validator";
 import { ExpressFile } from "./generated/ast";
-import { getReferenceDeclarations } from "../utils/reference-helpers";
+import { getReferenceSpecifications } from "../utils/interface-helpers";
 import { getSchemaDeclarations } from "../utils/schema-helpers";
 
 export class ExpressP11CodeActionProvider implements CodeActionProvider {
@@ -69,7 +69,7 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
     if (data) {
       const schema = getSchemaDeclarations(document).find((s) => s.name === data.sourceSchema);
       if (!schema) return;
-      const referenceClauses = getReferenceDeclarations(schema);
+      const referenceClauses = getReferenceSpecifications(schema);
 
       let position: Position;
       if (referenceClauses.length > 0) {
@@ -107,7 +107,7 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
     if (data) {
       const schema = getSchemaDeclarations(document).find((s) => s.name === data.sourceSchema);
       if (!schema) return;
-      const referenceClauses = getReferenceDeclarations(schema);
+      const referenceClauses = getReferenceSpecifications(schema);
 
       const referenceClauseToUpdate = referenceClauses.find((reference) => reference.schema.$refText === data.schema);
       if (!referenceClauseToUpdate) return;

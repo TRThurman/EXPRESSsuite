@@ -250,7 +250,7 @@ Local_decl: "LOCAL" variables+=Local_variable+ "END_LOCAL" ";" ;
 Local_variable: ids+=Variable_id ( "," ids+=Variable_id)* ":" type=Parameter_type ( ":=" Expression )? ";" ;
 Logical_expression: Expression ;
 Multiplication_like_op returns string: "*" | "/" | "DIV" | "MOD" | "AND" | "||" ;
-Named_type_or_rename: type=Named_types ("AS" newName=( Entity_id | Type_id ) )? ;
+Named_type_or_rename: namedType=[NamedType:Simple_id] (isRenamed?="AS" name=( Simple_id ) )? ;
 Null_stmt returns string: ";" ;
 Parameter: Expression ;
 Parameter_id: name=Simple_id ;
@@ -295,7 +295,7 @@ Type_id returns string: Simple_id ;
 Unary_op returns string: "+" | "-" | "NOT" ;
 Unique_rule: ( name=Rule_label_id ":" )? attributes+=Referenced_attribute ( "," attributes+=Referenced_attribute )* ";" ;
 Until_control: "UNTIL" expression=Logical_expression ;
-Use_clause: "USE" "FROM" schema=Schema_ref ( "(" types+=Named_type_or_rename ( "," types+=Named_type_or_rename )* ")" )? ";" ;
+Use_clause: "USE" "FROM" schema=[Schema_decl:Simple_id] ( "(" types+=Named_type_or_rename ( "," types+=Named_type_or_rename )* ")" )? ";" ;
 Variable_id: name=Simple_id ;
 While_control: "WHILE" expression=Logical_expression ;
 

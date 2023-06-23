@@ -18,7 +18,7 @@ import { getFunctionDeclarations } from "../utils/function-helpers";
 import { schemaHasConstants, schemaHasDeclarations, schemaHasSpecifications } from "../utils/schema-helpers";
 import { getProcedureDeclarations } from "../utils/procedure-helpers";
 import { getConstantDeclarations } from "../utils/constant-helpers";
-import { getReferenceDeclarations } from "../utils/reference-helpers";
+import { getReferenceSpecifications } from "../utils/interface-helpers";
 import { getSchemaDeclarations } from "../utils/schema-helpers";
 
 export class ExpressP11ScopeComputation implements ScopeComputation {
@@ -135,7 +135,7 @@ export class ExpressP11ScopeComputation implements ScopeComputation {
      * Other resources will be exposed by the scope provider.
      */
     if (schemaHasSpecifications(schema)) {
-      const referenceSpecifications = getReferenceDeclarations(schema);
+      const referenceSpecifications = getReferenceSpecifications(schema);
       referenceSpecifications?.forEach((r) => {
         r.resources.forEach((resource) => {
           // const name = resource.isRenamed ? resource.name : resource.resource.$refText;

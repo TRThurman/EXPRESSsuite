@@ -17,14 +17,21 @@ import {
   ExpressP11AstType,
   Reference_clause,
   Schema_decl,
+  Use_clause,
+  isConstant_body,
   isEntity_decl,
+  isEntity_head,
+  isFunction_head,
+  isProcedure_head,
   isReference_clause,
   isResource_or_rename,
+  isType_decl,
+  isUse_clause,
 } from "./generated/ast";
 import type { ExpressP11Services } from "./express-p-11-module";
 import { Entity_decl } from "./generated/ast";
 import { schemaHasDeclarations } from "../utils/schema-helpers";
-import { getReferenceDeclarations } from "../utils/reference-helpers";
+import { getReferenceSpecifications, getUseSpecifications } from "../utils/interface-helpers";
 import { isSchema_decl } from "./generated/ast";
 
 /**
@@ -127,17 +134,54 @@ export class ExpressP11Validator {
     });
     return importedResources;
   }
+
+  private buildUsedResourcesIndex(listOfUseFromClauses: Use_clause[]): MultiMap<SchemaName, NamedNode> {
+    const usedResources = new MultiMap<SchemaName, NamedNode>();
+    listOfUseFromClauses.forEach((useFrom) => {
+      //if (!referenceFrom.schema.ref) return;
+      //referenceClauses.set(referenceFrom.schema.$refText, referenceFrom);
+      useFrom.types.forEach((resourceDeclaration) => {
+        if (!resourceDeclaration.namedType.ref) return;
+        const resourceName = resourceDeclaration.isRenamed
+          ? resourceDeclaration.name
+          : resourceDeclaration.namedType.$refText;
+        if (!resourceName) return;
+        usedResources.add(useFrom.schema.$refText, {
+          name: resourceName,
+          node: resourceDeclaration.namedType.ref,
+        });
+      });
+    });
+    return usedResources;
+  }
   checkReferencesAreImported(schema: Schema_decl, accept: ValidationAcceptor): void {
-    const referenceFromClauses = getReferenceDeclarations(schema);
+    const referenceSpecifications = getReferenceSpecifications(schema);
+    const useSpecifications = getUseSpecifications(schema);
     if (!schema.name) return;
-    const importedResourcesIndex = this.buildImportedResourcesIndex(referenceFromClauses);
+    let importedResourcesIndex = this.buildImportedResourcesIndex(referenceSpecifications);
+    this.buildUsedResourcesIndex(useSpecifications).forEach((value, key) => importedResourcesIndex.add(key, value));
     const currentSchemaName = schema.name;
 
     for (const node of streamAst(schema)) {
       streamReferences(node).forEach((resourceNeeded) => {
-        if (isResource_or_rename(resourceNeeded.container) || isReference_clause(resourceNeeded.container)) return;
+        if (
+          isResource_or_rename(resourceNeeded.container) ||
+          isReference_clause(resourceNeeded.container) ||
+          isUse_clause(resourceNeeded.container)
+        )
+          return;
 
+        //console.log(resourceNeeded.reference.ref);
         if (!resourceNeeded.reference.$nodeDescription) return;
+        const reference = resourceNeeded.reference.ref;
+        if (
+          !isEntity_head(reference) &&
+          !isType_decl(reference) &&
+          !isConstant_body(reference) &&
+          !isFunction_head(reference) &&
+          !isProcedure_head(reference)
+        )
+          return;
 
         const schemaNeeded = getContainerOfType(resourceNeeded.reference.ref, isSchema_decl);
         if (!schemaNeeded || !schemaNeeded.name) return;

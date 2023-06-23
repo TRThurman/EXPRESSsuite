@@ -6909,45 +6909,45 @@ export const ExpressP11Grammar = (): Grammar => loadedExpressP11Grammar ?? (load
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "type",
+            "feature": "namedType",
             "operator": "=",
             "terminal": {
-              "$type": "RuleCall",
-              "rule": {
-                "$ref": "#/rules@23"
+              "$type": "CrossReference",
+              "type": {
+                "$ref": "#/types@0"
               },
-              "arguments": []
+              "terminal": {
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@197"
+                },
+                "arguments": []
+              },
+              "deprecatedSyntax": false
             }
           },
           {
             "$type": "Group",
             "elements": [
               {
-                "$type": "Keyword",
-                "value": "AS"
+                "$type": "Assignment",
+                "feature": "isRenamed",
+                "operator": "?=",
+                "terminal": {
+                  "$type": "Keyword",
+                  "value": "AS"
+                }
               },
               {
                 "$type": "Assignment",
-                "feature": "newName",
+                "feature": "name",
                 "operator": "=",
                 "terminal": {
-                  "$type": "Alternatives",
-                  "elements": [
-                    {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@131"
-                      },
-                      "arguments": []
-                    },
-                    {
-                      "$type": "RuleCall",
-                      "rule": {
-                        "$ref": "#/rules@189"
-                      },
-                      "arguments": []
-                    }
-                  ]
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@197"
+                  },
+                  "arguments": []
                 }
               }
             ],
@@ -8383,11 +8383,18 @@ export const ExpressP11Grammar = (): Grammar => loadedExpressP11Grammar ?? (load
             "feature": "schema",
             "operator": "=",
             "terminal": {
-              "$type": "RuleCall",
-              "rule": {
-                "$ref": "#/rules@107"
+              "$type": "CrossReference",
+              "type": {
+                "$ref": "#/rules@1"
               },
-              "arguments": []
+              "terminal": {
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@197"
+                },
+                "arguments": []
+              },
+              "deprecatedSyntax": false
             }
           },
           {

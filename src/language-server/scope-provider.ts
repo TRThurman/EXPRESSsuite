@@ -41,6 +41,7 @@ import {
   isAttribute_qualifier,
   //@ts-ignore
   isAttribute_ref,
+  isBuilt_in_constant_or_function,
   isComplex_Primary_body,
   isComplex_Primary_id,
   isDerived_attr,
@@ -61,7 +62,7 @@ import {
   isReference_clause,
   isResource_or_rename,
 } from "./generated/ast";
-import { getReferenceDeclarations } from "../utils/reference-helpers";
+import { getReferenceSpecifications } from "../utils/interface-helpers";
 import {
   getAttributeDeclarations,
   getAttributeName,
@@ -92,7 +93,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     return this.descriptions.createDescription(customExpressDescription.node, customExpressDescription.nameInScope);
   }
   getImportedTypes(schema: Schema_decl, referenceType: string): AstNodeDescription[] {
-    const imports = getReferenceDeclarations(schema);
+    const imports = getReferenceSpecifications(schema);
     const additionalScope: AstNodeDescription[] = [];
     if (!imports) return additionalScope;
     // console.log(`found ${imports.length} imports in ${schema.name}`);
