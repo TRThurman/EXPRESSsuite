@@ -1,21 +1,21 @@
-# easy-EXPRESS
-EXPRESS language support for Visual Studio Code
-<!-- Document contents based on template from  https://github.com/usnistgov/opensource-repo#readme -->
+# easyEXPRESS
+Language support for EXPRESS schema development
+<!-- Document contents based on a template from  https://github.com/usnistgov/opensource-repo#readme -->
 
 <!-- This document is available free of charge from [link](https://doi.org]<!-- URL -->
 
 # Introduction
 The easyEXPRESS extension was developed to provide language support for [EXPRESS](https://www.expresslang.org/) language files. It was initially targeted for improved development of [ISO 10303-11](https://www.iso.org/standard/38047.html) for [ISO 10303-21](https://www.iso.org/standard/63141.html) STEP development, but can be used with any EXPRESS schema.
 
-- Authoring and validation of the EXPRESS files are based on schema rules, eliminating the need to rely on a users understanding of the complex file format, which is error prone.
+- Authoring and validation of the EXPRESS files are based on schema rules, eliminating the need to rely on a users understanding of the complex file format, which is error-prone.
 
-- Autocomplete Typing repetive information is time consuming and error prone. This allows more time for use of cognative skills to carry out more complex tasks.
+- Autocomplete Typing repetitive information is time-consuming and error-prone. This allows more time for use of cognative skills to carry out more complex tasks.
 
-- Navigating the schema to locate inherited references across myultiple schemas in the workspace is prone to error if all files are not checked
+- Navigating the schema to locate inherited references across multiple schemas in the workspace is prone to error if all files are not checked
 
-- Large entities are hard to dechiper visually.
+- Large entities are hard to decipher visually.
 
-With the easyEXPRESS extension authoring time is reduced by presenting lists of repetitive commands for use with code completion and dropdown lists containing only valid values based on type from parsing files in the active workspace. Warnings and error messages with recommended solutions are provided to ensure syntax and content accuracy. 
+With the easyEXPRESS extension, authoring time is reduced by presenting lists of repetitive commands for use with code completion and dropdown lists containing only valid values based on type from parsing files in the active workspace. Warnings and error messages with recommended solutions are provided to ensure syntax and content accuracy. 
 
 
 
@@ -24,9 +24,9 @@ With the easyEXPRESS extension authoring time is reduced by presenting lists of 
 A list of functions and how they operate is listed in alphabetical order below.
 
 ## Code Completion
-Snippets based on the syntax of the lexical elements and grammar found in Annex A of [ISO 10303-11](https://www.iso.org/standard/38047.html) assist in efficient authoring by presenting only valid options base on rules for valid content.
+Snippets based on the syntax of the lexical elements and grammar found in Annex A of [ISO 10303-11](https://www.iso.org/standard/38047.html) assist in efficient authoring by presenting only valid options based on rules for valid content.
 
-The list of items with autocompletion are based on the hierarchy of the item being defined.
+The list of items with autocompletion is based on the hierarchy of the item being defined.
 
 <!-- ## Enumeration Type
 - Not implemented yet -->
@@ -44,16 +44,16 @@ Regions of code can be collapsed using the folding functionality.
 ![Example of Folding](./assets/images/Folding.gif)
 
 ## Inlay Hints
-Inlay hints of types and attribute are presented when defining entities based on schemas loaded in the workspace.
+Inlay hints of types and attributes are presented when defining entities based on schemas loaded in the workspace.
 
 ## Outline of Document
-An outline of the document can be viewed in the explorer pane and can be sorted based on type, name, category, and position in the file. Categories of elements can be collapsed using the downward pointing carrot icon.
+An outline of the document can be viewed in the explorer pane and can be sorted based on type, name, category, and position in the file. Categories of elements can be collapsed using the downward-pointing carrot icon.
 
 ## Quick Navigation
 Quickly navigate to references in any file loaded in the active workspace, including inherited attributes from supertypes, can be done by clicking `Ctrl + ?` when an entity is selected.
 <!-- Subtype of -->
 
-## Reference to open Files
+## Reference to Open Files
 When an entity is renamed in one file, reloading the workspace (by clicking ...) will update all references to files in the active workspace that reference that entity based on the hierarchy on entities.
 
 <!-- ## Remarks? -->
@@ -62,10 +62,10 @@ When an entity is renamed in one file, reloading the workspace (by clicking ...)
 - Types and documentation on hover
 
 ## Syntax Styling
-Many features to make viewing and editing of files have been implemented including
+Many features to make viewing and editing of files have been implemented, including
 - Syntax highlighting
 - Folding of braced blocks
-- Automatick bracket matching
+- Automatic bracket matching
 - Indentation of nested regions
 - Checking for valid spelling of entities
 - Colorization of items
@@ -76,10 +76,6 @@ Many features to make viewing and editing of files have been implemented includi
 
 ## Update of Renamed Items
 If an element is renamed, reloading the active workspace updates all instances where that element is used.
-
-<!-- # Documentation
-Full documentation can be found here [URL](url)
---> 
 
 # Installation
 The easyEXPRESS extension can be installed directly from the Visual Studio Code Marketplace or as an extension to other similar editors <!-- Should we mention these? (such as Eclipse Theia, Google Cloud Shell and others) --> 
