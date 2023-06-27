@@ -58,7 +58,7 @@ export const getFunctionLocalVariables = (func: Function_decl): Variable_id[] =>
 };
 
 export const getFunctionLocalConstants = (func: Function_decl): Constant_body[] => {
-  if (!func.algoHead.constant) return [];
+  if (!func.algoHead?.constant) return [];
 
   return func.algoHead.constant.items;
 };
