@@ -53,7 +53,7 @@ export const getFunctionParameters = (func: Function_decl): Parameter_id[] => {
 };
 
 export const getFunctionLocalVariables = (func: Function_decl): Variable_id[] => {
-  if (!func.algoHead.local) return [];
+  if (!func.algoHead?.local) return [];
   return func.algoHead.local?.variables.map((v) => v.ids).flat(1);
 };
 
