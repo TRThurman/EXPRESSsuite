@@ -8,6 +8,8 @@ import {
   Parameter_type,
   Redeclared_attribute,
   Schema_decl,
+  Supertype_expression,
+  Supertype_term,
   isDerived_attr,
   isEntity_decl,
   isEntity_head,
@@ -21,6 +23,7 @@ import { ExpressKind, getDocumentSymbol } from "./general";
 import { schemaHasBody } from "./schema-helpers";
 import { extractTypes } from "../language-server/type-system/semantic-type";
 import { CustomExpressDescription } from "../language-server/scope-provider";
+import { ExpressP11References } from "../language-server/references";
 
 export const getEntitiesDocumentSymbol = (schema: Schema_decl): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
@@ -110,6 +113,7 @@ export const getAttributeName = (attribute: Attribute_decl): string | undefined 
 export const getSuperTypes = (entity: Entity_decl | undefined): CustomExpressDescription<Entity_decl>[] => {
   let superTypes: CustomExpressDescription<Entity_decl>[] = [];
   if (!entity || !isEntity_decl(entity)) return superTypes;
+
   const hasSuperTypes = entity.head?.types?.supertypes?.entities;
   if (!hasSuperTypes) return superTypes;
   hasSuperTypes.forEach((supertype) => {
@@ -119,6 +123,46 @@ export const getSuperTypes = (entity: Entity_decl | undefined): CustomExpressDes
         superTypes.push(...getSuperTypes(supertype.entity.ref.$container));
       }
   });
+  return superTypes;
+};
+
+export const getSubTypes = (
+  entity: Entity_decl | undefined,
+  references: ExpressP11References | undefined
+): CustomExpressDescription<Entity_decl>[] => {
+  let subTypes: CustomExpressDescription<Entity_decl>[] = [];
+  if (!entity || !isEntity_decl(entity) || !references) return subTypes;
+  references.getUsedInSubtypeOf(entity).forEach((type) => subTypes.push({ node: type, nameInScope: type.head.name }));
+  return subTypes;
+};
+
+export const getTypesFromSupertypeExpression = (
+  expression: Supertype_expression
+): CustomExpressDescription<Entity_decl>[] => {
+  let superTypes: CustomExpressDescription<Entity_decl>[] = [];
+  expression.factors.forEach((factor) => {
+    if (!factor.terms) return;
+    factor.terms.forEach((term) => {
+      getTypesFromSupertypeTerm(term).forEach((type) => superTypes.push(type));
+    });
+  });
+  return superTypes;
+};
+
+export const getTypesFromSupertypeTerm = (term: Supertype_term): CustomExpressDescription<Entity_decl>[] => {
+  let superTypes: CustomExpressDescription<Entity_decl>[] = [];
+
+  switch (term.$type) {
+    case "One_of":
+      term.types.forEach((expression) => {
+        getTypesFromSupertypeExpression(expression).forEach((type) => superTypes.push(type));
+      });
+      break;
+    case "EntityRef":
+      if (isEntity_decl(term.entity?.ref?.$container))
+        superTypes.push({ nameInScope: term.entity.$refText, node: term.entity.ref?.$container as Entity_decl });
+  }
+
   return superTypes;
 };
 
@@ -161,4 +205,25 @@ export const getDataTypesFromParameterId = (param: Parameter_id): CustomExpressD
   if (!parameterType) return [];
 
   return getTypesFromParameterType(parameterType);
+};
+
+export const getFullSubSuperGraph = (
+  entityInScope: Entity_decl | undefined,
+  references: ExpressP11References
+): CustomExpressDescription<Entity_decl>[] => {
+  const graph: CustomExpressDescription<Entity_decl>[] = [];
+
+  if (!entityInScope || !isEntity_decl(entityInScope) || !references) return [];
+  getSuperTypes(entityInScope).forEach((supertype) => {
+    graph.push(supertype);
+  });
+  getSubTypes(entityInScope, references).forEach((subtype) => {
+    graph.push(subtype);
+  });
+  const subGraphs: CustomExpressDescription<Entity_decl>[] = [];
+  graph.forEach((type) => {
+    subGraphs.push(...getSubTypes(type.node, references));
+  });
+  graph.push(...subGraphs);
+  return graph;
 };
