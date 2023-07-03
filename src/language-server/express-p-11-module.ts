@@ -1,8 +1,6 @@
 import {
   createDefaultModule,
-  //@ts-ignore
   createDefaultSharedModule,
-  DefaultReferences,
   DefaultSharedModuleContext,
   inject,
   LangiumServices,
@@ -17,6 +15,7 @@ import { ExpressP11ScopeComputation } from "./scope-computation";
 import { ExpressP11ScopeProvider } from "./scope-provider";
 import { ExpressP11CodeActionProvider } from "./code-actions";
 import { ExpressP11CompletionProvider } from "./completion-provider";
+import { ExpressP11References } from "./references";
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -50,7 +49,7 @@ export const ExpressP11Module: Module<ExpressP11Services, PartialLangiumServices
   },
   references: {
     ScopeComputation: (services) => new ExpressP11ScopeComputation(services),
-    References: (services) => new DefaultReferences(services),
+    References: (services) => new ExpressP11References(services),
     ScopeProvider: (services) => new ExpressP11ScopeProvider(services),
   },
 };
