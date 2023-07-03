@@ -729,7 +729,7 @@ export const ExpressP11Grammar = (): Grammar => loadedExpressP11Grammar ?? (load
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@103"
+              "$ref": "#/rules@143"
             },
             "arguments": []
           }

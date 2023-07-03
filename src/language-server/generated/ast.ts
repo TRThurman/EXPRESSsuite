@@ -520,7 +520,7 @@ export function isSupertype_constraint(item: unknown): item is Supertype_constra
     return reflection.isInstance(item, Supertype_constraint);
 }
 
-export type Supertype_term = Entity_ref | One_of | Supertype_expression;
+export type Supertype_term = EntityRef | One_of | Supertype_expression;
 
 export const Supertype_term = 'Supertype_term';
 
@@ -617,7 +617,7 @@ export function isAggregate_source(item: unknown): item is Aggregate_source {
 }
 
 export interface Aggregate_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'Aggregate_type';
     of: Parameter_type
     type?: Type_label
@@ -659,7 +659,7 @@ export function isAlias_stmt(item: unknown): item is Alias_stmt {
 }
 
 export interface Array_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'Array_type';
     bound: Bound_spec
     isOptional: boolean
@@ -736,7 +736,7 @@ export function isAttribute_ref(item: unknown): item is Attribute_ref {
 }
 
 export interface Bag_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'Bag_type';
     bound?: Bound_spec
     type: Instantiable_type
@@ -983,7 +983,7 @@ export function isEntity_head(item: unknown): item is Entity_head {
 }
 
 export interface Entity_ref extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'Entity_ref';
     to: Reference<Entity_head>
 }
@@ -995,7 +995,7 @@ export function isEntity_ref(item: unknown): item is Entity_ref {
 }
 
 export interface EntityRef extends AstNode {
-    readonly $container: Subtype_declaration;
+    readonly $container: One_of | Subtype_constraint | Subtype_constraint_body | Subtype_declaration | Supertype_factor;
     readonly $type: 'EntityRef';
     entity: Reference<Entity_head>
 }
@@ -1056,7 +1056,7 @@ export function isEnumeration_reference(item: unknown): item is Enumeration_refe
 }
 
 export interface Enumeration_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'Enumeration_type';
     extension?: Enumeration_extension
     isExtensible: boolean
@@ -1161,7 +1161,7 @@ export function isFunction_ref(item: unknown): item is Function_ref {
 }
 
 export interface General_array_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'General_array_type';
     bound?: Bound_spec
     isOptional: boolean
@@ -1176,7 +1176,7 @@ export function isGeneral_array_type(item: unknown): item is General_array_type 
 }
 
 export interface General_bag_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'General_bag_type';
     bound?: Bound_spec
     type: Parameter_type
@@ -1189,7 +1189,7 @@ export function isGeneral_bag_type(item: unknown): item is General_bag_type {
 }
 
 export interface General_list_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'General_list_type';
     bound?: Bound_spec
     isUnique: boolean
@@ -1215,7 +1215,7 @@ export function isGeneral_ref(item: unknown): item is General_ref {
 }
 
 export interface General_set_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'General_set_type';
     bound?: Bound_spec
     type: Parameter_type
@@ -1228,7 +1228,7 @@ export function isGeneral_set_type(item: unknown): item is General_set_type {
 }
 
 export interface Generic_entity_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'Generic_entity_type';
     type?: Type_label
 }
@@ -1240,7 +1240,7 @@ export function isGeneric_entity_type(item: unknown): item is Generic_entity_typ
 }
 
 export interface Generic_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'Generic_type';
     type?: Type_label
 }
@@ -1350,7 +1350,7 @@ export function isInverse_clause(item: unknown): item is Inverse_clause {
 }
 
 export interface List_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'List_type';
     bound?: Bound_spec
     isUnique: boolean
@@ -1415,7 +1415,7 @@ export function isNamed_type_or_rename(item: unknown): item is Named_type_or_ren
 }
 
 export interface Named_types extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'Named_types';
     of: Reference<NamedType>
 }
@@ -1427,7 +1427,7 @@ export function isNamed_types(item: unknown): item is Named_types {
 }
 
 export interface One_of extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: One_of | Subtype_constraint | Subtype_constraint_body | Subtype_declaration | Supertype_factor;
     readonly $type: 'One_of';
     types: Array<Supertype_expression>
 }
@@ -1564,7 +1564,7 @@ export function isQuery_expression(item: unknown): item is Query_expression {
 }
 
 export interface Real_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'Real_type';
     precision?: Precision_spec
 }
@@ -1749,7 +1749,7 @@ export function isSelect_list(item: unknown): item is Select_list {
 }
 
 export interface Select_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'Select_type';
     select?: Select_extension | Select_list
 }
@@ -1773,7 +1773,7 @@ export function isSelector(item: unknown): item is Selector {
 }
 
 export interface Set_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'Set_type';
     bound?: Bound_spec
     type: Instantiable_type
@@ -1877,7 +1877,7 @@ export function isSubtype_declaration(item: unknown): item is Subtype_declaratio
 }
 
 export interface Supertype_expression extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: One_of | Subtype_constraint | Subtype_constraint_body | Subtype_declaration | Supertype_factor;
     readonly $type: 'Supertype_expression';
     factors: Array<Supertype_factor>
 }
@@ -2075,7 +2075,7 @@ export function isWhile_control(item: unknown): item is While_control {
 }
 
 export interface Width_spec extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | One_of | Rule_head | Set_type | Subtype_constraint | Subtype_constraint_body | Subtype_constraint_head | Supertype_factor | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
     readonly $type: 'Width_spec';
     isFixed?: 'FIXED'
     width: Width
@@ -2352,7 +2352,12 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
                 return this.isSubtype(Complex_Primary_ref, supertype) || this.isSubtype(NamedResource, supertype) || this.isSubtype(NamedType, supertype);
             }
             case Entity_ref: {
-                return this.isSubtype(Instantiable_type, supertype) || this.isSubtype(Supertype_term, supertype);
+                return this.isSubtype(Instantiable_type, supertype);
+            }
+            case EntityRef:
+            case One_of:
+            case Supertype_expression: {
+                return this.isSubtype(Supertype_term, supertype);
             }
             case Enumeration_type:
             case Select_type: {
@@ -2379,10 +2384,6 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
             }
             case Numeric_expression: {
                 return this.isSubtype(Bound_1, supertype) || this.isSubtype(Bound_2, supertype) || this.isSubtype(Increment, supertype) || this.isSubtype(Index, supertype) || this.isSubtype(Precision_spec, supertype) || this.isSubtype(Width, supertype);
-            }
-            case One_of:
-            case Supertype_expression: {
-                return this.isSubtype(Supertype_term, supertype);
             }
             case Parameter_id:
             case Variable_id: {

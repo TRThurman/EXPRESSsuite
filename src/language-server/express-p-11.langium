@@ -22,7 +22,7 @@ Subtype_declaration: 'SUBTYPE' 'OF' "(" entities+=EntityRef ( "," entities+=Enti
 
 Abstract_supertype_declaration: "ABSTRACT" "SUPERTYPE" constraint=Subtype_constraint? ;
 Subtype_constraint: "OF" "(" type=Supertype_expression ")" ;
-Supertype_term: One_of | "(" Supertype_expression ")" | Entity_ref ;
+Supertype_term: One_of | "(" Supertype_expression ")" | EntityRef ;
 One_of: "ONEOF" "(" types+=Supertype_expression ( "," types+=Supertype_expression )* ")" ;
 Abstract_entity_declaration returns string: "ABSTRACT";
 Supertype_rule: "SUPERTYPE" constraint=Subtype_constraint ;
