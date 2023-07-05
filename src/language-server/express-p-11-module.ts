@@ -16,6 +16,7 @@ import { ExpressP11ScopeProvider } from "./scope-provider";
 import { ExpressP11CodeActionProvider } from "./code-actions";
 import { ExpressP11CompletionProvider } from "./completion-provider";
 import { ExpressP11References } from "./references";
+import { ExpressDocumentValidator } from "../document-validator";
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -40,6 +41,7 @@ export type ExpressP11Services = LangiumServices & ExpressP11AddedServices;
 export const ExpressP11Module: Module<ExpressP11Services, PartialLangiumServices & ExpressP11AddedServices> = {
   validation: {
     ExpressP11Validator: (services) => new ExpressP11Validator(services),
+    DocumentValidator: (services) => new ExpressDocumentValidator(services),
   },
 
   lsp: {
