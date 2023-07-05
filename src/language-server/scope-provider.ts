@@ -3,6 +3,7 @@ import {
   AstNodeDescription,
   DefaultScopeProvider,
   EMPTY_SCOPE,
+  LangiumServices,
   ReferenceInfo,
   Scope,
   getContainerOfType,
@@ -10,12 +11,9 @@ import {
 } from "langium";
 import {
   Assignment_stmt_core,
-  // Assignment_stmt_core,
   Attribute_decl,
   Attribute_qualifier,
   Complex_Primary_body,
-  // Attribute_qualifier,
-  // Constant_factor,
   Entity_decl,
   Entity_head,
   Explicit_attr,
@@ -23,24 +21,12 @@ import {
   Inverse_attr,
   Parameter_id,
   Procedure_call_Or_Assigment_stmt_ref,
-  // Entity_head,
-  // Explicit_attr,
-  // Group_qualifier,
-  // Parameter_id,
-  // Procedure_call_Or_Assigment_stmt_ref,
-  // Qualifiable_ref,
-  // Qualified_Rep,
   Qualified_attribute,
   Reference_clause,
   Schema_decl,
   isAlias_stmt,
   isAssignment_stmt_core,
-  // isAssignment_stmt_core,
-  // isAttribute_decl,
-  // isAttribute_id,
   isAttribute_qualifier,
-  //@ts-ignore
-  isAttribute_ref,
   isBuilt_in_constant_or_function,
   isComplex_Primary_body,
   isComplex_Primary_id,
@@ -48,16 +34,9 @@ import {
   isEntity_decl,
   isExplicit_attr,
   isFunction_decl,
-  //@ts-ignore
   isGeneral_ref,
   isGroup_qualifier,
   isInverse_attr,
-  //@ts-ignore
-  isPrimary,
-  //@ts-ignore
-  isQualifiable_factor,
-  // isQualifiable_ref,
-  // isQualified_Rep,
   isQualified_attribute,
   isReference_clause,
   isResource_or_rename,
@@ -69,10 +48,8 @@ import {
   getDataTypesFromAttribute,
   getDataTypesFromParameterId,
   getDerivedAttributes,
-  // getDataTypesFromAttribute,
-  // getDataTypesFromParameterId,
   getExplicitAttributeDeclarations,
-  getSuperTypes,
+  getFullSubSuperGraph,
 } from "../utils/entity-helpers";
 import {
   getFunctionLocalConstants,
@@ -81,6 +58,7 @@ import {
   getStatementVariables,
 } from "../utils/function-helpers";
 import { isProcedure_call_Or_Assigment_stmt_ref } from "./generated/ast";
+import { ExpressP11References } from "./references";
 
 export type CustomExpressDescription<T> = {
   nameInScope: string;
@@ -88,6 +66,12 @@ export type CustomExpressDescription<T> = {
 };
 
 export class ExpressP11ScopeProvider extends DefaultScopeProvider {
+  private readonly p11References: ExpressP11References;
+
+  constructor(services: LangiumServices) {
+    super(services);
+    this.p11References = services.references.References as ExpressP11References;
+  }
   //TODO: manage renamed resources
   toAstNodeDescription(customExpressDescription: CustomExpressDescription<AstNode>): AstNodeDescription {
     return this.descriptions.createDescription(customExpressDescription.node, customExpressDescription.nameInScope);
@@ -268,7 +252,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
       //        |
       if (isQualified_attribute(context.container.$container)) {
         const leftEntityDataType = getContainerOfType(context.container, isEntity_decl);
-        getSuperTypes(leftEntityDataType).forEach((supertype) => {
+        getFullSubSuperGraph(leftEntityDataType, this.p11References).forEach((supertype) => {
           leftSideTypeOptions.push(
             this.toAstNodeDescription({ nameInScope: supertype.nameInScope, node: supertype.node.head })
           );
@@ -302,7 +286,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
             case "SELF":
               const entity = getContainerOfType(context.container, isEntity_decl);
               if (entity) {
-                getSuperTypes(entity).forEach((supertype) => {
+                getFullSubSuperGraph(entity, this.p11References).forEach((supertype) => {
                   leftSideTypeOptions.push(
                     this.toAstNodeDescription({ nameInScope: supertype.nameInScope, node: supertype.node.head })
                   );
@@ -416,7 +400,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
                   const localEntity = getContainerOfType(qualifiedRep, isEntity_decl);
                   if (localEntity) {
                     dataTypesInScope.push(localEntity);
-                    getSuperTypes(localEntity).forEach((e) => dataTypesInScope.push(e.node));
+                    getFullSubSuperGraph(localEntity, this.p11References).forEach((e) => dataTypesInScope.push(e.node));
                   }
                   break;
               }
