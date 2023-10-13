@@ -1,6 +1,10 @@
 import {
   createDefaultModule,
+  //@ts-ignore
   createDefaultSharedModule,
+  DeepPartial,
+  //@ts-ignore
+  DefaultDocumentBuilder,
   DefaultSharedModuleContext,
   inject,
   LangiumServices,
@@ -9,14 +13,24 @@ import {
   PartialLangiumServices,
 } from "langium";
 import { ExpressP11GeneratedModule, ExpressP11GeneratedSharedModule } from "./generated/module";
-import { ExpressP11Validator, registerValidationChecks } from "./express-p-11-validator";
-import { ExpressP11DocumentSymbolProvider } from "./document-symbol-provider";
-import { ExpressP11ScopeComputation } from "./scope-computation";
-import { ExpressP11ScopeProvider } from "./scope-provider";
-import { ExpressP11CodeActionProvider } from "./code-actions";
-import { ExpressP11CompletionProvider } from "./completion-provider";
-import { ExpressP11References } from "./references";
-import { ExpressDocumentValidator } from "../document-validator";
+import { ExpressP11Validator, registerValidationChecks } from "./express-p11-validator";
+import { ExpressP11DocumentSymbolProvider } from "./express-p11-document-symbol-provider";
+
+import { ExpressP11ScopeComputation } from "./express-p11-scope-computation";
+
+import { ExpressP11ScopeProvider } from "./express-p11-scope-provider";
+import { ExpressP11CodeActionProvider } from "./express-p11-code-action-provider";
+
+import { ExpressP11CompletionProvider } from "./express-p11-completion-provider";
+import { ExpressP11References } from "./express-p11-references";
+import { ExpressDocumentValidator } from "./express-p11-document-validator";
+
+import { ExpressP11DocumentBuilder } from "./express-p11-document-builder";
+import { ExpressP11NameProvider } from "./express-p11-name-provider";
+import { ScopingCache } from "../utils/caching";
+import { ExpressP11IndexManager } from "./express-p11-index-manager";
+import { ExpressP11NodeKindProvider } from "./express-p11-node-kind-provider";
+import { ExpressP11TypeContainer } from "./express-p11-type-container";
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -25,25 +39,52 @@ export type ExpressP11AddedServices = {
   validation: {
     ExpressP11Validator: ExpressP11Validator;
   };
+  caching: {
+    CustomCache: ScopingCache;
+  };
+  shared: ExpressP11SharedServices;
 };
 
+export type ExpressP11AddedSharedServices = {
+  workspace: {
+    DocumentBuilder: ExpressP11DocumentBuilder;
+    IndexManager: ExpressP11IndexManager;
+    TypeContainer: ExpressP11TypeContainer;
+  };
+  lsp: {
+    NodeKindProvider: ExpressP11NodeKindProvider;
+  };
+};
+
+export const ExpressP11SharedModule: Module<ExpressP11SharedServices, DeepPartial<ExpressP11SharedServices>> = {
+  workspace: {
+    DocumentBuilder: (services) => new ExpressP11DocumentBuilder(services),
+    IndexManager: (services) => new ExpressP11IndexManager(services),
+    TypeContainer: (services) => new ExpressP11TypeContainer(services),
+  },
+  lsp: {
+    NodeKindProvider: () => new ExpressP11NodeKindProvider(),
+  },
+};
 /**
  * Union of Langium default services and your custom services - use this as constructor parameter
  * of custom service classes.
  */
 export type ExpressP11Services = LangiumServices & ExpressP11AddedServices;
-
+export type ExpressP11SharedServices = LangiumSharedServices & ExpressP11AddedSharedServices;
 /**
  * Dependency injection module that overrides Langium default services and contributes the
  * declared custom services. The Langium defaults can be partially specified to override only
  * selected services, while the custom services must be fully specified.
  */
-export const ExpressP11Module: Module<ExpressP11Services, PartialLangiumServices & ExpressP11AddedServices> = {
+export const ExpressP11Module: Module<ExpressP11Services, DeepPartial<ExpressP11Services>> = {
   validation: {
     ExpressP11Validator: (services) => new ExpressP11Validator(services),
     DocumentValidator: (services) => new ExpressDocumentValidator(services),
   },
-
+  caching: {
+    CustomCache: (services) => new ScopingCache(services),
+  },
   lsp: {
     DocumentSymbolProvider: (services) => new ExpressP11DocumentSymbolProvider(services),
     CodeActionProvider: () => new ExpressP11CodeActionProvider(),
@@ -53,8 +94,14 @@ export const ExpressP11Module: Module<ExpressP11Services, PartialLangiumServices
     ScopeComputation: (services) => new ExpressP11ScopeComputation(services),
     References: (services) => new ExpressP11References(services),
     ScopeProvider: (services) => new ExpressP11ScopeProvider(services),
+    NameProvider: () => new ExpressP11NameProvider(),
   },
 };
+
+export interface ExpressP11SharedModuleContext extends DefaultSharedModuleContext {
+  module?: Module<ExpressP11Services, DeepPartial<ExpressP11Services>>;
+  sharedModule?: Module<ExpressP11SharedServices, DeepPartial<ExpressP11SharedServices>>;
+}
 
 /**
  * Create the full set of services required by Langium.
@@ -71,14 +118,24 @@ export const ExpressP11Module: Module<ExpressP11Services, PartialLangiumServices
  * @param context Optional module context with the LSP connection
  * @returns An object wrapping the shared services and the language-specific services
  */
-export function createExpressP11Services(context: DefaultSharedModuleContext): {
-  shared: LangiumSharedServices;
+export function createExpressP11Services(context: ExpressP11SharedModuleContext): {
+  shared: ExpressP11SharedServices;
   ExpressP11: ExpressP11Services;
 } {
-  const shared = inject(createDefaultSharedModule(context), ExpressP11GeneratedSharedModule);
-  const ExpressP11 = inject(createDefaultModule({ shared }), ExpressP11GeneratedModule, ExpressP11Module);
+  const shared = inject(
+    createDefaultSharedModule(context),
+    ExpressP11GeneratedSharedModule,
+    ExpressP11SharedModule,
+    context.sharedModule
+  );
+  const ExpressP11 = inject(
+    createDefaultModule({ shared }),
+    ExpressP11GeneratedModule,
+    ExpressP11Module,
+    context.module
+  );
   shared.ServiceRegistry.register(ExpressP11);
-  registerValidationChecks(ExpressP11);
+  //   registerValidationChecks(ExpressP11);
   return { shared, ExpressP11 };
 }
 

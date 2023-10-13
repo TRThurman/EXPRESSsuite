@@ -1,8 +1,8 @@
 {
-  "name": "EasyExpress",
+  "name": "easyexpress",
   "displayName": "EasyExpress",
   "description": "Please enter a brief description here",
-  "version": "0.0.1",
+  "version": "0.2.1",
   "engines": {
     "vscode": "^1.67.0"
   },
@@ -50,7 +50,8 @@
   },
   "main": "./out/extension.js",
   "scripts": {
-    "vscode:prepublish": "npm run build && npm run lint",
+    "vscode:prepublish": "tsc --noEmit && npm run lint && node esbuild.mjs --minify",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
     "build": "tsc -b tsconfig.json",
     "watch": "tsc -b tsconfig.json --watch",
     "lint": "eslint src --ext ts",
@@ -58,10 +59,10 @@
     "langium:watch": "langium generate --watch"
   },
   "dependencies": {
-    "chevrotain": "~10.4.2",
     "chalk": "~4.1.2",
+    "chevrotain": "~10.4.2",
     "commander": "~10.0.0",
-    "langium": "~1.2.0",
+    "langium": "^1.2.0",
     "vscode-languageclient": "~8.0.2",
     "vscode-languageserver": "~8.0.2",
     "vscode-uri": "~3.0.7"
@@ -71,8 +72,9 @@
     "@types/vscode": "~1.67.0",
     "@typescript-eslint/eslint-plugin": "~5.51.0",
     "@typescript-eslint/parser": "~5.51.0",
+    "esbuild": "^0.18.17",
     "eslint": "~8.33.0",
-    "langium-cli": "~1.2.0",
+    "langium-cli": "^1.2.0",
     "typescript": "~4.9.5"
   }
 }

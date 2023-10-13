@@ -6,7 +6,7 @@
     "sourceMap": true,
     "outDir": "out",
     "strict": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noImplicitReturns": true,
     "noImplicitOverride": true,
     "moduleResolution": "node",
@@ -14,11 +14,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-     "src/**/*.ts"
-  ],
-  "exclude": [
-     "out",
-     "node_modules"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["out", "node_modules"]
 }

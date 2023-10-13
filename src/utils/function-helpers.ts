@@ -1,20 +1,29 @@
 import { DocumentSymbol } from "vscode-languageserver";
 import {
   Constant_body,
-  Function_decl,
+  EntityDefinition,
+  FunctionDefinition,
   Parameter_id,
   Query_expression,
   Repeat_stmt,
-  Schema_decl,
+  SchemaDefinition,
   Variable_id,
-  isFunction_decl,
+  isFormal_parameter,
+  isFunctionDefinition,
+  isLocal_variable,
+  isParameter_id,
   isQuery_expression,
   isRepeat_stmt,
+  isVariable_id,
 } from "../language-server/generated/ast";
 import { ExpressKind, getDocumentSymbol } from "./general";
 import { AstNode } from "langium";
+// import { getDirectTypesFromParameterType } from "./entity-helpers";
+import { CustomExpressDescription } from "../language-server/express-p11-scope-provider";
+import { getTypesFromParameterType } from "./entity-helpers";
+import { ExpressP11References } from "../language-server/express-p11-references";
 
-export const getFunctionDocumentSymbols = (schema: Schema_decl): DocumentSymbol[] => {
+export const getFunctionDocumentSymbols = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
   var funcDeclarations = getFunctionDeclarations(schema);
   if (funcDeclarations) {
@@ -28,18 +37,18 @@ export const getFunctionDocumentSymbols = (schema: Schema_decl): DocumentSymbol[
   return symbols;
 };
 
-export const getFunctionDeclarations = (schema: Schema_decl): Function_decl[] | undefined => {
+export const getFunctionDeclarations = (schema: SchemaDefinition): FunctionDefinition[] | undefined => {
   if (!schema) return;
 
-  var typeDeclarations = schema.body.declarations.filter((d) => isFunction_decl(d)) as Function_decl[];
-  return typeDeclarations.filter((f) => f.head && f.head.name);
+  var typeDeclarations = schema.body.declarations.filter((d) => isFunctionDefinition(d)) as FunctionDefinition[];
+  return typeDeclarations.filter((f) => f.head && f.name);
 };
 
-export const getFunctionDocumentSymbol = (func: Function_decl): DocumentSymbol | undefined => {
+export const getFunctionDocumentSymbol = (func: FunctionDefinition): DocumentSymbol | undefined => {
   if (func && func.$cstNode && func.head.$cstNode) {
     const typeSymbol = getDocumentSymbol(
       ExpressKind.Function,
-      func.head.name,
+      func.name,
       func.$cstNode.range,
       func.head.$cstNode.range
     );
@@ -48,16 +57,16 @@ export const getFunctionDocumentSymbol = (func: Function_decl): DocumentSymbol |
   return;
 };
 
-export const getFunctionParameters = (func: Function_decl): Parameter_id[] => {
+export const getFunctionParameters = (func: FunctionDefinition): Parameter_id[] => {
   return func.head.parameters.map((p) => p.ids).flat(1);
 };
 
-export const getFunctionLocalVariables = (func: Function_decl): Variable_id[] => {
+export const getFunctionLocalVariables = (func: FunctionDefinition): Variable_id[] => {
   if (!func.algoHead?.local) return [];
   return func.algoHead.local?.variables.map((v) => v.ids).flat(1);
 };
 
-export const getFunctionLocalConstants = (func: Function_decl): Constant_body[] => {
+export const getFunctionLocalConstants = (func: FunctionDefinition): Constant_body[] => {
   if (!func.algoHead?.constant) return [];
 
   return func.algoHead.constant.items;
@@ -93,4 +102,26 @@ export const extractVariableFromStmt = (stmt: AstNode): Variable_id | undefined 
       return query.variable;
   }
   return;
+};
+
+export const getFunctionParameterType = (
+  parameter: Parameter_id,
+  references: ExpressP11References
+): CustomExpressDescription<EntityDefinition>[] => {
+  if (isParameter_id(parameter) && isFormal_parameter(parameter.$container)) {
+    const parameterType = parameter.$container.type;
+    return getTypesFromParameterType(parameterType, references);
+  }
+  return [];
+};
+
+export const getVariableType = (
+  variable: Variable_id,
+  references: ExpressP11References
+): CustomExpressDescription<EntityDefinition>[] => {
+  if (isVariable_id(variable) && isLocal_variable(variable.$container)) {
+    const parameterType = variable.$container.type;
+    return getTypesFromParameterType(parameterType, references);
+  }
+  return [];
 };

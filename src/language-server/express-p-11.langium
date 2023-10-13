@@ -2,18 +2,19 @@ grammar ExpressP11
 
 
 entry ExpressFile: Syntax;
-Schema_decl: "SCHEMA" name=Simple_id schema_version_id=String_literal? ";" body=Schema_body "END_SCHEMA" ";" ;
+Syntax: schemas+=SchemaDefinition (schemas+=SchemaDefinition)*;
+
+SchemaDefinition: "SCHEMA" name=Simple_id schema_version_id=String_literal? ";" body=Schema_body "END_SCHEMA" ";" ;
 Schema_body: specifications+=Interface_specification* constant=Constant_decl? declarations+=(Declaration | Rule_decl)* ;
-Schema_id returns string: Simple_id ;
-Declaration: Entity_decl | Function_decl | Procedure_decl | Subtype_constraint_decl | Type_decl ;
+
+Declaration: EntityDefinition | FunctionDefinition | ProcedureDefinition | SubtypeConstraintDefinition | TypeDefinition ;
 Rule_decl: ruleHead=Rule_head algoHead=Algorithm_head stmts+=Stmt* where=Where_clause "END_RULE" ";" ;
 
 
 
 
-
-Entity_decl: head=Entity_head body=Entity_body 'END_ENTITY' ";" ;
-Entity_head: 'ENTITY' name=Simple_id types=Subsuper ";" ;
+//ENTITY
+EntityDefinition: 'ENTITY' name=Simple_id types=Subsuper ";" body=Entity_body 'END_ENTITY' ";" ;
 Entity_body: attributes+=Explicit_attr* derived=Derive_clause? inverse=Inverse_clause? unique=Unique_clause? (where=Where_clause)? ;
 
 Subsuper: subtypes=Supertype_constraint? supertypes=Subtype_declaration? ;
@@ -28,12 +29,14 @@ Abstract_entity_declaration returns string: "ABSTRACT";
 Supertype_rule: "SUPERTYPE" constraint=Subtype_constraint ;
 
 Explicit_attr: attributes+=Attribute_decl ( "," attributes+=Attribute_decl )* ":" isOptional?="OPTIONAL"? type=Parameter_type ";" ;
-Inverse_attr: attribute=Attribute_decl ":" ( ( "SET" | "BAG" ) bound=Bound_spec? "OF" )? ofEntity=[Entity_head:Simple_id] "FOR" ( forEntity=[Entity_head:Simple_id] "." )? forAttribute=[Attribute_decl:Simple_id] ";" ;
+Inverse_attr: attribute=Attribute_decl ":" ( ( "SET" | "BAG" ) bound=Bound_spec? "OF" )? type=[EntityDefinition:Simple_id] "FOR" ( forEntity=[EntityDefinition:Simple_id] "." )? forAttribute=[Attribute_decl:Simple_id] ";" ;
 
 Attribute_decl : Redeclared_attribute | Attribute_id ;
 Attribute_id : name=Simple_id;
+Redeclared_attribute: qualifiedAttribute=Qualified_attribute (isRenamed?="RENAMED" name=Simple_id)? ; 
+
 Parameter_type : Generalized_types | Simple_types | Named_types ;
-type NamedType = Entity_head | Type_decl |Resource_or_rename;
+type NamedType = EntityDefinition | TypeDefinition;
 Named_types: of=[NamedType:Simple_id] ;
 Simple_types  : Binary_type | Boolean_type | Integer_type | Logical_type | Number_type | Real_type | String_type ;
 Binary_type: "BINARY" Width_spec? ;
@@ -96,17 +99,15 @@ Where_clause: "WHERE" (rules+=Domain_rule)+ ;
 
 
 // TODO
-Syntax: schemas+=Schema_decl (schemas+=Schema_decl)*;
 Interface_specification: Reference_clause | Use_clause ;
 
-Procedure_decl: head=Procedure_head algoHead=Algorithm_head stmts+=Stmt* "END_PROCEDURE" ";" ;
-Procedure_head: "PROCEDURE" name=Procedure_id ( "(" "VAR"? parameters+=Formal_parameter ( ";" "VAR"? parameters+=Formal_parameter )* ")")? ";" ;
+ProcedureDefinition:"PROCEDURE" name=Procedure_id head=Procedure_head algoHead=Algorithm_head stmts+=Stmt* "END_PROCEDURE" ";" ;
+Procedure_head:  ( "(" "VAR"? parameters+=Formal_parameter ( ";" "VAR"? parameters+=Formal_parameter )* ")")? ";" ;
 Procedure_id returns string: Simple_id ;
 
+SubtypeConstraintDefinition: "SUBTYPE_CONSTRAINT" name=Simple_id "FOR" type=Entity_ref ";" body=Subtype_constraint_body "END_SUBTYPE_CONSTRAINT" ";" ;
 Subtype_constraint_body: isAbstract?=Abstract_supertype? totalOver=Total_over? (supertypeExpress=Supertype_expression ";")? ;
-Subtype_constraint_decl: head=Subtype_constraint_head body=Subtype_constraint_body "END_SUBTYPE_CONSTRAINT" ";" ;
-Subtype_constraint_head: "SUBTYPE_CONSTRAINT" name=Subtype_constraint_id "FOR" type=Entity_ref ";" ;
-Subtype_constraint_id returns string: Simple_id ;
+
 Abstract_supertype returns string: "ABSTRACT" "SUPERTYPE" ";" ;
 
 Supertype_expression: factors+=Supertype_factor ( "ANDOR" factors+=Supertype_factor )* ;
@@ -131,9 +132,8 @@ Supertype_factor: terms+=Supertype_term ( "AND" terms+=Supertype_term )* ;
 Encoded_string_literal returns string: "\"" Encoded_character+ "\"" ;
 Encoded_character returns string: Octet Octet Octet Octet;
 Octet returns string: Hex_digit Hex_digit ;
-Hex_digit returns string: Digit | "a" | "b" | "c" | "d" | "e" | "f" ;
+Hex_digit returns string: Digit | Hex ;
 
-Redeclared_attribute: qualifiedAttribute=Qualified_attribute (isRenamed?="RENAMED" name=Simple_id)? ; 
 
 
 Aggregate_type: "AGGREGATE" ( ":" type=Type_label )? "OF" of=Parameter_type ;
@@ -150,9 +150,9 @@ Type_label_id returns string: Simple_id ;
 
 
 Numeric_expression: Simple_expression ;
-Simple_expression  : left=Term ( op=Add_like_op right=Term )* ;
-Term: left=Factor ( op=Multiplication_like_op right=Factor )* ;
-Factor: factors+=Simple_factor ( "**" factors+=Simple_factor )? ;
+Simple_expression  : Term ({infer BinaryExpression.left = current} op=Add_like_op right=Term )* ;
+Term: Factor ({infer BinaryExpression.left=current} op=Multiplication_like_op right=Factor )* ;
+Factor: Simple_factor ({infer Factor.principal = current} "**" exp=Simple_factor )? ;
 
 /* 
 Simple_factor:  Aggregate_initializer | Interval | Query_expression  | Temp |Entity_constructor | Enumeration_reference ;
@@ -167,28 +167,28 @@ type GeneralAndAttribute = Attribute_decl | Parameter_id | Variable_id ;
 Constant_factor: constant=Built_in_constant;// | Constant_ref ;
 */
 
-Simple_factor:  Aggregate_initializer | Interval | Query_expression  | Temp  ;
+Simple_factor:  Aggregate_initializer | Interval | Query_expression  | (op=Unary_op? ( "(" expression=Expression ")" | primary=Primary ))  ;
 Temp:  op=Unary_op? ( "(" expression=Expression ")" | primary=Primary )  ;
 Primary: Literal | Complex_Primary  ;
-Complex_Primary: head=(Built_in_constant_or_function | Complex_Primary_id) body=Complex_Primary_body;
+Complex_Primary: head=(Built_in_constant_or_function | Complex_Primary_reference) body=Complex_Primary_body;
 // TODO: due to syntax, attribute_qualifier has to be used for enum_ref if head is type_ref
 
 Complex_Primary_body: parameterList=Actual_parameter_list? qualifiers+=Qualifier*;
 Built_in_constant_or_function returns string: Built_in_constant | Built_in_function;
-Complex_Primary_id: to=[Complex_Primary_ref:Simple_id];
-type Complex_Primary_ref = Entity_head|Function_head|Attribute_decl|Parameter_id|Variable_id|Constant_body;
+Complex_Primary_reference: to=[Complex_Primary_id:Simple_id];
+type Complex_Primary_id = EntityDefinition|FunctionDefinition|Attribute_decl|Parameter_id|Variable_id|Constant_body;
 // TODO: enum_ref needs to be added since it can be used as head without type_ref
 
 Attribute_ref: target=[Attribute_decl:Simple_id] ;
 // Constant_ref returns string: Constant_id ;
-Entity_ref: to=[Entity_head:Simple_id];
+Entity_ref: to=[EntityDefinition:Simple_id];
 //Enumeration_ref returns string: Enumeration_id ;
-Function_ref: function=[Function_head:Simple_id]; //returns string: Function_id ;
+Function_ref: function=[FunctionDefinition:Simple_id]; //returns string: Function_id ;
 Parameter_ref : parameterReferenceTo=[Parameter_id:Simple_id] ;
 Procedure_ref returns string: Procedure_id ;
 //Rule_label_ref returns string: Rule_label_id ;
 //Rule_ref returns string: Rule_id ;
-Schema_ref returns string: Schema_id ;
+
 
 //Schema_ref returns string:  ;
 //Subtype_constraint_ref returns string: Subtype_constraint_id ;
@@ -216,24 +216,24 @@ Compound_stmt  : "BEGIN" body+=Stmt+ "END" ";" ;
 Constant_body: name=Simple_id ":" type=Instantiable_type ":=" expression=Expression ";" ;
 // Constant_id returns string: Simple_id ;
 Derived_attr: attribute=Attribute_decl ":" type=Parameter_type ":=" expression=Expression ";" ;
-Domain_rule: (id=Simple_id ":")? expr=Expression";";
+Domain_rule: (id=Simple_id ":")? rule=Expression";";
 Element: expression=Expression  (":" rep=Repetition)?  ;
-Entity_constructor: type=[Entity_head:Simple_id] "(" ( expr+=Expression ( "," expr+=Expression )* )? ")" ;
+Entity_constructor: type=[EntityDefinition:Simple_id] "(" ( expr+=Expression ( "," expr+=Expression )* )? ")" ;
 Entity_id returns string: Simple_id ;
 Enumeration_id: name=Simple_id ;
-Enumeration_reference:  (type=[Type_decl:Simple_id] "." )? ref=[Enumeration_id:Simple_id] ; //check
+Enumeration_reference:  (type=[TypeDefinition:Simple_id] "." )? ref=[Enumeration_id:Simple_id] ; //check
 Escape_stmt returns string: "ESCAPE" ";" ;
-Expression: left=Simple_expression (op=Rel_op_extended right=Simple_expression)? ;
-Formal_parameter: ids+=Parameter_id ( "," ids+=Parameter_id )* ":" type=Parameter_type ;
+Expression: Simple_expression ({infer Expression.left = current} op=Rel_op_extended right=Simple_expression)? ;
 Function_call: fct=( Built_in_function | Function_ref ) paramterList=Actual_parameter_list ;
-Function_decl: head=Function_head algoHead=Algorithm_head stmts+=Stmt+ "END_FUNCTION" ";" ;
-Function_head: "FUNCTION" name=Simple_id ( "(" parameters+=Formal_parameter ( ";" parameters+=Formal_parameter )* ")" )? ":" returnType=Parameter_type ";" ;
+FunctionDefinition:"FUNCTION" name=Simple_id head=Function_head algoHead=Algorithm_head stmts+=Stmt+ "END_FUNCTION" ";" ;
+Function_head:  ( "(" parameters+=Formal_parameter ( ";" parameters+=Formal_parameter )* ")" )? ":" returnType=Parameter_type ";" ;
+Formal_parameter: ids+=Parameter_id ( "," ids+=Parameter_id )* ":" type=Parameter_type ;
 Function_id returns string: Simple_id ;
 General_ref: reference=[GeneralRef] ;
 type GeneralRef = Parameter_id | Variable_id;
 
-Group_qualifier: "\\" entity=[Entity_head:Simple_id]  ;
-EntityRef: entity=[Entity_head:Simple_id];
+Group_qualifier: "\\" entity=[EntityDefinition:Simple_id]  ;
+EntityRef: entity=[EntityDefinition:Simple_id];
 If_stmt  : "IF" condition=Logical_expression "THEN" body+=Stmt+ ("ELSE" elseBody+=Stmt+)? "END_IF" ";" ;
 Increment: Numeric_expression ;
 Increment_control: var=Variable_id ":=" lowerBound=Bound_1 "TO" upperBound=Bound_2  ("BY" increment=Increment)?  ;
@@ -250,18 +250,18 @@ Local_decl: "LOCAL" variables+=Local_variable+ "END_LOCAL" ";" ;
 Local_variable: ids+=Variable_id ( "," ids+=Variable_id)* ":" type=Parameter_type ( ":=" Expression )? ";" ;
 Logical_expression: Expression ;
 Multiplication_like_op returns string: "*" | "/" | "DIV" | "MOD" | "AND" | "||" ;
-Named_type_or_rename: namedType=[NamedType:Simple_id] (isRenamed?="AS" name=( Simple_id ) )? ;
+Named_type_or_rename: resource=[NamedType:Simple_id] (isRenamed?="AS" name=( Simple_id ) )? ;
 Null_stmt returns string: ";" ;
 Parameter: Expression ;
 Parameter_id: name=Simple_id ;
-Population: entity=[Entity_head:Simple_id];// returns string: Entity_ref ;
+Population: entity=[EntityDefinition:Simple_id];// returns string: Entity_ref ;
 Procedure_call_stmt  : name=( Built_in_procedure | Procedure_ref ) parameterList=Actual_parameter_list ";" ;
 Qualified_attribute : "SELF" group=Group_qualifier attribute=Attribute_qualifier ;
 Qualifier: Attribute_qualifier | Group_qualifier | Index_qualifier ;
 Query_expression: "QUERY" "(" variable=Variable_id "<*" source=Aggregate_source "|" expression=Logical_expression ")" ;
 Referenced_attribute : Attribute_ref | Qualified_attribute ;
 //Reference_clause: "REFERENCE" "FROM" schema=Schema_ref  "(" resources+=Resource_or_rename  ("," resources+=Resource_or_rename)*  ")"  ";" ;
-Reference_clause: "REFERENCE" "FROM" schema=[Schema_decl:Simple_id]  ("(" resources+=Resource_or_rename  ("," resources+=Resource_or_rename)*  ")")?  ";" ;
+Reference_clause: "REFERENCE" "FROM" schema=[SchemaDefinition:Simple_id]  ("(" resources+=Resource_or_rename  ("," resources+=Resource_or_rename)*  ")")?  ";" ;
 Rel_op returns string: "<=" | ">=" | "<>" | "=" | ":<>:" | ":=:" | "<" | ">" ;
 Rel_op_extended returns string: Rel_op | "IN" | "LIKE" ;
 // Rename_id returns string: Constant_id | Entity_id | Function_id | Procedure_id | Type_id ;
@@ -273,7 +273,7 @@ Resource_or_rename: resource=[NamedResource:Simple_id] (isRenamed?="AS" name=Sim
 // Resource: ref=[Entity_head:Simple_id];
 // Rename: sourceName=[Entity_head:Simple_id] "AS" ref=Simple_id;
 //Resource_ref returns string: Constant_ref | Entity_ref | Function_ref | Procedure_ref | Type_ref ;
-type NamedResource = Entity_head|Function_head|Procedure_head|Constant_body|Type_decl;
+type NamedResource = EntityDefinition|FunctionDefinition|ProcedureDefinition|Constant_body|TypeDefinition;
 Return_stmt  : "RETURN" ( "(" expression=Expression ")" )? ";" ;
 Rule_head: "RULE" name=Rule_id "FOR" "(" types+=Entity_ref ("," types+=Entity_ref )* ")" ";" ;
 Rule_id returns string: Simple_id ;
@@ -282,20 +282,21 @@ Selector: expression=Expression ;
 Skip_stmt returns string: "SKIP" ";" ;
 
 Stmt: Alias_stmt |  Case_stmt | Compound_stmt | Escape_stmt | If_stmt | Null_stmt | Procedure_call_Or_Assigment_stmt | Repeat_stmt | Return_stmt | Skip_stmt ;
+
 // CUSTOM grammar fragment
-Procedure_call_Or_Assigment_stmt: head=(Built_in_procedure|Procedure_call_Or_Assigment_stmt_ref) core=(Actual_parameter_list | Assignment_stmt_core) ";";
-Procedure_call_Or_Assigment_stmt_ref: to=[Procedure_call_Or_Assigment_stmt_id];
-Assignment_stmt_core: qualifiers+=Qualifier* ":=" expression=Expression;
-type Procedure_call_Or_Assigment_stmt_id = General_id | Procedure_head;
+Procedure_call_Or_Assigment_stmt: head=(Built_in_procedure|Procedure_call_Or_Assigment_stmt_reference) body=(Actual_parameter_list | Assignment_stmt_body) ";";
+Procedure_call_Or_Assigment_stmt_reference: to=[Procedure_call_Or_Assigment_stmt_id];
+Assignment_stmt_body: qualifiers+=Qualifier* ":=" expression=Expression;
+type Procedure_call_Or_Assigment_stmt_id = Variable_id | Parameter_id | ProcedureDefinition;
 type General_id = Variable_id | Parameter_id;
 
 Total_over: "TOTAL_OVER" "(" entities+=Entity_ref ( "," entities+=Entity_ref )? ")" ";" ;
-Type_decl: "TYPE" name=Simple_id "=" underlyingType=Underlying_type ";" where=Where_clause? "END_TYPE" ";" ;
+TypeDefinition: "TYPE" name=Simple_id "=" underlyingType=Underlying_type ";" where=Where_clause? "END_TYPE" ";" ;
 Type_id returns string: Simple_id ;
 Unary_op returns string: "+" | "-" | "NOT" ;
 Unique_rule: ( name=Rule_label_id ":" )? attributes+=Referenced_attribute ( "," attributes+=Referenced_attribute )* ";" ;
 Until_control: "UNTIL" expression=Logical_expression ;
-Use_clause: "USE" "FROM" schema=[Schema_decl:Simple_id] ( "(" types+=Named_type_or_rename ( "," types+=Named_type_or_rename )* ")" )? ";" ;
+Use_clause: "USE" "FROM" schema=[SchemaDefinition:Simple_id] ( "(" resources+=Named_type_or_rename ( "," resources+=Named_type_or_rename )* ")" )? ";" ;
 Variable_id: name=Simple_id ;
 While_control: "WHILE" expression=Logical_expression ;
 
@@ -304,13 +305,14 @@ While_control: "WHILE" expression=Logical_expression ;
 terminal Self returns string: "SELF";
 terminal Simple_id returns string: ID ;
 terminal Slash returns string:("\\");
-terminal NUM returns string: /\d+((\.\d+)?([eE][\-+]?\d+)?)?/;
+terminal NUM returns string: /(\d+(\.?[eE]?[-+]?\d+)?)/;
 terminal SIMPLE_STRING returns string: /\'(\\.|\\\\|[^'])*\'/;
 terminal BINARY_LITERAL returns string:/(%[0-1]+)/;
 hidden terminal WS: /\s+/;
 hidden terminal SL_COMMENT:/(\-\-)[^\n\r]*/;
 hidden terminal ML_COMMENT: /\(\*[\s\S]*?\*\)/;
 terminal ID: /[_a-zA-Z][\w_]*/;
+terminal Hex returns string: ('a'..'f');
 terminal Digit returns string: ('0'..'9');
 terminal Letter: ('a'..'z') ;
 terminal Not_paren_star_quote_special: "!" | '"' | "#" | "$" | "%" | "&" | "+" | "," | "-" | "." |

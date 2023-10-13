@@ -14,25 +14,24 @@ import {
 } from "langium";
 import {
   Attribute_decl,
+  EntityDefinition,
   ExpressP11AstType,
   Reference_clause,
-  Schema_decl,
+  SchemaDefinition,
   Use_clause,
   isConstant_body,
-  isEntity_decl,
-  isEntity_head,
+  isEntityDefinition,
   isFunction_head,
   isProcedure_head,
   isReference_clause,
   isResource_or_rename,
-  isType_decl,
+  isSchemaDefinition,
+  isTypeDefinition,
   isUse_clause,
 } from "./generated/ast";
-import type { ExpressP11Services } from "./express-p-11-module";
-import { Entity_decl } from "./generated/ast";
+import type { ExpressP11Services } from "./express-p11-module";
 import { schemaHasDeclarations } from "../utils/schema-helpers";
 import { getReferenceSpecifications, getUseSpecifications } from "../utils/interface-helpers";
-import { isSchema_decl } from "./generated/ast";
 
 /**
  * Register custom validation checks.
@@ -40,9 +39,7 @@ import { isSchema_decl } from "./generated/ast";
 export function registerValidationChecks(services: ExpressP11Services) {
   const registry = services.validation.ValidationRegistry;
   const validator = services.validation.ExpressP11Validator;
-  const checks: ValidationChecks<ExpressP11AstType> = {
-    Schema_decl: [validator.checkUniqueEntityName, validator.checkReferencesAreImported],
-  };
+  const checks: ValidationChecks<ExpressP11AstType> = {};
   registry.register(checks, validator);
 }
 
@@ -97,21 +94,21 @@ export class ExpressP11Validator {
     }
   }
 
-  checkUniqueEntityName(schema: Schema_decl, accept: ValidationAcceptor): void {
+  checkUniqueEntityName(schema: SchemaDefinition, accept: ValidationAcceptor): void {
     const reported = new Set();
     if (!schemaHasDeclarations(schema)) return;
     // var allDeclarations: Declaration[] = schema.body.declarations.filter(
     //   (d) => d.$type == "Declaration"
     // ) as Declaration[];
-    var entityDeclarations = schema.body.declarations.filter((d) => isEntity_decl(d)) as Entity_decl[];
+    var entityDeclarations = schema.body.declarations.filter((d) => isEntityDefinition(d)) as EntityDefinition[];
     entityDeclarations.forEach((e) => {
-      if (reported.has(e.head.name)) {
-        accept("error", `Entity has non-unique name '${e.head.name}'.`, {
-          node: e.head,
+      if (reported.has(e.name)) {
+        accept("error", `Entity has non-unique name '${e.name}'.`, {
+          node: e,
           property: "name",
         });
       }
-      reported.add(e.head.name);
+      reported.add(e.name);
     });
   }
 
@@ -140,81 +137,85 @@ export class ExpressP11Validator {
     listOfUseFromClauses.forEach((useFrom) => {
       //if (!referenceFrom.schema.ref) return;
       //referenceClauses.set(referenceFrom.schema.$refText, referenceFrom);
-      useFrom.types.forEach((resourceDeclaration) => {
-        if (!resourceDeclaration.namedType.ref) return;
+      useFrom.resources.forEach((resourceDeclaration) => {
+        if (!resourceDeclaration.resource.ref) return;
         const resourceName = resourceDeclaration.isRenamed
           ? resourceDeclaration.name
-          : resourceDeclaration.namedType.$refText;
+          : resourceDeclaration.resource.$refText;
         if (!resourceName) return;
         usedResources.add(useFrom.schema.$refText, {
           name: resourceName,
-          node: resourceDeclaration.namedType.ref,
+          node: resourceDeclaration.resource.ref,
         });
       });
     });
     return usedResources;
   }
-  checkReferencesAreImported(schema: Schema_decl, accept: ValidationAcceptor): void {
-    const referenceSpecifications = getReferenceSpecifications(schema);
-    const useSpecifications = getUseSpecifications(schema);
-    if (!schema.name) return;
-    let importedResourcesIndex = this.buildImportedResourcesIndex(referenceSpecifications);
-    this.buildUsedResourcesIndex(useSpecifications).forEach((value, key) => importedResourcesIndex.add(key, value));
-    const currentSchemaName = schema.name;
+  checkReferencesAreImported(schema: SchemaDefinition, accept: ValidationAcceptor): void {
+    try {
+      const referenceSpecifications = getReferenceSpecifications(schema);
+      const useSpecifications = getUseSpecifications(schema);
+      if (!schema.name) return;
+      let importedResourcesIndex = this.buildImportedResourcesIndex(referenceSpecifications);
+      this.buildUsedResourcesIndex(useSpecifications).forEach((value, key) => importedResourcesIndex.add(key, value));
+      const currentSchemaName = schema.name;
 
-    for (const node of streamAst(schema)) {
-      streamReferences(node).forEach((resourceNeeded) => {
-        if (
-          isResource_or_rename(resourceNeeded.container) ||
-          isReference_clause(resourceNeeded.container) ||
-          isUse_clause(resourceNeeded.container)
-        )
-          return;
+      for (const node of streamAst(schema)) {
+        streamReferences(node).forEach((resourceNeeded) => {
+          if (
+            isResource_or_rename(resourceNeeded.container) ||
+            isReference_clause(resourceNeeded.container) ||
+            isUse_clause(resourceNeeded.container)
+          )
+            return;
 
-        //console.log(resourceNeeded.reference.ref);
-        if (!resourceNeeded.reference.$nodeDescription) return;
-        const reference = resourceNeeded.reference.ref;
-        if (
-          !isEntity_head(reference) &&
-          !isType_decl(reference) &&
-          !isConstant_body(reference) &&
-          !isFunction_head(reference) &&
-          !isProcedure_head(reference)
-        )
-          return;
+          //console.log(resourceNeeded.reference.ref);
+          if (!resourceNeeded.reference.$nodeDescription) return;
+          const reference = resourceNeeded.reference.ref;
+          if (
+            !isEntityDefinition(reference) &&
+            !isTypeDefinition(reference) &&
+            !isConstant_body(reference) &&
+            !isFunction_head(reference) &&
+            !isProcedure_head(reference)
+          )
+            return;
 
-        const schemaNeeded = getContainerOfType(resourceNeeded.reference.ref, isSchema_decl);
-        if (!schemaNeeded || !schemaNeeded.name) return;
-        if (schemaNeeded.name === currentSchemaName) return;
+          const schemaNeeded = getContainerOfType(resourceNeeded.reference.ref, isSchemaDefinition);
+          if (!schemaNeeded || !schemaNeeded.name) return;
+          if (schemaNeeded.name === currentSchemaName) return;
 
-        const resourceImported = importedResourcesIndex
-          .get(schemaNeeded.name)
-          .find((ref) => ref.node === resourceNeeded.reference.ref);
+          const resourceImported = importedResourcesIndex
+            .get(schemaNeeded.name)
+            .find((ref) => ref.node === resourceNeeded.reference.ref);
 
-        if (!resourceImported) {
-          const schemaIsAlreadyImported = importedResourcesIndex.has(schemaNeeded.name);
-          this.issueReferenceStatementDiagnostic(
-            currentSchemaName,
-            schemaIsAlreadyImported,
-            schemaNeeded,
-            resourceNeeded,
-            accept
-          );
-          return;
-        }
+          if (!resourceImported) {
+            const schemaIsAlreadyImported = importedResourcesIndex.has(schemaNeeded.name);
+            this.issueReferenceStatementDiagnostic(
+              currentSchemaName,
+              schemaIsAlreadyImported,
+              schemaNeeded,
+              resourceNeeded,
+              accept
+            );
+            return;
+          }
 
-        if (resourceImported.name !== resourceNeeded.reference.$refText) {
-          this.issueRenameReferenceDiagnostic(resourceImported, accept, resourceNeeded);
-          return;
-        }
-      });
+          if (resourceImported.name !== resourceNeeded.reference.$refText) {
+            this.issueRenameReferenceDiagnostic(resourceImported, accept, resourceNeeded);
+            return;
+          }
+        });
+      }
+    } catch (error) {
+      console.log("ERROR VALIDATION");
     }
   }
 
   private issueReferenceStatementDiagnostic(
     sourceSchema: string,
     schemaIsAlreadyImported: boolean,
-    schemaNeeded: Schema_decl,
+    schemaNeeded: SchemaDefinition,
     resourceNeeded: ReferenceInfo,
     accept: ValidationAcceptor
   ) {

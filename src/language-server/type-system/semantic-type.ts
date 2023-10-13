@@ -1,23 +1,28 @@
 import { AstNode } from "langium";
-import { Entity_decl, Entity_head, Select_list, Select_type, Type_decl, Underlying_type } from "../generated/ast";
+import {
+  EntityDefinition,
+  Select_type,
+  Underlying_type,
+  isEntityDefinition,
+  isSelect_list,
+  isTypeDefinition,
+} from "../generated/ast";
 
-export const extractTypes = (type: Underlying_type): Entity_decl[] => {
+export const extractTypes = (type: Underlying_type): EntityDefinition[] => {
   switch (type.$type) {
     case Select_type:
-      return extractFromSelectType(type as Select_type);
+      return extractFromSelectType(type);
   }
   return [];
 };
 
-const extractFromSelectType = (selectType: AstNode): Entity_decl[] => {
-  const select = selectType as Select_type;
-  const results: Entity_decl[] = [];
+const extractFromSelectType = (select: Select_type): EntityDefinition[] => {
+  const results: EntityDefinition[] = [];
   if (!select.select) return [];
-  if (select.select.$type === Select_list) {
-    (select.select as Select_list).types.forEach((type) => {
-      // console.log(`${type.ref?.$type}`);
-      if (type.ref?.$type === Entity_head) results.push((type.ref as Entity_head).$container as Entity_decl);
-      if (type.ref?.$type === Type_decl) results.push(...extractTypes((type.ref as Type_decl).underlyingType));
+  if (isSelect_list(select.select)) {
+    select.select.types.forEach((type) => {
+      if (isEntityDefinition(type.ref)) results.push(type.ref);
+      if (isTypeDefinition(type.ref)) results.push(...extractTypes(type.ref.underlyingType));
     });
   }
   return results;

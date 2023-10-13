@@ -106,12 +106,12 @@ export function isBuilt_in_procedure(item: unknown): item is Built_in_procedure 
     return item === 'INSERT' || item === 'REMOVE';
 }
 
-export type Complex_Primary_ref = Attribute_decl | Constant_body | Entity_head | Function_head | Parameter_id | Variable_id;
+export type Complex_Primary_id = Attribute_decl | Constant_body | EntityDefinition | FunctionDefinition | Parameter_id | Variable_id;
 
-export const Complex_Primary_ref = 'Complex_Primary_ref';
+export const Complex_Primary_id = 'Complex_Primary_id';
 
-export function isComplex_Primary_ref(item: unknown): item is Complex_Primary_ref {
-    return reflection.isInstance(item, Complex_Primary_ref);
+export function isComplex_Primary_id(item: unknown): item is Complex_Primary_id {
+    return reflection.isInstance(item, Complex_Primary_id);
 }
 
 export type Concrete_types = Aggregation_types | Simple_types;
@@ -130,7 +130,7 @@ export function isConstructed_types(item: unknown): item is Constructed_types {
     return reflection.isInstance(item, Constructed_types);
 }
 
-export type Declaration = Entity_decl | Function_decl | Procedure_decl | Subtype_constraint_decl | Type_decl;
+export type Declaration = EntityDefinition | FunctionDefinition | ProcedureDefinition | SubtypeConstraintDefinition | TypeDefinition;
 
 export const Declaration = 'Declaration';
 
@@ -208,10 +208,10 @@ export function isGeneralRef(item: unknown): item is GeneralRef {
     return reflection.isInstance(item, GeneralRef);
 }
 
-export type Hex_digit = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | string;
+export type Hex_digit = string;
 
 export function isHex_digit(item: unknown): item is Hex_digit {
-    return item === 'a' || item === 'b' || item === 'c' || item === 'd' || item === 'e' || item === 'f' || (typeof item === 'string' && (/[0-9]/.test(item)));
+    return (typeof item === 'string' && (/[0-9]/.test(item) || /[a-f]/.test(item)));
 }
 
 export type Increment = Numeric_expression;
@@ -324,7 +324,7 @@ export function isMultiplication_like_op(item: unknown): item is Multiplication_
     return item === '*' || item === '/' || item === 'DIV' || item === 'MOD' || item === 'AND' || item === '||';
 }
 
-export type NamedResource = Constant_body | Entity_head | Function_head | Procedure_head | Type_decl;
+export type NamedResource = Constant_body | EntityDefinition | FunctionDefinition | ProcedureDefinition | TypeDefinition;
 
 export const NamedResource = 'NamedResource';
 
@@ -332,7 +332,7 @@ export function isNamedResource(item: unknown): item is NamedResource {
     return reflection.isInstance(item, NamedResource);
 }
 
-export type NamedType = Entity_head | Resource_or_rename | Type_decl;
+export type NamedType = EntityDefinition | TypeDefinition;
 
 export const NamedType = 'NamedType';
 
@@ -398,7 +398,7 @@ export function isPrimary(item: unknown): item is Primary {
     return reflection.isInstance(item, Primary);
 }
 
-export type Procedure_call_Or_Assigment_stmt_id = General_id | Procedure_head;
+export type Procedure_call_Or_Assigment_stmt_id = Parameter_id | ProcedureDefinition | Variable_id;
 
 export const Procedure_call_Or_Assigment_stmt_id = 'Procedure_call_Or_Assigment_stmt_id';
 
@@ -454,20 +454,12 @@ export function isRule_label_id(item: unknown): item is Rule_label_id {
     return (typeof item === 'string' && (/([_a-zA-Z][\w_]*)/.test(item)));
 }
 
-export type Schema_id = string;
+export type Simple_expression = BinaryExpression | Term;
 
-export function isSchema_id(item: unknown): item is Schema_id {
-    return (typeof item === 'string' && (/([_a-zA-Z][\w_]*)/.test(item)));
-}
+export const Simple_expression = 'Simple_expression';
 
-export type Schema_ref = Schema_id;
-
-export type Simple_factor = Aggregate_initializer | Interval | Query_expression | Temp;
-
-export const Simple_factor = 'Simple_factor';
-
-export function isSimple_factor(item: unknown): item is Simple_factor {
-    return reflection.isInstance(item, Simple_factor);
+export function isSimple_expression(item: unknown): item is Simple_expression {
+    return reflection.isInstance(item, Simple_expression);
 }
 
 export type Simple_types = Binary_type | Real_type | String_type;
@@ -506,12 +498,6 @@ export function isString_type(item: unknown): item is String_type {
     return reflection.isInstance(item, String_type);
 }
 
-export type Subtype_constraint_id = string;
-
-export function isSubtype_constraint_id(item: unknown): item is Subtype_constraint_id {
-    return (typeof item === 'string' && (/([_a-zA-Z][\w_]*)/.test(item)));
-}
-
 export type Supertype_constraint = Abstract_supertype_declaration | Supertype_rule;
 
 export const Supertype_constraint = 'Supertype_constraint';
@@ -526,6 +512,14 @@ export const Supertype_term = 'Supertype_term';
 
 export function isSupertype_term(item: unknown): item is Supertype_term {
     return reflection.isInstance(item, Supertype_term);
+}
+
+export type Term = BinaryExpression | Factor;
+
+export const Term = 'Term';
+
+export function isTerm(item: unknown): item is Term {
+    return reflection.isInstance(item, Term);
 }
 
 export type Type_id = string;
@@ -592,18 +586,6 @@ export function isActual_parameter_list(item: unknown): item is Actual_parameter
     return reflection.isInstance(item, Actual_parameter_list);
 }
 
-export interface Aggregate_initializer extends AstNode {
-    readonly $container: Factor;
-    readonly $type: 'Aggregate_initializer';
-    elts: Array<Element>
-}
-
-export const Aggregate_initializer = 'Aggregate_initializer';
-
-export function isAggregate_initializer(item: unknown): item is Aggregate_initializer {
-    return reflection.isInstance(item, Aggregate_initializer);
-}
-
 export interface Aggregate_source extends AstNode {
     readonly $container: Query_expression;
     readonly $type: 'Aggregate_source';
@@ -617,7 +599,7 @@ export function isAggregate_source(item: unknown): item is Aggregate_source {
 }
 
 export interface Aggregate_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Aggregate_type';
     of: Parameter_type
     type?: Type_label
@@ -630,7 +612,7 @@ export function isAggregate_type(item: unknown): item is Aggregate_type {
 }
 
 export interface Algorithm_head extends AstNode {
-    readonly $container: Function_decl | Procedure_decl | Rule_decl;
+    readonly $container: FunctionDefinition | ProcedureDefinition | Rule_decl;
     readonly $type: 'Algorithm_head';
     constant?: Constant_decl
     declarations: Array<Declaration>
@@ -644,7 +626,7 @@ export function isAlgorithm_head(item: unknown): item is Algorithm_head {
 }
 
 export interface Alias_stmt extends AstNode {
-    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | Function_decl | If_stmt | Procedure_decl | Repeat_stmt | Rule_decl;
+    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | FunctionDefinition | If_stmt | ProcedureDefinition | Repeat_stmt | Rule_decl;
     readonly $type: 'Alias_stmt';
     qual: Qualifier
     stmts: Array<Stmt>
@@ -659,7 +641,7 @@ export function isAlias_stmt(item: unknown): item is Alias_stmt {
 }
 
 export interface Array_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Array_type';
     bound: Bound_spec
     isOptional: boolean
@@ -686,21 +668,21 @@ export function isAssignment_stmt(item: unknown): item is Assignment_stmt {
     return reflection.isInstance(item, Assignment_stmt);
 }
 
-export interface Assignment_stmt_core extends AstNode {
+export interface Assignment_stmt_body extends AstNode {
     readonly $container: Procedure_call_Or_Assigment_stmt;
-    readonly $type: 'Assignment_stmt_core';
+    readonly $type: 'Assignment_stmt_body';
     expression: Expression
     qualifiers: Array<Qualifier>
 }
 
-export const Assignment_stmt_core = 'Assignment_stmt_core';
+export const Assignment_stmt_body = 'Assignment_stmt_body';
 
-export function isAssignment_stmt_core(item: unknown): item is Assignment_stmt_core {
-    return reflection.isInstance(item, Assignment_stmt_core);
+export function isAssignment_stmt_body(item: unknown): item is Assignment_stmt_body {
+    return reflection.isInstance(item, Assignment_stmt_body);
 }
 
 export interface Attribute_id extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'Attribute_id';
     name: string
 }
@@ -712,7 +694,7 @@ export function isAttribute_id(item: unknown): item is Attribute_id {
 }
 
 export interface Attribute_qualifier extends AstNode {
-    readonly $container: Alias_stmt | Assignment_stmt | Assignment_stmt_core | Complex_Primary_body | Qualified_attribute;
+    readonly $container: Alias_stmt | Assignment_stmt | Assignment_stmt_body | Complex_Primary_body | Qualified_attribute;
     readonly $type: 'Attribute_qualifier';
     target: Reference<Attribute_decl>
 }
@@ -736,7 +718,7 @@ export function isAttribute_ref(item: unknown): item is Attribute_ref {
 }
 
 export interface Bag_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Bag_type';
     bound?: Bound_spec
     type: Instantiable_type
@@ -746,6 +728,20 @@ export const Bag_type = 'Bag_type';
 
 export function isBag_type(item: unknown): item is Bag_type {
     return reflection.isInstance(item, Bag_type);
+}
+
+export interface BinaryExpression extends AstNode {
+    readonly $container: Actual_parameter_list | Aggregate_source | Assignment_stmt | Assignment_stmt_body | BinaryExpression | Bound_spec | Case_label | Constant_body | Derived_attr | Domain_rule | Element | Entity_constructor | Expression | Factor | If_stmt | Increment_control | Index_qualifier | Interval | Local_decl | Query_expression | Real_type | Repetition | Return_stmt | Selector | Simple_factor | Temp | Until_control | While_control | Width_spec;
+    readonly $type: 'BinaryExpression';
+    left: Factor | Term
+    op: Add_like_op | Multiplication_like_op
+    right: Factor | Term
+}
+
+export const BinaryExpression = 'BinaryExpression';
+
+export function isBinaryExpression(item: unknown): item is BinaryExpression {
+    return reflection.isInstance(item, BinaryExpression);
 }
 
 export interface Bound_spec extends AstNode {
@@ -787,7 +783,7 @@ export function isCase_label(item: unknown): item is Case_label {
 }
 
 export interface Case_stmt extends AstNode {
-    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | Function_decl | If_stmt | Procedure_decl | Repeat_stmt | Rule_decl;
+    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | FunctionDefinition | If_stmt | ProcedureDefinition | Repeat_stmt | Rule_decl;
     readonly $type: 'Case_stmt';
     action?: Case_action
     selector: Selector
@@ -801,10 +797,10 @@ export function isCase_stmt(item: unknown): item is Case_stmt {
 }
 
 export interface Complex_Primary extends AstNode {
-    readonly $container: Temp;
+    readonly $container: Simple_factor | Temp;
     readonly $type: 'Complex_Primary';
     body: Complex_Primary_body
-    head: Built_in_constant_or_function | Complex_Primary_id
+    head: Built_in_constant_or_function | Complex_Primary_reference
 }
 
 export const Complex_Primary = 'Complex_Primary';
@@ -826,20 +822,20 @@ export function isComplex_Primary_body(item: unknown): item is Complex_Primary_b
     return reflection.isInstance(item, Complex_Primary_body);
 }
 
-export interface Complex_Primary_id extends AstNode {
+export interface Complex_Primary_reference extends AstNode {
     readonly $container: Complex_Primary;
-    readonly $type: 'Complex_Primary_id';
-    to: Reference<Complex_Primary_ref>
+    readonly $type: 'Complex_Primary_reference';
+    to: Reference<Complex_Primary_id>
 }
 
-export const Complex_Primary_id = 'Complex_Primary_id';
+export const Complex_Primary_reference = 'Complex_Primary_reference';
 
-export function isComplex_Primary_id(item: unknown): item is Complex_Primary_id {
-    return reflection.isInstance(item, Complex_Primary_id);
+export function isComplex_Primary_reference(item: unknown): item is Complex_Primary_reference {
+    return reflection.isInstance(item, Complex_Primary_reference);
 }
 
 export interface Compound_stmt extends AstNode {
-    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | Function_decl | If_stmt | Procedure_decl | Repeat_stmt | Rule_decl;
+    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | FunctionDefinition | If_stmt | ProcedureDefinition | Repeat_stmt | Rule_decl;
     readonly $type: 'Compound_stmt';
     body: Array<Stmt>
 }
@@ -851,7 +847,7 @@ export function isCompound_stmt(item: unknown): item is Compound_stmt {
 }
 
 export interface Constant_body extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'Constant_body';
     expression: Expression
     name: string
@@ -905,8 +901,8 @@ export function isDerived_attr(item: unknown): item is Derived_attr {
 export interface Domain_rule extends AstNode {
     readonly $container: Where_clause;
     readonly $type: 'Domain_rule';
-    expr: Expression
     id?: string
+    rule: Expression
 }
 
 export const Domain_rule = 'Domain_rule';
@@ -929,7 +925,7 @@ export function isElement(item: unknown): item is Element {
 }
 
 export interface Entity_body extends AstNode {
-    readonly $container: Entity_decl;
+    readonly $container: EntityDefinition;
     readonly $type: 'Entity_body';
     attributes: Array<Explicit_attr>
     derived?: Derive_clause
@@ -947,7 +943,7 @@ export function isEntity_body(item: unknown): item is Entity_body {
 export interface Entity_constructor extends AstNode {
     readonly $type: 'Entity_constructor';
     expr: Array<Expression>
-    type: Reference<Entity_head>
+    type: Reference<EntityDefinition>
 }
 
 export const Entity_constructor = 'Entity_constructor';
@@ -956,36 +952,10 @@ export function isEntity_constructor(item: unknown): item is Entity_constructor 
     return reflection.isInstance(item, Entity_constructor);
 }
 
-export interface Entity_decl extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
-    readonly $type: 'Entity_decl';
-    body: Entity_body
-    head: Entity_head
-}
-
-export const Entity_decl = 'Entity_decl';
-
-export function isEntity_decl(item: unknown): item is Entity_decl {
-    return reflection.isInstance(item, Entity_decl);
-}
-
-export interface Entity_head extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
-    readonly $type: 'Entity_head';
-    name: string
-    types: Subsuper
-}
-
-export const Entity_head = 'Entity_head';
-
-export function isEntity_head(item: unknown): item is Entity_head {
-    return reflection.isInstance(item, Entity_head);
-}
-
 export interface Entity_ref extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Entity_ref';
-    to: Reference<Entity_head>
+    to: Reference<EntityDefinition>
 }
 
 export const Entity_ref = 'Entity_ref';
@@ -994,10 +964,24 @@ export function isEntity_ref(item: unknown): item is Entity_ref {
     return reflection.isInstance(item, Entity_ref);
 }
 
+export interface EntityDefinition extends AstNode {
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $type: 'EntityDefinition';
+    body: Entity_body
+    name: string
+    types: Subsuper
+}
+
+export const EntityDefinition = 'EntityDefinition';
+
+export function isEntityDefinition(item: unknown): item is EntityDefinition {
+    return reflection.isInstance(item, EntityDefinition);
+}
+
 export interface EntityRef extends AstNode {
     readonly $container: One_of | Subtype_constraint | Subtype_constraint_body | Subtype_declaration | Supertype_factor;
     readonly $type: 'EntityRef';
-    entity: Reference<Entity_head>
+    entity: Reference<EntityDefinition>
 }
 
 export const EntityRef = 'EntityRef';
@@ -1046,7 +1030,7 @@ export function isEnumeration_items(item: unknown): item is Enumeration_items {
 export interface Enumeration_reference extends AstNode {
     readonly $type: 'Enumeration_reference';
     ref: Reference<Enumeration_id>
-    type?: Reference<Type_decl>
+    type?: Reference<TypeDefinition>
 }
 
 export const Enumeration_reference = 'Enumeration_reference';
@@ -1056,7 +1040,7 @@ export function isEnumeration_reference(item: unknown): item is Enumeration_refe
 }
 
 export interface Enumeration_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Enumeration_type';
     extension?: Enumeration_extension
     isExtensible: boolean
@@ -1084,9 +1068,10 @@ export function isExplicit_attr(item: unknown): item is Explicit_attr {
 }
 
 export interface Factor extends AstNode {
-    readonly $container: Term;
-    readonly $type: 'Factor';
-    factors: Array<Simple_factor>
+    readonly $container: Actual_parameter_list | Aggregate_source | Assignment_stmt | Assignment_stmt_body | BinaryExpression | Bound_spec | Case_label | Constant_body | Derived_attr | Domain_rule | Element | Entity_constructor | Expression | Factor | If_stmt | Increment_control | Index_qualifier | Interval | Local_decl | Query_expression | Real_type | Repetition | Return_stmt | Selector | Simple_factor | Temp | Until_control | While_control | Width_spec;
+    readonly $type: 'Aggregate_initializer' | 'Factor' | 'Interval' | 'Query_expression' | 'Simple_factor';
+    exp: Simple_factor
+    principal: Simple_factor
 }
 
 export const Factor = 'Factor';
@@ -1120,24 +1105,9 @@ export function isFunction_call(item: unknown): item is Function_call {
     return reflection.isInstance(item, Function_call);
 }
 
-export interface Function_decl extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
-    readonly $type: 'Function_decl';
-    algoHead: Algorithm_head
-    head: Function_head
-    stmts: Array<Stmt>
-}
-
-export const Function_decl = 'Function_decl';
-
-export function isFunction_decl(item: unknown): item is Function_decl {
-    return reflection.isInstance(item, Function_decl);
-}
-
 export interface Function_head extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
+    readonly $container: FunctionDefinition;
     readonly $type: 'Function_head';
-    name: string
     parameters: Array<Formal_parameter>
     returnType: Parameter_type
 }
@@ -1151,7 +1121,7 @@ export function isFunction_head(item: unknown): item is Function_head {
 export interface Function_ref extends AstNode {
     readonly $container: Function_call;
     readonly $type: 'Function_ref';
-    function: Reference<Function_head>
+    function: Reference<FunctionDefinition>
 }
 
 export const Function_ref = 'Function_ref';
@@ -1160,8 +1130,23 @@ export function isFunction_ref(item: unknown): item is Function_ref {
     return reflection.isInstance(item, Function_ref);
 }
 
+export interface FunctionDefinition extends AstNode {
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $type: 'FunctionDefinition';
+    algoHead: Algorithm_head
+    head: Function_head
+    name: string
+    stmts: Array<Stmt>
+}
+
+export const FunctionDefinition = 'FunctionDefinition';
+
+export function isFunctionDefinition(item: unknown): item is FunctionDefinition {
+    return reflection.isInstance(item, FunctionDefinition);
+}
+
 export interface General_array_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'General_array_type';
     bound?: Bound_spec
     isOptional: boolean
@@ -1176,7 +1161,7 @@ export function isGeneral_array_type(item: unknown): item is General_array_type 
 }
 
 export interface General_bag_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'General_bag_type';
     bound?: Bound_spec
     type: Parameter_type
@@ -1189,7 +1174,7 @@ export function isGeneral_bag_type(item: unknown): item is General_bag_type {
 }
 
 export interface General_list_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'General_list_type';
     bound?: Bound_spec
     isUnique: boolean
@@ -1215,7 +1200,7 @@ export function isGeneral_ref(item: unknown): item is General_ref {
 }
 
 export interface General_set_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'General_set_type';
     bound?: Bound_spec
     type: Parameter_type
@@ -1228,7 +1213,7 @@ export function isGeneral_set_type(item: unknown): item is General_set_type {
 }
 
 export interface Generic_entity_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Generic_entity_type';
     type?: Type_label
 }
@@ -1240,7 +1225,7 @@ export function isGeneric_entity_type(item: unknown): item is Generic_entity_typ
 }
 
 export interface Generic_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Generic_type';
     type?: Type_label
 }
@@ -1252,9 +1237,9 @@ export function isGeneric_type(item: unknown): item is Generic_type {
 }
 
 export interface Group_qualifier extends AstNode {
-    readonly $container: Alias_stmt | Assignment_stmt | Assignment_stmt_core | Complex_Primary_body | Qualified_attribute;
+    readonly $container: Alias_stmt | Assignment_stmt | Assignment_stmt_body | Complex_Primary_body | Qualified_attribute;
     readonly $type: 'Group_qualifier';
-    entity: Reference<Entity_head>
+    entity: Reference<EntityDefinition>
 }
 
 export const Group_qualifier = 'Group_qualifier';
@@ -1264,7 +1249,7 @@ export function isGroup_qualifier(item: unknown): item is Group_qualifier {
 }
 
 export interface If_stmt extends AstNode {
-    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | Function_decl | If_stmt | Procedure_decl | Repeat_stmt | Rule_decl;
+    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | FunctionDefinition | If_stmt | ProcedureDefinition | Repeat_stmt | Rule_decl;
     readonly $type: 'If_stmt';
     body: Array<Stmt>
     condition: Logical_expression
@@ -1293,7 +1278,7 @@ export function isIncrement_control(item: unknown): item is Increment_control {
 }
 
 export interface Index_qualifier extends AstNode {
-    readonly $container: Alias_stmt | Assignment_stmt | Assignment_stmt_core | Complex_Primary_body | Qualified_attribute;
+    readonly $container: Alias_stmt | Assignment_stmt | Assignment_stmt_body | Complex_Primary_body | Qualified_attribute;
     readonly $type: 'Index_qualifier';
     index1: Index_1
     index2?: Index_2
@@ -1305,30 +1290,14 @@ export function isIndex_qualifier(item: unknown): item is Index_qualifier {
     return reflection.isInstance(item, Index_qualifier);
 }
 
-export interface Interval extends AstNode {
-    readonly $container: Factor;
-    readonly $type: 'Interval';
-    firstInterval: Interval_op
-    high: Interval_high
-    item: Interval_item
-    low: Interval_low
-    secondInterval: Interval_op
-}
-
-export const Interval = 'Interval';
-
-export function isInterval(item: unknown): item is Interval {
-    return reflection.isInstance(item, Interval);
-}
-
 export interface Inverse_attr extends AstNode {
     readonly $container: Inverse_clause;
     readonly $type: 'Inverse_attr';
     attribute: Attribute_decl
     bound?: Bound_spec
     forAttribute: Reference<Attribute_decl>
-    forEntity?: Reference<Entity_head>
-    ofEntity: Reference<Entity_head>
+    forEntity?: Reference<EntityDefinition>
+    type: Reference<EntityDefinition>
 }
 
 export const Inverse_attr = 'Inverse_attr';
@@ -1350,7 +1319,7 @@ export function isInverse_clause(item: unknown): item is Inverse_clause {
 }
 
 export interface List_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'List_type';
     bound?: Bound_spec
     isUnique: boolean
@@ -1364,7 +1333,7 @@ export function isList_type(item: unknown): item is List_type {
 }
 
 export interface Literal extends AstNode {
-    readonly $container: Temp;
+    readonly $container: Simple_factor | Temp;
     readonly $type: 'Literal';
     value: Logical_literal | String_literal | string
 }
@@ -1388,8 +1357,8 @@ export function isLocal_decl(item: unknown): item is Local_decl {
 }
 
 export interface Local_variable extends AstNode {
-    readonly $container: Actual_parameter_list | Assignment_stmt | Assignment_stmt_core | Case_label | Constant_body | Derived_attr | Domain_rule | Element | Entity_constructor | If_stmt | Local_decl | Query_expression | Return_stmt | Selector | Temp | Until_control | While_control;
-    readonly $type: 'Expression' | 'Local_variable';
+    readonly $container: Actual_parameter_list | Aggregate_source | Assignment_stmt | Assignment_stmt_body | BinaryExpression | Bound_spec | Case_label | Constant_body | Derived_attr | Domain_rule | Element | Entity_constructor | Expression | Factor | If_stmt | Increment_control | Index_qualifier | Interval | Local_decl | Query_expression | Real_type | Repetition | Return_stmt | Selector | Simple_factor | Temp | Until_control | While_control | Width_spec;
+    readonly $type: 'Aggregate_initializer' | 'BinaryExpression' | 'Expression' | 'Factor' | 'Interval' | 'Local_variable' | 'Query_expression' | 'Simple_expression' | 'Simple_factor' | 'Term';
     ids: Array<Variable_id>
     type: Parameter_type
 }
@@ -1405,7 +1374,7 @@ export interface Named_type_or_rename extends AstNode {
     readonly $type: 'Named_type_or_rename';
     isRenamed: boolean
     name?: string
-    namedType: Reference<NamedType>
+    resource: Reference<NamedType>
 }
 
 export const Named_type_or_rename = 'Named_type_or_rename';
@@ -1415,7 +1384,7 @@ export function isNamed_type_or_rename(item: unknown): item is Named_type_or_ren
 }
 
 export interface Named_types extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Named_types';
     of: Reference<NamedType>
 }
@@ -1439,7 +1408,7 @@ export function isOne_of(item: unknown): item is One_of {
 }
 
 export interface Parameter_id extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'Parameter_id';
     name: string
 }
@@ -1463,7 +1432,7 @@ export function isParameter_ref(item: unknown): item is Parameter_ref {
 
 export interface Population extends AstNode {
     readonly $type: 'Population';
-    entity: Reference<Entity_head>
+    entity: Reference<EntityDefinition>
 }
 
 export const Population = 'Population';
@@ -1473,10 +1442,10 @@ export function isPopulation(item: unknown): item is Population {
 }
 
 export interface Procedure_call_Or_Assigment_stmt extends AstNode {
-    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | Function_decl | If_stmt | Procedure_decl | Repeat_stmt | Rule_decl;
+    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | FunctionDefinition | If_stmt | ProcedureDefinition | Repeat_stmt | Rule_decl;
     readonly $type: 'Procedure_call_Or_Assigment_stmt';
-    core: Actual_parameter_list | Assignment_stmt_core
-    head: Built_in_procedure | Procedure_call_Or_Assigment_stmt_ref
+    body: Actual_parameter_list | Assignment_stmt_body
+    head: Built_in_procedure | Procedure_call_Or_Assigment_stmt_reference
 }
 
 export const Procedure_call_Or_Assigment_stmt = 'Procedure_call_Or_Assigment_stmt';
@@ -1485,16 +1454,16 @@ export function isProcedure_call_Or_Assigment_stmt(item: unknown): item is Proce
     return reflection.isInstance(item, Procedure_call_Or_Assigment_stmt);
 }
 
-export interface Procedure_call_Or_Assigment_stmt_ref extends AstNode {
+export interface Procedure_call_Or_Assigment_stmt_reference extends AstNode {
     readonly $container: Procedure_call_Or_Assigment_stmt;
-    readonly $type: 'Procedure_call_Or_Assigment_stmt_ref';
+    readonly $type: 'Procedure_call_Or_Assigment_stmt_reference';
     to: Reference<Procedure_call_Or_Assigment_stmt_id>
 }
 
-export const Procedure_call_Or_Assigment_stmt_ref = 'Procedure_call_Or_Assigment_stmt_ref';
+export const Procedure_call_Or_Assigment_stmt_reference = 'Procedure_call_Or_Assigment_stmt_reference';
 
-export function isProcedure_call_Or_Assigment_stmt_ref(item: unknown): item is Procedure_call_Or_Assigment_stmt_ref {
-    return reflection.isInstance(item, Procedure_call_Or_Assigment_stmt_ref);
+export function isProcedure_call_Or_Assigment_stmt_reference(item: unknown): item is Procedure_call_Or_Assigment_stmt_reference {
+    return reflection.isInstance(item, Procedure_call_Or_Assigment_stmt_reference);
 }
 
 export interface Procedure_call_stmt extends AstNode {
@@ -1509,24 +1478,9 @@ export function isProcedure_call_stmt(item: unknown): item is Procedure_call_stm
     return reflection.isInstance(item, Procedure_call_stmt);
 }
 
-export interface Procedure_decl extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
-    readonly $type: 'Procedure_decl';
-    algoHead: Algorithm_head
-    head: Procedure_head
-    stmts: Array<Stmt>
-}
-
-export const Procedure_decl = 'Procedure_decl';
-
-export function isProcedure_decl(item: unknown): item is Procedure_decl {
-    return reflection.isInstance(item, Procedure_decl);
-}
-
 export interface Procedure_head extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
+    readonly $container: ProcedureDefinition;
     readonly $type: 'Procedure_head';
-    name: Procedure_id
     parameters: Array<Formal_parameter>
 }
 
@@ -1534,6 +1488,21 @@ export const Procedure_head = 'Procedure_head';
 
 export function isProcedure_head(item: unknown): item is Procedure_head {
     return reflection.isInstance(item, Procedure_head);
+}
+
+export interface ProcedureDefinition extends AstNode {
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $type: 'ProcedureDefinition';
+    algoHead: Algorithm_head
+    head: Procedure_head
+    name: Procedure_id
+    stmts: Array<Stmt>
+}
+
+export const ProcedureDefinition = 'ProcedureDefinition';
+
+export function isProcedureDefinition(item: unknown): item is ProcedureDefinition {
+    return reflection.isInstance(item, ProcedureDefinition);
 }
 
 export interface Qualified_attribute extends AstNode {
@@ -1549,22 +1518,8 @@ export function isQualified_attribute(item: unknown): item is Qualified_attribut
     return reflection.isInstance(item, Qualified_attribute);
 }
 
-export interface Query_expression extends AstNode {
-    readonly $container: Factor;
-    readonly $type: 'Query_expression';
-    expression: Logical_expression
-    source: Aggregate_source
-    variable: Variable_id
-}
-
-export const Query_expression = 'Query_expression';
-
-export function isQuery_expression(item: unknown): item is Query_expression {
-    return reflection.isInstance(item, Query_expression);
-}
-
 export interface Real_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Real_type';
     precision?: Precision_spec
 }
@@ -1576,7 +1531,7 @@ export function isReal_type(item: unknown): item is Real_type {
 }
 
 export interface Redeclared_attribute extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'Redeclared_attribute';
     isRenamed: boolean
     name?: string
@@ -1593,7 +1548,7 @@ export interface Reference_clause extends AstNode {
     readonly $container: Schema_body;
     readonly $type: 'Reference_clause';
     resources: Array<Resource_or_rename>
-    schema: Reference<Schema_decl>
+    schema: Reference<SchemaDefinition>
 }
 
 export const Reference_clause = 'Reference_clause';
@@ -1617,7 +1572,7 @@ export function isRepeat_control(item: unknown): item is Repeat_control {
 }
 
 export interface Repeat_stmt extends AstNode {
-    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | Function_decl | If_stmt | Procedure_decl | Repeat_stmt | Rule_decl;
+    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | FunctionDefinition | If_stmt | ProcedureDefinition | Repeat_stmt | Rule_decl;
     readonly $type: 'Repeat_stmt';
     body: Array<Stmt>
     control: Repeat_control
@@ -1642,7 +1597,7 @@ export function isRepetition(item: unknown): item is Repetition {
 }
 
 export interface Resource_or_rename extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
+    readonly $container: Reference_clause;
     readonly $type: 'Resource_or_rename';
     isRenamed: boolean
     name?: string
@@ -1656,7 +1611,7 @@ export function isResource_or_rename(item: unknown): item is Resource_or_rename 
 }
 
 export interface Return_stmt extends AstNode {
-    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | Function_decl | If_stmt | Procedure_decl | Repeat_stmt | Rule_decl;
+    readonly $container: Alias_stmt | Case_action | Case_stmt | Compound_stmt | FunctionDefinition | If_stmt | ProcedureDefinition | Repeat_stmt | Rule_decl;
     readonly $type: 'Return_stmt';
     expression?: Expression
 }
@@ -1696,7 +1651,7 @@ export function isRule_head(item: unknown): item is Rule_head {
 }
 
 export interface Schema_body extends AstNode {
-    readonly $container: Schema_decl;
+    readonly $container: SchemaDefinition;
     readonly $type: 'Schema_body';
     constant?: Constant_decl
     declarations: Array<Declaration | Rule_decl>
@@ -1709,18 +1664,18 @@ export function isSchema_body(item: unknown): item is Schema_body {
     return reflection.isInstance(item, Schema_body);
 }
 
-export interface Schema_decl extends AstNode {
+export interface SchemaDefinition extends AstNode {
     readonly $container: Syntax;
-    readonly $type: 'Schema_decl';
+    readonly $type: 'SchemaDefinition';
     body: Schema_body
     name: string
     schema_version_id?: String_literal
 }
 
-export const Schema_decl = 'Schema_decl';
+export const SchemaDefinition = 'SchemaDefinition';
 
-export function isSchema_decl(item: unknown): item is Schema_decl {
-    return reflection.isInstance(item, Schema_decl);
+export function isSchemaDefinition(item: unknown): item is SchemaDefinition {
+    return reflection.isInstance(item, SchemaDefinition);
 }
 
 export interface Select_extension extends AstNode {
@@ -1749,7 +1704,7 @@ export function isSelect_list(item: unknown): item is Select_list {
 }
 
 export interface Select_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Select_type';
     select?: Select_extension | Select_list
 }
@@ -1773,7 +1728,7 @@ export function isSelector(item: unknown): item is Selector {
 }
 
 export interface Set_type extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Set_type';
     bound?: Bound_spec
     type: Instantiable_type
@@ -1785,22 +1740,8 @@ export function isSet_type(item: unknown): item is Set_type {
     return reflection.isInstance(item, Set_type);
 }
 
-export interface Simple_expression extends AstNode {
-    readonly $container: Aggregate_source | Bound_spec | Expression | Increment_control | Index_qualifier | Interval | Real_type | Repetition | Width_spec;
-    readonly $type: 'Simple_expression';
-    left: Term
-    op?: Add_like_op
-    right?: Term
-}
-
-export const Simple_expression = 'Simple_expression';
-
-export function isSimple_expression(item: unknown): item is Simple_expression {
-    return reflection.isInstance(item, Simple_expression);
-}
-
 export interface Subsuper extends AstNode {
-    readonly $container: Entity_head;
+    readonly $container: EntityDefinition;
     readonly $type: 'Subsuper';
     subtypes?: Supertype_constraint
     supertypes?: Subtype_declaration
@@ -1825,7 +1766,7 @@ export function isSubtype_constraint(item: unknown): item is Subtype_constraint 
 }
 
 export interface Subtype_constraint_body extends AstNode {
-    readonly $container: Subtype_constraint_decl;
+    readonly $container: SubtypeConstraintDefinition;
     readonly $type: 'Subtype_constraint_body';
     isAbstract: boolean
     supertypeExpress?: Supertype_expression
@@ -1838,32 +1779,6 @@ export function isSubtype_constraint_body(item: unknown): item is Subtype_constr
     return reflection.isInstance(item, Subtype_constraint_body);
 }
 
-export interface Subtype_constraint_decl extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
-    readonly $type: 'Subtype_constraint_decl';
-    body: Subtype_constraint_body
-    head: Subtype_constraint_head
-}
-
-export const Subtype_constraint_decl = 'Subtype_constraint_decl';
-
-export function isSubtype_constraint_decl(item: unknown): item is Subtype_constraint_decl {
-    return reflection.isInstance(item, Subtype_constraint_decl);
-}
-
-export interface Subtype_constraint_head extends AstNode {
-    readonly $container: Subtype_constraint_decl;
-    readonly $type: 'Subtype_constraint_head';
-    name: Subtype_constraint_id
-    type: Entity_ref
-}
-
-export const Subtype_constraint_head = 'Subtype_constraint_head';
-
-export function isSubtype_constraint_head(item: unknown): item is Subtype_constraint_head {
-    return reflection.isInstance(item, Subtype_constraint_head);
-}
-
 export interface Subtype_declaration extends AstNode {
     readonly $container: Subsuper;
     readonly $type: 'Subtype_declaration';
@@ -1874,6 +1789,20 @@ export const Subtype_declaration = 'Subtype_declaration';
 
 export function isSubtype_declaration(item: unknown): item is Subtype_declaration {
     return reflection.isInstance(item, Subtype_declaration);
+}
+
+export interface SubtypeConstraintDefinition extends AstNode {
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $type: 'SubtypeConstraintDefinition';
+    body: Subtype_constraint_body
+    name: string
+    type: Entity_ref
+}
+
+export const SubtypeConstraintDefinition = 'SubtypeConstraintDefinition';
+
+export function isSubtypeConstraintDefinition(item: unknown): item is SubtypeConstraintDefinition {
+    return reflection.isInstance(item, SubtypeConstraintDefinition);
 }
 
 export interface Supertype_expression extends AstNode {
@@ -1914,7 +1843,7 @@ export function isSupertype_rule(item: unknown): item is Supertype_rule {
 
 export interface Syntax extends AstNode {
     readonly $type: 'Syntax';
-    schemas: Array<Schema_decl>
+    schemas: Array<SchemaDefinition>
 }
 
 export const Syntax = 'Syntax';
@@ -1924,7 +1853,6 @@ export function isSyntax(item: unknown): item is Syntax {
 }
 
 export interface Temp extends AstNode {
-    readonly $container: Factor;
     readonly $type: 'Temp';
     expression?: Expression
     op?: Unary_op
@@ -1935,20 +1863,6 @@ export const Temp = 'Temp';
 
 export function isTemp(item: unknown): item is Temp {
     return reflection.isInstance(item, Temp);
-}
-
-export interface Term extends AstNode {
-    readonly $container: Simple_expression;
-    readonly $type: 'Term';
-    left: Factor
-    op?: Multiplication_like_op
-    right?: Factor
-}
-
-export const Term = 'Term';
-
-export function isTerm(item: unknown): item is Term {
-    return reflection.isInstance(item, Term);
 }
 
 export interface Total_over extends AstNode {
@@ -1963,18 +1877,18 @@ export function isTotal_over(item: unknown): item is Total_over {
     return reflection.isInstance(item, Total_over);
 }
 
-export interface Type_decl extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
-    readonly $type: 'Type_decl';
+export interface TypeDefinition extends AstNode {
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $type: 'TypeDefinition';
     name: string
     underlyingType: Underlying_type
     where?: Where_clause
 }
 
-export const Type_decl = 'Type_decl';
+export const TypeDefinition = 'TypeDefinition';
 
-export function isType_decl(item: unknown): item is Type_decl {
-    return reflection.isInstance(item, Type_decl);
+export function isTypeDefinition(item: unknown): item is TypeDefinition {
+    return reflection.isInstance(item, TypeDefinition);
 }
 
 export interface Unique_clause extends AstNode {
@@ -2017,8 +1931,8 @@ export function isUntil_control(item: unknown): item is Until_control {
 export interface Use_clause extends AstNode {
     readonly $container: Schema_body;
     readonly $type: 'Use_clause';
-    schema: Reference<Schema_decl>
-    types: Array<Named_type_or_rename>
+    resources: Array<Named_type_or_rename>
+    schema: Reference<SchemaDefinition>
 }
 
 export const Use_clause = 'Use_clause';
@@ -2028,7 +1942,7 @@ export function isUse_clause(item: unknown): item is Use_clause {
 }
 
 export interface Variable_id extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Entity_decl | Explicit_attr | Formal_parameter | Function_decl | Increment_control | Inverse_attr | Local_variable | Procedure_decl | Query_expression | Reference_clause | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'Variable_id';
     name: string
 }
@@ -2051,7 +1965,7 @@ export function isVariable_ref(item: unknown): item is Variable_ref {
 }
 
 export interface Where_clause extends AstNode {
-    readonly $container: Entity_body | Rule_decl | Type_decl;
+    readonly $container: Entity_body | Rule_decl | TypeDefinition;
     readonly $type: 'Where_clause';
     rules: Array<Domain_rule>
 }
@@ -2075,7 +1989,7 @@ export function isWhile_control(item: unknown): item is While_control {
 }
 
 export interface Width_spec extends AstNode {
-    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | Subtype_constraint_head | Total_over | Type_decl;
+    readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Width_spec';
     isFixed?: 'FIXED'
     width: Width
@@ -2087,18 +2001,74 @@ export function isWidth_spec(item: unknown): item is Width_spec {
     return reflection.isInstance(item, Width_spec);
 }
 
+export interface Simple_factor extends Factor {
+    readonly $container: Actual_parameter_list | Aggregate_source | Assignment_stmt | Assignment_stmt_body | BinaryExpression | Bound_spec | Case_label | Constant_body | Derived_attr | Domain_rule | Element | Entity_constructor | Expression | Factor | If_stmt | Increment_control | Index_qualifier | Interval | Local_decl | Query_expression | Real_type | Repetition | Return_stmt | Selector | Simple_factor | Temp | Until_control | While_control | Width_spec;
+    readonly $type: 'Aggregate_initializer' | 'Interval' | 'Query_expression' | 'Simple_factor';
+    expression: Expression
+    op?: Unary_op
+    primary: Primary
+}
+
+export const Simple_factor = 'Simple_factor';
+
+export function isSimple_factor(item: unknown): item is Simple_factor {
+    return reflection.isInstance(item, Simple_factor);
+}
+
 export interface Expression extends Local_variable {
-    readonly $container: Actual_parameter_list | Assignment_stmt | Assignment_stmt_core | Case_label | Constant_body | Derived_attr | Domain_rule | Element | Entity_constructor | If_stmt | Local_decl | Query_expression | Return_stmt | Selector | Temp | Until_control | While_control;
-    readonly $type: 'Expression';
+    readonly $container: Actual_parameter_list | Aggregate_source | Assignment_stmt | Assignment_stmt_body | BinaryExpression | Bound_spec | Case_label | Constant_body | Derived_attr | Domain_rule | Element | Entity_constructor | Expression | Factor | If_stmt | Increment_control | Index_qualifier | Interval | Local_decl | Query_expression | Real_type | Repetition | Return_stmt | Selector | Simple_factor | Temp | Until_control | While_control | Width_spec;
+    readonly $type: 'Aggregate_initializer' | 'BinaryExpression' | 'Expression' | 'Factor' | 'Interval' | 'Query_expression' | 'Simple_expression' | 'Simple_factor' | 'Term';
     left: Simple_expression
-    op?: Rel_op_extended
-    right?: Simple_expression
+    op: Rel_op_extended
+    right: Simple_expression
 }
 
 export const Expression = 'Expression';
 
 export function isExpression(item: unknown): item is Expression {
     return reflection.isInstance(item, Expression);
+}
+
+export interface Aggregate_initializer extends Simple_factor {
+    readonly $container: Actual_parameter_list | Aggregate_source | Assignment_stmt | Assignment_stmt_body | BinaryExpression | Bound_spec | Case_label | Constant_body | Derived_attr | Domain_rule | Element | Entity_constructor | Expression | Factor | If_stmt | Increment_control | Index_qualifier | Interval | Local_decl | Query_expression | Real_type | Repetition | Return_stmt | Selector | Simple_factor | Temp | Until_control | While_control | Width_spec;
+    readonly $type: 'Aggregate_initializer';
+    elts: Array<Element>
+}
+
+export const Aggregate_initializer = 'Aggregate_initializer';
+
+export function isAggregate_initializer(item: unknown): item is Aggregate_initializer {
+    return reflection.isInstance(item, Aggregate_initializer);
+}
+
+export interface Interval extends Simple_factor {
+    readonly $container: Actual_parameter_list | Aggregate_source | Assignment_stmt | Assignment_stmt_body | BinaryExpression | Bound_spec | Case_label | Constant_body | Derived_attr | Domain_rule | Element | Entity_constructor | Expression | Factor | If_stmt | Increment_control | Index_qualifier | Interval | Local_decl | Query_expression | Real_type | Repetition | Return_stmt | Selector | Simple_factor | Temp | Until_control | While_control | Width_spec;
+    readonly $type: 'Interval';
+    firstInterval: Interval_op
+    high: Interval_high
+    item: Interval_item
+    low: Interval_low
+    secondInterval: Interval_op
+}
+
+export const Interval = 'Interval';
+
+export function isInterval(item: unknown): item is Interval {
+    return reflection.isInstance(item, Interval);
+}
+
+export interface Query_expression extends Simple_factor {
+    readonly $container: Actual_parameter_list | Aggregate_source | Assignment_stmt | Assignment_stmt_body | BinaryExpression | Bound_spec | Case_label | Constant_body | Derived_attr | Domain_rule | Element | Entity_constructor | Expression | Factor | If_stmt | Increment_control | Index_qualifier | Interval | Local_decl | Query_expression | Real_type | Repetition | Return_stmt | Selector | Simple_factor | Temp | Until_control | While_control | Width_spec;
+    readonly $type: 'Query_expression';
+    expression: Logical_expression
+    source: Aggregate_source
+    variable: Variable_id
+}
+
+export const Query_expression = 'Query_expression';
+
+export function isQuery_expression(item: unknown): item is Query_expression {
+    return reflection.isInstance(item, Query_expression);
 }
 
 export type ExpressP11AstType = {
@@ -2112,12 +2082,13 @@ export type ExpressP11AstType = {
     Alias_stmt: Alias_stmt
     Array_type: Array_type
     Assignment_stmt: Assignment_stmt
-    Assignment_stmt_core: Assignment_stmt_core
+    Assignment_stmt_body: Assignment_stmt_body
     Attribute_decl: Attribute_decl
     Attribute_id: Attribute_id
     Attribute_qualifier: Attribute_qualifier
     Attribute_ref: Attribute_ref
     Bag_type: Bag_type
+    BinaryExpression: BinaryExpression
     Binary_type: Binary_type
     Bound_1: Bound_1
     Bound_2: Bound_2
@@ -2128,7 +2099,7 @@ export type ExpressP11AstType = {
     Complex_Primary: Complex_Primary
     Complex_Primary_body: Complex_Primary_body
     Complex_Primary_id: Complex_Primary_id
-    Complex_Primary_ref: Complex_Primary_ref
+    Complex_Primary_reference: Complex_Primary_reference
     Compound_stmt: Compound_stmt
     Concrete_types: Concrete_types
     Constant_body: Constant_body
@@ -2139,11 +2110,10 @@ export type ExpressP11AstType = {
     Derived_attr: Derived_attr
     Domain_rule: Domain_rule
     Element: Element
+    EntityDefinition: EntityDefinition
     EntityRef: EntityRef
     Entity_body: Entity_body
     Entity_constructor: Entity_constructor
-    Entity_decl: Entity_decl
-    Entity_head: Entity_head
     Entity_ref: Entity_ref
     Enumeration_extension: Enumeration_extension
     Enumeration_id: Enumeration_id
@@ -2155,8 +2125,8 @@ export type ExpressP11AstType = {
     Expression: Expression
     Factor: Factor
     Formal_parameter: Formal_parameter
+    FunctionDefinition: FunctionDefinition
     Function_call: Function_call
-    Function_decl: Function_decl
     Function_head: Function_head
     Function_ref: Function_ref
     GeneralRef: GeneralRef
@@ -2204,11 +2174,11 @@ export type ExpressP11AstType = {
     Population: Population
     Precision_spec: Precision_spec
     Primary: Primary
+    ProcedureDefinition: ProcedureDefinition
     Procedure_call_Or_Assigment_stmt: Procedure_call_Or_Assigment_stmt
     Procedure_call_Or_Assigment_stmt_id: Procedure_call_Or_Assigment_stmt_id
-    Procedure_call_Or_Assigment_stmt_ref: Procedure_call_Or_Assigment_stmt_ref
+    Procedure_call_Or_Assigment_stmt_reference: Procedure_call_Or_Assigment_stmt_reference
     Procedure_call_stmt: Procedure_call_stmt
-    Procedure_decl: Procedure_decl
     Procedure_head: Procedure_head
     Qualified_attribute: Qualified_attribute
     Qualifier: Qualifier
@@ -2224,8 +2194,8 @@ export type ExpressP11AstType = {
     Return_stmt: Return_stmt
     Rule_decl: Rule_decl
     Rule_head: Rule_head
+    SchemaDefinition: SchemaDefinition
     Schema_body: Schema_body
-    Schema_decl: Schema_decl
     Select_extension: Select_extension
     Select_list: Select_list
     Select_type: Select_type
@@ -2237,10 +2207,9 @@ export type ExpressP11AstType = {
     Stmt: Stmt
     String_type: String_type
     Subsuper: Subsuper
+    SubtypeConstraintDefinition: SubtypeConstraintDefinition
     Subtype_constraint: Subtype_constraint
     Subtype_constraint_body: Subtype_constraint_body
-    Subtype_constraint_decl: Subtype_constraint_decl
-    Subtype_constraint_head: Subtype_constraint_head
     Subtype_declaration: Subtype_declaration
     Supertype_constraint: Supertype_constraint
     Supertype_expression: Supertype_expression
@@ -2251,7 +2220,7 @@ export type ExpressP11AstType = {
     Temp: Temp
     Term: Term
     Total_over: Total_over
-    Type_decl: Type_decl
+    TypeDefinition: TypeDefinition
     Underlying_type: Underlying_type
     Unique_clause: Unique_clause
     Unique_rule: Unique_rule
@@ -2268,7 +2237,7 @@ export type ExpressP11AstType = {
 export class ExpressP11AstReflection extends AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return ['Abstract_supertype_declaration', 'Actual_parameter_list', 'Aggregate_initializer', 'Aggregate_source', 'Aggregate_type', 'Aggregation_types', 'Algorithm_head', 'Alias_stmt', 'Array_type', 'Assignment_stmt', 'Assignment_stmt_core', 'Attribute_decl', 'Attribute_id', 'Attribute_qualifier', 'Attribute_ref', 'Bag_type', 'Binary_type', 'Bound_1', 'Bound_2', 'Bound_spec', 'Case_action', 'Case_label', 'Case_stmt', 'Complex_Primary', 'Complex_Primary_body', 'Complex_Primary_id', 'Complex_Primary_ref', 'Compound_stmt', 'Concrete_types', 'Constant_body', 'Constant_decl', 'Constructed_types', 'Declaration', 'Derive_clause', 'Derived_attr', 'Domain_rule', 'Element', 'EntityRef', 'Entity_body', 'Entity_constructor', 'Entity_decl', 'Entity_head', 'Entity_ref', 'Enumeration_extension', 'Enumeration_id', 'Enumeration_items', 'Enumeration_reference', 'Enumeration_type', 'Explicit_attr', 'ExpressFile', 'Expression', 'Factor', 'Formal_parameter', 'Function_call', 'Function_decl', 'Function_head', 'Function_ref', 'GeneralRef', 'General_aggregation_types', 'General_array_type', 'General_bag_type', 'General_id', 'General_list_type', 'General_ref', 'General_set_type', 'Generalized_types', 'Generic_entity_type', 'Generic_type', 'Group_qualifier', 'If_stmt', 'Increment', 'Increment_control', 'Index', 'Index_1', 'Index_2', 'Index_qualifier', 'Instantiable_type', 'Interface_specification', 'Interval', 'Interval_high', 'Interval_item', 'Interval_low', 'Inverse_attr', 'Inverse_clause', 'List_type', 'Literal', 'Local_decl', 'Local_variable', 'Logical_expression', 'NamedResource', 'NamedType', 'Named_type_or_rename', 'Named_types', 'Numeric_expression', 'One_of', 'Parameter', 'Parameter_id', 'Parameter_ref', 'Parameter_type', 'Population', 'Precision_spec', 'Primary', 'Procedure_call_Or_Assigment_stmt', 'Procedure_call_Or_Assigment_stmt_id', 'Procedure_call_Or_Assigment_stmt_ref', 'Procedure_call_stmt', 'Procedure_decl', 'Procedure_head', 'Qualified_attribute', 'Qualifier', 'Query_expression', 'Real_type', 'Redeclared_attribute', 'Reference_clause', 'Referenced_attribute', 'Repeat_control', 'Repeat_stmt', 'Repetition', 'Resource_or_rename', 'Return_stmt', 'Rule_decl', 'Rule_head', 'Schema_body', 'Schema_decl', 'Select_extension', 'Select_list', 'Select_type', 'Selector', 'Set_type', 'Simple_expression', 'Simple_factor', 'Simple_types', 'Stmt', 'String_type', 'Subsuper', 'Subtype_constraint', 'Subtype_constraint_body', 'Subtype_constraint_decl', 'Subtype_constraint_head', 'Subtype_declaration', 'Supertype_constraint', 'Supertype_expression', 'Supertype_factor', 'Supertype_rule', 'Supertype_term', 'Syntax', 'Temp', 'Term', 'Total_over', 'Type_decl', 'Underlying_type', 'Unique_clause', 'Unique_rule', 'Until_control', 'Use_clause', 'Variable_id', 'Variable_ref', 'Where_clause', 'While_control', 'Width', 'Width_spec'];
+        return ['Abstract_supertype_declaration', 'Actual_parameter_list', 'Aggregate_initializer', 'Aggregate_source', 'Aggregate_type', 'Aggregation_types', 'Algorithm_head', 'Alias_stmt', 'Array_type', 'Assignment_stmt', 'Assignment_stmt_body', 'Attribute_decl', 'Attribute_id', 'Attribute_qualifier', 'Attribute_ref', 'Bag_type', 'BinaryExpression', 'Binary_type', 'Bound_1', 'Bound_2', 'Bound_spec', 'Case_action', 'Case_label', 'Case_stmt', 'Complex_Primary', 'Complex_Primary_body', 'Complex_Primary_id', 'Complex_Primary_reference', 'Compound_stmt', 'Concrete_types', 'Constant_body', 'Constant_decl', 'Constructed_types', 'Declaration', 'Derive_clause', 'Derived_attr', 'Domain_rule', 'Element', 'EntityDefinition', 'EntityRef', 'Entity_body', 'Entity_constructor', 'Entity_ref', 'Enumeration_extension', 'Enumeration_id', 'Enumeration_items', 'Enumeration_reference', 'Enumeration_type', 'Explicit_attr', 'ExpressFile', 'Expression', 'Factor', 'Formal_parameter', 'FunctionDefinition', 'Function_call', 'Function_head', 'Function_ref', 'GeneralRef', 'General_aggregation_types', 'General_array_type', 'General_bag_type', 'General_id', 'General_list_type', 'General_ref', 'General_set_type', 'Generalized_types', 'Generic_entity_type', 'Generic_type', 'Group_qualifier', 'If_stmt', 'Increment', 'Increment_control', 'Index', 'Index_1', 'Index_2', 'Index_qualifier', 'Instantiable_type', 'Interface_specification', 'Interval', 'Interval_high', 'Interval_item', 'Interval_low', 'Inverse_attr', 'Inverse_clause', 'List_type', 'Literal', 'Local_decl', 'Local_variable', 'Logical_expression', 'NamedResource', 'NamedType', 'Named_type_or_rename', 'Named_types', 'Numeric_expression', 'One_of', 'Parameter', 'Parameter_id', 'Parameter_ref', 'Parameter_type', 'Population', 'Precision_spec', 'Primary', 'ProcedureDefinition', 'Procedure_call_Or_Assigment_stmt', 'Procedure_call_Or_Assigment_stmt_id', 'Procedure_call_Or_Assigment_stmt_reference', 'Procedure_call_stmt', 'Procedure_head', 'Qualified_attribute', 'Qualifier', 'Query_expression', 'Real_type', 'Redeclared_attribute', 'Reference_clause', 'Referenced_attribute', 'Repeat_control', 'Repeat_stmt', 'Repetition', 'Resource_or_rename', 'Return_stmt', 'Rule_decl', 'Rule_head', 'SchemaDefinition', 'Schema_body', 'Select_extension', 'Select_list', 'Select_type', 'Selector', 'Set_type', 'Simple_expression', 'Simple_factor', 'Simple_types', 'Stmt', 'String_type', 'Subsuper', 'SubtypeConstraintDefinition', 'Subtype_constraint', 'Subtype_constraint_body', 'Subtype_declaration', 'Supertype_constraint', 'Supertype_expression', 'Supertype_factor', 'Supertype_rule', 'Supertype_term', 'Syntax', 'Temp', 'Term', 'Total_over', 'TypeDefinition', 'Underlying_type', 'Unique_clause', 'Unique_rule', 'Until_control', 'Use_clause', 'Variable_id', 'Variable_ref', 'Where_clause', 'While_control', 'Width', 'Width_spec'];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
@@ -2279,8 +2248,7 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
             }
             case Aggregate_initializer:
             case Interval:
-            case Query_expression:
-            case Temp: {
+            case Query_expression: {
                 return this.isSubtype(Simple_factor, supertype);
             }
             case Aggregate_type:
@@ -2308,7 +2276,7 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
                 return this.isSubtype(Aggregation_types, supertype);
             }
             case Attribute_decl: {
-                return this.isSubtype(Complex_Primary_ref, supertype);
+                return this.isSubtype(Complex_Primary_id, supertype);
             }
             case Attribute_id:
             case Redeclared_attribute: {
@@ -2328,6 +2296,9 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
             case String_type: {
                 return this.isSubtype(Simple_types, supertype);
             }
+            case BinaryExpression: {
+                return this.isSubtype(Simple_expression, supertype) || this.isSubtype(Term, supertype);
+            }
             case Complex_Primary:
             case Literal: {
                 return this.isSubtype(Primary, supertype);
@@ -2335,24 +2306,17 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
             case Concrete_types: {
                 return this.isSubtype(Instantiable_type, supertype) || this.isSubtype(Underlying_type, supertype);
             }
-            case Constant_body:
-            case Function_head: {
-                return this.isSubtype(Complex_Primary_ref, supertype) || this.isSubtype(NamedResource, supertype);
+            case Constant_body: {
+                return this.isSubtype(Complex_Primary_id, supertype) || this.isSubtype(NamedResource, supertype);
             }
             case Constructed_types: {
                 return this.isSubtype(Underlying_type, supertype);
             }
-            case Entity_decl:
-            case Function_decl:
-            case Procedure_decl:
-            case Subtype_constraint_decl: {
-                return this.isSubtype(Declaration, supertype);
-            }
-            case Entity_head: {
-                return this.isSubtype(Complex_Primary_ref, supertype) || this.isSubtype(NamedResource, supertype) || this.isSubtype(NamedType, supertype);
-            }
             case Entity_ref: {
                 return this.isSubtype(Instantiable_type, supertype);
+            }
+            case EntityDefinition: {
+                return this.isSubtype(Complex_Primary_id, supertype) || this.isSubtype(Declaration, supertype) || this.isSubtype(NamedResource, supertype) || this.isSubtype(NamedType, supertype);
             }
             case EntityRef:
             case One_of:
@@ -2366,14 +2330,17 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
             case Expression: {
                 return this.isSubtype(Local_variable, supertype) || this.isSubtype(Logical_expression, supertype) || this.isSubtype(Parameter, supertype);
             }
+            case Factor: {
+                return this.isSubtype(Term, supertype);
+            }
+            case FunctionDefinition: {
+                return this.isSubtype(Complex_Primary_id, supertype) || this.isSubtype(Declaration, supertype) || this.isSubtype(NamedResource, supertype);
+            }
             case General_array_type:
             case General_bag_type:
             case General_list_type:
             case General_set_type: {
                 return this.isSubtype(General_aggregation_types, supertype);
-            }
-            case General_id: {
-                return this.isSubtype(Procedure_call_Or_Assigment_stmt_id, supertype);
             }
             case Generalized_types:
             case Named_types: {
@@ -2387,28 +2354,34 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
             }
             case Parameter_id:
             case Variable_id: {
-                return this.isSubtype(Complex_Primary_ref, supertype) || this.isSubtype(GeneralRef, supertype) || this.isSubtype(General_id, supertype);
+                return this.isSubtype(Complex_Primary_id, supertype) || this.isSubtype(GeneralRef, supertype) || this.isSubtype(General_id, supertype) || this.isSubtype(Procedure_call_Or_Assigment_stmt_id, supertype);
             }
-            case Procedure_head: {
-                return this.isSubtype(NamedResource, supertype) || this.isSubtype(Procedure_call_Or_Assigment_stmt_id, supertype);
+            case ProcedureDefinition: {
+                return this.isSubtype(Declaration, supertype) || this.isSubtype(NamedResource, supertype) || this.isSubtype(Procedure_call_Or_Assigment_stmt_id, supertype);
             }
             case Reference_clause:
             case Use_clause: {
                 return this.isSubtype(Interface_specification, supertype);
             }
-            case Resource_or_rename: {
-                return this.isSubtype(NamedType, supertype);
-            }
             case Simple_expression: {
-                return this.isSubtype(Interval_high, supertype) || this.isSubtype(Interval_item, supertype) || this.isSubtype(Interval_low, supertype) || this.isSubtype(Numeric_expression, supertype);
+                return this.isSubtype(Expression, supertype) || this.isSubtype(Interval_high, supertype) || this.isSubtype(Interval_item, supertype) || this.isSubtype(Interval_low, supertype) || this.isSubtype(Numeric_expression, supertype);
+            }
+            case Simple_factor: {
+                return this.isSubtype(Factor, supertype);
             }
             case Simple_types: {
                 return this.isSubtype(Concrete_types, supertype) || this.isSubtype(Parameter_type, supertype);
             }
+            case SubtypeConstraintDefinition: {
+                return this.isSubtype(Declaration, supertype);
+            }
             case Syntax: {
                 return this.isSubtype(ExpressFile, supertype);
             }
-            case Type_decl: {
+            case Term: {
+                return this.isSubtype(Simple_expression, supertype);
+            }
+            case TypeDefinition: {
                 return this.isSubtype(Declaration, supertype) || this.isSubtype(NamedResource, supertype) || this.isSubtype(NamedType, supertype);
             }
             case Width_spec: {
@@ -2431,31 +2404,31 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
             case 'Inverse_attr:forAttribute': {
                 return Attribute_decl;
             }
-            case 'Complex_Primary_id:to': {
-                return Complex_Primary_ref;
+            case 'Complex_Primary_reference:to': {
+                return Complex_Primary_id;
             }
             case 'Entity_constructor:type':
             case 'Entity_ref:to':
             case 'EntityRef:entity':
             case 'Group_qualifier:entity':
             case 'Inverse_attr:forEntity':
-            case 'Inverse_attr:ofEntity':
+            case 'Inverse_attr:type':
             case 'Population:entity': {
-                return Entity_head;
+                return EntityDefinition;
             }
             case 'Enumeration_reference:ref': {
                 return Enumeration_id;
             }
             case 'Enumeration_reference:type': {
-                return Type_decl;
+                return TypeDefinition;
             }
             case 'Function_ref:function': {
-                return Function_head;
+                return FunctionDefinition;
             }
             case 'General_ref:reference': {
                 return GeneralRef;
             }
-            case 'Named_type_or_rename:namedType':
+            case 'Named_type_or_rename:resource':
             case 'Named_types:of':
             case 'Select_list:types': {
                 return NamedType;
@@ -2463,12 +2436,12 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
             case 'Parameter_ref:parameterReferenceTo': {
                 return Parameter_id;
             }
-            case 'Procedure_call_Or_Assigment_stmt_ref:to': {
+            case 'Procedure_call_Or_Assigment_stmt_reference:to': {
                 return Procedure_call_Or_Assigment_stmt_id;
             }
             case 'Reference_clause:schema':
             case 'Use_clause:schema': {
-                return Schema_decl;
+                return SchemaDefinition;
             }
             case 'Resource_or_rename:resource': {
                 return NamedResource;
@@ -2489,14 +2462,6 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
                     name: 'Actual_parameter_list',
                     mandatory: [
                         { name: 'params', type: 'array' }
-                    ]
-                };
-            }
-            case 'Aggregate_initializer': {
-                return {
-                    name: 'Aggregate_initializer',
-                    mandatory: [
-                        { name: 'elts', type: 'array' }
                     ]
                 };
             }
@@ -2533,9 +2498,9 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
                     ]
                 };
             }
-            case 'Assignment_stmt_core': {
+            case 'Assignment_stmt_body': {
                 return {
-                    name: 'Assignment_stmt_core',
+                    name: 'Assignment_stmt_body',
                     mandatory: [
                         { name: 'qualifiers', type: 'array' }
                     ]
@@ -2622,14 +2587,6 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
                     ]
                 };
             }
-            case 'Factor': {
-                return {
-                    name: 'Factor',
-                    mandatory: [
-                        { name: 'factors', type: 'array' }
-                    ]
-                };
-            }
             case 'Formal_parameter': {
                 return {
                     name: 'Formal_parameter',
@@ -2638,19 +2595,19 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
                     ]
                 };
             }
-            case 'Function_decl': {
-                return {
-                    name: 'Function_decl',
-                    mandatory: [
-                        { name: 'stmts', type: 'array' }
-                    ]
-                };
-            }
             case 'Function_head': {
                 return {
                     name: 'Function_head',
                     mandatory: [
                         { name: 'parameters', type: 'array' }
+                    ]
+                };
+            }
+            case 'FunctionDefinition': {
+                return {
+                    name: 'FunctionDefinition',
+                    mandatory: [
+                        { name: 'stmts', type: 'array' }
                     ]
                 };
             }
@@ -2728,19 +2685,19 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
                     ]
                 };
             }
-            case 'Procedure_decl': {
-                return {
-                    name: 'Procedure_decl',
-                    mandatory: [
-                        { name: 'stmts', type: 'array' }
-                    ]
-                };
-            }
             case 'Procedure_head': {
                 return {
                     name: 'Procedure_head',
                     mandatory: [
                         { name: 'parameters', type: 'array' }
+                    ]
+                };
+            }
+            case 'ProcedureDefinition': {
+                return {
+                    name: 'ProcedureDefinition',
+                    mandatory: [
+                        { name: 'stmts', type: 'array' }
                     ]
                 };
             }
@@ -2877,7 +2834,7 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
                 return {
                     name: 'Use_clause',
                     mandatory: [
-                        { name: 'types', type: 'array' }
+                        { name: 'resources', type: 'array' }
                     ]
                 };
             }
@@ -2886,6 +2843,14 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
                     name: 'Where_clause',
                     mandatory: [
                         { name: 'rules', type: 'array' }
+                    ]
+                };
+            }
+            case 'Aggregate_initializer': {
+                return {
+                    name: 'Aggregate_initializer',
+                    mandatory: [
+                        { name: 'elts', type: 'array' }
                     ]
                 };
             }

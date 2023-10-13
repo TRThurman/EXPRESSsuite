@@ -42,7 +42,7 @@
         },
         {
           "name": "constant.language.builtin.express",
-          "match": "(?i)(CONST_E|FALSE|PI|SELF|TRUE|UNKNOWN|\\?)"
+          "match": "(?i)\\b(CONST_E|FALSE|PI|SELF|TRUE|UNKNOWN|\\?)\\b"
         },
         {
           "name": "entity.name.tag",
@@ -149,6 +149,9 @@
         },
         {
           "include": "#function"
+        },
+        {
+          "include": "#rule"
         }
       ]
     },
@@ -320,6 +323,50 @@
         }
       },
       "end": "(?i)(END_FUNCTION)(;)",
+      "endCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        }
+      },
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#keywords"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#string"
+        },
+        {
+          "include": "#number"
+        },
+        {
+          "include": "#assignment"
+        },
+        {
+          "include": "#functionCall"
+        }
+      ]
+    },
+    "rule": {
+      "name": "rule",
+      "begin": "(?i)(RULE)\\s*(\\w+)",
+      "beginCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        },
+        "2": {
+          "name": "entity.name.type.rule.express"
+        }
+      },
+      "end": "(?i)(END_RULE)(;)",
       "endCaptures": {
         "1": {
           "patterns": [{ "include": "#keywords" }]

@@ -1,7 +1,7 @@
 import { startLanguageServer } from "langium";
 import { NodeFileSystem } from "langium/node";
 import { createConnection, ProposedFeatures } from "vscode-languageserver/node";
-import { createExpressP11Services } from "./express-p-11-module";
+import { createExpressP11Services } from "./express-p11-module";
 
 // Create a connection to the client
 const connection = createConnection(ProposedFeatures.all);
@@ -11,4 +11,8 @@ const { shared } = createExpressP11Services({ connection, ...NodeFileSystem });
 
 // Start the language server with the shared services
 // startLanguageServer(shared);
-startLanguageServer(shared);
+try {
+  startLanguageServer(shared);
+} catch (error) {
+  console.log("ERROR");
+}

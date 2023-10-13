@@ -5,15 +5,17 @@ import {
   DocumentValidator,
   LangiumDocument,
   LinkingErrorData,
+  ValidationAcceptor,
   getContainerOfType,
   interruptAndCheck,
   isOperationCancelled,
+  streamAst,
   tokenToRange,
 } from "langium";
 import type { Diagnostic } from "vscode-languageserver";
 import type { MismatchedTokenException } from "chevrotain";
 import { CancellationToken, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
-import { isQuery_expression } from "./language-server/generated/ast";
+import { isQuery_expression } from "./generated/ast";
 
 export class ExpressDocumentValidator extends DefaultDocumentValidator {
   override async validateDocument(
@@ -81,7 +83,10 @@ export class ExpressDocumentValidator extends DefaultDocumentValidator {
       }
     }
 
+    // console.time("reference");
+    // console.log(document.references.length);
     // Process unresolved references
+    //@ts-ignore
     for (const reference of document.references) {
       const linkingError = reference.error;
       if (linkingError) {
@@ -103,21 +108,47 @@ export class ExpressDocumentValidator extends DefaultDocumentValidator {
       }
     }
 
-    // Process custom validations
-    try {
-      diagnostics.push(...(await this.validateAst(parseResult.value, document, cancelToken)));
-    } catch (err) {
-      if (isOperationCancelled(err)) {
-        throw err;
-      }
-      console.error("An error occurred during validation:", err);
-    }
+    //Process custom validations
+    // try {
+    //   diagnostics.push(...(await this.validateAst(parseResult.value, document, cancelToken)));
+    // } catch (err) {
+    //   if (isOperationCancelled(err)) {
+    //     throw err;
+    //   }
+    //   console.error("An error occurred during validation:", err);
+    // }
+    // console.timeEnd("reference");
 
     await interruptAndCheck(cancelToken);
 
     return diagnostics;
   }
+  protected override async validateAst(
+    rootNode: AstNode,
+    document: LangiumDocument,
+    cancelToken = CancellationToken.None
+  ): Promise<Diagnostic[]> {
+    const validationItems: Diagnostic[] = [];
+    const acceptor: ValidationAcceptor = <N extends AstNode>(
+      severity: "error" | "warning" | "info" | "hint",
+      message: string,
+      info: DiagnosticInfo<N>
+    ) => {
+      validationItems.push(this.toDiagnostic(severity, message, info));
+    };
 
+    await Promise.all(
+      streamAst(rootNode).map(async (node) => {
+        await interruptAndCheck(cancelToken);
+        const checks = this.validationRegistry.getChecks(node.$type);
+        for (const check of checks) {
+          await check(node, acceptor, cancelToken);
+        }
+      })
+    );
+
+    return validationItems;
+  }
   protected isNestedQuery(node: AstNode): boolean {
     const firstQuery = getContainerOfType(node, isQuery_expression);
     if (!firstQuery) return false;

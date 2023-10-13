@@ -1,9 +1,9 @@
 import { DocumentSymbol } from "vscode-languageserver";
-import { Procedure_decl, Schema_decl, isProcedure_decl } from "../language-server/generated/ast";
+import { ProcedureDefinition, SchemaDefinition, isProcedureDefinition } from "../language-server/generated/ast";
 import { schemaHasDeclarations } from "./schema-helpers";
 import { ExpressKind, getDocumentSymbol } from "./general";
 
-export const getProcedureDocumentSymbols = (schema: Schema_decl): DocumentSymbol[] => {
+export const getProcedureDocumentSymbols = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
   var procedureDeclarations = getProcedureDeclarations(schema);
   if (procedureDeclarations) {
@@ -17,18 +17,18 @@ export const getProcedureDocumentSymbols = (schema: Schema_decl): DocumentSymbol
   return symbols;
 };
 
-export const getProcedureDeclarations = (schema: Schema_decl): Procedure_decl[] | undefined => {
+export const getProcedureDeclarations = (schema: SchemaDefinition): ProcedureDefinition[] | undefined => {
   if (!schemaHasDeclarations(schema)) return;
 
-  var procedureDeclarations = schema.body.declarations.filter((d) => isProcedure_decl(d)) as Procedure_decl[];
-  return procedureDeclarations.filter((p) => p.head && p.head.name);
+  var procedureDeclarations = schema.body.declarations.filter((d) => isProcedureDefinition(d)) as ProcedureDefinition[];
+  return procedureDeclarations.filter((p) => p.head && p.name);
 };
 
-export const getProcedureDocumentSymbol = (proc: Procedure_decl): DocumentSymbol | undefined => {
+export const getProcedureDocumentSymbol = (proc: ProcedureDefinition): DocumentSymbol | undefined => {
   if (proc && proc.$cstNode && proc.head.$cstNode) {
     const typeSymbol = getDocumentSymbol(
       ExpressKind.Function,
-      proc.head.name,
+      proc.name,
       proc.$cstNode.range,
       proc.head.$cstNode.range
     );

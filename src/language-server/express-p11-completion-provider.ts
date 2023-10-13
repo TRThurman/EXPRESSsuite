@@ -1,17 +1,25 @@
-import { AstNodeDescription, CompletionValueItem, DefaultCompletionProvider } from "langium";
+import {
+  AstNodeDescription,
+  CompletionAcceptor,
+  CompletionContext,
+  CompletionValueItem,
+  DefaultCompletionProvider,
+  MaybePromise,
+  NextFeature,
+} from "langium";
 import { CompletionItemKind } from "vscode-languageserver";
 import {
   Attribute_decl,
   Attribute_id,
   Constant_body,
-  Entity_head,
+  EntityDefinition,
+  FunctionDefinition,
   Parameter_id,
   Resource_or_rename,
-  Schema_decl,
-  Type_decl,
+  SchemaDefinition,
+  TypeDefinition,
   Variable_id,
 } from "./generated/ast";
-import { Function_head } from "./generated/ast";
 
 export class ExpressP11CompletionProvider extends DefaultCompletionProvider {
   protected override createReferenceCompletionItem(nodeDescription: AstNodeDescription): CompletionValueItem {
@@ -24,16 +32,16 @@ export class ExpressP11CompletionProvider extends DefaultCompletionProvider {
         processedNode.type = (nodeDescription.node as Resource_or_rename).resource.ref?.$type ?? "";
     }
     switch (processedNode.type) {
-      case Schema_decl:
+      case SchemaDefinition:
         kind = CompletionItemKind.Module;
         detail = "Schema";
         break;
-      case Entity_head:
+      case EntityDefinition:
         kind = CompletionItemKind.Class;
         detail = "Entity";
         documentation = nodeDescription.node?.$container?.$cstNode?.text ?? "";
         break;
-      case Type_decl:
+      case TypeDefinition:
         kind = CompletionItemKind.Variable;
         detail = "Type";
         break;
@@ -42,10 +50,10 @@ export class ExpressP11CompletionProvider extends DefaultCompletionProvider {
         kind = CompletionItemKind.Variable;
         detail = "Variable";
         break;
-      case Function_head:
+      case FunctionDefinition:
         kind = CompletionItemKind.Function;
-        const returnType = (nodeDescription.node as Function_head).returnType.$cstNode?.text;
-        detail = `(fct) -> ${returnType}`;
+        //const returnType = (nodeDescription.node as Function_head).returnType.$cstNode?.text;
+        detail = "Function";
         break;
       case Attribute_decl:
       case Attribute_id:
@@ -68,5 +76,14 @@ export class ExpressP11CompletionProvider extends DefaultCompletionProvider {
       sortText: "0",
       documentation,
     };
+  }
+
+  protected override completionFor(
+    context: CompletionContext,
+    next: NextFeature,
+    acceptor: CompletionAcceptor
+  ): MaybePromise<void> {
+    // console.log(context);
+    return super.completionFor(context, next, acceptor);
   }
 }

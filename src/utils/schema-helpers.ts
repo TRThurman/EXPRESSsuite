@@ -1,5 +1,5 @@
 import { DocumentSymbol } from "vscode-languageserver";
-import { ExpressFile, Schema_decl } from "../language-server/generated/ast";
+import { ExpressFile, SchemaDefinition } from "../language-server/generated/ast";
 import { getEntitiesDocumentSymbol } from "./entity-helpers";
 import { getTypesDocumentSymbol } from "./type-helpers";
 import { getFunctionDocumentSymbols } from "./function-helpers";
@@ -8,35 +8,35 @@ import { getProcedureDocumentSymbols } from "./procedure-helpers";
 import { getConstantDocumentSymbols } from "./constant-helpers";
 import { LangiumDocument } from "langium";
 
-export const schemaHasBody = (schema: Schema_decl): boolean => {
+export const schemaHasBody = (schema: SchemaDefinition): boolean => {
   if (!schema) return false;
   if (!schema.body) return false;
   return true;
 };
 
-export const schemaHasDeclarations = (schema: Schema_decl): boolean => {
+export const schemaHasDeclarations = (schema: SchemaDefinition): boolean => {
   if (!schemaHasBody(schema)) return false;
   if (!schema.body.declarations) return false;
   return true;
 };
 
-export const schemaHasConstants = (schema: Schema_decl): boolean => {
+export const schemaHasConstants = (schema: SchemaDefinition): boolean => {
   if (!schemaHasBody(schema)) return false;
   if (!schema.body.constant) return false;
   return true;
 };
 
-export const schemaHasSpecifications = (schema: Schema_decl): boolean => {
+export const schemaHasSpecifications = (schema: SchemaDefinition): boolean => {
   if (!schemaHasBody(schema)) return false;
   if (!schema.body.specifications) return false;
   return true;
 };
 
-export const getSchemaDeclarations = (document: LangiumDocument<ExpressFile>): Schema_decl[] => {
+export const getSchemaDeclarations = (document: LangiumDocument<ExpressFile>): SchemaDefinition[] => {
   if (document.parseResult.value.schemas) return document.parseResult.value.schemas;
   return [];
 };
-export const getSchemaDocumentSymbol = (schema: Schema_decl): DocumentSymbol | undefined => {
+export const getSchemaDocumentSymbol = (schema: SchemaDefinition): DocumentSymbol | undefined => {
   if (!schemaHasBody(schema)) return;
   if (!schema || !schema.$cstNode) return;
   const children: DocumentSymbol[] = [];

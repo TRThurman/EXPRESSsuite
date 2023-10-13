@@ -1,8 +1,8 @@
 import { DocumentSymbol } from "vscode-languageserver";
-import { Schema_decl, Type_decl, isType_decl } from "../language-server/generated/ast";
+import { SchemaDefinition, TypeDefinition, isTypeDefinition } from "../language-server/generated/ast";
 import { ExpressKind, getDocumentSymbol } from "./general";
 
-export const getTypesDocumentSymbol = (schema: Schema_decl): DocumentSymbol[] => {
+export const getTypesDocumentSymbol = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
   var typeDeclarations = getTypeDeclarations(schema);
   if (typeDeclarations) {
@@ -16,14 +16,14 @@ export const getTypesDocumentSymbol = (schema: Schema_decl): DocumentSymbol[] =>
   return symbols;
 };
 
-export const getTypeDeclarations = (schema: Schema_decl): Type_decl[] | undefined => {
+export const getTypeDeclarations = (schema: SchemaDefinition): TypeDefinition[] | undefined => {
   if (!schema) return;
 
-  var typeDeclarations = schema.body.declarations.filter((d) => isType_decl(d)) as Type_decl[];
+  var typeDeclarations = schema.body.declarations.filter((d) => isTypeDefinition(d)) as TypeDefinition[];
   return typeDeclarations.filter((t) => t.name);
 };
 
-export const getTypeDocumentSymbol = (type: Type_decl): DocumentSymbol | undefined => {
+export const getTypeDocumentSymbol = (type: TypeDefinition): DocumentSymbol | undefined => {
   if (type && type.$cstNode && type.name) {
     const typeSymbol = getDocumentSymbol(ExpressKind.Type, type.name, type.$cstNode.range, type.$cstNode.range);
     return typeSymbol;

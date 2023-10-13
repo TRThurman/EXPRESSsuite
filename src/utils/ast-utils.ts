@@ -1,6 +1,12 @@
 import { AstNode } from "langium";
-import { isAssignment_stmt_core } from "../language-server/generated/ast";
 
-export const isAssignment_stmt = (node: AstNode): boolean => {
-  return isAssignment_stmt_core(node);
-};
+export function getFirstContainerOfType(node: AstNode | undefined, types: string[]): AstNode | undefined {
+  let item = node?.$container;
+  while (item) {
+    if (types.includes(item.$type)) {
+      return item;
+    }
+    item = item.$container;
+  }
+  return undefined;
+}

@@ -1,5 +1,5 @@
 import { DefaultReferences, LangiumDocuments, LangiumServices, getContainerOfType } from "langium";
-import { Entity_decl, isEntity_decl, isSubtype_declaration, isSupertype_constraint } from "./generated/ast";
+import { EntityDefinition, isEntityDefinition, isSubtype_declaration, isSupertype_constraint } from "./generated/ast";
 
 export class ExpressP11References extends DefaultReferences {
   protected readonly documents: LangiumDocuments;
@@ -9,9 +9,9 @@ export class ExpressP11References extends DefaultReferences {
     this.documents = services.shared.workspace.LangiumDocuments;
   }
 
-  getUsedInSupertypeOf(entity: Entity_decl): Entity_decl[] {
-    const usedIn: Array<Entity_decl> = [];
-    const refs = this.index.findAllReferences(entity.head, this.nodeLocator.getAstNodePath(entity.head));
+  getUsedInSupertypeOf(entity: EntityDefinition): EntityDefinition[] {
+    const usedIn: Array<EntityDefinition> = [];
+    const refs = this.index.findAllReferences(entity, this.nodeLocator.getAstNodePath(entity));
     refs.forEach((ref) => {
       const doc = this.documents.getOrCreateDocument(ref.sourceUri);
       const astNode = this.nodeLocator.getAstNode(doc.parseResult.value, ref.sourcePath);
@@ -20,21 +20,21 @@ export class ExpressP11References extends DefaultReferences {
       const subtypeOf = getContainerOfType(astNode, isSupertype_constraint);
       if (!subtypeOf) return;
 
-      const entityContext = getContainerOfType(subtypeOf, isEntity_decl);
+      const entityContext = getContainerOfType(subtypeOf, isEntityDefinition);
       if (entityContext) usedIn.push(entityContext);
     });
     return usedIn;
   }
 
-  getUsedInSubtypeOf(entity: Entity_decl): Entity_decl[] {
-    const usedIn: Array<Entity_decl> = [];
-    const refs = this.index.findAllReferences(entity.head, this.nodeLocator.getAstNodePath(entity.head));
+  getUsedInSubtypeOf(entity: EntityDefinition): EntityDefinition[] {
+    const usedIn: Array<EntityDefinition> = [];
+    const refs = this.index.findAllReferences(entity, this.nodeLocator.getAstNodePath(entity));
     refs.forEach((ref) => {
       const doc = this.documents.getOrCreateDocument(ref.sourceUri);
       const astNode = this.nodeLocator.getAstNode(doc.parseResult.value, ref.sourcePath);
       const subtypeOf = getContainerOfType(astNode, isSubtype_declaration);
       if (!subtypeOf) return;
-      const entityContext = getContainerOfType(subtypeOf, isEntity_decl);
+      const entityContext = getContainerOfType(subtypeOf, isEntityDefinition);
       if (entityContext) usedIn.push(entityContext);
     });
     return usedIn;

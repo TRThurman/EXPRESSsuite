@@ -2,7 +2,7 @@ import { CodeActionProvider, LangiumDocument, MaybePromise } from "langium";
 import { CancellationToken, CodeActionKind, Diagnostic, Position } from "vscode-languageserver";
 import { CodeActionParams } from "vscode-languageserver-protocol";
 import { CodeAction, Command } from "vscode-languageserver-types";
-import { ExpressP11Issues, ReferenceStatementData, WrongReferenceLabelData } from "./express-p-11-validator";
+import { ExpressP11Issues, ReferenceStatementData, WrongReferenceLabelData } from "./express-p11-validator";
 import { ExpressFile } from "./generated/ast";
 import { getReferenceSpecifications } from "../utils/interface-helpers";
 import { getSchemaDeclarations } from "../utils/schema-helpers";
