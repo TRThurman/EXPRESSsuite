@@ -31,6 +31,8 @@ import { ScopingCache } from "../utils/caching";
 import { ExpressP11IndexManager } from "./express-p11-index-manager";
 import { ExpressP11NodeKindProvider } from "./express-p11-node-kind-provider";
 import { ExpressP11TypeContainer } from "./express-p11-type-container";
+import { ExpressP11Linker } from "./express-p11-linker";
+import { ExpressP11WorkspaceManager } from "./express-p11-workspace-manager";
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -61,6 +63,7 @@ export const ExpressP11SharedModule: Module<ExpressP11SharedServices, DeepPartia
     DocumentBuilder: (services) => new ExpressP11DocumentBuilder(services),
     IndexManager: (services) => new ExpressP11IndexManager(services),
     TypeContainer: (services) => new ExpressP11TypeContainer(services),
+    WorkspaceManager: (services) => new ExpressP11WorkspaceManager(services),
   },
   lsp: {
     NodeKindProvider: () => new ExpressP11NodeKindProvider(),
@@ -95,6 +98,7 @@ export const ExpressP11Module: Module<ExpressP11Services, DeepPartial<ExpressP11
     References: (services) => new ExpressP11References(services),
     ScopeProvider: (services) => new ExpressP11ScopeProvider(services),
     NameProvider: () => new ExpressP11NameProvider(),
+    Linker: (services) => new ExpressP11Linker(services),
   },
 };
 

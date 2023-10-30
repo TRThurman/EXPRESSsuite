@@ -1,6 +1,13 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from "vscode-languageclient/node";
+import {
+  LanguageClient,
+  LanguageClientOptions,
+  ServerOptions,
+  TransportKind,
+  WorkDoneProgress,
+} from "vscode-languageclient/node";
+import { EASYEXPRESS_FIRST_DONE, EASYEXPRESS_TOKEN } from "./shared/notifications";
 
 let client: LanguageClient;
 
@@ -50,9 +57,28 @@ function startLanguageClient(context: vscode.ExtensionContext): LanguageClient {
   };
 
   // Create the language client and start the client.
-  const client = new LanguageClient("express-p-11", "express-p11", serverOptions, clientOptions);
-
+  const client = new LanguageClient("express-p-11", "easyEXPRESS", serverOptions, clientOptions);
+  const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   // Start the client. This will also launch the server
   client.start();
+
+  client.onProgress(WorkDoneProgress.type, EASYEXPRESS_TOKEN, (params) => {
+    switch (params.kind) {
+      case "begin":
+        status.text = `$(sync~spin) easyEXPRESS loading`;
+        status.show();
+        break;
+      case "report":
+        status.show();
+        status.text = `${params.message}`;
+
+        break;
+      case "end":
+        vscode.window.showInformationMessage("easyEXPRESS has finished loading your workspace.");
+
+        status.hide();
+        break;
+    }
+  });
   return client;
 }

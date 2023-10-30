@@ -17,6 +17,7 @@ import {
   ProcedureDefinition,
   Query_expression,
   Repeat_stmt,
+  Rule_decl,
   SchemaDefinition,
   Variable_id,
   isAttribute_decl,
@@ -53,21 +54,26 @@ export class ExpressP11ScopeComputation extends DefaultScopeComputation {
     const exports: AstNodeDescription[] = [];
 
     for (const schema of getSchemaDeclarations(document)) {
+      await interruptAndCheck(cancelToken);
       if (schema.name) exports.push(this.descriptions.createDescription(schema, schema.name, document));
-      for (const modelNode of streamContents(schema.body)) {
-        await interruptAndCheck(cancelToken);
-        if (
-          isEntityDefinition(modelNode) ||
-          isTypeDefinition(modelNode) ||
-          isFunctionDefinition(modelNode) ||
-          isProcedureDefinition(modelNode)
-        ) {
-          let name = this.nameProvider.getName(modelNode);
-          if (name) {
-            exports.push(this.descriptions.createDescription(modelNode, name, document));
+      try {
+        if (!schema.body) continue;
+        for (const modelNode of streamContents(schema.body)) {
+          await interruptAndCheck(cancelToken);
+          if (
+            isEntityDefinition(modelNode) ||
+            isTypeDefinition(modelNode) ||
+            isFunctionDefinition(modelNode) ||
+            isProcedureDefinition(modelNode) ||
+            isEnumeration_id(modelNode)
+          ) {
+            let name = this.nameProvider.getName(modelNode);
+            if (name) {
+              exports.push(this.descriptions.createDescription(modelNode, name, document));
+            }
           }
         }
-      }
+      } catch (err) {}
     }
 
     return exports;
@@ -89,6 +95,7 @@ export class ExpressP11ScopeComputation extends DefaultScopeComputation {
         ProcedureDefinition,
         Repeat_stmt,
         Query_expression,
+        Rule_decl,
       ]);
       if (!scopingContainer) return;
       this.addToLocalScope(node, scopingContainer, document, scopes);

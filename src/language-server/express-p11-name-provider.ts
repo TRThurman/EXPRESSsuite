@@ -50,7 +50,7 @@ export class ExpressP11NameProvider extends DefaultNameProvider {
     if (isRedeclared_attribute(node)) {
       if (node.isRenamed) return super.getName(node);
       //we use refText because we are not guaranteed that the reference has been resolved yet
-      return node.qualifiedAttribute.attribute.target?.$refText;
+      return node.qualifiedAttribute.attribute.target.$refText;
     }
     return;
   }

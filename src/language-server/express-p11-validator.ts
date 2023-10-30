@@ -74,7 +74,7 @@ export class ExpressP11Validator {
     this.documents = services.shared.workspace.LangiumDocuments;
     this.nameProvider = services.references.NameProvider;
     // this.resourceManager = services.resources.ResourceManager;
-    console.log("ExpressP11Validator loaded;");
+    //console.log("ExpressP11Validator loaded;");
   }
 
   checkAttributeNameStartsWithLowerCase(attribute: Attribute_decl, accept: ValidationAcceptor): void {

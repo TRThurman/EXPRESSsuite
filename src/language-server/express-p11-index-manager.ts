@@ -7,9 +7,9 @@ export class ExpressP11IndexManager extends DefaultIndexManager {
     const changedUriString = changed.toString();
     const documentUri = document.uri.toString();
     // // The document is affected if it contains linking errors
-    if (document.references.some((e) => e.error !== undefined)) {
-      return true;
-    }
+    // if (document.references.some((e) => e.error !== undefined)) {
+    //   return true;
+    // }
     const references = this.referenceIndex.get(documentUri);
     // ...or if it contains a reference to the changed file
     if (references) {

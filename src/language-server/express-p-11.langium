@@ -176,7 +176,7 @@ Complex_Primary: head=(Built_in_constant_or_function | Complex_Primary_reference
 Complex_Primary_body: parameterList=Actual_parameter_list? qualifiers+=Qualifier*;
 Built_in_constant_or_function returns string: Built_in_constant | Built_in_function;
 Complex_Primary_reference: to=[Complex_Primary_id:Simple_id];
-type Complex_Primary_id = EntityDefinition|FunctionDefinition|Attribute_decl|Parameter_id|Variable_id|Constant_body;
+type Complex_Primary_id = EntityDefinition|FunctionDefinition|Attribute_decl|Parameter_id|Variable_id|Constant_body|Enumeration_id|TypeDefinition;
 // TODO: enum_ref needs to be added since it can be used as head without type_ref
 
 Attribute_ref: target=[Attribute_decl:Simple_id] ;
@@ -292,6 +292,7 @@ type General_id = Variable_id | Parameter_id;
 
 Total_over: "TOTAL_OVER" "(" entities+=Entity_ref ( "," entities+=Entity_ref )? ")" ";" ;
 TypeDefinition: "TYPE" name=Simple_id "=" underlyingType=Underlying_type ";" where=Where_clause? "END_TYPE" ";" ;
+
 Type_id returns string: Simple_id ;
 Unary_op returns string: "+" | "-" | "NOT" ;
 Unique_rule: ( name=Rule_label_id ":" )? attributes+=Referenced_attribute ( "," attributes+=Referenced_attribute )* ";" ;

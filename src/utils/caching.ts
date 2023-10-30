@@ -70,7 +70,7 @@ export class ScopingCache {
   }
 
   public logFinal(): void {
-    console.log(`Saved: ${this.saved} - Computed: ${this.computed}`);
+    //console.log(`Saved: ${this.saved} - Computed: ${this.computed}`);
     this.saved = 0;
     this.computed = 0;
   }

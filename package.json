@@ -1,8 +1,15 @@
 {
-  "name": "easyexpress",
-  "displayName": "EasyExpress",
-  "description": "Please enter a brief description here",
-  "version": "0.2.1",
+  "name": "easyEXPRESS",
+  "displayName": "easyEXPRESS",
+  "description": "EXPRESS language support for Visual Studio Code",
+  "homepage": "https://github.com/usnistgov/easyexpress-public/",
+  "bugs": {
+    "url": "https://github.com/usnistgov/easyexpress-public/issues"
+  },
+  "publisher": "usnistgov",
+  "license": "See License.txt",
+  "icon": "nist_logo.png",
+  "version": "0.2.5",
   "engines": {
     "vscode": "^1.67.0"
   },
@@ -10,6 +17,52 @@
     "Programming Languages"
   ],
   "contributes": {
+    "configuration": {
+      "title": "easyEXPRESS language server",
+      "properties": {
+        "express-p-11.useOptimizedConfiguration": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use STEP optimized configuration and ignore files and folders not required for development."
+        },
+        "express-p-11.excludedFolders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "dvlp",
+            "sys",
+            "nav",
+            "ap233_system_engineering_and_design",
+            "css",
+            "doc",
+            "dtd",
+            "help",
+            "images",
+            "publication",
+            "utils",
+            "xsl",
+            "basic",
+            "library",
+            "resource_docs",
+            "business_object_models"
+          ],
+          "description": "Exclude folders that contain one of these keywords in their name."
+        },
+        "express-p-11.excludedFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "lf",
+            "concatenated"
+          ],
+          "description": "Exclude files that contain one of these keywords in their name."
+        }
+      }
+    },
     "languages": [
       {
         "id": "express-p-11",
@@ -38,7 +91,7 @@
     ]
   },
   "activationEvents": [
-    "onLanguage:express-p-11"
+    "workspaceContains:**/*.exp"
   ],
   "files": [
     "bin",

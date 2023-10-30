@@ -1,6 +1,8 @@
 import {
   AstNode,
+  ConfigurationProvider,
   DocumentState,
+  LangiumDocument,
   LangiumDocuments,
   MultiMap,
   getContainerOfType,
@@ -32,6 +34,10 @@ import {
   isUse_clause,
 } from "./generated/ast";
 import { CancellationToken } from "vscode-languageserver";
+import { allowedDocuments } from "../utils/file-filter";
+import { Configuration } from "./express-p11-workspace-manager";
+import { DefinitionType, ExpressP11Entity, ExpressP11Schema, InterfaceType } from "./express-p11-type-utilities";
+import { ExpressP11MemoPool } from "./express-p11-memo-pool";
 
 type ConcreteType = {
   name: string;
@@ -58,42 +64,57 @@ type ExpressSink = {
   localTypes: MultiMap<string, ConcreteType>;
   imports: MultiMap<string, SubSuperTypeDefinition>;
 };
+
 export class ExpressP11TypeContainer {
+  protected memoPool: ExpressP11MemoPool = new ExpressP11MemoPool();
+  protected schemas: Map<string, ExpressP11Schema> = new Map();
   protected readonly langiumDocuments: LangiumDocuments;
-  protected localTypes = new MultiMap<string, ConcreteType>();
+  protected localEntities = new MultiMap<string, ConcreteType>();
+  protected localPartialUseFrom = new MultiMap<string, SubSuperTypeDefinition>();
+  protected localPartialReferenceFrom = new MultiMap<string, SubSuperTypeDefinition>();
+
+  protected localFullUseFrom = new MultiMap<string, string>();
+  protected localFullReferenceFrom = new MultiMap<string, string>();
+
   protected readonly memoizedSupertypesCall = new Map<string, EntityDefinition[]>();
   protected readonly memoizedSubtypesCall = new Map<string, EntityDefinition[]>();
+  protected readonly memoizedAllResourcesFromCall = new Map<string, EntityDefinition[]>();
+  protected readonly memoizedAllDefinitionsFromCall = new Map<string, SubSuperTypeDefinition[]>();
+
   protected readonly memoizedAttributesCall = new Map<string, Attribute_decl[]>();
 
+  private workspaceConfiguration: Configuration = {
+    useOptimizedConfiguration: true,
+    excludedFiles: [],
+    excludedFolders: [],
+  };
+  private configurationProvider: ConfigurationProvider | undefined;
   constructor(services: ExpressP11SharedServices) {
     this.langiumDocuments = services.workspace.LangiumDocuments;
-    services.workspace.DocumentBuilder.onBuildPhase(DocumentState.ComputedScopes, (_, cancelToken) =>
-      this.build(cancelToken)
+    services.workspace.DocumentBuilder.onBuildPhase(DocumentState.ComputedScopes, (docs, cancelToken) =>
+      this.build(docs, cancelToken)
     );
   }
-  protected async build(cancelToken: CancellationToken): Promise<void> {
-    this.localTypes.clear();
-    this.memoizedSupertypesCall.clear();
+  protected async build(documents: LangiumDocument[], cancelToken: CancellationToken): Promise<void> {
+    this.reset();
+    await this.configureWorkspace();
     const sink: ExpressSink = {
       imports: new MultiMap<string, SubSuperTypeDefinition>(),
       localTypes: new MultiMap<string, ConcreteType>(),
     };
+    const validDocs = allowedDocuments(this.langiumDocuments.all.toArray(), this.workspaceConfiguration);
 
-    for (const document of this.langiumDocuments.all) {
-      await interruptAndCheck(cancelToken);
-      const value = document.parseResult.value;
-      if (isExpressFile(value)) {
-        await this.extractEntities(value, sink, cancelToken);
-      }
-    }
-    for (const document of this.langiumDocuments.all) {
+    await this.loadSchemas(validDocs, cancelToken, sink);
+
+    for (const document of validDocs) {
       await interruptAndCheck(cancelToken);
       const value = document.parseResult.value;
       if (isExpressFile(value)) {
         await this.resolveSpecifications(value, sink, cancelToken);
       }
     }
-    for (const document of this.langiumDocuments.all) {
+
+    for (const document of validDocs) {
       await interruptAndCheck(cancelToken);
       const value = document.parseResult.value;
       if (isExpressFile(value)) {
@@ -102,6 +123,42 @@ export class ExpressP11TypeContainer {
     }
 
     await this.resolveSubTypes(cancelToken);
+    console.log("done");
+  }
+
+  private async loadSchemas(validDocs: LangiumDocument<AstNode>[], cancelToken: CancellationToken, sink: ExpressSink) {
+    for (const document of validDocs) {
+      await interruptAndCheck(cancelToken);
+      const value = document.parseResult.value;
+      if (isExpressFile(value)) {
+        await this.extractEntities(value, sink, cancelToken);
+      }
+    }
+  }
+
+  private async configureWorkspace() {
+    const useOptimizedConfiguration = await this.configurationProvider?.getConfiguration(
+      "express-p-11",
+      "useOptimizedConfiguration"
+    );
+    const excludedFolders = await this.configurationProvider?.getConfiguration("express-p-11", "excludedFolders");
+    const excludedFiles = await this.configurationProvider?.getConfiguration("express-p-11", "excludedFiles");
+    this.workspaceConfiguration = { useOptimizedConfiguration, excludedFiles, excludedFolders };
+  }
+
+  private reset() {
+    this.localEntities.clear();
+    this.localFullReferenceFrom.clear();
+    this.localFullUseFrom.clear();
+    this.localPartialReferenceFrom.clear();
+    this.localPartialUseFrom.clear();
+    this.memoizedSupertypesCall.clear();
+    this.memoizedSubtypesCall.clear();
+    this.memoizedAllResourcesFromCall.clear();
+    this.memoizedAllDefinitionsFromCall.clear();
+    this.memoizedAttributesCall.clear();
+    this.schemas.clear();
+    this.memoPool.reset();
   }
 
   protected async resolveSuperTypes(
@@ -109,43 +166,65 @@ export class ExpressP11TypeContainer {
     sink: ExpressSink,
     cancelToken: CancellationToken
   ): Promise<void> {
+    if (!file.schemas) return;
     for (const schema of file.schemas) {
       await interruptAndCheck(cancelToken);
       const localTypes = sink.localTypes.get(schema.name);
       const imports = sink.imports.get(schema.name);
+      const allAvailable = this.getAllResourceDefinitionFrom(sink, schema.name);
       for (const eType of localTypes) {
         await interruptAndCheck(cancelToken);
         if (this.hasSuperTypes(eType.node)) {
           for (const supertype of eType.node.types.supertypes?.entities!) {
             const supertypeName = supertype.entity.$refText;
-            let supertypeObject = localTypes.find((t) => t.name === supertypeName);
-            let source: string | undefined = undefined;
-            if (supertypeObject) {
-              source = schema.name;
-            }
-            if (!supertypeObject) {
-              const importedObject = imports.find((i) => i.name === supertypeName);
-              if (importedObject) source = importedObject.schema;
-            }
-            if (!source) continue;
+            // let supertypeObject = localTypes.find((t) => t.name === supertypeName);
+            // let source: string | undefined = undefined;
+            // if (supertypeObject) {
+            //   source = schema.name;
+            // }
+            // if (!supertypeObject) {
+            //   const importedObject = imports.find((i) => i.name === supertypeName);
+            //   if (importedObject) source = importedObject.schema;
+            // }
+            // if (!source) continue;
 
-            eType.supertypes.push({
-              name: supertypeName,
-              schema: source,
-            });
+            // eType.supertypes.push({
+            //   name: supertypeName,
+            //   schema: source,
+            // });
+            const supertypeObject = allAvailable.find((def) => def.name === supertypeName);
+            if (supertypeObject) eType.supertypes.push(supertypeObject);
           }
         }
-        this.localTypes.add(schema.name, eType);
+        this.localEntities.add(schema.name, eType);
       }
+    }
+
+    for (const schema of this.schemas.values()) {
+      await interruptAndCheck(cancelToken);
+      if (schema.isResolved()) continue;
+      const allAvailable = schema.getAllResources();
+      for (const entity of schema.getEntities()) {
+        if (this.hasSuperTypes(entity.getNode())) {
+          for (const supertype of entity.getNode().types.supertypes?.entities!) {
+            const supertypeName = supertype.entity.$refText;
+            const supertypeDefinition = allAvailable.find(
+              (def) => def.type === DefinitionType.Entity && def.resource.getName() === supertypeName
+            );
+            if (supertypeDefinition) entity.addSuperType(supertypeDefinition.resource as ExpressP11Entity);
+          }
+        }
+      }
+      schema.markAsResolved();
     }
   }
 
   protected async resolveSubTypes(cancelToken: CancellationToken): Promise<void> {
     const tempoSubTypes = new MultiMap<string, SubSuperTypeDefinition>();
     const tempSystem = new MultiMap<string, ConcreteType>();
-    for (const schema of this.localTypes.keys()) {
+    for (const schema of this.localEntities.keys()) {
       await interruptAndCheck(cancelToken);
-      for (const eType of this.localTypes.get(schema)) {
+      for (const eType of this.localEntities.get(schema)) {
         const subtypeDefinition = this.getDefinition(eType, schema);
         for (const supertype of eType.supertypes) {
           this.addSubType(subtypeDefinition, supertype);
@@ -172,12 +251,16 @@ export class ExpressP11TypeContainer {
     sink: ExpressSink,
     cancelToken: CancellationToken
   ): Promise<void> {
+    if (!file.schemas) return;
     for (const schema of file.schemas) {
       await interruptAndCheck(cancelToken);
-
+      if (!schema.body) continue;
+      const expressSchema = this.schemas.get(schema.name);
+      if (!expressSchema) continue;
       for (const specification of schema.body.specifications) {
         await interruptAndCheck(cancelToken);
 
+        const interfacedSchema = this.schemas.get(specification.schema.$refText);
         if (isReference_clause(specification)) {
           if (specification.resources.length < 1) {
             //import all from schema
@@ -186,13 +269,25 @@ export class ExpressP11TypeContainer {
               imports.push({ name: t.name, schema: specification.schema.$refText });
             });
             sink.imports.addAll(schema.name, imports);
+            this.localFullReferenceFrom.add(schema.name, specification.schema.$refText);
+            //new
+            if (interfacedSchema) expressSchema.fullyInterfaceWith(interfacedSchema, InterfaceType.ReferenceFrom);
           }
           if (specification.resources.length >= 1) {
             for (const resource of specification.resources) {
               const imp0rt = sink.localTypes
                 .get(specification.schema.$refText)
                 .find((t) => t.name === resource.resource.$refText);
-              if (imp0rt) sink.imports.add(schema.name, { name: imp0rt.name, schema: specification.schema.$refText });
+              if (imp0rt) {
+                sink.imports.add(schema.name, { name: imp0rt.name, schema: specification.schema.$refText });
+                this.localPartialReferenceFrom.add(schema.name, {
+                  name: imp0rt.name,
+                  schema: specification.schema.$refText,
+                });
+              }
+              //new
+              const def = interfacedSchema?.getLocalDefinition(resource.resource.$refText);
+              if (def) expressSchema.partiallyInterfaceWith({ interface: InterfaceType.ReferenceFrom, ...def });
             }
           }
         }
@@ -205,13 +300,25 @@ export class ExpressP11TypeContainer {
               imports.push({ name: t.name, schema: specification.schema.$refText });
             });
             sink.imports.addAll(schema.name, imports);
+            this.localFullUseFrom.add(schema.name, specification.schema.$refText);
+            //new
+            if (interfacedSchema) expressSchema.fullyInterfaceWith(interfacedSchema, InterfaceType.UseFrom);
           }
           if (specification.resources.length >= 1) {
             for (const resource of specification.resources) {
               const imp0rt = sink.localTypes
                 .get(specification.schema.$refText)
                 .find((t) => t.name === resource.resource.$refText);
-              if (imp0rt) sink.imports.add(schema.name, { name: imp0rt.name, schema: specification.schema.$refText });
+              if (imp0rt) {
+                sink.imports.add(schema.name, { name: imp0rt.name, schema: specification.schema.$refText });
+                this.localPartialUseFrom.add(schema.name, {
+                  name: imp0rt.name,
+                  schema: specification.schema.$refText,
+                });
+              }
+              //new
+              const def = interfacedSchema?.getLocalDefinition(resource.resource.$refText);
+              if (def) expressSchema.partiallyInterfaceWith({ interface: InterfaceType.UseFrom, ...def });
             }
           }
         }
@@ -224,16 +331,22 @@ export class ExpressP11TypeContainer {
    */
   protected async extractEntities(file: ExpressFile, sink: ExpressSink, cancelToken: CancellationToken): Promise<void> {
     //
+    if (!file.schemas) return;
     for (const schema of file.schemas) {
       await interruptAndCheck(cancelToken);
       const temporaryTypes: ConcreteType[] = [];
+      if (!schema.body) continue;
+      const newSchema = new ExpressP11Schema(schema.name);
       for (const decl of schema.body.declarations) {
         if (isEntityDefinition(decl)) {
+          newSchema.addEntity(new ExpressP11Entity(decl.name, newSchema, decl));
           const concreteType: ConcreteType = { name: decl.name, subtypes: [], supertypes: [], local: true, node: decl };
           temporaryTypes.push(concreteType);
         }
       }
+      this.schemas.set(schema.name, newSchema);
       sink.localTypes.addAll(schema.name, temporaryTypes);
+      //   this.localTypes.addAll(schema.name, temporaryTypes);
     }
   }
 
@@ -317,12 +430,14 @@ export class ExpressP11TypeContainer {
     return supertypes;
   }
 
-  public getSubTypesOf(entity: string, schema: string): EntityDefinition[] {
+  public getSubTypesOf(entity: string, schema: string, traversed: string[] = []): EntityDefinition[] {
     if (!entity || !schema) {
       console.log(`Incomplete key ${entity}.${schema}`);
       return [];
     }
     const memoKey = `${schema}.${entity}`;
+    if (traversed.includes(memoKey)) return [];
+    traversed.push(memoKey);
     const hasBeenComputed = this.memoizedSubtypesCall.has(memoKey);
     if (hasBeenComputed) {
       return this.memoizedSubtypesCall.get(memoKey)!;
@@ -339,7 +454,7 @@ export class ExpressP11TypeContainer {
       const concreteSubtype = this.findType(subtypeDef.name, subtypeDef.schema);
       if (concreteSubtype) {
         subtypes.push(concreteSubtype.node);
-        subtypes.push(...this.getSuperTypesOf(subtypeDef.name, subtypeDef.schema));
+        subtypes.push(...this.getSubTypesOf(subtypeDef.name, subtypeDef.schema, traversed));
       }
     }
 
@@ -368,15 +483,124 @@ export class ExpressP11TypeContainer {
   public getFullSubSuperGraph(entity: EntityDefinition): EntityDefinition[] {
     // const graph: EntityDefinition[] = [];
     const supertypes = this.getSuperTypesFromDefinition(entity);
-    //const subtypes = this.getSubTypesFromDefinition(entity);
+    const subtypes = this.getSubTypesFromDefinition(entity);
     // for(const subtype of sub)
+    const result = [...supertypes, ...subtypes, entity];
+    //new
+    const schema = getContainerOfType(entity, isSchemaDefinition);
+    if (!schema || !schema.name) {
+      console.log(`No schema found for ${entity.name}`);
+    }
 
-    return [...supertypes, entity];
+    const expressSchema = this.schemas.get(schema!.name);
+    if (expressSchema) {
+      const expEntity = expressSchema.getEntity(entity.name);
+      if (expEntity) {
+        const newGraph = expEntity.getFullSubSuperGraph(this.memoPool);
+        if (newGraph) {
+          return newGraph;
+          //   if (newGraph.length !== result.length)
+          //     console.log(
+          //       `ERROR ${schema!.name}.${entity.name}: ${result.length} vs ${newGraph.length} : ${
+          //         result.length > newGraph.length ? "Regression" : "Improved"
+          //       }`
+          //     );
+        }
+      } else {
+        console.log(`ENTITY ${entity.name} NOT FOUND`);
+      }
+    } else {
+      console.log(`SCHEMA ${schema!.name} NOT FOUND`);
+    }
+    return result;
   }
   private findType(entity: string, schema: string): ConcreteType | undefined {
-    return this.localTypes.get(schema)?.find((t) => t.name === entity);
+    return this.localEntities.get(schema)?.find((t) => t.name === entity);
   }
   private hasSuperTypes(entity: EntityDefinition): boolean {
     return entity.types?.supertypes?.entities ? true : false;
+  }
+
+  public getAllResourcesFrom(
+    schema: string,
+    includeReference: boolean = true,
+    traversed: string[] = []
+  ): EntityDefinition[] {
+    if (traversed.includes(schema)) return [];
+    traversed.push(schema);
+    const hasBeenComputed = this.memoizedAllResourcesFromCall.has(schema);
+    if (hasBeenComputed) {
+      return this.memoizedAllResourcesFromCall.get(schema)!;
+    }
+
+    const entitiesInScope: EntityDefinition[] = [];
+    for (const e of this.localEntities.get(schema)) {
+      entitiesInScope.push(e.node);
+    }
+    for (const i of this.localPartialUseFrom.get(schema)) {
+      const def = this.findType(i.name, i.schema);
+      if (!def) continue;
+      entitiesInScope.push(def.node);
+    }
+    if (includeReference) {
+      for (const i of this.localPartialReferenceFrom.get(schema)) {
+        const def = this.findType(i.name, i.schema);
+        if (!def) continue;
+        entitiesInScope.push(def.node);
+      }
+      for (const i of this.localFullReferenceFrom.get(schema)) {
+        for (const e of this.localEntities.get(i)) {
+          entitiesInScope.push(e.node);
+        }
+      }
+    }
+
+    for (const fullImport of this.localFullUseFrom.get(schema)) {
+      const imported = this.getAllResourcesFrom(fullImport, false, traversed);
+      for (const e of imported) {
+        entitiesInScope.push(e);
+      }
+    }
+    this.memoizedAllResourcesFromCall.set(schema, entitiesInScope);
+    return entitiesInScope;
+  }
+  private getAllResourceDefinitionFrom(
+    sink: ExpressSink,
+    schema: string,
+    includeReference: boolean = true,
+    traversed: string[] = []
+  ): SubSuperTypeDefinition[] {
+    if (traversed.includes(schema)) return [];
+    traversed.push(schema);
+    // const hasBeenComputed = this.memoizedAllDefinitionsFromCall.has(schema);
+    // if (hasBeenComputed) {
+    //   return this.memoizedAllDefinitionsFromCall.get(schema)!;
+    // }
+    const entitiesInScope: SubSuperTypeDefinition[] = [];
+    // We add locally defined entities
+    for (const e of sink.localTypes.get(schema)) {
+      entitiesInScope.push({ name: e.name, schema });
+    }
+    for (const i of this.localPartialUseFrom.get(schema)) {
+      entitiesInScope.push(i);
+    }
+    if (includeReference) {
+      for (const i of this.localPartialReferenceFrom.get(schema)) {
+        entitiesInScope.push(i);
+      }
+      for (const i of this.localFullReferenceFrom.get(schema)) {
+        for (const e of sink.localTypes.get(i)) {
+          entitiesInScope.push({ schema: i, name: e.name });
+        }
+      }
+    }
+    for (const fullImport of this.localFullUseFrom.get(schema)) {
+      const imported = this.getAllResourceDefinitionFrom(sink, fullImport, false, traversed);
+      for (const e of imported) {
+        entitiesInScope.push(e);
+      }
+    }
+    // this.memoizedAllDefinitionsFromCall.set(schema, entitiesInScope);
+    return entitiesInScope;
   }
 }

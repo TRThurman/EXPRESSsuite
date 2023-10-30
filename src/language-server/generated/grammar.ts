@@ -9105,6 +9105,18 @@ export const ExpressP11Grammar = (): Grammar => loadedExpressP11Grammar ?? (load
             "typeRef": {
               "$ref": "#/rules@121"
             }
+          },
+          {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/rules@127"
+            }
+          },
+          {
+            "$type": "SimpleType",
+            "typeRef": {
+              "$ref": "#/rules@183"
+            }
           }
         ]
       }

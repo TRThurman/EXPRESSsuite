@@ -30,6 +30,8 @@ import {
   isComplex_Primary_reference,
   isDerived_attr,
   isEntityDefinition,
+  isEntityRef,
+  isEnumeration_type,
   isExplicit_attr,
   isFunctionDefinition,
   isGeneral_ref,
@@ -41,6 +43,9 @@ import {
   isQualifier,
   isReference_clause,
   isResource_or_rename,
+  isSchemaDefinition,
+  isSubtype_declaration,
+  isTypeDefinition,
 } from "./generated/ast";
 import { getReferenceSpecifications } from "../utils/interface-helpers";
 import {
@@ -122,6 +127,13 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     // 4. previous is head
 
     try {
+      //   if (context.property === "entity" && isEntityRef(context.container)) {
+      //     const schema = getContainerOfType(context.container, isSchemaDefinition);
+      //     if (!schema) return EMPTY_SCOPE;
+      //     const entities = this.typeContainer.getAllResourcesFrom(schema.name);
+      //     return this.createScopeForNodes(entities);
+      //   }
+
       //Inverse attribute
       if (context.property === "forAttribute" && isInverse_attr(context.container)) {
         const inverseAttribute = context.container as Inverse_attr;
@@ -286,11 +298,16 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
                     getDirectDataTypeFromAttribute(attr, this.p11References).forEach((type) =>
                       directLeftSideTypes.push(type.node)
                     );
-                    getDataTypesFromAttribute(attr, this.p11References).forEach((type) =>
-                      leftSideTypeOptions.push(
-                        this.toAstNodeDescription({ nameInScope: type.nameInScope, node: type.node })
-                      )
-                    );
+                    // getDataTypesFromAttribute(attr, this.p11References).forEach((type) =>
+                    //   leftSideTypeOptions.push(
+                    //     this.toAstNodeDescription({ nameInScope: type.nameInScope, node: type.node })
+                    //   )
+                    // );
+                    for (const type of directLeftSideTypes) {
+                      for (const entityDef of this.typeContainer.getFullSubSuperGraph(type)) {
+                        leftSideTypeOptions.push(this.descriptions.createDescription(entityDef, entityDef.name));
+                      }
+                    }
                     break;
                 }
                 break;
@@ -320,7 +337,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
           if (directLeftSideTypes.length < 1) return EMPTY_SCOPE;
 
           const attributes = directLeftSideTypes.map((type) => this.typeContainer.getAllAttributes(type)).flat();
-          return this.createScopeForNodes(attributes);
+          return this.createScopeForNodes(attributes, undefined, { caseInsensitive: true });
         }
 
         if (searchingFor === Qualifier.Group) {
@@ -333,12 +350,11 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
           //     .filter((o) => isEntityDefinition(o.node))
           //     .map((e) => this.descriptions.createDescription(e.node!, e.node?.name!));
         }
-        return this.createScope(scopeElements);
+        return this.createScope(scopeElements, undefined, { caseInsensitive: true });
       }
 
       return super.getScope(context);
     } catch (error) {
-      console.log("A scope could not be computed.");
       return EMPTY_SCOPE;
     }
 

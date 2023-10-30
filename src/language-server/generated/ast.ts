@@ -106,7 +106,7 @@ export function isBuilt_in_procedure(item: unknown): item is Built_in_procedure 
     return item === 'INSERT' || item === 'REMOVE';
 }
 
-export type Complex_Primary_id = Attribute_decl | Constant_body | EntityDefinition | FunctionDefinition | Parameter_id | Variable_id;
+export type Complex_Primary_id = Attribute_decl | Constant_body | EntityDefinition | Enumeration_id | FunctionDefinition | Parameter_id | TypeDefinition | Variable_id;
 
 export const Complex_Primary_id = 'Complex_Primary_id';
 
@@ -682,7 +682,7 @@ export function isAssignment_stmt_body(item: unknown): item is Assignment_stmt_b
 }
 
 export interface Attribute_id extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Enumeration_items | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'Attribute_id';
     name: string
 }
@@ -847,7 +847,7 @@ export function isCompound_stmt(item: unknown): item is Compound_stmt {
 }
 
 export interface Constant_body extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Enumeration_items | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'Constant_body';
     expression: Expression
     name: string
@@ -965,7 +965,7 @@ export function isEntity_ref(item: unknown): item is Entity_ref {
 }
 
 export interface EntityDefinition extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Enumeration_items | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'EntityDefinition';
     body: Entity_body
     name: string
@@ -1004,7 +1004,7 @@ export function isEnumeration_extension(item: unknown): item is Enumeration_exte
 }
 
 export interface Enumeration_id extends AstNode {
-    readonly $container: Enumeration_items;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Enumeration_items | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'Enumeration_id';
     name: string
 }
@@ -1131,7 +1131,7 @@ export function isFunction_ref(item: unknown): item is Function_ref {
 }
 
 export interface FunctionDefinition extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Enumeration_items | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'FunctionDefinition';
     algoHead: Algorithm_head
     head: Function_head
@@ -1408,7 +1408,7 @@ export function isOne_of(item: unknown): item is One_of {
 }
 
 export interface Parameter_id extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Enumeration_items | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'Parameter_id';
     name: string
 }
@@ -1491,7 +1491,7 @@ export function isProcedure_head(item: unknown): item is Procedure_head {
 }
 
 export interface ProcedureDefinition extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Enumeration_items | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'ProcedureDefinition';
     algoHead: Algorithm_head
     head: Procedure_head
@@ -1531,7 +1531,7 @@ export function isReal_type(item: unknown): item is Real_type {
 }
 
 export interface Redeclared_attribute extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Enumeration_items | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'Redeclared_attribute';
     isRenamed: boolean
     name?: string
@@ -1792,7 +1792,7 @@ export function isSubtype_declaration(item: unknown): item is Subtype_declaratio
 }
 
 export interface SubtypeConstraintDefinition extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Enumeration_items | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'SubtypeConstraintDefinition';
     body: Subtype_constraint_body
     name: string
@@ -1878,7 +1878,7 @@ export function isTotal_over(item: unknown): item is Total_over {
 }
 
 export interface TypeDefinition extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Enumeration_items | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'TypeDefinition';
     name: string
     underlyingType: Underlying_type
@@ -1942,7 +1942,7 @@ export function isUse_clause(item: unknown): item is Use_clause {
 }
 
 export interface Variable_id extends AstNode {
-    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
+    readonly $container: Algorithm_head | Alias_stmt | Constant_decl | Derived_attr | Enumeration_items | Explicit_attr | Formal_parameter | Increment_control | Inverse_attr | Local_variable | Query_expression | Schema_body;
     readonly $type: 'Variable_id';
     name: string
 }
@@ -2275,7 +2275,8 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
             case Set_type: {
                 return this.isSubtype(Aggregation_types, supertype);
             }
-            case Attribute_decl: {
+            case Attribute_decl:
+            case Enumeration_id: {
                 return this.isSubtype(Complex_Primary_id, supertype);
             }
             case Attribute_id:
@@ -2315,7 +2316,8 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
             case Entity_ref: {
                 return this.isSubtype(Instantiable_type, supertype);
             }
-            case EntityDefinition: {
+            case EntityDefinition:
+            case TypeDefinition: {
                 return this.isSubtype(Complex_Primary_id, supertype) || this.isSubtype(Declaration, supertype) || this.isSubtype(NamedResource, supertype) || this.isSubtype(NamedType, supertype);
             }
             case EntityRef:
@@ -2380,9 +2382,6 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
             }
             case Term: {
                 return this.isSubtype(Simple_expression, supertype);
-            }
-            case TypeDefinition: {
-                return this.isSubtype(Declaration, supertype) || this.isSubtype(NamedResource, supertype) || this.isSubtype(NamedType, supertype);
             }
             case Width_spec: {
                 return this.isSubtype(Binary_type, supertype) || this.isSubtype(String_type, supertype);
