@@ -1,6 +1,53 @@
+import { AstNode, getContainerOfType } from "langium";
 import { ExpressP11MemoPool, MemoQuery, MemoType } from "./express-p11-memo-pool";
-import { EntityDefinition } from "./generated/ast";
+import {
+  Derived_attr,
+  EntityDefinition,
+  Enumeration_id,
+  Enumeration_type,
+  Explicit_attr,
+  Parameter_type,
+  Select_type,
+  TypeDefinition,
+  isDerived_attr,
+  isEnumeration_type,
+  isExplicit_attr,
+  isGeneral_aggregation_types,
+  isNamed_types,
+  isSchemaDefinition,
+  isSelect_extension,
+  isSelect_list,
+  isSelect_type,
+} from "./generated/ast";
 
+export abstract class ExpressResource<T extends AstNode> {
+  protected owner: ExpressP11Schema | undefined;
+  protected name: string;
+  protected type: DefinitionType;
+
+  protected readonly node: T;
+  constructor(name: string, type: DefinitionType, node: T) {
+    this.name = name;
+    this.type = type;
+    this.node = node;
+  }
+
+  public getQualifiedName(): string {
+    return this.owner ? `${this.owner.getName()}.${this.name}` : `.${this.name}`;
+  }
+  public setOwner(owner: ExpressP11Schema) {
+    this.owner = owner;
+  }
+
+  public getName(): string {
+    return this.name;
+  }
+
+  public getNode(): T {
+    return this.node;
+  }
+  abstract getDefinition(): Definition;
+}
 export enum DefinitionType {
   Entity,
   EnumType,
@@ -29,29 +76,81 @@ export type Definition =
     };
 
 export type InterfacedDefinition = { interface: InterfaceType } & Definition;
+
+export enum ExpressConflictType {
+  EntityExistInSchema,
+  TypeExistInSchema,
+  FunctionExistInSchema,
+}
+export type ExpressConflict = { source: AstNode; type: ExpressConflictType };
+
+export class ExpressP11ConflictManager {
+  protected conflicts: ExpressConflict[] = [];
+
+  public addConflict(conflict: ExpressConflict): void {
+    if (conflict) this.conflicts.push(conflict);
+  }
+
+  public getConflicts(): ExpressConflict[] {
+    return this.conflicts;
+  }
+  public reset(): void {
+    this.conflicts = [];
+  }
+}
 export class ExpressP11Schema {
   protected hasResolvedGraph: boolean = false;
   protected name: string;
   protected entities: Map<string, ExpressP11Entity> = new Map();
+  protected types: Map<string, ExpressP11Type> = new Map();
+  protected conflictManager: ExpressP11ConflictManager;
   protected enumTypes: Map<string, ExpressP11EnumType> = new Map();
   protected selectTypes: Map<string, ExpressP11SelectType> = new Map();
   protected localResourceRegistry: Map<string, Definition> = new Map();
   protected partiallyInterfacedResourceRegistry: InterfacedDefinition[] = [];
   protected fullInterfaces: Interface[] = [];
 
-  constructor(name: string) {
+  constructor(name: string, conflictManager: ExpressP11ConflictManager) {
     this.name = name;
+    this.conflictManager = conflictManager;
   }
 
   public addEntity(entity: ExpressP11Entity): void {
     if (entity) {
+      if (this.entities.has(entity.getName())) {
+        this.conflictManager.addConflict({ source: entity.getNode(), type: ExpressConflictType.EntityExistInSchema });
+        return;
+      }
+      entity.setOwner(this);
       this.entities.set(entity.getName(), entity);
       this.localResourceRegistry.set(entity.getName(), entity.getDefinition());
     }
   }
 
+  public addType(type: ExpressP11Type): void {
+    if (type) {
+      if (this.types.has(type.getName()))
+        this.conflictManager.addConflict({
+          source: type.getNode(),
+          type: ExpressConflictType.TypeExistInSchema,
+        });
+      type.setOwner(this);
+      this.types.set(type.getName(), type);
+      this.localResourceRegistry.set(type.getName(), type.getDefinition());
+    }
+  }
+
   public markAsResolved() {
     this.hasResolvedGraph = true;
+  }
+
+  public resolve() {
+    this.resolveTypes();
+  }
+  public resolveTypes() {
+    for (const t of this.types.values()) {
+      t.resolve();
+    }
   }
   public isResolved() {
     return this.hasResolvedGraph;
@@ -59,13 +158,18 @@ export class ExpressP11Schema {
   public getEntity(name: string): ExpressP11Entity | undefined {
     return this.entities.get(name);
   }
-
+  public getType(name: string): ExpressP11Type | undefined {
+    return this.types.get(name);
+  }
   public getLocalDefinition(name: string): Definition | undefined {
     return this.localResourceRegistry.get(name);
   }
 
-  public getEntities(): IterableIterator<ExpressP11Entity> {
-    return this.entities.values();
+  public getEntities(): Map<string, ExpressP11Entity> {
+    return this.entities;
+  }
+  public getTypes(): Map<string, ExpressP11Type> {
+    return this.types;
   }
 
   public getLocalDefinitions(): IterableIterator<Definition> {
@@ -110,28 +214,12 @@ export class ExpressP11Schema {
   }
 }
 
-export class ExpressP11Entity {
-  protected name: string;
-  protected node: EntityDefinition;
+export class ExpressP11Entity extends ExpressResource<EntityDefinition> {
   protected subtypes: ExpressP11Entity[] = [];
   protected supertyes: ExpressP11Entity[] = [];
-  protected owner: ExpressP11Schema;
 
-  constructor(name: string, owner: ExpressP11Schema, node: EntityDefinition) {
-    this.name = name;
-    this.owner = owner;
-    this.node = node;
-  }
-
-  public getName(): string {
-    return this.name;
-  }
-
-  public getNode(): EntityDefinition {
-    return this.node;
-  }
-  public getQualifiedName(): string {
-    return `${this.owner.getName()}.${this.name}`;
+  constructor(name: string, node: EntityDefinition) {
+    super(name, DefinitionType.Entity, node);
   }
 
   public getDefinition(): Definition {
@@ -188,52 +276,228 @@ export class ExpressP11Entity {
   }
 }
 
-enum P11Type {
-  Enum,
-  Select,
-}
-export abstract class ExpressP11Type {
-  protected name: string;
+export abstract class ExpressP11Type extends ExpressResource<TypeDefinition> {
   protected isExtensible: boolean;
-  protected hasBase: boolean;
+  protected hasBase: boolean = false;
 
-  constructor(name: string, isExtensible: boolean, hasBase: boolean) {
-    this.name = name;
+  constructor(name: string, isExtensible: boolean, hasBase: boolean, type: DefinitionType, node: TypeDefinition) {
+    super(name, type, node);
     this.isExtensible = isExtensible;
     this.hasBase = hasBase;
   }
+
+  abstract resolve(): void;
 }
 
 export class ExpressP11EnumType extends ExpressP11Type {
-  protected values: string[] = [];
+  protected values: EnumValue[] = [];
   protected base: ExpressP11EnumType | undefined;
-  constructor(name: string, isExtensible: boolean, hasBase: boolean, base: ExpressP11EnumType, values: string[]) {
-    super(name, isExtensible, hasBase);
-    this.values = values;
-    this.base = base;
-  }
-
-  public getValues(): string[] {
-    return this.values;
-  }
-}
-
-export class ExpressP11SelectType extends ExpressP11Type {
-  protected values: ExpressP11Entity[] = [];
-  protected base: ExpressP11SelectType | undefined;
+  protected baseName: string | undefined;
   constructor(
     name: string,
     isExtensible: boolean,
     hasBase: boolean,
-    base: ExpressP11SelectType,
-    values: ExpressP11Entity[]
+    baseName: string | undefined,
+    values: EnumValue[],
+    node: TypeDefinition
   ) {
-    super(name, isExtensible, hasBase);
+    super(name, isExtensible, hasBase, DefinitionType.EnumType, node);
     this.values = values;
-    this.base = base;
+    this.baseName = baseName;
+  }
+
+  public getValues(): EnumValue[] {
+    const allValues: EnumValue[] = [];
+    allValues.push(...this.values);
+    if (this.hasBase && this.base) allValues.push(...this.base.getValues());
+    return allValues;
+  }
+  override getDefinition(): Definition {
+    return { resource: this, type: DefinitionType.EnumType };
+  }
+
+  override resolve(): void {
+    if (!this.hasBase) return;
+    const base = this.owner
+      ?.getAllResources()
+      .find((r) => r.type === DefinitionType.EnumType && r.resource.name === this.baseName);
+    if (base) this.base = base.resource as ExpressP11EnumType;
+  }
+}
+
+export type EnumValue = {
+  node: Enumeration_id;
+};
+
+export class ExpressP11SelectType extends ExpressP11Type {
+  protected values: ExpressP11Entity[] = [];
+  protected valueNames: string[] = [];
+  protected base: ExpressP11SelectType | undefined;
+  protected baseName: string | undefined;
+
+  constructor(
+    name: string,
+    isExtensible: boolean,
+    hasBase: boolean,
+    baseName: string | undefined,
+    valueNames: string[],
+    node: TypeDefinition
+  ) {
+    super(name, isExtensible, hasBase, DefinitionType.SelectType, node);
+    this.valueNames = valueNames;
+    this.baseName = baseName;
   }
 
   public getValues(): ExpressP11Entity[] {
-    return this.values;
+    const allValues: ExpressP11Entity[] = [];
+    allValues.push(...this.values);
+    if (this.hasBase && this.base) allValues.push(...this.base.getValues());
+    return allValues;
   }
+  override getDefinition(): Definition {
+    return { resource: this, type: DefinitionType.SelectType };
+  }
+  override resolve(): void {
+    this.resolveBase();
+    this.resolveSelectValues();
+  }
+
+  private resolveBase(): void {
+    if (!this.hasBase) return;
+    const base = this.owner
+      ?.getAllResources()
+      .find((r) => r.type === DefinitionType.SelectType && r.resource.name === this.baseName);
+    if (base) this.base = base.resource as ExpressP11SelectType;
+  }
+  private resolveSelectValues(): void {
+    for (const selectValue of this.valueNames) {
+      const selectEntity = this.owner
+        ?.getAllResources()
+        .find((r) => r.type === DefinitionType.Entity && r.resource.getName() === selectValue);
+      if (selectEntity) this.values.push(selectEntity.resource as ExpressP11Entity);
+    }
+  }
+}
+
+export class ExpressP11TypeFactory {
+  static getType(def: TypeDefinition): ExpressP11Type | undefined {
+    if (isEnumeration_type(def.underlyingType)) {
+      const enumType = def.underlyingType as Enumeration_type;
+      //basic enum
+      if (enumType.items) {
+        return new ExpressP11EnumType(
+          def.name,
+          enumType.isExtensible,
+          false,
+          undefined,
+          enumType.items.items.map((i) => ({ node: i } as EnumValue)),
+          def
+        );
+      }
+      //extension
+      if (enumType.extension) {
+        const baseName = enumType.extension.type.$refText;
+        return new ExpressP11EnumType(
+          def.name,
+          enumType.isExtensible,
+          true,
+          baseName,
+          enumType.extension.items?.items.map((i) => ({ node: i } as EnumValue)) ?? [],
+          def
+        );
+      }
+    }
+    if (isSelect_type(def.underlyingType)) {
+      const selectType = def.underlyingType as Select_type;
+      const isExtensible = selectType.isExtensible;
+      if (isSelect_list(selectType.select)) {
+        return new ExpressP11SelectType(
+          def.name,
+          isExtensible,
+          false,
+          undefined,
+          selectType.select.types.map((t) => t.$refText),
+          def
+        );
+      }
+      if (isSelect_extension(selectType.select)) {
+        const baseName = selectType.select.type.$refText;
+        return new ExpressP11SelectType(
+          def.name,
+          isExtensible,
+          true,
+          baseName,
+          selectType.select.selectList?.types.map((t) => t.$refText) ?? [],
+          def
+        );
+      }
+    }
+    return;
+  }
+}
+
+export class ExpressP11ParameterTypeResolver {
+  public static resolve(
+    attribute: Explicit_attr | Derived_attr,
+    schemas: Map<string, ExpressP11Schema>
+  ): ExpressP11ParameterTypeResolution {
+    if (isExplicit_attr(attribute) || isDerived_attr(attribute)) {
+      const schema = getContainerOfType(attribute, isSchemaDefinition);
+      if (!schema || !schema.name) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
+      const schemaObj = schemas.get(schema.name);
+      if (!schemaObj) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
+
+      //read parameterType
+      const parameterType = attribute.type;
+      return ExpressP11ParameterTypeResolver.resolveType(parameterType, schemaObj);
+    }
+
+    return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
+  }
+  private static resolveType(
+    parameterType: Parameter_type,
+    schema: ExpressP11Schema
+  ): ExpressP11ParameterTypeResolution {
+    if (isNamed_types(parameterType)) {
+      const entityDataType = parameterType.of;
+      if (!entityDataType) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
+
+      if (parameterType.of.error) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
+      const name = parameterType.of.$refText;
+      const namedTypeResource = schema.getAllResources().find((r) => r.resource.getName() === name);
+      if (!namedTypeResource) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
+      switch (namedTypeResource.type) {
+        case DefinitionType.Entity:
+          return {
+            type: ExpressP11ParameterTypeResolutionType.EntityDefinition,
+            value: [namedTypeResource.resource.getNode()],
+          };
+        case DefinitionType.SelectType:
+          return {
+            type: ExpressP11ParameterTypeResolutionType.EntityDefinition,
+            value: namedTypeResource.resource.getValues().map((v) => v.getNode()),
+          };
+        case DefinitionType.EnumType:
+          return {
+            type: ExpressP11ParameterTypeResolutionType.EnumValue,
+            value: namedTypeResource.resource.getValues(),
+          };
+      }
+    }
+    if (isGeneral_aggregation_types(parameterType)) {
+      return ExpressP11ParameterTypeResolver.resolveType(parameterType.type, schema);
+    }
+    return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
+  }
+}
+
+export type ExpressP11ParameterTypeResolution =
+  | { type: ExpressP11ParameterTypeResolutionType.EnumValue; value: EnumValue[] }
+  | { type: ExpressP11ParameterTypeResolutionType.EntityDefinition; value: EntityDefinition[] }
+  | { type: ExpressP11ParameterTypeResolutionType.Unresolved; value: undefined };
+
+export enum ExpressP11ParameterTypeResolutionType {
+  EnumValue,
+  EntityDefinition,
+  Unresolved,
 }

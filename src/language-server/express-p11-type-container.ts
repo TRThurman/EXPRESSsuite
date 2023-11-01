@@ -31,12 +31,21 @@ import {
   isRedeclared_attribute,
   isReference_clause,
   isSchemaDefinition,
+  isTypeDefinition,
   isUse_clause,
 } from "./generated/ast";
 import { CancellationToken } from "vscode-languageserver";
 import { allowedDocuments } from "../utils/file-filter";
 import { Configuration } from "./express-p11-workspace-manager";
-import { DefinitionType, ExpressP11Entity, ExpressP11Schema, InterfaceType } from "./express-p11-type-utilities";
+import {
+  DefinitionType,
+  ExpressConflict,
+  ExpressP11ConflictManager,
+  ExpressP11Entity,
+  ExpressP11Schema,
+  ExpressP11TypeFactory,
+  InterfaceType,
+} from "./express-p11-type-utilities";
 import { ExpressP11MemoPool } from "./express-p11-memo-pool";
 
 type ConcreteType = {
@@ -66,6 +75,7 @@ type ExpressSink = {
 };
 
 export class ExpressP11TypeContainer {
+  protected conflictManager: ExpressP11ConflictManager = new ExpressP11ConflictManager();
   protected memoPool: ExpressP11MemoPool = new ExpressP11MemoPool();
   protected schemas: Map<string, ExpressP11Schema> = new Map();
   protected readonly langiumDocuments: LangiumDocuments;
@@ -94,6 +104,14 @@ export class ExpressP11TypeContainer {
     services.workspace.DocumentBuilder.onBuildPhase(DocumentState.ComputedScopes, (docs, cancelToken) =>
       this.build(docs, cancelToken)
     );
+  }
+
+  public getSchemas(): Map<string, ExpressP11Schema> {
+    return this.schemas;
+  }
+
+  public getConflicts(): ExpressConflict[] {
+    return this.conflictManager.getConflicts();
   }
   protected async build(documents: LangiumDocument[], cancelToken: CancellationToken): Promise<void> {
     this.reset();
@@ -159,6 +177,7 @@ export class ExpressP11TypeContainer {
     this.memoizedAttributesCall.clear();
     this.schemas.clear();
     this.memoPool.reset();
+    this.conflictManager.reset();
   }
 
   protected async resolveSuperTypes(
@@ -204,7 +223,7 @@ export class ExpressP11TypeContainer {
       await interruptAndCheck(cancelToken);
       if (schema.isResolved()) continue;
       const allAvailable = schema.getAllResources();
-      for (const entity of schema.getEntities()) {
+      for (const entity of schema.getEntities().values()) {
         if (this.hasSuperTypes(entity.getNode())) {
           for (const supertype of entity.getNode().types.supertypes?.entities!) {
             const supertypeName = supertype.entity.$refText;
@@ -215,6 +234,7 @@ export class ExpressP11TypeContainer {
           }
         }
       }
+      schema.resolveTypes();
       schema.markAsResolved();
     }
   }
@@ -336,12 +356,16 @@ export class ExpressP11TypeContainer {
       await interruptAndCheck(cancelToken);
       const temporaryTypes: ConcreteType[] = [];
       if (!schema.body) continue;
-      const newSchema = new ExpressP11Schema(schema.name);
+      const newSchema = new ExpressP11Schema(schema.name, this.conflictManager);
       for (const decl of schema.body.declarations) {
         if (isEntityDefinition(decl)) {
-          newSchema.addEntity(new ExpressP11Entity(decl.name, newSchema, decl));
+          newSchema.addEntity(new ExpressP11Entity(decl.name, decl));
           const concreteType: ConcreteType = { name: decl.name, subtypes: [], supertypes: [], local: true, node: decl };
           temporaryTypes.push(concreteType);
+        }
+        if (isTypeDefinition(decl)) {
+          const type = ExpressP11TypeFactory.getType(decl);
+          if (type) newSchema.addType(type);
         }
       }
       this.schemas.set(schema.name, newSchema);
@@ -468,7 +492,14 @@ export class ExpressP11TypeContainer {
       console.log(`No schema found for ${entity.name}`);
       return [];
     }
-    return this.getSuperTypesOf(entity.name, schema.name);
+    return (
+      this.schemas
+        .get(schema.name)
+        ?.getEntity(entity.name)
+        ?.getSuperTypes(this.memoPool)
+        .map((t) => t.getNode()) ?? []
+    );
+    // return this.getSuperTypesOf(entity.name, schema.name);
   }
 
   public getSubTypesFromDefinition(entity: EntityDefinition): EntityDefinition[] {
@@ -477,7 +508,14 @@ export class ExpressP11TypeContainer {
       console.log(`No schema found for ${entity.name}`);
       return [];
     }
-    return this.getSubTypesOf(entity.name, schema.name);
+    return (
+      this.schemas
+        .get(schema.name)
+        ?.getEntity(entity.name)
+        ?.getSubTypes(this.memoPool)
+        .map((t) => t.getNode()) ?? []
+    );
+    //return this.getSubTypesOf(entity.name, schema.name);
   }
 
   public getFullSubSuperGraph(entity: EntityDefinition): EntityDefinition[] {
@@ -506,11 +544,7 @@ export class ExpressP11TypeContainer {
           //       }`
           //     );
         }
-      } else {
-        console.log(`ENTITY ${entity.name} NOT FOUND`);
       }
-    } else {
-      console.log(`SCHEMA ${schema!.name} NOT FOUND`);
     }
     return result;
   }

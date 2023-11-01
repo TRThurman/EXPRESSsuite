@@ -2457,11 +2457,18 @@ export const ExpressP11Grammar = (): Grammar => loadedExpressP11Grammar ?? (load
             "feature": "type",
             "operator": "=",
             "terminal": {
-              "$type": "RuleCall",
-              "rule": {
-                "$ref": "#/rules@104"
+              "$type": "CrossReference",
+              "type": {
+                "$ref": "#/rules@183"
               },
-              "arguments": []
+              "terminal": {
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@192"
+                },
+                "arguments": []
+              },
+              "deprecatedSyntax": false
             }
           },
           {
@@ -2505,8 +2512,14 @@ export const ExpressP11Grammar = (): Grammar => loadedExpressP11Grammar ?? (load
             "$type": "Group",
             "elements": [
               {
-                "$type": "Keyword",
-                "value": "EXTENSIBLE"
+                "$type": "Assignment",
+                "feature": "isExtensible",
+                "operator": "?=",
+                "terminal": {
+                  "$type": "Keyword",
+                  "value": "EXTENSIBLE"
+                },
+                "cardinality": "?"
               },
               {
                 "$type": "Keyword",
@@ -2640,11 +2653,18 @@ export const ExpressP11Grammar = (): Grammar => loadedExpressP11Grammar ?? (load
             "feature": "type",
             "operator": "=",
             "terminal": {
-              "$type": "RuleCall",
-              "rule": {
-                "$ref": "#/rules@104"
+              "$type": "CrossReference",
+              "type": {
+                "$ref": "#/rules@183"
               },
-              "arguments": []
+              "terminal": {
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@192"
+                },
+                "arguments": []
+              },
+              "deprecatedSyntax": false
             }
           },
           {

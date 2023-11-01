@@ -36,8 +36,8 @@ Attribute_id : name=Simple_id;
 Redeclared_attribute: qualifiedAttribute=Qualified_attribute (isRenamed?="RENAMED" name=Simple_id)? ; 
 
 Parameter_type : Generalized_types | Simple_types | Named_types ;
-type NamedType = EntityDefinition | TypeDefinition;
 Named_types: of=[NamedType:Simple_id] ;
+type NamedType = EntityDefinition | TypeDefinition;
 Simple_types  : Binary_type | Boolean_type | Integer_type | Logical_type | Number_type | Real_type | String_type ;
 Binary_type: "BINARY" Width_spec? ;
 Boolean_type returns string: "BOOLEAN";
@@ -72,11 +72,11 @@ Set_type  : "SET" bound=Bound_spec? "OF" type=Instantiable_type ;
 
 Enumeration_type: isExtensible?="EXTENSIBLE"? "ENUMERATION" (( "OF" items=Enumeration_items ) | extension=Enumeration_extension )? ;
 Enumeration_items: "(" items+=Enumeration_id ( "," items+=Enumeration_id )* ")" ;
-Enumeration_extension: "BASED_ON" type=Type_ref ( "WITH" items=Enumeration_items )? ;
+Enumeration_extension: "BASED_ON" type=[TypeDefinition:Simple_id] ( "WITH" items=Enumeration_items )? ;
 
-Select_type: ("EXTENSIBLE" "GENERIC_ENTITY"? )? "SELECT" select=(Select_list | Select_extension)? ; // withou GENERIC_ENTITY?
+Select_type: (isExtensible?="EXTENSIBLE"? "GENERIC_ENTITY"? )? "SELECT" select=(Select_list | Select_extension)? ; // withou GENERIC_ENTITY?
 Select_list: "(" types+=[NamedType:Simple_id] ( "," types+=[NamedType:Simple_id])* ")" ;
-Select_extension: "BASED_ON" type=Type_ref ("WITH" selectList=Select_list)? ;
+Select_extension: "BASED_ON" type=[TypeDefinition:Simple_id] ("WITH" selectList=Select_list)? ;
 
 Bit returns string: "0" | "1";
 // Digits returns number: Digit+;

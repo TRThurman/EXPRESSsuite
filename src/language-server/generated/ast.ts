@@ -994,7 +994,7 @@ export interface Enumeration_extension extends AstNode {
     readonly $container: Enumeration_type;
     readonly $type: 'Enumeration_extension';
     items?: Enumeration_items
-    type: Type_ref
+    type: Reference<TypeDefinition>
 }
 
 export const Enumeration_extension = 'Enumeration_extension';
@@ -1682,7 +1682,7 @@ export interface Select_extension extends AstNode {
     readonly $container: Select_type;
     readonly $type: 'Select_extension';
     selectList?: Select_list
-    type: Type_ref
+    type: Reference<TypeDefinition>
 }
 
 export const Select_extension = 'Select_extension';
@@ -1706,6 +1706,7 @@ export function isSelect_list(item: unknown): item is Select_list {
 export interface Select_type extends AstNode {
     readonly $container: Aggregate_type | Array_type | Bag_type | Constant_body | Derived_attr | Explicit_attr | Formal_parameter | Function_head | General_array_type | General_bag_type | General_list_type | General_set_type | List_type | Local_variable | Rule_head | Set_type | SubtypeConstraintDefinition | Total_over | TypeDefinition;
     readonly $type: 'Select_type';
+    isExtensible: boolean
     select?: Select_extension | Select_list
 }
 
@@ -2415,11 +2416,13 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
             case 'Population:entity': {
                 return EntityDefinition;
             }
+            case 'Enumeration_extension:type':
+            case 'Enumeration_reference:type':
+            case 'Select_extension:type': {
+                return TypeDefinition;
+            }
             case 'Enumeration_reference:ref': {
                 return Enumeration_id;
-            }
-            case 'Enumeration_reference:type': {
-                return TypeDefinition;
             }
             case 'Function_ref:function': {
                 return FunctionDefinition;
@@ -2762,6 +2765,14 @@ export class ExpressP11AstReflection extends AbstractAstReflection {
                     name: 'Select_list',
                     mandatory: [
                         { name: 'types', type: 'array' }
+                    ]
+                };
+            }
+            case 'Select_type': {
+                return {
+                    name: 'Select_type',
+                    mandatory: [
+                        { name: 'isExtensible', type: 'boolean' }
                     ]
                 };
             }
