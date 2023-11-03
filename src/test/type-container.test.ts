@@ -36,24 +36,24 @@ describe("Type container", async () => {
   await services.shared.workspace.DocumentBuilder.build([expDocument]);
   const typeContainer = services.shared.workspace.TypeContainer;
 
-  test("Find SCHEMA", () => {
+  test("All SCHEMA are found", () => {
     expect(typeContainer.getSchemas().get("Nist")).toBeDefined();
     expect(typeContainer.getSchemas().get("nistt")).toBeUndefined();
   });
 
-  test("Find ENTITY", () => {
+  test("All ENTITY are found", () => {
     expect(typeContainer.getSchemas().get("Nist")?.getEntity("Person")).toBeDefined();
     expect(typeContainer.getSchemas().get("Nist")?.getEntity("Employee")).toBeDefined();
     expect(typeContainer.getSchemas().get("Nist")?.getEntity("Fed")).toBeDefined();
     expect(typeContainer.getSchemas().get("Nist")?.getEntity("Guest")).toBeDefined();
   });
 
-  test("Find TYPE", () => {
+  test("All TYPE are found", () => {
     expect(typeContainer.getSchemas().get("Nist")?.getType("NistEmployee")).toBeDefined();
     expect(typeContainer.getSchemas().get("Nist")?.getType("NistEnum")).toBeDefined();
   });
 
-  test("Find TYPE type", () => {
+  test("TYPE type(ENUMERATION/SELECT) is detected", () => {
     expect(
       typeContainer.getSchemas().get("Nist")?.getType("NistEmployee")?.getDefinition().type ===
         DefinitionType.SelectType
@@ -63,7 +63,7 @@ describe("Type container", async () => {
     ).toBeTruthy();
   });
 
-  test("Find subtypes", () => {
+  test("Subtypes are found", () => {
     const personNode = typeContainer.getSchemas().get("Nist")?.getEntity("Person")?.getNode();
     expect(typeContainer.getSubTypesFromDefinition(personNode!).length).toBe(3);
 
@@ -76,7 +76,7 @@ describe("Type container", async () => {
     const guestNode = typeContainer.getSchemas().get("Nist")?.getEntity("Guest")?.getNode();
     expect(typeContainer.getSubTypesFromDefinition(guestNode!).length).toBe(0);
   });
-  test("Find supertypes", () => {
+  test("Supertypes are found", () => {
     const personNode = typeContainer.getSchemas().get("Nist")?.getEntity("Person")?.getNode();
     expect(typeContainer.getSuperTypesFromDefinition(personNode!).length).toBe(0);
 
@@ -89,7 +89,7 @@ describe("Type container", async () => {
     const guestNode = typeContainer.getSchemas().get("Nist")?.getEntity("Guest")?.getNode();
     expect(typeContainer.getSuperTypesFromDefinition(guestNode!).length).toBe(2);
   });
-  test("Find entity graph", () => {
+  test("ENTITY graph (SELF + supertypes + subtypes) is valid", () => {
     const personNode = typeContainer.getSchemas().get("Nist")?.getEntity("Person")?.getNode();
     expect(typeContainer.getFullSubSuperGraph(personNode!).length).toBe(4);
 
@@ -109,11 +109,13 @@ describe("TYPE resolver", async () => {
 
   const expFile =
     "SCHEMA Nist;" +
-    "TYPE NistEmployee = SELECT(Fed, Guest) ;" +
+    "TYPE NistSelect = SELECT(Fed) ;" +
     "END_TYPE;" +
     "TYPE NistEnum = EXTENSIBLE ENUMERATION OF(Fed, Guest) ;" +
     "END_TYPE;" +
     "TYPE ExtendedNistEnum = ENUMERATION BASED_ON NistEnum WITH(New) ;" +
+    "END_TYPE;" +
+    "TYPE ExtendedNistSelect = SELECT BASED_ON NistSelect WITH(Guest) ;" +
     "END_TYPE;" +
     "ENTITY Person;" +
     "END_ENTITY;" +
@@ -129,23 +131,31 @@ describe("TYPE resolver", async () => {
   await services.shared.workspace.DocumentBuilder.build([expDocument]);
   const typeContainer = services.shared.workspace.TypeContainer;
 
-  test("Find ENUMERATION TYPE values", () => {
+  test("ENUMERATION values are found", () => {
     expect((typeContainer.getSchemas().get("Nist")?.getType("NistEnum") as ExpressP11EnumType).getValues().length).toBe(
       2
     );
+  });
+  test("ENUMERATION BASED_ON values are found", () => {
     expect(
       (typeContainer.getSchemas().get("Nist")?.getType("ExtendedNistEnum") as ExpressP11EnumType).getValues().length
     ).toBe(3);
   });
 
-  test("Find SELECT TYPE values", () => {
+  test("SELECT values are found", () => {
     expect(
-      (typeContainer.getSchemas().get("Nist")?.getType("NistEmployee") as ExpressP11SelectType).getValues().length
+      (typeContainer.getSchemas().get("Nist")?.getType("NistSelect") as ExpressP11SelectType).getValues().length
+    ).toBe(1);
+  });
+
+  test("SELECT BASED_ON values are found", () => {
+    expect(
+      (typeContainer.getSchemas().get("Nist")?.getType("ExtendedNistSelect") as ExpressP11SelectType).getValues().length
     ).toBe(2);
   });
 });
 
-describe("Interface resolver", async () => {
+describe("Interfaces", async () => {
   const services = createExpressP11Services(EmptyFileSystem).ExpressP11;
 
   const expFile =
@@ -184,14 +194,18 @@ describe("Interface resolver", async () => {
   await services.shared.workspace.DocumentBuilder.build([expDocument]);
   const typeContainer = services.shared.workspace.TypeContainer;
 
-  test("USE FROM", () => {
-    expect(typeContainer.getSchemas().get("One")?.getAllResources().length).toBe(2);
-    expect(typeContainer.getSchemas().get("Two")?.getAllResources().length).toBe(3);
-    expect(typeContainer.getSchemas().get("Four")?.getAllResources().length).toBe(3);
+  test("USE FROM are imported", () => {
+    expect(typeContainer.getSchemas().get("One")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(2);
+    expect(typeContainer.getSchemas().get("Two")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(3);
+    expect(typeContainer.getSchemas().get("Four")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(
+      3
+    );
   });
 
-  test("REFERENCE FROM", () => {
-    expect(typeContainer.getSchemas().get("Three")?.getAllResources().length).toBe(2);
+  test("REFERENCE FROM are imported", () => {
+    expect(typeContainer.getSchemas().get("Three")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(
+      2
+    );
   });
 });
 
