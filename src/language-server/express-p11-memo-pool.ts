@@ -1,10 +1,17 @@
-import { ExpressP11Entity } from "./express-p11-type-utilities";
+import {
+  Definition,
+  ExpressP11Entity,
+  ExpressP11OptimizedResourceList,
+  ExpressP11ParameterTypeResolution,
+} from "./express-p11-type-utilities";
 import { EntityDefinition } from "./generated/ast";
 
 export enum MemoType {
   Supertypes,
   Subtypes,
   Graph,
+  Resources,
+  Types,
 }
 
 export type MemoRecord = { name: string } & (
@@ -20,6 +27,14 @@ export type MemoRecord = { name: string } & (
       type: MemoType.Graph;
       payload: EntityDefinition[];
     }
+  | {
+      type: MemoType.Resources;
+      payload: ExpressP11OptimizedResourceList;
+    }
+  | {
+      type: MemoType.Types;
+      payload: ExpressP11ParameterTypeResolution;
+    }
 );
 
 export type MemoQuery = {
@@ -32,6 +47,7 @@ export class ExpressP11MemoPool {
   protected readonly memoizedSubtypesCall = new Map<string, ExpressP11Entity[]>();
 
   protected readonly memoizedGraphCall = new Map<string, EntityDefinition[]>();
+  protected readonly memoizedAllResourcesCall = new Map<string, ExpressP11OptimizedResourceList>();
 
   constructor() {}
 
@@ -39,6 +55,7 @@ export class ExpressP11MemoPool {
     this.memoizedGraphCall.clear();
     this.memoizedSubtypesCall.clear();
     this.memoizedSupertypesCall.clear();
+    this.memoizedAllResourcesCall.clear();
   }
   public memoize(record: MemoRecord): void {
     switch (record.type) {
@@ -51,6 +68,9 @@ export class ExpressP11MemoPool {
       case MemoType.Supertypes:
         this.memoizedSupertypesCall.set(record.name, record.payload);
         break;
+      case MemoType.Resources:
+        this.memoizedAllResourcesCall.set(record.name, record.payload);
+        break;
     }
   }
 
@@ -62,12 +82,14 @@ export class ExpressP11MemoPool {
         return this.memoizedSubtypesCall.has(query.name);
       case MemoType.Supertypes:
         return this.memoizedSupertypesCall.has(query.name);
+      case MemoType.Resources:
+        return this.memoizedAllResourcesCall.has(query.name);
       default:
         return false;
     }
   }
 
-  public query(query: MemoQuery): ExpressP11Entity[] | EntityDefinition[] {
+  public query(query: MemoQuery): ExpressP11Entity[] | EntityDefinition[] | ExpressP11OptimizedResourceList {
     switch (query.type) {
       case MemoType.Graph:
         return this.memoizedGraphCall.get(query.name) ?? [];
@@ -75,6 +97,8 @@ export class ExpressP11MemoPool {
         return this.memoizedSubtypesCall.get(query.name) ?? [];
       case MemoType.Supertypes:
         return this.memoizedSupertypesCall.get(query.name) ?? [];
+      case MemoType.Resources:
+        return this.memoizedAllResourcesCall.get(query.name) ?? [];
       default:
         return [];
     }

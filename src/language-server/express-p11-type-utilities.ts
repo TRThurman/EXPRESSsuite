@@ -1,4 +1,4 @@
-import { AstNode, getContainerOfType } from "langium";
+import { AstNode, MultiMap, getContainerOfType } from "langium";
 import { ExpressP11MemoPool, MemoQuery, MemoType } from "./express-p11-memo-pool";
 import {
   Derived_attr,
@@ -6,6 +6,7 @@ import {
   Enumeration_id,
   Enumeration_type,
   Explicit_attr,
+  Inverse_attr,
   Parameter_type,
   Select_type,
   TypeDefinition,
@@ -13,6 +14,7 @@ import {
   isEnumeration_type,
   isExplicit_attr,
   isGeneral_aggregation_types,
+  isInverse_attr,
   isNamed_types,
   isSchemaDefinition,
   isSelect_extension,
@@ -144,12 +146,12 @@ export class ExpressP11Schema {
     this.hasResolvedGraph = true;
   }
 
-  public resolve() {
-    this.resolveTypes();
+  public resolve(memoPool: ExpressP11MemoPool) {
+    this.resolveTypes(memoPool);
   }
-  public resolveTypes() {
+  public resolveTypes(memoPool: ExpressP11MemoPool) {
     for (const t of this.types.values()) {
-      t.resolve();
+      t.resolve(memoPool);
     }
   }
   public isResolved() {
@@ -185,28 +187,67 @@ export class ExpressP11Schema {
     this.partiallyInterfacedResourceRegistry.push(definition);
   }
 
-  public getAllResources(includeReference: boolean = true, exclude: string[] = []): Definition[] {
-    if (exclude.includes(this.name)) return [];
-    exclude.push(this.name);
-    const definitionsInScope: Definition[] = [];
+  public getAllResources(
+    memoPool: ExpressP11MemoPool = new ExpressP11MemoPool(),
+    includeReference: boolean = true,
+    exclude: string[] = []
+  ): ExpressP11OptimizedResourceList {
+    const def = new ExpressP11OptimizedResourceList();
 
-    definitionsInScope.push(...this.localResourceRegistry.values());
+    if (memoPool.exist({ name: this.getName(), type: MemoType.Resources }))
+      return memoPool.query({ name: this.getName(), type: MemoType.Resources }) as ExpressP11OptimizedResourceList;
+    if (exclude.includes(this.name)) return new ExpressP11OptimizedResourceList();
+    exclude.push(this.name);
+    // const definitionsInScope: Definition[] = [];
+
+    //definitionsInScope.push(...this.localResourceRegistry.values());
+    for (const resource of this.localResourceRegistry.values()) {
+      //   definitionsInScope.push(resource);
+      def.add(resource.type, resource.resource.getName(), resource);
+    }
 
     if (includeReference) {
-      definitionsInScope.push(...this.partiallyInterfacedResourceRegistry.values());
-      this.fullInterfaces
-        .filter((i) => i.type === InterfaceType.ReferenceFrom)
-        .forEach((i) => definitionsInScope.push(...i.schema.getLocalDefinitions()));
+      // definitionsInScope.push(...this.partiallyInterfacedResourceRegistry.values());
+      for (const resource of this.partiallyInterfacedResourceRegistry.values()) {
+        // definitionsInScope.push(resource);
+        def.add(resource.type, resource.resource.getName(), resource);
+      }
+
+      //   this.fullInterfaces
+      //     .filter((i) => i.type === InterfaceType.ReferenceFrom)
+      //     .forEach((i) => definitionsInScope.push(...i.schema.getLocalDefinitions()));
+      for (const i of this.fullInterfaces.filter((i) => i.type === InterfaceType.ReferenceFrom)) {
+        for (const resource of i.schema.getLocalDefinitions()) {
+          //   definitionsInScope.push(resource);
+          def.add(resource.type, resource.resource.getName(), resource);
+        }
+      }
     } else {
-      definitionsInScope.push(
-        ...this.partiallyInterfacedResourceRegistry.filter((elt) => elt.interface != InterfaceType.ReferenceFrom)
-      );
+      //   definitionsInScope.push(
+      //     ...this.partiallyInterfacedResourceRegistry.filter((elt) => elt.interface != InterfaceType.ReferenceFrom)
+      //     );
+      for (const resource of this.partiallyInterfacedResourceRegistry.filter(
+        (elt) => elt.interface != InterfaceType.ReferenceFrom
+      )) {
+        // definitionsInScope.push(resource);
+        def.add(resource.type, resource.resource.getName(), resource);
+      }
     }
 
     for (const useFromInterface of this.fullInterfaces.filter((i) => i.type === InterfaceType.UseFrom)) {
-      definitionsInScope.push(...useFromInterface.schema.getAllResources(false, exclude));
+      // definitionsInScope.push(...useFromInterface.schema.getAllResources(false, exclude));
+      for (const resources of useFromInterface.schema.getAllResources(memoPool, false, exclude).resources.values()) {
+        for (const resource of resources.values()) {
+          def.add(resource.type, resource.resource.getName(), resource);
+        }
+
+        // definitionsInScope.push(resource);
+        // def.add(resource.type, resource.resource.getName(), resource);
+      }
     }
-    return definitionsInScope;
+    memoPool.memoize({ name: this.getName(), payload: def, type: MemoType.Resources });
+
+    return def;
   }
 
   public getName(): string {
@@ -286,7 +327,7 @@ export abstract class ExpressP11Type extends ExpressResource<TypeDefinition> {
     this.hasBase = hasBase;
   }
 
-  abstract resolve(): void;
+  abstract resolve(memoPool: ExpressP11MemoPool): void;
 }
 
 export class ExpressP11EnumType extends ExpressP11Type {
@@ -316,11 +357,12 @@ export class ExpressP11EnumType extends ExpressP11Type {
     return { resource: this, type: DefinitionType.EnumType };
   }
 
-  override resolve(): void {
+  override resolve(memoPool: ExpressP11MemoPool): void {
     if (!this.hasBase) return;
-    const base = this.owner
-      ?.getAllResources()
-      .find((r) => r.type === DefinitionType.EnumType && r.resource.name === this.baseName);
+    // const base = this.owner
+    //   ?.getAllResources(memoPool)
+    //   .find((r) => r.type === DefinitionType.EnumType && r.resource.name === this.baseName);
+    const base = this.owner?.getAllResources(memoPool)?.resources.get(DefinitionType.EnumType)?.get(this.baseName!);
     if (base) this.base = base.resource as ExpressP11EnumType;
   }
 }
@@ -357,23 +399,28 @@ export class ExpressP11SelectType extends ExpressP11Type {
   override getDefinition(): Definition {
     return { resource: this, type: DefinitionType.SelectType };
   }
-  override resolve(): void {
-    this.resolveBase();
-    this.resolveSelectValues();
+  override resolve(memoPool: ExpressP11MemoPool): void {
+    this.resolveBase(memoPool);
+    this.resolveSelectValues(memoPool);
   }
 
-  private resolveBase(): void {
+  private resolveBase(memoPool: ExpressP11MemoPool): void {
     if (!this.hasBase) return;
-    const base = this.owner
-      ?.getAllResources()
-      .find((r) => r.type === DefinitionType.SelectType && r.resource.name === this.baseName);
+    // const base = this.owner
+    //   ?.getAllResources(memoPool)
+    //   .find((r) => r.type === DefinitionType.SelectType && r.resource.name === this.baseName);
+    const base = this.owner?.getAllResources(memoPool)?.resources.get(DefinitionType.SelectType)?.get(this.baseName!);
     if (base) this.base = base.resource as ExpressP11SelectType;
   }
-  private resolveSelectValues(): void {
+  private resolveSelectValues(memoPool: ExpressP11MemoPool): void {
     for (const selectValue of this.valueNames) {
+      //   const selectEntity = this.owner
+      //     ?.getAllResources(memoPool)
+      //     .find((r) => r.type === DefinitionType.Entity && r.resource.getName() === selectValue);
       const selectEntity = this.owner
-        ?.getAllResources()
-        .find((r) => r.type === DefinitionType.Entity && r.resource.getName() === selectValue);
+        ?.getAllResources(memoPool)
+        ?.resources.get(DefinitionType.Entity)
+        ?.get(selectValue);
       if (selectEntity) this.values.push(selectEntity.resource as ExpressP11Entity);
     }
   }
@@ -438,25 +485,35 @@ export class ExpressP11TypeFactory {
 
 export class ExpressP11ParameterTypeResolver {
   public static resolve(
-    attribute: Explicit_attr | Derived_attr,
-    schemas: Map<string, ExpressP11Schema>
+    attribute: Explicit_attr | Derived_attr | Inverse_attr,
+    schemas: Map<string, ExpressP11Schema>,
+    memoPool: ExpressP11MemoPool = new ExpressP11MemoPool()
   ): ExpressP11ParameterTypeResolution {
+    const schema = getContainerOfType(attribute, isSchemaDefinition);
+    if (!schema || !schema.name) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
+    const schemaObj = schemas.get(schema.name);
+    if (!schemaObj) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
     if (isExplicit_attr(attribute) || isDerived_attr(attribute)) {
-      const schema = getContainerOfType(attribute, isSchemaDefinition);
-      if (!schema || !schema.name) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
-      const schemaObj = schemas.get(schema.name);
-      if (!schemaObj) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
-
       //read parameterType
       const parameterType = attribute.type;
-      return ExpressP11ParameterTypeResolver.resolveType(parameterType, schemaObj);
+      return ExpressP11ParameterTypeResolver.resolveType(parameterType, schemaObj, memoPool);
+    }
+    if (isInverse_attr(attribute)) {
+      const entityName = attribute.type.$refText;
+      const entityObj = schemaObj.getAllResources(memoPool).resources.get(DefinitionType.Entity)?.get(entityName);
+      if (entityObj)
+        return {
+          type: ExpressP11ParameterTypeResolutionType.EntityDefinition,
+          value: [entityObj.resource.getNode() as EntityDefinition],
+        };
     }
 
     return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
   }
   private static resolveType(
     parameterType: Parameter_type,
-    schema: ExpressP11Schema
+    schema: ExpressP11Schema,
+    memoPool: ExpressP11MemoPool
   ): ExpressP11ParameterTypeResolution {
     if (isNamed_types(parameterType)) {
       const entityDataType = parameterType.of;
@@ -464,7 +521,7 @@ export class ExpressP11ParameterTypeResolver {
 
       if (parameterType.of.error) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
       const name = parameterType.of.$refText;
-      const namedTypeResource = schema.getAllResources().find((r) => r.resource.getName() === name);
+      const namedTypeResource = schema.getAllResources(memoPool).findByName(name);
       if (!namedTypeResource) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
       switch (namedTypeResource.type) {
         case DefinitionType.Entity:
@@ -485,7 +542,7 @@ export class ExpressP11ParameterTypeResolver {
       }
     }
     if (isGeneral_aggregation_types(parameterType)) {
-      return ExpressP11ParameterTypeResolver.resolveType(parameterType.type, schema);
+      return ExpressP11ParameterTypeResolver.resolveType(parameterType.type, schema, memoPool);
     }
     return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
   }
@@ -500,4 +557,29 @@ export enum ExpressP11ParameterTypeResolutionType {
   EnumValue,
   EntityDefinition,
   Unresolved,
+}
+
+export class ExpressP11OptimizedResourceList {
+  protected resource = new Map<DefinitionType, Map<string, Definition>>();
+
+  public add(type: DefinitionType, name: string, definition: Definition): void {
+    if (this.resource.has(type)) {
+      this.resource.get(type)?.set(name, definition);
+    } else {
+      this.resource.set(type, new Map<string, Definition>());
+      this.resource.get(type)?.set(name, definition);
+    }
+  }
+
+  get resources() {
+    return this.resource;
+  }
+
+  public findByName(name: string): Definition | undefined {
+    let result: Definition | undefined;
+    this.resource.forEach((v, k) => {
+      if (v.has(name)) result = v.get(name);
+    });
+    return result;
+  }
 }
