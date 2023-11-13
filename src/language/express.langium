@@ -247,7 +247,7 @@ Interval_item: Simple_expression ;
 Interval_low: Simple_expression ;
 Interval_op returns string: "<=" | "<" ;
 Local_decl: "LOCAL" variables+=Local_variable+ "END_LOCAL" ";" ;
-Local_variable: ids+=Variable_id ( "," ids+=Variable_id)* ":" type=Parameter_type ( ":=" Expression )? ";" ;
+Local_variable: ids+=Variable_id ( "," ids+=Variable_id)* ":" type=Parameter_type ( ":=" expression=Expression )? ";" ;
 Logical_expression: Expression ;
 Multiplication_like_op returns string: "*" | "/" | "DIV" | "MOD" | "AND" | "||" ;
 Named_type_or_rename: resource=[NamedType:Simple_id] (isRenamed?="AS" name=( Simple_id ) )? ;
