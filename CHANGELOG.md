@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0-2](https://github.com/usnistgov/easy-express/compare/0.3.0-1...0.3.0-2) (2023-11-13)
+
+
+### Bug Fixes
+
+* assets folder to vscodeignore ([1f86283](https://github.com/usnistgov/easy-express/commit/1f86283041263694bb0ccfedae7be91b2a9197eb))
+
 ## [0.3.0-1](https://github.com/usnistgov/easy-express/compare/0.3.0-0...0.3.0-1) (2023-11-13)
 
 
