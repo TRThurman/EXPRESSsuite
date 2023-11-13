@@ -25,7 +25,8 @@
     "langium:watch": "langium generate --watch",
     "test": "vitest --reporter=verbose",
     "coverage": "vitest --coverage",
-    "release-pre": "release-it --preRelease --ci"
+    "release-pre": "release-it --preRelease --ci",
+    "release": "release-it --ci"
   },
   "dependencies": {
     "chalk": "~5.3.0",

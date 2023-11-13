@@ -1,0 +1,26 @@
+name: Create release version
+on: workflow_dispatch
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install deps
+        run: npm ci
+      - name: Init git user
+        run: |
+          git config --global user.email "krimas@nist.gov"
+          git config --global user.name "Sylvere Krima"
+      - name: Install vsce
+        run: npm i -g @vscode/vsce
+      - name: Generate language utilities
+        run: npm run langium:generate
+      - name: Release extension
+        run: npm run release
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: End message
+        run: echo 'Done'
