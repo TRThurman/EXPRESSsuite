@@ -1,0 +1,36 @@
+{
+  "github": {
+    "release": true,
+    "assets": ["*.vsix"]
+  },
+  "npm": {
+    "publish": false
+  },
+  "git": {
+    "commitMessage": "chore: release v${version}",
+    "changelog": "npx auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs"
+  },
+  "hooks": {
+    "before:github:release": "vsce package"
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "header": "# Changelog",
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          {
+            "type": "feat",
+            "section": "Features"
+          },
+          {
+            "type": "fix",
+            "section": "Bug Fixes"
+          },
+          {}
+        ]
+      },
+      "infile": "CHANGELOG.md"
+    }
+  }
+}
