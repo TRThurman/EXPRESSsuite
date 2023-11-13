@@ -1,7 +1,7 @@
 import { DocumentSymbol } from "vscode-languageserver";
-import { ProcedureDefinition, SchemaDefinition, isProcedureDefinition } from "../language-server/generated/ast";
-import { schemaHasDeclarations } from "./schema-helpers";
-import { ExpressKind, getDocumentSymbol } from "./general";
+import { ProcedureDefinition, SchemaDefinition, isProcedureDefinition } from "../language/generated/ast.js";
+import { schemaHasDeclarations } from "./schema-helpers.js";
+import { ExpressKind, getDocumentSymbol } from "./general.js";
 
 export const getProcedureDocumentSymbols = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
@@ -26,12 +26,7 @@ export const getProcedureDeclarations = (schema: SchemaDefinition): ProcedureDef
 
 export const getProcedureDocumentSymbol = (proc: ProcedureDefinition): DocumentSymbol | undefined => {
   if (proc && proc.$cstNode && proc.head.$cstNode) {
-    const typeSymbol = getDocumentSymbol(
-      ExpressKind.Function,
-      proc.name,
-      proc.$cstNode.range,
-      proc.head.$cstNode.range
-    );
+    const typeSymbol = getDocumentSymbol(ExpressKind.Function, proc.name, proc.$cstNode.range, proc.head.$cstNode.range);
     return typeSymbol;
   }
   return;

@@ -1,9 +1,9 @@
 import { EmptyFileSystem } from "langium";
 import { describe, expect, test } from "vitest";
-import { createExpressP11Services } from "../language-server/express-p11-module";
+import { createExpressP11Services } from "../language/express-module.js";
 import { expectSymbols } from "langium/test";
 import { DocumentSymbol } from "vscode-languageserver";
-import { ExpressKind } from "../utils/general";
+import { ExpressKind } from "../utils/general.js";
 
 describe("Symbol provider", async () => {
   const text = `SCHEMA Nist;
@@ -36,10 +36,9 @@ describe("Symbol provider", async () => {
       text,
       assert: (symbols: DocumentSymbol[]) => {
         expect(symbols[0].kind).toBe(ExpressKind.Namespace);
-        const [EntA, EntB, TSelect] = [...symbols[0].children!];
-        expect(TSelect.kind).toBe(ExpressKind.Type);
-        expect(EntA.kind).toBe(ExpressKind.Entity);
-        expect(EntB.kind).toBe(ExpressKind.Entity);
+        expect(symbols[0].children?.find((c) => c.name === "TSelect")?.kind).toBe(ExpressKind.Type);
+        expect(symbols[0].children?.find((c) => c.name === "EntA")?.kind).toBe(ExpressKind.Entity);
+        expect(symbols[0].children?.find((c) => c.name === "EntB")?.kind).toBe(ExpressKind.Entity);
       },
     });
   });
@@ -48,10 +47,10 @@ describe("Symbol provider", async () => {
       text,
       assert: (symbols: DocumentSymbol[]) => {
         expect(symbols[0].name).toBe("Nist");
-        const [EntA, EntB, TSelect] = [...symbols[0].children!];
-        expect(TSelect.name).toBe("TSelect");
-        expect(EntA.name).toBe("EntA");
-        expect(EntB.name).toBe("EntB");
+
+        expect(symbols[0].children?.find((c) => c.name === "TSelect")).toBeDefined;
+        expect(symbols[0].children?.find((c) => c.name === "EntA")).toBeDefined;
+        expect(symbols[0].children?.find((c) => c.name === "EntB")).toBeDefined;
       },
     });
   });

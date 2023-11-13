@@ -1,4 +1,11 @@
+langium-quickstart.md
 .vscode/**
 .vscode-test/**
+out/test/**
+src/**
 .gitignore
-langium-quickstart.md
+.yarnrc
+**/tsconfig.json
+**/.eslintrc.json
+**/*.map
+**/*.ts

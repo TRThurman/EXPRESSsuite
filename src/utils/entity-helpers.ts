@@ -24,12 +24,12 @@ import {
   isSelect_list,
   isSelect_type,
   isTypeDefinition,
-} from "../language-server/generated/ast";
-import { ExpressKind, getDocumentSymbol } from "./general";
-import { schemaHasBody } from "./schema-helpers";
-import { extractTypes } from "../language-server/type-system/semantic-type";
-import { CustomExpressDescription } from "../language-server/express-p11-scope-provider";
-import { ExpressP11References } from "../language-server/express-p11-references";
+} from "../language/generated/ast.js";
+import { ExpressKind, getDocumentSymbol } from "./general.js";
+import { schemaHasBody } from "./schema-helpers.js";
+import { extractTypes } from "../language/type-system/semantic-type.js";
+import { CustomExpressDescription } from "../language/express-p11-scope-provider.js";
+import { ExpressP11References } from "../language/express-p11-references.js";
 
 export const getEntitiesDocumentSymbol = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
@@ -52,12 +52,7 @@ export const getEntityDeclarations = (schema: SchemaDefinition): EntityDefinitio
 
 export const getEntityDocumentSymbol = (entity: EntityDefinition): DocumentSymbol | undefined => {
   if (entity && entity.$cstNode && entity.name) {
-    const entitySymbol = getDocumentSymbol(
-      ExpressKind.Entity,
-      entity.name,
-      entity.$cstNode.range,
-      entity.$cstNode.range
-    );
+    const entitySymbol = getDocumentSymbol(ExpressKind.Entity, entity.name, entity.$cstNode.range, entity.$cstNode.range);
     const children: DocumentSymbol[] = [];
     const attributes = getExplicitAttributeDeclarations(entity);
 
@@ -94,9 +89,7 @@ export const getAttributeDocumentSymbol = (explicitAttribute: Explicit_attr): Do
   explicitAttribute?.attributes.forEach((attr) => {
     const name = getAttributeName(attr);
     if (name && attr.$cstNode)
-      symbols.push(
-        getDocumentSymbol(ExpressKind.Property, name, explicitAttribute.$cstNode!.range, attr.$cstNode!.range)
-      );
+      symbols.push(getDocumentSymbol(ExpressKind.Property, name, explicitAttribute.$cstNode!.range, attr.$cstNode!.range));
   });
   return symbols;
 };
@@ -142,9 +135,7 @@ export const getSubTypes = (
   return subTypes;
 };
 
-export const getTypesFromSupertypeExpression = (
-  expression: Supertype_expression
-): CustomExpressDescription<EntityDefinition>[] => {
+export const getTypesFromSupertypeExpression = (expression: Supertype_expression): CustomExpressDescription<EntityDefinition>[] => {
   let superTypes: CustomExpressDescription<EntityDefinition>[] = [];
   expression.factors.forEach((factor) => {
     if (!factor.terms) return;
@@ -185,8 +176,7 @@ export const getDirectDataTypeFromAttribute = (
   attribute: Explicit_attr | Derived_attr,
   references: ExpressP11References
 ): CustomExpressDescription<EntityDefinition>[] => {
-  if (isExplicit_attr(attribute) || isDerived_attr(attribute))
-    return getTypesFromParameterType(attribute.type, references);
+  if (isExplicit_attr(attribute) || isDerived_attr(attribute)) return getTypesFromParameterType(attribute.type, references);
   return [];
 };
 export const getTypesFromParameterType = (
@@ -206,9 +196,7 @@ export const getTypesFromParameterType = (
         if (isSelect_list(type.underlyingType.select)) {
           type.underlyingType.select.types.forEach((type) => {
             if (type.ref)
-              getTypesFromParameterType(type.ref as unknown as Parameter_type, references).forEach((type) =>
-                dataTypes.push(type)
-              );
+              getTypesFromParameterType(type.ref as unknown as Parameter_type, references).forEach((type) => dataTypes.push(type));
           });
         }
       }
@@ -223,9 +211,7 @@ export const getTypesFromParameterType = (
     }
 
     if (isTypeDefinition(entityDataType.ref))
-      extractTypes(entityDataType.ref.underlyingType).forEach((entity) =>
-        dataTypes.push({ node: entity, nameInScope: entity.name })
-      );
+      extractTypes(entityDataType.ref.underlyingType).forEach((entity) => dataTypes.push({ node: entity, nameInScope: entity.name }));
   }
   if (isGeneral_aggregation_types(parameterType)) {
     dataTypes = getTypesFromParameterType(parameterType.type, references);

@@ -1,6 +1,6 @@
 import { AstNode, EmptyFileSystem, LangiumDocument, streamAllContents } from "langium";
 import { describe, test, expect } from "vitest";
-import { createExpressP11Services } from "../language-server/express-p11-module";
+import { createExpressP11Services } from "../language/express-module.js";
 import { parseDocument } from "langium/test";
 import {
   DefinitionType,
@@ -10,8 +10,8 @@ import {
   ExpressP11ParameterTypeResolutionType,
   ExpressP11ParameterTypeResolver,
   ExpressP11SelectType,
-} from "../language-server/express-p11-type-utilities";
-import { EntityDefinition, Explicit_attr, isAttribute_decl, isExplicit_attr } from "../language-server/generated/ast";
+} from "../language/express-p11-type-utilities.js";
+import { EntityDefinition, Explicit_attr, isAttribute_decl, isExplicit_attr } from "../language/generated/ast.js";
 
 describe("Type container", async () => {
   const services = createExpressP11Services(EmptyFileSystem).ExpressP11;
@@ -55,12 +55,9 @@ describe("Type container", async () => {
 
   test("TYPE type(ENUMERATION/SELECT) is detected", () => {
     expect(
-      typeContainer.getSchemas().get("Nist")?.getType("NistEmployee")?.getDefinition().type ===
-        DefinitionType.SelectType
+      typeContainer.getSchemas().get("Nist")?.getType("NistEmployee")?.getDefinition().type === DefinitionType.SelectType
     ).toBeTruthy();
-    expect(
-      typeContainer.getSchemas().get("Nist")?.getType("NistEnum")?.getDefinition().type === DefinitionType.EnumType
-    ).toBeTruthy();
+    expect(typeContainer.getSchemas().get("Nist")?.getType("NistEnum")?.getDefinition().type === DefinitionType.EnumType).toBeTruthy();
   });
 
   test("Subtypes are found", () => {
@@ -132,26 +129,18 @@ describe("TYPE resolver", async () => {
   const typeContainer = services.shared.workspace.TypeContainer;
 
   test("ENUMERATION values are found", () => {
-    expect((typeContainer.getSchemas().get("Nist")?.getType("NistEnum") as ExpressP11EnumType).getValues().length).toBe(
-      2
-    );
+    expect((typeContainer.getSchemas().get("Nist")?.getType("NistEnum") as ExpressP11EnumType).getValues().length).toBe(2);
   });
   test("ENUMERATION BASED_ON values are found", () => {
-    expect(
-      (typeContainer.getSchemas().get("Nist")?.getType("ExtendedNistEnum") as ExpressP11EnumType).getValues().length
-    ).toBe(3);
+    expect((typeContainer.getSchemas().get("Nist")?.getType("ExtendedNistEnum") as ExpressP11EnumType).getValues().length).toBe(3);
   });
 
   test("SELECT values are found", () => {
-    expect(
-      (typeContainer.getSchemas().get("Nist")?.getType("NistSelect") as ExpressP11SelectType).getValues().length
-    ).toBe(1);
+    expect((typeContainer.getSchemas().get("Nist")?.getType("NistSelect") as ExpressP11SelectType).getValues().length).toBe(1);
   });
 
   test("SELECT BASED_ON values are found", () => {
-    expect(
-      (typeContainer.getSchemas().get("Nist")?.getType("ExtendedNistSelect") as ExpressP11SelectType).getValues().length
-    ).toBe(2);
+    expect((typeContainer.getSchemas().get("Nist")?.getType("ExtendedNistSelect") as ExpressP11SelectType).getValues().length).toBe(2);
   });
 });
 
@@ -197,15 +186,11 @@ describe("Interfaces", async () => {
   test("USE FROM are imported", () => {
     expect(typeContainer.getSchemas().get("One")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(2);
     expect(typeContainer.getSchemas().get("Two")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(3);
-    expect(typeContainer.getSchemas().get("Four")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(
-      3
-    );
+    expect(typeContainer.getSchemas().get("Four")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(3);
   });
 
   test("REFERENCE FROM are imported", () => {
-    expect(typeContainer.getSchemas().get("Three")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(
-      2
-    );
+    expect(typeContainer.getSchemas().get("Three")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(2);
   });
 });
 
@@ -232,9 +217,7 @@ describe("Conflicts management", async () => {
     expect(typeContainer.getConflicts().length).toBe(2);
   });
   test("ENTITY duplicates are detected", () => {
-    expect(typeContainer.getConflicts().filter((c) => c.type === ExpressConflictType.EntityExistInSchema).length).toBe(
-      1
-    );
+    expect(typeContainer.getConflicts().filter((c) => c.type === ExpressConflictType.EntityExistInSchema).length).toBe(1);
   });
   test("TYPE duplicates are detected", () => {
     expect(typeContainer.getConflicts().filter((c) => c.type === ExpressConflictType.TypeExistInSchema).length).toBe(1);

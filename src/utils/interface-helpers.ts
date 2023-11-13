@@ -1,6 +1,6 @@
-import { SchemaDefinition, isUse_clause } from "../language-server/generated/ast";
-import { Reference_clause, Use_clause, isReference_clause } from "../language-server/generated/ast";
-import { schemaHasSpecifications } from "./schema-helpers";
+import { SchemaDefinition, isUse_clause } from "../language/generated/ast.js";
+import { Reference_clause, Use_clause, isReference_clause } from "../language/generated/ast.js";
+import { schemaHasSpecifications } from "./schema-helpers.js";
 
 export const getReferenceSpecifications = (schema: SchemaDefinition): Reference_clause[] => {
   if (!schemaHasSpecifications(schema)) return [];

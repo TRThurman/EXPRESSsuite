@@ -1,6 +1,6 @@
 import { EmptyFileSystem } from "langium";
 import { describe, test } from "vitest";
-import { createExpressP11Services } from "../language-server/express-p11-module";
+import { createExpressP11Services } from "../language/express-module.js";
 import { expectGoToDefinition } from "langium/test";
 
 describe("Basic Definition provider", async () => {

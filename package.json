@@ -1,5 +1,5 @@
 {
-  "name": "easyEXPRESS",
+  "name": "easyexpress",
   "displayName": "easyEXPRESS",
   "description": "EXPRESS language support for Visual Studio Code",
   "homepage": "https://github.com/usnistgov/easyexpress-public/",
@@ -11,22 +11,63 @@
   "license": "See License.txt",
   "icon": "nist_logo.png",
   "version": "0.2.5",
+  "files": [
+    "bin"
+  ],
+  "type": "module",
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild-base",
+    "esbuild-base": "tsc --noEmit && npm run lint && node esbuild.mjs --minify",
+    "build": "tsc -b tsconfig.json && node esbuild.mjs",
+    "watch": "concurrently -n tsc,esbuild -c blue,yellow \"tsc -b tsconfig.json --watch\" \"node esbuild.mjs --watch\"",
+    "lint": "eslint src --ext ts",
+    "langium:generate": "langium generate",
+    "langium:watch": "langium generate --watch",
+    "test": "vitest --reporter=verbose",
+    "coverage": "vitest --coverage"
+  },
+  "dependencies": {
+    "chalk": "~5.3.0",
+    "commander": "~10.0.0",
+    "langium": "^2.1.1",
+    "vscode-languageclient": "~8.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "~16.18.11",
+    "@types/vscode": "~1.67.0",
+    "@typescript-eslint/eslint-plugin": "~5.58.0",
+    "@typescript-eslint/parser": "~5.58.0",
+    "concurrently": "^7.6.0",
+    "esbuild": "^0.18.14",
+    "eslint": "~8.33.0",
+    "langium-cli": "^2.1.0",
+    "typescript": "~5.0.4",
+    "vitest": "^0.34.6"
+  },
   "engines": {
-    "vscode": "^1.67.0"
+    "vscode": "^1.67.0",
+    "node": ">=16.0.0"
   },
   "categories": [
     "Programming Languages"
   ],
   "contributes": {
+    "commands": [
+      {
+        "command": "express.buildWorkspace",
+        "title": "Build EXPRESS workspace",
+        "category": "easyEXPRESS"
+      }
+    ],
     "configuration": {
       "title": "easyEXPRESS language server",
       "properties": {
-        "express-p-11.useOptimizedConfiguration": {
+        "express.useOptimizedConfiguration": {
           "type": "boolean",
           "default": true,
           "description": "Use STEP optimized configuration and ignore files and folders not required for development."
         },
-        "express-p-11.excludedFolders": {
+        "express.excludedFolders": {
           "type": "array",
           "items": {
             "type": "string"
@@ -51,7 +92,7 @@
           ],
           "description": "Exclude folders that contain one of these keywords in their name."
         },
-        "express-p-11.excludedFiles": {
+        "express.excludedFiles": {
           "type": "array",
           "items": {
             "type": "string"
@@ -66,10 +107,10 @@
     },
     "languages": [
       {
-        "id": "express-p-11",
+        "id": "express",
         "aliases": [
-          "express-p11",
-          "express-p-11"
+          "EXPRESS",
+          "ISO 10303-11"
         ],
         "extensions": [
           ".exp"
@@ -79,14 +120,14 @@
     ],
     "grammars": [
       {
-        "language": "express-p-11",
-        "scopeName": "source.express-p-11",
-        "path": "./syntaxes/express-p-11.manual.tmLanguage.json"
+        "language": "express",
+        "scopeName": "source.express",
+        "path": "./syntaxes/express-p11.manual.tmLanguage.json"
       }
     ],
     "snippets": [
       {
-        "language": "express-p-11",
+        "language": "express",
         "path": "./snippets/snippets.json"
       }
     ]
@@ -94,45 +135,8 @@
   "activationEvents": [
     "workspaceContains:**/*.exp"
   ],
-  "files": [
-    "bin",
-    "out",
-    "src"
-  ],
+  "main": "./out/extension/main.cjs",
   "bin": {
-    "express-p-11-cli": "./bin/cli"
-  },
-  "main": "./out/extension.js",
-  "scripts": {
-    "vscode:prepublish": "tsc --noEmit && npm run lint && node esbuild.mjs --minify",
-    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
-    "build": "tsc -b tsconfig.json",
-    "watch": "tsc -b tsconfig.json --watch",
-    "lint": "eslint src --ext ts",
-    "langium:generate": "langium generate",
-    "langium:watch": "langium generate --watch",
-    "test": "vitest",
-    "coverage": "vitest --coverage"
-  },
-  "dependencies": {
-    "chalk": "~4.1.2",
-    "chevrotain": "~10.4.2",
-    "commander": "~10.0.0",
-    "langium": "^1.2.0",
-    "vscode-languageclient": "~8.0.2",
-    "vscode-languageserver": "~8.0.2",
-    "vscode-uri": "~3.0.7"
-  },
-  "devDependencies": {
-    "@types/node": "~16.18.11",
-    "@types/vscode": "~1.67.0",
-    "@typescript-eslint/eslint-plugin": "~5.51.0",
-    "@typescript-eslint/parser": "~5.51.0",
-    "@vitest/coverage-v8": "^0.34.6",
-    "esbuild": "^0.18.17",
-    "eslint": "~8.33.0",
-    "langium-cli": "^1.2.0",
-    "typescript": "~4.9.5",
-    "vitest": "^0.34.6"
+    "express-cli": "./bin/cli.js"
   }
 }

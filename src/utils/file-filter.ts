@@ -1,6 +1,6 @@
 import { LangiumDocument } from "langium";
 import { URI } from "vscode-uri";
-import { Configuration } from "../language-server/express-p11-workspace-manager";
+import { Configuration } from "../language/express-p11-workspace-manager.js";
 
 export function allowedDocuments(documents: LangiumDocument[], configuration: Configuration): LangiumDocument[] {
   return documents.filter((d) => isAllowedFile(d.uri, configuration));
