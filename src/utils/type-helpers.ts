@@ -1,6 +1,6 @@
 import { DocumentSymbol } from "vscode-languageserver";
-import { SchemaDefinition, TypeDefinition, isTypeDefinition } from "../language-server/generated/ast";
-import { ExpressKind, getDocumentSymbol } from "./general";
+import { SchemaDefinition, TypeDefinition, isTypeDefinition } from "../language/generated/ast.js";
+import { ExpressKind, getDocumentSymbol } from "./general.js";
 
 export const getTypesDocumentSymbol = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];

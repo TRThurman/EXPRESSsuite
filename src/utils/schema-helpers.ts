@@ -1,11 +1,11 @@
 import { DocumentSymbol } from "vscode-languageserver";
-import { ExpressFile, SchemaDefinition } from "../language-server/generated/ast";
-import { getEntitiesDocumentSymbol } from "./entity-helpers";
-import { getTypesDocumentSymbol } from "./type-helpers";
-import { getFunctionDocumentSymbols } from "./function-helpers";
-import { ExpressKind } from "./general";
-import { getProcedureDocumentSymbols } from "./procedure-helpers";
-import { getConstantDocumentSymbols } from "./constant-helpers";
+import { ExpressFile, SchemaDefinition } from "../language/generated/ast.js";
+import { getEntitiesDocumentSymbol } from "./entity-helpers.js";
+import { getTypesDocumentSymbol } from "./type-helpers.js";
+import { getFunctionDocumentSymbols } from "./function-helpers.js";
+import { ExpressKind } from "./general.js";
+import { getProcedureDocumentSymbols } from "./procedure-helpers.js";
+import { getConstantDocumentSymbols } from "./constant-helpers.js";
 import { LangiumDocument } from "langium";
 
 export const schemaHasBody = (schema: SchemaDefinition): boolean => {

@@ -1,7 +1,7 @@
 import { DocumentSymbol } from "vscode-languageserver";
-import { Constant_body, SchemaDefinition } from "../language-server/generated/ast";
-import { schemaHasConstants } from "./schema-helpers";
-import { ExpressKind, getDocumentSymbol } from "./general";
+import { Constant_body, SchemaDefinition } from "../language/generated/ast.js";
+import { schemaHasConstants } from "./schema-helpers.js";
+import { ExpressKind, getDocumentSymbol } from "./general.js";
 
 export const getConstantDocumentSymbols = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
@@ -26,12 +26,7 @@ export const getConstantDeclarations = (schema: SchemaDefinition): Constant_body
 
 export const getConstantDocumentSymbol = (constant: Constant_body): DocumentSymbol | undefined => {
   if (constant && constant.$cstNode && constant.name) {
-    const typeSymbol = getDocumentSymbol(
-      ExpressKind.Constant,
-      constant.name,
-      constant.$cstNode.range,
-      constant.$cstNode.range
-    );
+    const typeSymbol = getDocumentSymbol(ExpressKind.Constant, constant.name, constant.$cstNode.range, constant.$cstNode.range);
     return typeSymbol;
   }
   return;

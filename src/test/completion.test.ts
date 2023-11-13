@@ -1,6 +1,6 @@
 import { AstNode, EmptyFileSystem, LangiumDocument, streamAllContents } from "langium";
 import { describe, test, expect } from "vitest";
-import { createExpressP11Services } from "../language-server/express-p11-module";
+import { createExpressP11Services } from "../language/express-module.js";
 import { expectCompletion, parseDocument } from "langium/test";
 
 describe("Basic completion", async () => {

@@ -1,4 +1,4 @@
-import { AstNode, DocumentState } from "langium";
+import { AstNode } from "langium";
 import {
   Constant_body,
   EntityDefinition,
@@ -7,18 +7,11 @@ import {
   Variable_id,
   isEntityDefinition,
   isFunctionDefinition,
-} from "../language-server/generated/ast";
-import {
-  getFunctionLocalConstants,
-  getFunctionLocalVariables,
-  getFunctionParameters,
-  getStatementVariables,
-} from "./function-helpers";
-import { ExpressP11References } from "../language-server/express-p11-references";
-import { getFullSubSuperGraph } from "./entity-helpers";
-import { CustomExpressDescription } from "../language-server/express-p11-scope-provider";
-import { ExpressP11Services, ExpressP11SharedServices } from "../language-server/express-p11-module";
-import { CancellationToken } from "vscode-languageserver";
+} from "../language/generated/ast.js";
+import { getFunctionLocalConstants, getFunctionLocalVariables, getFunctionParameters, getStatementVariables } from "./function-helpers.js";
+import { ExpressP11References } from "../language/express-p11-references.js";
+import { getFullSubSuperGraph } from "./entity-helpers.js";
+import { CustomExpressDescription } from "../language/express-p11-scope-provider.js";
 
 type MemoCall = {
   deps: string[];
@@ -46,15 +39,8 @@ export class ScopingCache {
   private memoCalls: MemoCall[] = [];
   private computed: number = 0;
   private saved: number = 0;
+  constructor() {}
 
-  constructor(services: ExpressP11Services) {
-    services.shared.workspace.DocumentBuilder.onBuildPhase(DocumentState.ComputedScopes, (_, cancelToken) =>
-      this.build(cancelToken)
-    );
-  }
-  protected async build(cancelToken: CancellationToken): Promise<void> {
-    this.memoCalls = [];
-  }
   private get<T>({ type, key, deps, filler }: { type: MemoType; key: AstNode; deps: string[]; filler: () => T }): T {
     const call = this.memoCalls.find((c) => c.key === key && c.type === type);
 
@@ -70,7 +56,7 @@ export class ScopingCache {
   }
 
   public logFinal(): void {
-    //console.log(`Saved: ${this.saved} - Computed: ${this.computed}`);
+    console.log(`Saved: ${this.saved} - Computed: ${this.computed}`);
     this.saved = 0;
     this.computed = 0;
   }
@@ -131,5 +117,10 @@ export class ScopingCache {
       deps,
       key: entity,
     });
+  }
+
+  public flush(dep: string): void {
+    //console.log(`flushing ${dep}`);
+    this.memoCalls = this.memoCalls.filter((m) => !m.deps.includes(dep));
   }
 }
