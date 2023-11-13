@@ -1,4 +1,4 @@
-name: Create pre-realease version
+name: Create pre-release version
 on: workflow_dispatch
 jobs:
   release:
@@ -16,6 +16,8 @@ jobs:
           git config --global user.name "Sylvere Krima"
       - name: Install vsce
         run: npm i -g @vscode/vsce
+      - name: Generate language utilities
+        run: npm run langium:generate
       - name: Release extension
         run: npm run release-pre
         env:
