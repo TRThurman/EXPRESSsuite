@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0-1](https://github.com/usnistgov/easy-express/compare/0.3.0-0...0.3.0-1) (2023-11-13)
+
+
+### Bug Fixes
+
+* add step to pre-release workflow ([07b2eaf](https://github.com/usnistgov/easy-express/commit/07b2eaf28e70e1385bc70f3afee8d53d8f55a79f))
+* missing assignment in Local_variable ([ee9519f](https://github.com/usnistgov/easy-express/commit/ee9519feb1622f549bf248ba6ab882f45dcbde83))
+
 ## 0.3.0-0 (2023-11-13)
 
 
