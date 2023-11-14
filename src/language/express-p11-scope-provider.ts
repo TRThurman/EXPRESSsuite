@@ -7,58 +7,30 @@ import {
   ReferenceInfo,
   Scope,
   getContainerOfType,
-  getDocument,
 } from "langium";
 import {
-  Assignment_stmt_body,
-  Attribute_decl,
   Attribute_qualifier,
-  Complex_Primary_body,
   EntityDefinition,
-  Explicit_attr,
   Group_qualifier,
   Inverse_attr,
-  Parameter_id,
-  Procedure_call_Or_Assigment_stmt_reference,
-  Qualified_attribute,
-  Reference_clause,
-  SchemaDefinition,
-  isAlias_stmt,
   isAssignment_stmt_body,
   isAttribute_qualifier,
-  isAttribute_ref,
   isBuilt_in_constant_or_function,
   isComplex_Primary_body,
   isComplex_Primary_reference,
   isDerived_attr,
   isEntityDefinition,
   isExplicit_attr,
-  isFunctionDefinition,
-  isGeneral_ref,
   isGroup_qualifier,
   //@ts-ignore
   isIndex_qualifier,
   isInverse_attr,
   isQualified_attribute,
   isQualifier,
-  isReference_clause,
-  isResource_or_rename,
 } from "./generated/ast.js";
-import { getReferenceSpecifications } from "../utils/interface-helpers.js";
-import {
-  getAttributeDeclarations,
-  getAttributeName,
-  getDataTypesFromAttribute,
-  getDataTypesFromParameterId,
-  getDerivedAttributes,
-  //@ts-ignore
-  getDirectDataTypeFromAttribute,
-  getExplicitAttributeDeclarations,
-} from "../utils/entity-helpers.js";
-import { getFunctionParameterType, getStatementVariables, getVariableType } from "../utils/function-helpers.js";
+import { getFunctionParameterType, getVariableType } from "../utils/function-helpers.js";
 import { isProcedure_call_Or_Assigment_stmt_reference } from "./generated/ast.js";
 import { ExpressP11References } from "./express-p11-references.js";
-import { ScopingCache } from "../utils/caching.js";
 import { ExpressP11Services } from "./express-module.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
 import { ExpressP11ParameterTypeResolutionType } from "./express-p11-type-utilities.js";
