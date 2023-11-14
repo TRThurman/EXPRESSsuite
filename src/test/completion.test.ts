@@ -2,6 +2,7 @@ import { AstNode, EmptyFileSystem, LangiumDocument, streamAllContents } from "la
 import { describe, test, expect } from "vitest";
 import { createExpressP11Services } from "../language/express-module.js";
 import { expectCompletion, parseDocument } from "langium/test";
+import { CompletionList } from "vscode-languageserver";
 
 describe("Basic completion", async () => {
   const text = `SCHEMA Nist;
@@ -105,3 +106,55 @@ describe("Completion with SELECT TYPE attribute", async () => {
     await completion({ text, index: 2, expectedItems: ["EntE", "EntB", "EntA"] });
   });
 });
+
+describe("Completion with ENUM TYPE attribute", async () => {
+  const text = `
+    SCHEMA Nist;
+
+    TYPE TBaseColor = EXTENSIBLE ENUMERATION OF (Red, Blue, White) ;
+    END_TYPE;
+
+    TYPE TExtendColor = ENUMERATION BASED_ON TBaseColor WITH (Yellow, Purple) ;
+    END_TYPE;
+
+    ENTITY Test;
+    attributeOne: TBaseColor;
+    attributeTwo: TExtendColor;
+    WHERE
+    WR1: SELF.attributeOne = TBaseColor.<|>;
+    WR2: SELF.attributeTwo = TExtendColor.<|>;
+    END_ENTITY;
+
+    END_SCHEMA;
+    `;
+
+  const services = createExpressP11Services(EmptyFileSystem).ExpressP11;
+  const completion = expectCompletion(services);
+
+  test("ENUM TYPE values are suggested", async () => {
+    await completion({
+      text,
+      index: 0,
+      assert: (completionList) => {
+        assertCompletionListIsComplete(completionList, ["Red", "Blue", "White"]);
+      },
+    });
+  });
+  test("Extended ENUM TYPE values are suggested", async () => {
+    await completion({
+      text,
+      index: 1,
+      assert: (completionList) => {
+        assertCompletionListIsComplete(completionList, ["Yellow", "Red", "Blue", "White", "Purple"]);
+      },
+    });
+  });
+});
+
+const assertCompletionListIsComplete = (actualList: CompletionList, expectedList: string[]): void => {
+  expect(actualList.items.length).toBe(expectedList.length);
+  while (expectedList.length > 0) {
+    const elt = expectedList.pop();
+    expect(actualList.items.find((i) => i.label === elt)).toBeDefined();
+  }
+};

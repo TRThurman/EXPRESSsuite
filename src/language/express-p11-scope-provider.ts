@@ -7,61 +7,36 @@ import {
   ReferenceInfo,
   Scope,
   getContainerOfType,
-  getDocument,
 } from "langium";
 import {
-  Assignment_stmt_body,
-  Attribute_decl,
   Attribute_qualifier,
-  Complex_Primary_body,
   EntityDefinition,
-  Explicit_attr,
   Group_qualifier,
   Inverse_attr,
-  Parameter_id,
-  Procedure_call_Or_Assigment_stmt_reference,
-  Qualified_attribute,
-  Reference_clause,
-  SchemaDefinition,
-  isAlias_stmt,
+  TypeDefinition,
   isAssignment_stmt_body,
   isAttribute_qualifier,
-  isAttribute_ref,
   isBuilt_in_constant_or_function,
   isComplex_Primary_body,
   isComplex_Primary_reference,
   isDerived_attr,
   isEntityDefinition,
+  isEnumeration_type,
   isExplicit_attr,
-  isFunctionDefinition,
-  isGeneral_ref,
   isGroup_qualifier,
   //@ts-ignore
   isIndex_qualifier,
   isInverse_attr,
   isQualified_attribute,
   isQualifier,
-  isReference_clause,
-  isResource_or_rename,
+  isSchemaDefinition,
 } from "./generated/ast.js";
-import { getReferenceSpecifications } from "../utils/interface-helpers.js";
-import {
-  getAttributeDeclarations,
-  getAttributeName,
-  getDataTypesFromAttribute,
-  getDataTypesFromParameterId,
-  getDerivedAttributes,
-  //@ts-ignore
-  getDirectDataTypeFromAttribute,
-  getExplicitAttributeDeclarations,
-} from "../utils/entity-helpers.js";
-import { getFunctionParameterType, getStatementVariables, getVariableType } from "../utils/function-helpers.js";
+import { getFunctionParameterType, getVariableType } from "../utils/function-helpers.js";
 import { isProcedure_call_Or_Assigment_stmt_reference } from "./generated/ast.js";
 import { ExpressP11References } from "./express-p11-references.js";
-import { ScopingCache } from "../utils/caching.js";
 import { ExpressP11Services } from "./express-module.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
-import { ExpressP11ParameterTypeResolutionType } from "./express-p11-type-utilities.js";
+import { DefinitionType, ExpressP11EnumType, ExpressP11ParameterTypeResolutionType } from "./express-p11-type-utilities.js";
 
 export type CustomExpressDescription<T> = {
   nameInScope: string;
@@ -99,6 +74,10 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
       //     return this.createScopeForNodes(entities);
       //   }
 
+      const schemaNode = getContainerOfType(context.container, isSchemaDefinition);
+      if (!schemaNode || !schemaNode.name) return EMPTY_SCOPE;
+      const schema = this.typeContainer.getSchemas().get(schemaNode.name);
+      if (!schema) return EMPTY_SCOPE;
       //Inverse attribute
       if (context.property === "forAttribute" && isInverse_attr(context.container)) {
         const inverseAttribute = context.container as Inverse_attr;
@@ -175,6 +154,16 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
               case "Variable_id":
                 getVariableType(leftNode!, this.p11References).forEach((type) => directLeftSideTypes.push(type.node));
                 break;
+              case TypeDefinition:
+                if (!isEnumeration_type(leftNode.underlyingType)) return EMPTY_SCOPE;
+                const type = schema.getAllResources().findByName(leftNode.name);
+                if (!type || type.type !== DefinitionType.EnumType) return EMPTY_SCOPE;
+                const enums = type.resource.getValues();
+                return this.createScopeForNodes(
+                  enums.map((e) => e.node),
+                  undefined,
+                  { caseInsensitive: true }
+                );
             }
           }
           if (isBuilt_in_constant_or_function(leftMember)) {
