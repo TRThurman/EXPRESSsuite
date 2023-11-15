@@ -11,6 +11,7 @@ import {
 import {
   Attribute_qualifier,
   EntityDefinition,
+  FunctionDefinition,
   Group_qualifier,
   Inverse_attr,
   TypeDefinition,
@@ -36,7 +37,8 @@ import { isProcedure_call_Or_Assigment_stmt_reference } from "./generated/ast.js
 import { ExpressP11References } from "./express-p11-references.js";
 import { ExpressP11Services } from "./express-module.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
-import { DefinitionType, ExpressP11EnumType, ExpressP11ParameterTypeResolutionType } from "./express-p11-type-utilities.js";
+import { DefinitionType, ExpressP11ParameterTypeResolutionType } from "./express-p11-type-utilities.js";
+import { getTypesFromParameterType } from "../utils/entity-helpers.js";
 
 export type CustomExpressDescription<T> = {
   nameInScope: string;
@@ -164,6 +166,12 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
                   undefined,
                   { caseInsensitive: true }
                 );
+              case FunctionDefinition:
+                if (!leftNode.head?.returnType) return EMPTY_SCOPE;
+                getTypesFromParameterType(leftNode.head.returnType, this.p11References).forEach((type) =>
+                  directLeftSideTypes.push(type.node)
+                );
+                break;
             }
           }
           if (isBuilt_in_constant_or_function(leftMember)) {
