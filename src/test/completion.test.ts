@@ -24,7 +24,18 @@ describe("Basic completion", async () => {
     END_ENTITY;
 
     ENTITY Guest SUBTYPE OF(Employee);
+    WHERE
+    WR1: GetSupervisor(SELF)\\<|>;
+    WR2: GetSupervisor(SELF).<|>;
     END_ENTITY;
+
+    FUNCTION GetSupervisor(t:Guest): Fed;
+    IF (TRUE) THEN
+    RETURN(TRUE);
+    ELSE
+    RETURN(FALSE);
+    END_IF;
+    END_FUNCTION;
 
     END_SCHEMA;`;
 
@@ -40,6 +51,25 @@ describe("Basic completion", async () => {
   test("Higher supertype attributes are suggested in ATTRIBUTE qualifier", async () => {
     await completion({ text, index: 2, expectedItems: ["firstname"] });
     await completion({ text, index: 3, expectedItems: ["lastname"] });
+  });
+
+  test("FunctionCall return type types are suggested in GROUP qualifier", async () => {
+    await completion({
+      text,
+      index: 4,
+      assert: (completions) => {
+        assertCompletionListIsComplete(completions, ["Fed", "Employee", "Person"]);
+      },
+    });
+  });
+  test("FunctionCall return type attributes are suggested in ATTRIBUTE qualifier", async () => {
+    await completion({
+      text,
+      index: 5,
+      assert: (completions) => {
+        assertCompletionListIsComplete(completions, ["isPermanent", "firstname", "lastname"]);
+      },
+    });
   });
 });
 
