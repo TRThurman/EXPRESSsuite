@@ -205,9 +205,9 @@ export const getTypesFromParameterType = (
     if (isEntityDefinition(entityDataType.ref)) {
       const entity = entityDataType.ref;
       dataTypes.push({ nameInScope: entity.name, node: entity });
-      getFullSubSuperGraph(entity, references).forEach((entityDescription) => {
-        if (entityDescription) dataTypes.push(entityDescription);
-      });
+      //   getFullSubSuperGraph(entity, references).forEach((entityDescription) => {
+      //     if (entityDescription) dataTypes.push(entityDescription);
+      //   });
     }
 
     if (isTypeDefinition(entityDataType.ref))
