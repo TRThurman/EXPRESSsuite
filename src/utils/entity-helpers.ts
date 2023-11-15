@@ -15,10 +15,6 @@ import {
   isExplicit_attr,
   isFormal_parameter,
   isGeneral_aggregation_types,
-  isGeneral_array_type,
-  isGeneral_bag_type,
-  isGeneral_list_type,
-  isGeneral_set_type,
   isNamed_types,
   isParameter_id,
   isSelect_list,
@@ -29,7 +25,6 @@ import { ExpressKind, getDocumentSymbol } from "./general.js";
 import { schemaHasBody } from "./schema-helpers.js";
 import { extractTypes } from "../language/type-system/semantic-type.js";
 import { CustomExpressDescription } from "../language/express-p11-scope-provider.js";
-import { ExpressP11References } from "../language/express-p11-references.js";
 
 export const getEntitiesDocumentSymbol = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
@@ -125,16 +120,6 @@ export const getSuperTypes = (entity: EntityDefinition | undefined): CustomExpre
   return superTypes;
 };
 
-export const getSubTypes = (
-  entity: EntityDefinition | undefined,
-  references: ExpressP11References | undefined
-): CustomExpressDescription<EntityDefinition>[] => {
-  let subTypes: CustomExpressDescription<EntityDefinition>[] = [];
-  if (!entity || !isEntityDefinition(entity) || !references) return subTypes;
-  references.getUsedInSubtypeOf(entity).forEach((type) => subTypes.push({ node: type, nameInScope: type.name }));
-  return subTypes;
-};
-
 export const getTypesFromSupertypeExpression = (expression: Supertype_expression): CustomExpressDescription<EntityDefinition>[] => {
   let superTypes: CustomExpressDescription<EntityDefinition>[] = [];
   expression.factors.forEach((factor) => {
@@ -163,26 +148,17 @@ export const getTypesFromSupertypeTerm = (term: Supertype_term): CustomExpressDe
   return superTypes;
 };
 
-export const getDataTypesFromAttribute = (
-  attribute: Explicit_attr | Derived_attr,
-  references: ExpressP11References
-): CustomExpressDescription<EntityDefinition>[] => {
-  if (isExplicit_attr(attribute)) return getTypesFromParameterType(attribute.type, references);
-  if (isDerived_attr(attribute)) return getTypesFromParameterType(attribute.type, references);
+export const getDataTypesFromAttribute = (attribute: Explicit_attr | Derived_attr): CustomExpressDescription<EntityDefinition>[] => {
+  if (isExplicit_attr(attribute)) return getTypesFromParameterType(attribute.type);
+  if (isDerived_attr(attribute)) return getTypesFromParameterType(attribute.type);
   return [];
 };
 
-export const getDirectDataTypeFromAttribute = (
-  attribute: Explicit_attr | Derived_attr,
-  references: ExpressP11References
-): CustomExpressDescription<EntityDefinition>[] => {
-  if (isExplicit_attr(attribute) || isDerived_attr(attribute)) return getTypesFromParameterType(attribute.type, references);
+export const getDirectDataTypeFromAttribute = (attribute: Explicit_attr | Derived_attr): CustomExpressDescription<EntityDefinition>[] => {
+  if (isExplicit_attr(attribute) || isDerived_attr(attribute)) return getTypesFromParameterType(attribute.type);
   return [];
 };
-export const getTypesFromParameterType = (
-  parameterType: Parameter_type,
-  references: ExpressP11References
-): CustomExpressDescription<EntityDefinition>[] => {
+export const getTypesFromParameterType = (parameterType: Parameter_type): CustomExpressDescription<EntityDefinition>[] => {
   if (!parameterType) return [];
   let dataTypes: CustomExpressDescription<EntityDefinition>[] = [];
   if (isNamed_types(parameterType)) {
@@ -195,8 +171,7 @@ export const getTypesFromParameterType = (
       if (isSelect_type(type.underlyingType)) {
         if (isSelect_list(type.underlyingType.select)) {
           type.underlyingType.select.types.forEach((type) => {
-            if (type.ref)
-              getTypesFromParameterType(type.ref as unknown as Parameter_type, references).forEach((type) => dataTypes.push(type));
+            if (type.ref) getTypesFromParameterType(type.ref as unknown as Parameter_type).forEach((type) => dataTypes.push(type));
           });
         }
       }
@@ -214,7 +189,7 @@ export const getTypesFromParameterType = (
       extractTypes(entityDataType.ref.underlyingType).forEach((entity) => dataTypes.push({ node: entity, nameInScope: entity.name }));
   }
   if (isGeneral_aggregation_types(parameterType)) {
-    dataTypes = getTypesFromParameterType(parameterType.type, references);
+    dataTypes = getTypesFromParameterType(parameterType.type);
   }
   return dataTypes;
 };
@@ -239,26 +214,20 @@ export const getTypesFromParameterType = (
 //   return dataType;
 // };
 
-export const getDataTypesFromParameterId = (
-  param: Parameter_id,
-  references: ExpressP11References
-): CustomExpressDescription<EntityDefinition>[] => {
+export const getDataTypesFromParameterId = (param: Parameter_id): CustomExpressDescription<EntityDefinition>[] => {
   if (!isParameter_id(param)) return [];
   if (!isFormal_parameter(param.$container)) return [];
 
   const parameterType = param.$container.type as Parameter_type;
   if (!parameterType) return [];
 
-  return getTypesFromParameterType(parameterType, references);
+  return getTypesFromParameterType(parameterType);
 };
 
-export const getFullSubSuperGraph = (
-  entity: EntityDefinition | undefined,
-  references: ExpressP11References
-): CustomExpressDescription<EntityDefinition>[] => {
+export const getFullSubSuperGraph = (entity: EntityDefinition | undefined): CustomExpressDescription<EntityDefinition>[] => {
   const graph: CustomExpressDescription<EntityDefinition>[] = [];
 
-  if (!entity || !isEntityDefinition(entity) || !references) return [];
+  if (!entity || !isEntityDefinition(entity)) return [];
   getSuperTypes(entity).forEach((supertype) => {
     graph.push(supertype);
   });

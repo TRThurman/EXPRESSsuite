@@ -34,7 +34,6 @@ import {
 } from "./generated/ast.js";
 import { getFunctionParameterType, getVariableType } from "../utils/function-helpers.js";
 import { isProcedure_call_Or_Assigment_stmt_reference } from "./generated/ast.js";
-import { ExpressP11References } from "./express-p11-references.js";
 import { ExpressP11Services } from "./express-module.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
 import { DefinitionType, ExpressP11ParameterTypeResolutionType } from "./express-p11-type-utilities.js";
@@ -46,13 +45,11 @@ export type CustomExpressDescription<T> = {
 };
 
 export class ExpressP11ScopeProvider extends DefaultScopeProvider {
-  private readonly p11References: ExpressP11References;
   protected readonly astNodeDescriptionProvider: AstNodeDescriptionProvider;
   private readonly typeContainer: ExpressP11TypeContainer;
 
   constructor(services: ExpressP11Services) {
     super(services);
-    this.p11References = services.references.References as ExpressP11References;
     this.astNodeDescriptionProvider = services.workspace.AstNodeDescriptionProvider;
     this.typeContainer = services.shared.workspace.TypeContainer;
   }
@@ -150,11 +147,11 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
                 }
                 break;
               case "Parameter_id":
-                getFunctionParameterType(leftNode!, this.p11References).forEach((type) => directLeftSideTypes.push(type.node));
+                getFunctionParameterType(leftNode!).forEach((type) => directLeftSideTypes.push(type.node));
 
                 break;
               case "Variable_id":
-                getVariableType(leftNode!, this.p11References).forEach((type) => directLeftSideTypes.push(type.node));
+                getVariableType(leftNode!).forEach((type) => directLeftSideTypes.push(type.node));
                 break;
               case TypeDefinition:
                 if (!isEnumeration_type(leftNode.underlyingType)) return EMPTY_SCOPE;
@@ -168,9 +165,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
                 );
               case FunctionDefinition:
                 if (!leftNode.head?.returnType) return EMPTY_SCOPE;
-                getTypesFromParameterType(leftNode.head.returnType, this.p11References).forEach((type) =>
-                  directLeftSideTypes.push(type.node)
-                );
+                getTypesFromParameterType(leftNode.head.returnType).forEach((type) => directLeftSideTypes.push(type.node));
                 break;
             }
           }

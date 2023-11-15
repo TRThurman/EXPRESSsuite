@@ -20,7 +20,6 @@ import { ExpressKind, getDocumentSymbol } from "./general.js";
 import { AstNode } from "langium";
 import { getTypesFromParameterType } from "./entity-helpers.js";
 import { CustomExpressDescription } from "../language/express-p11-scope-provider.js";
-import { ExpressP11References } from "../language/express-p11-references.js";
 
 export const getFunctionDocumentSymbols = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
@@ -95,21 +94,18 @@ export const extractVariableFromStmt = (stmt: AstNode): Variable_id | undefined 
   return;
 };
 
-export const getFunctionParameterType = (
-  parameter: Parameter_id,
-  references: ExpressP11References
-): CustomExpressDescription<EntityDefinition>[] => {
+export const getFunctionParameterType = (parameter: Parameter_id): CustomExpressDescription<EntityDefinition>[] => {
   if (isParameter_id(parameter) && isFormal_parameter(parameter.$container)) {
     const parameterType = parameter.$container.type;
-    return getTypesFromParameterType(parameterType, references);
+    return getTypesFromParameterType(parameterType);
   }
   return [];
 };
 
-export const getVariableType = (variable: Variable_id, references: ExpressP11References): CustomExpressDescription<EntityDefinition>[] => {
+export const getVariableType = (variable: Variable_id): CustomExpressDescription<EntityDefinition>[] => {
   if (isVariable_id(variable) && isLocal_variable(variable.$container)) {
     const parameterType = variable.$container.type;
-    return getTypesFromParameterType(parameterType, references);
+    return getTypesFromParameterType(parameterType);
   }
   return [];
 };

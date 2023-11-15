@@ -1,15 +1,6 @@
-import type {
-  DeepPartial,
-  DefaultSharedModuleContext,
-  LangiumServices,
-  LangiumSharedServices,
-  Module,
-  PartialLangiumServices,
-} from "langium";
+import type { DeepPartial, DefaultSharedModuleContext, LangiumServices, LangiumSharedServices, Module } from "langium";
 import { createDefaultModule, createDefaultSharedModule, inject } from "langium";
 import { ExpressP11GeneratedModule, ExpressGeneratedSharedModule } from "./generated/module.js";
-import { ExpressValidator, registerValidationChecks } from "./express-validator.js";
-import { ScopingCache } from "../utils/caching.js";
 import { ExpressP11DocumentBuilder } from "./express-p11-document-builder.js";
 import { ExpressP11IndexManager } from "./express-p11-index-manager.js";
 import { ExpressP11NodeKindProvider } from "./express-p11-node-kind-provider.js";
@@ -18,7 +9,6 @@ import { ExpressP11DocumentSymbolProvider } from "./express-p11-document-symbol-
 import { ExpressP11CodeActionProvider } from "./express-p11-code-action-provider.js";
 import { ExpressP11CompletionProvider } from "./express-p11-completion-provider.js";
 import { ExpressP11ScopeComputation } from "./express-p11-scope-computation.js";
-import { ExpressP11References } from "./express-p11-references.js";
 import { ExpressP11ScopeProvider } from "./express-p11-scope-provider.js";
 import { ExpressP11NameProvider } from "./express-p11-name-provider.js";
 import { ExpressP11Validator } from "./express-p11-validator.js";
@@ -33,9 +23,6 @@ import { ExpressP11ExecuteComandHandler } from "./express-p11-execute-command-ha
 export type ExpressP11AddedServices = {
   validation: {
     ExpressP11Validator: ExpressP11Validator;
-  };
-  caching: {
-    CustomCache: ScopingCache;
   };
   shared: ExpressP11SharedServices;
 };
@@ -79,9 +66,6 @@ export const ExpressP11Module: Module<ExpressP11Services, DeepPartial<ExpressP11
     ExpressP11Validator: (services) => new ExpressP11Validator(services),
     DocumentValidator: (services) => new ExpressDocumentValidator(services),
   },
-  caching: {
-    CustomCache: () => new ScopingCache(),
-  },
   lsp: {
     DocumentSymbolProvider: (services) => new ExpressP11DocumentSymbolProvider(services),
     CodeActionProvider: () => new ExpressP11CodeActionProvider(),
@@ -89,7 +73,6 @@ export const ExpressP11Module: Module<ExpressP11Services, DeepPartial<ExpressP11
   },
   references: {
     ScopeComputation: (services) => new ExpressP11ScopeComputation(services),
-    References: (services) => new ExpressP11References(services),
     ScopeProvider: (services) => new ExpressP11ScopeProvider(services),
     NameProvider: () => new ExpressP11NameProvider(),
     Linker: (services) => new ExpressP11Linker(services),
