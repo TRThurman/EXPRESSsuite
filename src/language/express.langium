@@ -291,7 +291,7 @@ Assignment_stmt_body: qualifiers+=Qualifier* ":=" expression=Expression;
 type Procedure_call_Or_Assigment_stmt_id = Variable_id | Parameter_id | ProcedureDefinition;
 type General_id = Variable_id | Parameter_id;
 
-Total_over: "TOTAL_OVER" "(" entities+=Entity_ref ( "," entities+=Entity_ref )? ")" ";" ;
+Total_over: "TOTAL_OVER" "(" entities+=Entity_ref ( "," entities+=Entity_ref )* ")" ";" ;
 TypeDefinition: "TYPE" name=Simple_id "=" underlyingType=Underlying_type ";" where=Where_clause? "END_TYPE" ";" ;
 
 Type_id returns string: Simple_id ;
