@@ -79,7 +79,7 @@
       ]
     },
     "string": {
-      "match": "'(\\w+\\.*)+'",
+      "match": "'([^+']*)'",
       "name": "string.quoted.single.express"
     },
     "comments": {
