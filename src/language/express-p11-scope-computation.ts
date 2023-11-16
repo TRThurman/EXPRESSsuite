@@ -7,9 +7,7 @@ import {
   PrecomputedScopes,
   getContainerOfType,
   interruptAndCheck,
-  streamAllContents,
   streamContents,
-  // isReference,
 } from "langium";
 import {
   ExpressFile,
@@ -19,9 +17,9 @@ import {
   Repeat_stmt,
   Rule_decl,
   SchemaDefinition,
-  Variable_id,
   isAttribute_decl,
   isConstant_body,
+  isConstant_decl,
   isDeclaration,
   isEntityDefinition,
   isEnumeration_id,
@@ -70,6 +68,16 @@ export class ExpressP11ScopeComputation extends DefaultScopeComputation {
             let name = this.nameProvider.getName(modelNode);
             if (name) {
               exports.push(this.descriptions.createDescription(modelNode, name, document));
+            }
+          }
+          if (isConstant_decl(modelNode)) {
+            for (const constant of streamContents(modelNode)) {
+              if (isConstant_body(constant)) {
+                let name = this.nameProvider.getName(constant);
+                if (name) {
+                  exports.push(this.descriptions.createDescription(constant, name, document));
+                }
+              }
             }
           }
         }
