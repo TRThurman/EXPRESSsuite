@@ -9,34 +9,47 @@ import {
   getContainerOfType,
 } from "langium";
 import {
+  Attribute_id,
   Attribute_qualifier,
   EntityDefinition,
   FunctionDefinition,
   Group_qualifier,
-  Inverse_attr,
+  Parameter_id,
+  Primary,
+  Redeclared_attribute,
+  Simple_expression,
   TypeDefinition,
+  Variable_id,
   isAssignment_stmt_body,
   isAttribute_qualifier,
   isBuilt_in_constant_or_function,
+  isBuilt_in_function,
+  isComplex_Primary,
   isComplex_Primary_body,
   isComplex_Primary_reference,
   isDerived_attr,
   isEntityDefinition,
+  isEnumeration_id,
   isEnumeration_type,
   isExplicit_attr,
+  isFunctionDefinition,
   isGroup_qualifier,
-  //@ts-ignore
   isIndex_qualifier,
   isInverse_attr,
+  isLocal_variable,
   isQualified_attribute,
   isQualifier,
+  isQuery_expression,
   isSchemaDefinition,
+  isSimple_expression,
+  isSimple_factor,
+  isVariable_id,
 } from "./generated/ast.js";
-import { getFunctionParameterType, getVariableType } from "../utils/function-helpers.js";
+import { getFunctionParameterType } from "../utils/function-helpers.js";
 import { isProcedure_call_Or_Assigment_stmt_reference } from "./generated/ast.js";
 import { ExpressP11Services } from "./express-module.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
-import { DefinitionType, ExpressP11ParameterTypeResolutionType } from "./express-p11-type-utilities.js";
+import { DefinitionType, ExpressP11ParameterTypeResolutionType, ExpressP11Schema } from "./express-p11-type-utilities.js";
 import { getTypesFromParameterType } from "../utils/entity-helpers.js";
 
 export type CustomExpressDescription<T> = {
@@ -79,7 +92,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
       if (!schema) return EMPTY_SCOPE;
       //Inverse attribute
       if (context.property === "forAttribute" && isInverse_attr(context.container)) {
-        const inverseAttribute = context.container as Inverse_attr;
+        const inverseAttribute = context.container;
         const ofType = inverseAttribute.forEntity ? inverseAttribute.forEntity : inverseAttribute.type;
         if (ofType.error || !ofType.ref) return EMPTY_SCOPE;
         const attributes = this.typeContainer.getAllAttributes(ofType.ref);
@@ -92,14 +105,16 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         }
         const searchingFor: Qualifier = isGroup_qualifier(context.container) ? Qualifier.Group : Qualifier.Attribute;
 
-        const directLeftSideTypes: EntityDefinition[] = [];
+        const nodesInScope: AstNode[] = [];
+        let nodesInScopeType: ScopeType = ScopeType.Empty;
 
         if (isQualified_attribute(context.container.$container)) {
           if (searchingFor === Qualifier.Group) {
             const entity = getContainerOfType(context.container, isEntityDefinition);
             if (entity) {
+              nodesInScopeType = ScopeType.Entities;
               for (const entityDef of this.typeContainer.getFullSubSuperGraph(entity)) {
-                directLeftSideTypes.push(entityDef);
+                nodesInScope.push(entityDef);
               }
             }
           }
@@ -108,7 +123,8 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
             const entity = context.container.$container.group?.entity?.ref;
             // if (!entity) console.log("couldnt read");
             if (!entity || !isEntityDefinition(entity)) return EMPTY_SCOPE;
-            directLeftSideTypes.push(entity);
+            nodesInScope.push(entity);
+            nodesInScopeType = ScopeType.Entities;
           }
         }
 
@@ -135,46 +151,17 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
             if (!leftMember.to.ref) return EMPTY_SCOPE;
             const leftNode = leftMember.to.ref;
             if (!leftNode) return EMPTY_SCOPE;
-            switch (leftNode.$type) {
-              case "Redeclared_attribute":
-              case "Attribute_id":
-                if (!isExplicit_attr(leftNode.$container) && !isDerived_attr(leftNode.$container) && !isInverse_attr(leftNode.$container))
-                  return EMPTY_SCOPE;
-                const attribute = leftNode.$container;
-                const attributeType = this.typeContainer.resolveAttribute(attribute);
-                if (attributeType.type === ExpressP11ParameterTypeResolutionType.EntityDefinition) {
-                  directLeftSideTypes.push(...attributeType.value);
-                }
-                break;
-              case "Parameter_id":
-                getFunctionParameterType(leftNode!).forEach((type) => directLeftSideTypes.push(type.node));
-
-                break;
-              case "Variable_id":
-                getVariableType(leftNode!).forEach((type) => directLeftSideTypes.push(type.node));
-                break;
-              case TypeDefinition:
-                if (!isEnumeration_type(leftNode.underlyingType)) return EMPTY_SCOPE;
-                const type = schema.getAllResources().findByName(leftNode.name);
-                if (!type || type.type !== DefinitionType.EnumType) return EMPTY_SCOPE;
-                const enums = type.resource.getValues();
-                return this.createScopeForNodes(
-                  enums.map((e) => e.node),
-                  undefined,
-                  { caseInsensitive: true }
-                );
-              case FunctionDefinition:
-                if (!leftNode.head?.returnType) return EMPTY_SCOPE;
-                getTypesFromParameterType(leftNode.head.returnType).forEach((type) => directLeftSideTypes.push(type.node));
-                break;
-            }
+            const { nodes, type } = this.getSimpleScopeOptions(leftNode, schema);
+            nodesInScope.push(...nodes);
+            nodesInScopeType = type;
           }
           if (isBuilt_in_constant_or_function(leftMember)) {
             switch (leftMember.toLowerCase()) {
               case "self":
                 const entity = getContainerOfType(context.container, isEntityDefinition);
                 if (entity) {
-                  directLeftSideTypes.push(entity);
+                  nodesInScope.push(entity);
+                  nodesInScopeType = ScopeType.Entities;
                 }
                 break;
             }
@@ -199,7 +186,8 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
 
                     const attributeType = this.typeContainer.resolveAttribute(attr);
                     if (attributeType.type === ExpressP11ParameterTypeResolutionType.EntityDefinition) {
-                      directLeftSideTypes.push(...attributeType.value);
+                      nodesInScope.push(...attributeType.value);
+                      nodesInScopeType = ScopeType.Entities;
                     }
 
                     break;
@@ -211,7 +199,8 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
 
                 if (!isEntityDefinition(entity)) break;
                 if (entity) {
-                  directLeftSideTypes.push(entity);
+                  nodesInScope.push(entity);
+                  nodesInScopeType = ScopeType.Entities;
                 }
                 break;
             }
@@ -220,15 +209,19 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
 
         const scopeElements: AstNodeDescription[] = [];
         if (searchingFor === Qualifier.Attribute) {
-          if (directLeftSideTypes.length < 1) return EMPTY_SCOPE;
-
-          const attributes = directLeftSideTypes.map((type) => this.typeContainer.getAllAttributes(type)).flat();
-          return this.createScopeForNodes(attributes, undefined, { caseInsensitive: true });
+          if (nodesInScope.length < 1) return EMPTY_SCOPE;
+          if (nodesInScopeType === ScopeType.Entities) {
+            const attributes = nodesInScope.map((type) => this.typeContainer.getAllAttributes(type as EntityDefinition)).flat();
+            return this.createScopeForNodes(attributes, undefined, { caseInsensitive: true });
+          }
+          if (nodesInScopeType === ScopeType.Enums) {
+            return this.createScopeForNodes(nodesInScope, undefined, { caseInsensitive: true });
+          }
         }
 
         if (searchingFor === Qualifier.Group) {
-          for (const entity of directLeftSideTypes) {
-            for (const entityDef of this.typeContainer.getFullSubSuperGraph(entity)) {
+          for (const entity of nodesInScope) {
+            for (const entityDef of this.typeContainer.getFullSubSuperGraph(entity as EntityDefinition)) {
               scopeElements.push(this.descriptions.createDescription(entityDef, entityDef.name));
             }
           }
@@ -241,4 +234,102 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
       return EMPTY_SCOPE;
     }
   }
+
+  getSimpleScopeOptions(leftNode: AstNode, schema: ExpressP11Schema): { nodes: AstNode[]; type: ScopeType } {
+    if (!leftNode) return { nodes: [], type: ScopeType.Empty };
+    let nodes: AstNode[] = [];
+    switch (leftNode.$type) {
+      case Redeclared_attribute:
+      case Attribute_id:
+        if (!isExplicit_attr(leftNode.$container) && !isDerived_attr(leftNode.$container) && !isInverse_attr(leftNode.$container))
+          return { nodes: [], type: ScopeType.Empty };
+        const attribute = leftNode.$container;
+        const attributeType = this.typeContainer.resolveAttribute(attribute);
+        if (attributeType.type === ExpressP11ParameterTypeResolutionType.EntityDefinition) {
+          return { nodes: attributeType.value, type: ScopeType.Entities };
+        }
+        break;
+      case Parameter_id:
+        nodes = getFunctionParameterType(leftNode as Parameter_id).map((type) => type.node);
+        return { nodes, type: ScopeType.Entities };
+
+      case Variable_id:
+        const variable = leftNode as Variable_id;
+        if (isVariable_id(variable) && isLocal_variable(variable.$container)) {
+          const parameterType = variable.$container.type;
+          nodes = getTypesFromParameterType(parameterType).map((type) => type.node);
+          return { nodes, type: ScopeType.Entities };
+        }
+        if (isVariable_id(variable) && isQuery_expression(variable.$container)) {
+          const source = variable.$container.source;
+          if (source.expression) return this.getSimpleExpressionType(source.expression, schema);
+        }
+        return { nodes, type: ScopeType.Entities };
+
+      case TypeDefinition:
+        if (!isEnumeration_type((leftNode as TypeDefinition).underlyingType)) return { nodes: [], type: ScopeType.Empty };
+        const type = schema.getAllResources().findByName((leftNode as TypeDefinition).name);
+        if (!type || type.type !== DefinitionType.EnumType) return { nodes: [], type: ScopeType.Empty };
+        const enums = type.resource.getValues();
+
+        nodes = enums.map((e) => e.node);
+        return { nodes, type: ScopeType.Enums };
+
+      case FunctionDefinition:
+        if (!(leftNode as FunctionDefinition).head?.returnType) return { nodes: [], type: ScopeType.Empty };
+        nodes = getTypesFromParameterType((leftNode as FunctionDefinition).head.returnType).map((type) => type.node);
+        return { nodes, type: ScopeType.Entities };
+
+      case EntityDefinition:
+        return { nodes: [leftNode], type: ScopeType.Entities };
+    }
+    return { nodes: [], type: ScopeType.Empty };
+  }
+  private getSimpleExpressionType(expression: Simple_expression, schema: ExpressP11Schema): { nodes: AstNode[]; type: ScopeType } {
+    if (isSimple_factor(expression)) {
+      if (expression.primary) {
+        return this.getPrimaryType(expression.primary, schema);
+      }
+    }
+    if (isQuery_expression(expression)) {
+      if (expression.variable) {
+        return this.getSimpleScopeOptions(expression.variable, schema);
+      }
+    }
+    return { nodes: [], type: ScopeType.Empty };
+  }
+
+  private getPrimaryType(primary: Primary, schema: ExpressP11Schema): { nodes: AstNode[]; type: ScopeType } {
+    if (isComplex_Primary(primary)) {
+      if (!primary.body) {
+        if (isComplex_Primary_reference(primary.head)) {
+          if (primary.head.to.ref) return this.getSimpleScopeOptions(primary.head.to.ref, schema);
+        }
+      }
+      if (isComplex_Primary_reference(primary.head) && isFunctionDefinition(primary.head.to.ref) && primary.body.qualifiers.length < 1) {
+        return this.getSimpleScopeOptions(primary.head.to.ref, schema);
+      }
+      if (isBuilt_in_function(primary.head)) {
+        if (primary.head === "USEDIN") {
+          const source = primary.body.parameterList?.params[0];
+          if (!source) return { nodes: [], type: ScopeType.Empty };
+          if (isSimple_expression(source)) return this.getSimpleExpressionType(source, schema);
+        }
+      }
+
+      if (primary.body.qualifiers) {
+        const lastQualifier = primary.body.qualifiers.at(primary.body.qualifiers.length - 1);
+        if (isAttribute_qualifier(lastQualifier))
+          if (!isEnumeration_id(lastQualifier.target) && lastQualifier.target.ref)
+            return this.getSimpleScopeOptions(lastQualifier.target.ref, schema);
+      }
+    }
+    return { nodes: [], type: ScopeType.Empty };
+  }
+}
+
+enum ScopeType {
+  Entities,
+  Enums,
+  Empty,
 }
