@@ -26,7 +26,7 @@
         },
         {
           "name": "keyword.declaration.express",
-          "match": "(?i)\\b(ABSTRACT|CONSTANT|END_CONSTANT|END_ENTITY|END_FUNCTION|END_LOCAL|END_PROCEDURE|END_RULE|END_SCHEMA|END_SUBTYPE_CONSTRAINT|END_TYPE|ENTITY|FUNCTION|LOCAL|ONEOF|PROCEDURE|RULE|SCHEMA|SUBTYPE|SUBTYPE_CONSTRAINT|SUPERTYPE|TOTAL_OVER|TYPE)\\b"
+          "match": "(?i)\\b(ABSTRACT|CONSTANT|END_CONSTANT|END_ENTITY|END_FUNCTION|END_LOCAL|END_PROCEDURE|END_RULE|END_SCHEMA|END_SUBTYPE_CONSTRAINT|END_TYPE|ENTITY|FUNCTION|LOCAL|ONEOF|PROCEDURE|RULE|SCHEMA|SUBTYPE_CONSTRAINT|SUBTYPE|SUPERTYPE|TOTAL_OVER|TYPE)\\b"
         },
         {
           "name": "keyword.control.express",
@@ -152,6 +152,9 @@
         },
         {
           "include": "#rule"
+        },
+        {
+          "include": "#subtypeConstraint"
         }
       ]
     },
@@ -272,7 +275,7 @@
       ]
     },
     "type": {
-      "begin": "(?i)(TYPE)\\s*(\\w+)",
+      "begin": "(?i)(TYPE)\\s+(\\w+)",
       "beginCaptures": {
         "1": {
           "patterns": [{ "include": "#keywords" }]
@@ -432,6 +435,49 @@
           "name": "entity.name.type.function.express"
         }
       }
+    },
+    "subtypeConstraint": {
+      "begin": "(?i)(SUBTYPE_CONSTRAINT)\\s+(\\w+)\\s+(FOR)",
+      "beginCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        },
+        "2": {
+          "name": "entity.name.type.class.express"
+        },
+        "3": {
+          "patterns": [{ "include": "#keywords" }]
+        }
+      },
+      "end": "(?i)(END_SUBTYPE_CONSTRAINT;)",
+      "endCaptures": {
+        "1": {
+          "patterns": [{ "include": "#keywords" }]
+        }
+      },
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#keywords"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#string"
+        },
+        {
+          "include": "#number"
+        },
+        {
+          "include": "#assignment"
+        }
+      ]
     }
   }
 }
