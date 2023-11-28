@@ -20,34 +20,28 @@
           "name": "storage.express",
           "match": "(?i)\\b(AGGREGATE|ARRAY|BAG|BINARY|BOOLEAN|ENUMERATION|GENERIC_ENTITY|INTEGER|LIST|LOGICAL|NUMBER|REAL|SELECT|SET|STRING)\\b"
         },
-        {
-          "name": "keyword.executable.express",
-          "match": "(?i)\\b(ALIAS|BEGIN|CASE|ELSE|END|END_ALIAS|END_CASE|END_IF|END_REPEAT|ESCAPE|FOR|IF|OTHERWISE|REPEAT|SKIP|THEN|TO|UNTIL|WHILE)\\b"
-        },
+
         {
           "name": "keyword.declaration.express",
-          "match": "(?i)\\b(ABSTRACT|CONSTANT|END_CONSTANT|END_ENTITY|END_FUNCTION|END_LOCAL|END_PROCEDURE|END_RULE|END_SCHEMA|END_SUBTYPE_CONSTRAINT|END_TYPE|ENTITY|FUNCTION|LOCAL|ONEOF|PROCEDURE|RULE|SCHEMA|SUBTYPE_CONSTRAINT|SUBTYPE|SUPERTYPE|TOTAL_OVER|TYPE)\\b"
+          "match": "(?i)\\b(ABSTRACT|CONSTANT|END_CONSTANT|END_ENTITY|END_FUNCTION|END_LOCAL|END_PROCEDURE|END_RULE|END_SCHEMA|END_SUBTYPE_CONSTRAINT|END_TYPE|ENTITY|FUNCTION|LOCAL|ONEOF|PROCEDURE|RULE|SCHEMA|SUBTYPE_CONSTRAINT|SUBTYPE|SUPERTYPE|TOTAL_OVER|TYPE|FOR)\\b"
         },
         {
           "name": "keyword.control.express",
-          "match": "(?i)\\b(REFERENCE|USE|FROM)\\b"
+          "match": "(?i)\\b(REFERENCE|USE|FROM|IF|ELSE|THEN|END_IF|RETURN|ALIAS|BEGIN|CASE|END|END_ALIAS|END_CASE|END_REPEAT|ESCAPE|OTHERWISE|REPEAT|SKIP|TO|UNTIL|WHILE)\\b"
         },
         {
           "name": "keyword.other.express",
-          "match": "(?i)\\b(AS|BASED_ON|BY|DERIVE|EXTENSIBLE|FIXED|GENERIC|INVERSE|OF|OPTIONAL|QUERY|RENAMED|UNIQUE|VAR|WHERE|WITH)\\b"
+          "match": "(?i)\\b(AS|BASED_ON|BY|DERIVE|EXTENSIBLE|FIXED|GENERIC|INVERSE|OF|OPTIONAL|RENAMED|UNIQUE|VAR|WHERE|WITH)\\b"
         },
         {
-          "name": "keyword.function.builtin.express",
-          "match": "(?i)\\b(ABS|ACOS|ASIN|ATAN|BLENGTH|COS|EXISTS|EXP|FORMAT|HIBOUND|HIINDEX|LENGTH|LOBOUND|LOINDEX|LOG|LOG2|LOG10|NVL|ODD|ROLESOF|SIN|SIZEOF|SQRT|TAN|TYPEOF|USEDIN|VALUE|VALUE_IN|VALUE_UNIQUE)\\b"
+          "name": "entity.name.function.express",
+          "match": "(?i)\\b(ABS|ACOS|ASIN|ATAN|BLENGTH|COS|EXISTS|EXP|FORMAT|HIBOUND|HIINDEX|LENGTH|LOBOUND|LOINDEX|LOG|LOG2|LOG10|NVL|ODD|ROLESOF|SIN|SIZEOF|SQRT|TAN|TYPEOF|USEDIN|VALUE|VALUE_IN|VALUE_UNIQUE|QUERY)\\b"
         },
         {
           "name": "constant.language.builtin.express",
           "match": "(?i)\\b(CONST_E|FALSE|PI|SELF|TRUE|UNKNOWN|\\?)\\b"
         },
-        {
-          "name": "entity.name.tag",
-          "match": "(?i)\\b(RETURN)\\b"
-        },
+
         {
           "name": "keyword.operator.assignment.express",
           "match": "(:=|:)"
@@ -322,7 +316,7 @@
           "patterns": [{ "include": "#keywords" }]
         },
         "2": {
-          "name": "entity.name.type.function.express"
+          "name": "entity.name.function.express"
         }
       },
       "end": "(?i)(END_FUNCTION)(;)",
@@ -360,13 +354,16 @@
     },
     "rule": {
       "name": "rule",
-      "begin": "(?i)(RULE)\\s*(\\w+)",
+      "begin": "(?i)(RULE)\\s+(\\w+)\\s+(FOR)",
       "beginCaptures": {
         "1": {
           "patterns": [{ "include": "#keywords" }]
         },
         "2": {
           "name": "entity.name.type.rule.express"
+        },
+        "3": {
+          "patterns": [{ "include": "#keywords" }]
         }
       },
       "end": "(?i)(END_RULE)(;)",
@@ -403,7 +400,7 @@
       ]
     },
     "assignment": {
-      "begin": "(^|\\()\\s*(\\w+(\\s*,\\s*\\w+)*)\\s*(:)[^=]\\s*",
+      "begin": "(^|\\()\\s*(\\w+(\\s*,\\s*\\w+)*)\\s*(:)",
       "beginCaptures": {
         "2": {
           "name": "variable.property.express"
@@ -416,6 +413,7 @@
         "0": { "patterns": [{ "include": "#keywords" }] }
       },
       "patterns": [
+        { "include": "#comment" },
         {
           "include": "#string"
         },
@@ -432,7 +430,7 @@
       "match": "(\\w+)(\\s*\\()",
       "captures": {
         "1": {
-          "name": "entity.name.type.function.express"
+          "name": "entity.name.function.express"
         }
       }
     },
