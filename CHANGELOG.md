@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.3.0](https://github.com/usnistgov/easy-express/compare/0.3.0-4...0.3.0) (2023-12-04)
+
 ## [0.3.0-4](https://github.com/usnistgov/easy-express/compare/0.3.0-3...0.3.0-4) (2023-12-04)
 
 ## [0.3.0-3](https://github.com/usnistgov/easy-express/compare/0.3.0-2...0.3.0-3) (2023-12-04)
