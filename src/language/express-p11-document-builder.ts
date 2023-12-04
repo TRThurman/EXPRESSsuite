@@ -107,9 +107,9 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
   ): Promise<void> {
     this.prepareBuild(validDocs, options);
     // 0. Parse content
-    console.time("Total");
+    // console.time("Total");
     const needParsing = validDocs.filter((e) => e.state < DocumentState.Parsed);
-    console.log(`${needParsing.length} documents need parsing.`);
+    // console.log(`${needParsing.length} documents need parsing.`);
     await this.runCancelable(validDocs, DocumentState.Parsed, cancelToken, (doc) => {
       this.langiumDocumentFactory.update(doc);
     });
@@ -125,18 +125,18 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
     // console.timeEnd("Indexing");
 
     // 2. Compute scopes
-    console.time("Computing");
+    // console.time("Computing");
     // const needComputing = documents.filter((e) => e.state < DocumentState.ComputedScopes);
     // console.log(`${needComputing.length} documents need computing.`);
     await this.runCancelable(validDocs, DocumentState.ComputedScopes, cancelToken, async (doc) => {
       const scopeComputation = this.serviceRegistry.getServices(doc.uri).references.ScopeComputation;
       doc.precomputedScopes = await scopeComputation.computeLocalScopes(doc, cancelToken);
     });
-    console.timeEnd("Computing");
+    // console.timeEnd("Computing");
 
-    console.time("Linking");
+    // console.time("Linking");
     const documentsToLink = validDocs.filter((e) => e.state < DocumentState.Linked).length;
-    console.log(`${documentsToLink} documents need linking.`);
+    // console.log(`${documentsToLink} documents need linking.`);
     let linked = 0;
     // console.profile();
     // 3. Linking
@@ -155,20 +155,20 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
       return linker.link(doc, cancelToken);
     });
     // console.profileEnd();
-    console.timeEnd("Linking");
+    // console.timeEnd("Linking");
 
     // 4. Index references
-    console.time("Indexing2");
+    // console.time("Indexing2");
     await this.runCancelable(validDocs, DocumentState.IndexedReferences, cancelToken, (doc) =>
       this.indexManager.updateReferences(doc, cancelToken)
     );
-    console.timeEnd("Indexing2");
+    // console.timeEnd("Indexing2");
 
     // 5. Validation
     const toBeValidated = validDocs.filter((doc) => this.shouldValidate(doc));
     await this.runCancelable(toBeValidated, DocumentState.Validated, cancelToken, (doc) => this.validate(doc, cancelToken));
 
-    console.timeEnd("Total");
+    // console.timeEnd("Total");
 
     for (const doc of validDocs) {
       const state = this.buildState.get(doc.uri.toString());
