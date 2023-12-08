@@ -12,7 +12,7 @@
   "Entity Attribute": {
     "prefix": ["attr"],
     "body": ["${1:attribute_name} : ${2:attribute_type};$0"],
-    "description": "A new EXPRESS Entity."
+    "description": "A new attribute."
   },
   "Select 2": {
     "prefix": ["sel2"],
