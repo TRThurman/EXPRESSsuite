@@ -2,6 +2,11 @@ import { AstNodeDescription, DefaultLinker, DocumentState, LinkingError, Referen
 import { Attribute_decl, EntityDefinition, SchemaDefinition, isEntityDefinition, isQualified_attribute } from "./generated/ast.js";
 
 export class ExpressP11Linker extends DefaultLinker {
+  override getCandidate(refInfo: ReferenceInfo): AstNodeDescription | LinkingError {
+    const scope = this.scopeProvider.getScope(refInfo);
+    const description = scope.getElement(refInfo.reference.$refText);
+    return description ?? this.createLinkingError(refInfo);
+  }
   protected override createLinkingError(refInfo: ReferenceInfo, targetDescription?: AstNodeDescription | undefined): LinkingError {
     const document = getDocument(refInfo.container);
     if (document.state < DocumentState.ComputedScopes) {

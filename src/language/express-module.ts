@@ -16,6 +16,7 @@ import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
 import { ExpressP11Linker } from "./express-p11-linker.js";
 import { ExpressP11WorkspaceManager } from "./express-p11-workspace-manager.js";
 import { ExpressP11ExecuteComandHandler } from "./express-p11-execute-command-handler.js";
+import { ExpressP11ServiceRegistry } from "./express-p11-service-registry.js";
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -23,6 +24,7 @@ import { ExpressP11ExecuteComandHandler } from "./express-p11-execute-command-ha
 export type ExpressP11AddedServices = {
   validation: {
     ExpressP11Validator: ExpressP11Validator;
+    TypeContainer: ExpressP11TypeContainer;
   };
   shared: ExpressP11SharedServices;
 };
@@ -31,24 +33,26 @@ export type ExpressP11AddedSharedServices = {
   workspace: {
     DocumentBuilder: ExpressP11DocumentBuilder;
     IndexManager: ExpressP11IndexManager;
-    TypeContainer: ExpressP11TypeContainer;
+    // TypeContainer: ExpressP11TypeContainer;
   };
   lsp: {
     NodeKindProvider: ExpressP11NodeKindProvider;
   };
+  ServiceRegistry: ExpressP11ServiceRegistry;
 };
 
 export const ExpressP11SharedModule: Module<ExpressP11SharedServices, DeepPartial<ExpressP11SharedServices>> = {
   workspace: {
     DocumentBuilder: (services) => new ExpressP11DocumentBuilder(services),
     IndexManager: (services) => new ExpressP11IndexManager(services),
-    TypeContainer: (services) => new ExpressP11TypeContainer(services),
+    // TypeContainer: (services) => new ExpressP11TypeContainer(services),
     WorkspaceManager: (services) => new ExpressP11WorkspaceManager(services),
   },
   lsp: {
     NodeKindProvider: () => new ExpressP11NodeKindProvider(),
     ExecuteCommandHandler: (services) => new ExpressP11ExecuteComandHandler(services),
   },
+  ServiceRegistry: () => new ExpressP11ServiceRegistry(),
 };
 /**
  * Union of Langium default services and your custom services - use this as constructor parameter
@@ -65,6 +69,7 @@ export const ExpressP11Module: Module<ExpressP11Services, DeepPartial<ExpressP11
   validation: {
     ExpressP11Validator: (services) => new ExpressP11Validator(services),
     DocumentValidator: (services) => new ExpressDocumentValidator(services),
+    TypeContainer: (services) => new ExpressP11TypeContainer(services),
   },
   lsp: {
     DocumentSymbolProvider: (services) => new ExpressP11DocumentSymbolProvider(services),

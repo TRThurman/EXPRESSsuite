@@ -108,7 +108,9 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
     this.prepareBuild(validDocs, options);
     // 0. Parse content
     // console.time("Total");
-    const needParsing = validDocs.filter((e) => e.state < DocumentState.Parsed);
+
+    // const needParsing = validDocs.filter((e) => e.state < DocumentState.Parsed);
+
     // console.log(`${needParsing.length} documents need parsing.`);
     await this.runCancelable(validDocs, DocumentState.Parsed, cancelToken, (doc) => {
       this.langiumDocumentFactory.update(doc);

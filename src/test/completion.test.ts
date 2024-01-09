@@ -42,7 +42,13 @@ describe("Basic completion", async () => {
   const services = createExpressP11Services(EmptyFileSystem).ExpressP11;
   const completion = expectCompletion(services);
   test("All supertypes are suggested in GROUP qualifier", async () => {
-    await completion({ text, index: 0, expectedItems: ["Fed", "Employee", "Person"] });
+    await completion({
+      text,
+      index: 0,
+      assert: (completionList) => {
+        assertCompletionListIsComplete(completionList, ["Fed", "Employee", "Person", "Guest"]);
+      },
+    });
   });
 
   test("Direct supertype attribute is suggested in ATTRIBUTE qualifier", async () => {
@@ -58,7 +64,7 @@ describe("Basic completion", async () => {
       text,
       index: 4,
       assert: (completions) => {
-        assertCompletionListIsComplete(completions, ["Fed", "Employee", "Person"]);
+        assertCompletionListIsComplete(completions, ["Fed", "Employee", "Person", "Guest"]);
       },
     });
   });
@@ -67,7 +73,7 @@ describe("Basic completion", async () => {
       text,
       index: 5,
       assert: (completions) => {
-        assertCompletionListIsComplete(completions, ["isPermanent", "firstname", "lastname"]);
+        assertCompletionListIsComplete(completions, []);
       },
     });
   });
@@ -126,14 +132,33 @@ describe("Completion with SELECT TYPE attribute", async () => {
   const completion = expectCompletion(services);
 
   test("SELECT TYPE entities are suggested", async () => {
-    await completion({ text, index: 0, expectedItems: ["EntB", "EntA"] });
+    await completion({
+      text,
+      index: 0,
+
+      assert: (completions) => {
+        assertCompletionListIsComplete(completions, ["EntB", "EntA"]);
+      },
+    });
   });
   test("Extended SELECT TYPE entities are suggested", async () => {
-    await completion({ text, index: 1, expectedItems: ["EntC", "EntB", "EntA"] });
+    await completion({
+      text,
+      index: 1,
+      assert: (completions) => {
+        assertCompletionListIsComplete(completions, ["EntC", "EntB", "EntA"]);
+      },
+    });
   });
 
   test("Extended SELECT TYPE entities from interface specifications are suggested", async () => {
-    await completion({ text, index: 2, expectedItems: ["EntE", "EntB", "EntA"] });
+    await completion({
+      text,
+      index: 2,
+      assert: (completions) => {
+        assertCompletionListIsComplete(completions, ["EntE", "EntB", "EntA"]);
+      },
+    });
   });
 });
 

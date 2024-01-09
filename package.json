@@ -32,6 +32,7 @@
     "chalk": "~5.3.0",
     "commander": "~10.0.0",
     "langium": "^2.1.1",
+    "uuidv4": "^6.2.13",
     "vscode-languageclient": "~8.0.2"
   },
   "devDependencies": {
@@ -60,6 +61,11 @@
       {
         "command": "express.buildWorkspace",
         "title": "Build EXPRESS workspace",
+        "category": "easyEXPRESS"
+      },
+      {
+        "command": "express.buildGraph",
+        "title": "Generate type graphs",
         "category": "easyEXPRESS"
       }
     ],

@@ -34,7 +34,7 @@ describe("Type container", async () => {
 
   const expDocument: LangiumDocument<AstNode> = await parseDocument(services, expFile);
   await services.shared.workspace.DocumentBuilder.build([expDocument]);
-  const typeContainer = services.shared.workspace.TypeContainer;
+  const typeContainer = services.validation.TypeContainer;
 
   test("All SCHEMA are found", () => {
     expect(typeContainer.getSchemas().get("Nist")).toBeDefined();
@@ -94,10 +94,10 @@ describe("Type container", async () => {
     expect(typeContainer.getFullSubSuperGraph(employeeNode!).length).toBe(4);
 
     const fedNode = typeContainer.getSchemas().get("Nist")?.getEntity("Fed")?.getNode();
-    expect(typeContainer.getFullSubSuperGraph(fedNode!).length).toBe(3);
+    expect(typeContainer.getFullSubSuperGraph(fedNode!).length).toBe(4);
 
     const guestNode = typeContainer.getSchemas().get("Nist")?.getEntity("Guest")?.getNode();
-    expect(typeContainer.getFullSubSuperGraph(guestNode!).length).toBe(3);
+    expect(typeContainer.getFullSubSuperGraph(guestNode!).length).toBe(4);
   });
 });
 
@@ -126,7 +126,7 @@ describe("TYPE resolver", async () => {
 
   const expDocument: LangiumDocument<AstNode> = await parseDocument(services, expFile);
   await services.shared.workspace.DocumentBuilder.build([expDocument]);
-  const typeContainer = services.shared.workspace.TypeContainer;
+  const typeContainer = services.validation.TypeContainer;
 
   test("ENUMERATION values are found", () => {
     expect((typeContainer.getSchemas().get("Nist")?.getType("NistEnum") as ExpressP11EnumType).getValues().length).toBe(2);
@@ -181,7 +181,7 @@ describe("Interfaces", async () => {
 
   const expDocument: LangiumDocument<AstNode> = await parseDocument(services, expFile);
   await services.shared.workspace.DocumentBuilder.build([expDocument]);
-  const typeContainer = services.shared.workspace.TypeContainer;
+  const typeContainer = services.validation.TypeContainer;
 
   test("USE FROM are imported", () => {
     expect(typeContainer.getSchemas().get("One")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(2);
@@ -211,7 +211,7 @@ describe("Conflicts management", async () => {
 
   const expDocument: LangiumDocument<AstNode> = await parseDocument(services, expFile);
   await services.shared.workspace.DocumentBuilder.build([expDocument]);
-  const typeContainer = services.shared.workspace.TypeContainer;
+  const typeContainer = services.validation.TypeContainer;
 
   test("All duplicates are detected", () => {
     expect(typeContainer.getConflicts().length).toBe(2);
@@ -258,7 +258,7 @@ describe("Parameter type resolver", async () => {
 
   const expDocument: LangiumDocument<AstNode> = await parseDocument(services, expFile);
   await services.shared.workspace.DocumentBuilder.build([expDocument]);
-  const typeContainer = services.shared.workspace.TypeContainer;
+  const typeContainer = services.validation.TypeContainer;
 
   test("Named_type -> EntityDefinition is resolved", () => {
     const schema = typeContainer.getSchemas().get("Zero");

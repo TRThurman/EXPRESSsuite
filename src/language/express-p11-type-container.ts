@@ -5,14 +5,12 @@ import {
   LangiumDocument,
   LangiumDocuments,
   MultiMap,
+  NameProvider,
   getContainerOfType,
-  getNextNode,
   interruptAndCheck,
-  stream,
   streamAllContents,
-  streamContents,
 } from "langium";
-import { ExpressP11SharedServices } from "./express-module.js";
+import { ExpressP11Services } from "./express-module.js";
 import {
   Attribute_decl,
   Derived_attr,
@@ -21,17 +19,8 @@ import {
   ExpressFile,
   Inverse_attr,
   isAttribute_decl,
-  isAttribute_id,
-  isDerived_attr,
   isEntityDefinition,
-  isExplicit_attr,
   isExpressFile,
-  isGeneral_aggregation_types,
-  isGeneralized_types,
-  isInverse_attr,
-  isNamedType,
-  isNamed_types,
-  isRedeclared_attribute,
   isReference_clause,
   isSchemaDefinition,
   isTypeDefinition,
@@ -45,6 +34,7 @@ import {
   ExpressConflict,
   ExpressP11ConflictManager,
   ExpressP11Entity,
+  ExpressP11OptimizedAttributeList,
   ExpressP11ParameterTypeResolution,
   ExpressP11ParameterTypeResolver,
   ExpressP11Schema,
@@ -52,6 +42,7 @@ import {
   InterfaceType,
 } from "./express-p11-type-utilities.js";
 import { ExpressP11MemoPool } from "./express-p11-memo-pool.js";
+import { NIL } from "uuid";
 
 type ConcreteType = {
   name: string;
@@ -84,6 +75,7 @@ export class ExpressP11TypeContainer {
   protected memoPool: ExpressP11MemoPool = new ExpressP11MemoPool();
   protected schemas: Map<string, ExpressP11Schema> = new Map();
   protected readonly langiumDocuments: LangiumDocuments;
+  protected readonly nameProvider: NameProvider;
   protected localEntities = new MultiMap<string, ConcreteType>();
   protected localPartialUseFrom = new MultiMap<string, SubSuperTypeDefinition>();
   protected localPartialReferenceFrom = new MultiMap<string, SubSuperTypeDefinition>();
@@ -96,7 +88,7 @@ export class ExpressP11TypeContainer {
   protected readonly memoizedAllResourcesFromCall = new Map<string, EntityDefinition[]>();
   protected readonly memoizedAllDefinitionsFromCall = new Map<string, SubSuperTypeDefinition[]>();
 
-  protected readonly memoizedAttributesCall = new Map<string, Attribute_decl[]>();
+  protected readonly memoizedAttributesCall = new ExpressP11OptimizedAttributeList();
   protected resolveAttributeTypeCall: number = 0;
 
   private workspaceConfiguration: Configuration = {
@@ -105,9 +97,12 @@ export class ExpressP11TypeContainer {
     excludedFolders: [],
   };
   private configurationProvider: ConfigurationProvider | undefined;
-  constructor(services: ExpressP11SharedServices) {
-    this.langiumDocuments = services.workspace.LangiumDocuments;
-    services.workspace.DocumentBuilder.onBuildPhase(DocumentState.ComputedScopes, (docs, cancelToken) => this.build(docs, cancelToken));
+  constructor(services: ExpressP11Services) {
+    this.langiumDocuments = services.shared.workspace.LangiumDocuments;
+    this.nameProvider = services.references.NameProvider;
+    services.shared.workspace.DocumentBuilder.onBuildPhase(DocumentState.ComputedScopes, (docs, cancelToken) =>
+      this.build(docs, cancelToken)
+    );
   }
 
   public getSchemas(): Map<string, ExpressP11Schema> {
@@ -376,24 +371,35 @@ export class ExpressP11TypeContainer {
     }
   }
 
-  public getAllAttributes(entity: EntityDefinition): Attribute_decl[] {
-    const entityname = entity.name;
-    const schemaName = getContainerOfType(entity, isSchemaDefinition)?.name;
-    const memoKey = `${entityname}.${schemaName}`;
-    const hasBeenComputed = this.memoizedAttributesCall.has(memoKey);
-    if (hasBeenComputed) {
-      //   console.log(`saved attributes`);
-      return this.memoizedAttributesCall.get(memoKey)!;
-    }
-    if (!entityname || !schemaName) return [];
-    const type = this.findType(entityname, schemaName);
-    if (!type) return [];
-    let attributes: Attribute_decl[] = [];
-    //attributes = this.getAttributes(type);
+  public getAllAttributes(entity: EntityDefinition, filter: string = ""): Attribute_decl[] {
+    const expressEntity = this.getExpressP11EntityFrom(entity);
+    if (!expressEntity) return [];
+    const userFilter = filter;
 
-    this.getFullSubSuperGraph(entity).forEach((e) => this.getAttributesV2(e).forEach((a) => attributes.push(a)));
-    this.memoizedAttributesCall.set(memoKey, attributes);
-    return attributes;
+    const memoKey = expressEntity.graphKey;
+    const hasBeenComputed = this.memoizedAttributesCall.resources.has(memoKey.toString());
+    if (hasBeenComputed && memoKey !== NIL) {
+      return filter.length > 0 ? this.memoizedAttributesCall.findByName(memoKey.toString(), filter) : [];
+    }
+
+    const typeGraph = this.getFullSubSuperGraph(entity);
+    for (const e of typeGraph) {
+      for (const a of this.getAttributesV2(e)) {
+        const attributeName = this.nameProvider.getName(a);
+        if (attributeName) this.memoizedAttributesCall.add(expressEntity.graphKey.toString(), attributeName, a);
+      }
+    }
+    //this.getFullSubSuperGraph(entity).forEach((e) => this.getAttributesV2(e).forEach((a) => attributes.push(a)));
+    // for (const key of this.getFullSubSuperGraph(entity)) {
+    //   const ename = key.name;
+    //   const sname = getContainerOfType(key, isSchemaDefinition)?.name;
+    //   this.memoizedAttributesCall.set(`${ename}.${sname}`, attributes);
+    // }
+    //this.memoizedAttributesCall.set(memoKey.toString(), attributes);
+    // console.timeEnd(`${memoKey}`);
+
+    // return attributes;
+    return filter.length > 0 ? this.memoizedAttributesCall.findByName(expressEntity.graphKey.toString(), filter) : [];
   }
 
   protected getAttributes(type: ConcreteType): Attribute_decl[] {
@@ -406,7 +412,7 @@ export class ExpressP11TypeContainer {
 
     return attributes;
   }
-  protected getAttributesV2(entity: EntityDefinition): Attribute_decl[] {
+  public getAttributesV2(entity: EntityDefinition): Attribute_decl[] {
     const attributes: Attribute_decl[] = [];
     if (!entity.body) return [];
 
@@ -519,7 +525,6 @@ export class ExpressP11TypeContainer {
   public getSubTypesFromDefinition(entity: EntityDefinition): EntityDefinition[] {
     const schema = getContainerOfType(entity, isSchemaDefinition);
     if (!schema) {
-      //   console.log(`No schema found for ${entity.name}`);
       return [];
     }
     return (
@@ -529,45 +534,37 @@ export class ExpressP11TypeContainer {
         ?.getSubTypes(this.memoPool)
         .map((t) => t.getNode()) ?? []
     );
-    //return this.getSubTypesOf(entity.name, schema.name);
   }
 
-  public getFullSubSuperGraph(entity: EntityDefinition): EntityDefinition[] {
-    // const graph: EntityDefinition[] = [];
-    // const supertypes = this.getSuperTypesFromDefinition(entity);
-    // const subtypes = this.getSubTypesFromDefinition(entity);
-    // // for(const subtype of sub)
-    // const result = [...supertypes, ...subtypes, entity];
-    //new
+  public getGraphKey(entity: EntityDefinition): string {
+    const expEntity = this.getExpressP11EntityFrom(entity);
+
+    return expEntity ? expEntity.graphKey : NIL;
+  }
+
+  getExpressP11EntityFrom(entity: EntityDefinition): ExpressP11Entity | undefined {
     const schema = getContainerOfType(entity, isSchemaDefinition);
     if (!schema || !schema.name) {
-      //   console.log(`No schema found for ${entity.name}`);
+      return;
     }
     const key = `${schema}.${entity.name}`;
     const expressSchema = this.schemas.get(schema!.name);
-    if (expressSchema) {
-      const expEntity = expressSchema.getEntity(entity.name);
-      if (expEntity) {
-        const newGraph = expEntity.getFullSubSuperGraph(this.memoPool);
-        if (newGraph) {
-          return newGraph;
-          //   if (newGraph.length !== result.length)
-          //     console.log(
-          //       `ERROR ${schema!.name}.${entity.name}: ${result.length} vs ${newGraph.length} : ${
-          //         result.length > newGraph.length ? "Regression" : "Improved"
-          //       }`
-          //     );
-        } else {
-          //   console.log(`Graph not found for ${key} `);
-        }
-      } else {
-        // console.log(`entity not not found for ${key}`);
-      }
-    } else {
-      //   console.log(`schema not found for ${key}`);
+    if (!expressSchema) return;
+
+    const expEntity = expressSchema.getEntity(entity.name);
+    return expEntity;
+  }
+  public getFullSubSuperGraph(entity: EntityDefinition, filter: string = ""): readonly EntityDefinition[] {
+    const expressEntity = this.getExpressP11EntityFrom(entity);
+
+    if (!expressEntity) {
+      return [];
     }
-    return [];
-    // return result;
+    return expressEntity.getSubSuper(this.memoPool, filter);
+  }
+
+  public getAllGraphs(): Map<string, MultiMap<string, EntityDefinition>> {
+    return this.memoPool.getAllGraphs();
   }
   private findType(entity: string, schema: string): ConcreteType | undefined {
     return this.localEntities.get(schema)?.find((t) => t.name === entity);

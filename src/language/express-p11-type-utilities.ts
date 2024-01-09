@@ -1,6 +1,7 @@
 import { AstNode, MultiMap, getContainerOfType } from "langium";
 import { ExpressP11MemoPool, MemoQuery, MemoType } from "./express-p11-memo-pool.js";
 import {
+  Attribute_decl,
   Derived_attr,
   EntityDefinition,
   Enumeration_id,
@@ -21,6 +22,7 @@ import {
   isSelect_list,
   isSelect_type,
 } from "./generated/ast.js";
+import { NIL, v4 as uuidv4 } from "uuid";
 
 export abstract class ExpressResource<T extends AstNode> {
   protected owner: ExpressP11Schema | undefined;
@@ -254,9 +256,17 @@ export class ExpressP11Schema {
 }
 
 export class ExpressP11Entity extends ExpressResource<EntityDefinition> {
-  protected subtypes: ExpressP11Entity[] = [];
-  protected supertyes: ExpressP11Entity[] = [];
+  protected _subtypes: ExpressP11Entity[] = [];
+  protected _supertypes: ExpressP11Entity[] = [];
 
+  get supertypes() {
+    return this._supertypes;
+  }
+
+  get subtypes() {
+    return this._subtypes;
+  }
+  public graphKey: string = NIL;
   constructor(name: string, node: EntityDefinition) {
     super(name, DefinitionType.Entity, node);
   }
@@ -281,13 +291,54 @@ export class ExpressP11Entity extends ExpressResource<EntityDefinition> {
     exclude.push(this.getQualifiedName());
     const superTypes: ExpressP11Entity[] = [];
 
-    for (const supertype of this.supertyes) {
+    for (const supertype of this._supertypes) {
       superTypes.push(supertype);
       superTypes.push(...supertype.getSuperTypes(memo, exclude));
     }
     memo.memoize({ type: MemoType.Supertypes, name: this.getQualifiedName(), payload: superTypes });
 
     return superTypes;
+  }
+
+  public getSubSuper(memo: ExpressP11MemoPool, filter: string = ""): readonly EntityDefinition[] {
+    const userFilter = filter;
+    const memoQuery: MemoQuery = { name: this.graphKey.toString(), type: MemoType.SubSuper };
+    if (memo.exist(memoQuery) && this.graphKey != NIL) {
+      const memoized = memo.query(memoQuery) as MultiMap<string, EntityDefinition>;
+      return userFilter.length > 0 ? memoized.get(userFilter) : memoized.values().toArray();
+    }
+    const graph = new MultiMap<string, EntityDefinition>();
+    this.graphKey = uuidv4();
+    const payload = this.computeSubSuper([], this.graphKey);
+    payload.map((e) => graph.add(e.getName(), e.getNode()));
+
+    memo.memoize({ type: MemoType.SubSuper, name: this.graphKey.toString(), payload: graph });
+
+    return userFilter.length > 0 ? graph.get(filter) : graph.values().toArray();
+  }
+  private computeSubSuper(exclude: string[] = [], graphKey: string): ExpressP11Entity[] {
+    if (exclude.includes(this.getQualifiedName())) {
+      return [];
+    }
+    this.graphKey = graphKey;
+    const subSuperList: Map<string, ExpressP11Entity> = new Map();
+    exclude.push(this.getQualifiedName());
+    const directTypes = [...this._supertypes, ...this._subtypes];
+    for (const directType of directTypes) {
+      if (!exclude.includes(directType.getQualifiedName())) {
+        const result = directType.computeSubSuper(exclude, graphKey);
+
+        for (const t of result) {
+          if (!subSuperList.has(t.getQualifiedName())) {
+            subSuperList.set(t.getQualifiedName(), t);
+            exclude.push(t.getQualifiedName());
+          }
+        }
+      }
+    }
+    subSuperList.set(this.getQualifiedName(), this);
+
+    return [...subSuperList.values()];
   }
 
   public getSubTypes(memo: ExpressP11MemoPool, exclude: string[] = []): ExpressP11Entity[] {
@@ -297,7 +348,7 @@ export class ExpressP11Entity extends ExpressResource<EntityDefinition> {
     exclude.push(this.getQualifiedName());
     const subTypes: ExpressP11Entity[] = [];
 
-    for (const subtype of this.subtypes) {
+    for (const subtype of this._subtypes) {
       subTypes.push(subtype);
       subTypes.push(...subtype.getSubTypes(memo, exclude));
     }
@@ -306,12 +357,12 @@ export class ExpressP11Entity extends ExpressResource<EntityDefinition> {
   }
   public addSuperType(superType: ExpressP11Entity): void {
     if (superType) {
-      this.supertyes.push(superType);
+      this._supertypes.push(superType);
       superType.addSubType(this);
     }
   }
   public addSubType(subtype: ExpressP11Entity): void {
-    if (subtype) this.subtypes.push(subtype);
+    if (subtype) this._subtypes.push(subtype);
   }
 }
 
@@ -370,7 +421,8 @@ export type EnumValue = {
 };
 
 export class ExpressP11SelectType extends ExpressP11Type {
-  protected values: ExpressP11Entity[] = [];
+  protected simpleValues: ExpressP11Entity[] = [];
+  protected selectTypeValues: ExpressP11SelectType[] = [];
   protected valueNames: string[] = [];
   protected base: ExpressP11SelectType | undefined;
   protected baseName: string | undefined;
@@ -390,8 +442,9 @@ export class ExpressP11SelectType extends ExpressP11Type {
 
   public getValues(): ExpressP11Entity[] {
     const allValues: ExpressP11Entity[] = [];
-    allValues.push(...this.values);
+    allValues.push(...this.simpleValues);
     if (this.hasBase && this.base) allValues.push(...this.base.getValues());
+    allValues.push(...this.selectTypeValues.map((selectType) => selectType.getValues()).flat());
     return allValues;
   }
   override getDefinition(): Definition {
@@ -416,7 +469,14 @@ export class ExpressP11SelectType extends ExpressP11Type {
       //     ?.getAllResources(memoPool)
       //     .find((r) => r.type === DefinitionType.Entity && r.resource.getName() === selectValue);
       const selectEntity = this.owner?.getAllResources(memoPool)?.resources.get(DefinitionType.Entity)?.get(selectValue);
-      if (selectEntity) this.values.push(selectEntity.resource as ExpressP11Entity);
+      if (selectEntity) {
+        this.simpleValues.push(selectEntity.resource as ExpressP11Entity);
+        continue;
+      }
+      const selectType = this.owner?.getAllResources(memoPool)?.resources.get(DefinitionType.SelectType)?.get(selectValue);
+      if (selectType) {
+        this.selectTypeValues.push(selectType.resource as ExpressP11SelectType);
+      }
     }
   }
 }
@@ -458,7 +518,7 @@ export class ExpressP11TypeFactory {
           isExtensible,
           false,
           undefined,
-          selectType.select.types.map((t) => t.$refText),
+          selectType.select.types.map((t) => t.$refText), //make sure there is no error
           def
         );
       }
@@ -576,5 +636,40 @@ export class ExpressP11OptimizedResourceList {
       if (v.has(name)) result = v.get(name);
     });
     return result;
+  }
+}
+
+export class ExpressP11OptimizedAttributeList {
+  protected resource = new Map<string, Map<string, Attribute_decl[]>>();
+
+  public add(graphKey: string, attributeName: string, attribute: Attribute_decl): void {
+    if (this.resource.has(graphKey)) {
+      if (this.resource.get(graphKey)?.has(attributeName)) {
+        const attributes = this.resource.get(graphKey)?.get(attributeName);
+        this.resource.get(graphKey)?.set(attributeName, [...attributes!, attribute]);
+      } else {
+        this.resource.get(graphKey)?.set(attributeName, [attribute]);
+      }
+    } else {
+      this.resource.set(graphKey, new Map<string, Attribute_decl[]>());
+      this.resource.get(graphKey)?.set(attributeName, [attribute]);
+    }
+  }
+
+  get resources() {
+    return this.resource;
+  }
+
+  public findByName(graphKey: string, name: string): Attribute_decl[] {
+    // let result: Attribute_decl[] | undefined;
+    // this.resource.forEach((v, k) => {
+    //   if (v.has(name)) result = v.get(name);
+    // });
+    return this.resource.get(graphKey)?.get(name) ?? [];
+    // return result;
+  }
+
+  public clear() {
+    this.resource.clear();
   }
 }

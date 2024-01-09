@@ -1,14 +1,6 @@
+import { AstNode, AstNodeDescriptionProvider, DefaultScopeProvider, EMPTY_SCOPE, ReferenceInfo, Scope, getContainerOfType } from "langium";
 import {
-  AstNode,
-  AstNodeDescription,
-  AstNodeDescriptionProvider,
-  DefaultScopeProvider,
-  EMPTY_SCOPE,
-  ReferenceInfo,
-  Scope,
-  getContainerOfType,
-} from "langium";
-import {
+  Attribute_decl,
   Attribute_id,
   Attribute_qualifier,
   EntityDefinition,
@@ -64,7 +56,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
   constructor(services: ExpressP11Services) {
     super(services);
     this.astNodeDescriptionProvider = services.workspace.AstNodeDescriptionProvider;
-    this.typeContainer = services.shared.workspace.TypeContainer;
+    this.typeContainer = services.validation.TypeContainer;
   }
 
   override getScope(context: ReferenceInfo): Scope {
@@ -95,8 +87,9 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         const inverseAttribute = context.container;
         const ofType = inverseAttribute.forEntity ? inverseAttribute.forEntity : inverseAttribute.type;
         if (ofType.error || !ofType.ref) return EMPTY_SCOPE;
-        const attributes = this.typeContainer.getAllAttributes(ofType.ref);
-        return this.createScopeForNodes(attributes);
+        const attributes = this.typeContainer.getAllAttributes(ofType.ref, context.reference.$refText);
+        const scope = this.createScopeForNodes(attributes);
+        return scope;
       }
       if (isGroup_qualifier(context.container) || isAttribute_qualifier(context.container)) {
         enum Qualifier {
@@ -113,9 +106,10 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
             const entity = getContainerOfType(context.container, isEntityDefinition);
             if (entity) {
               nodesInScopeType = ScopeType.Entities;
-              for (const entityDef of this.typeContainer.getFullSubSuperGraph(entity)) {
-                nodesInScope.push(entityDef);
-              }
+              //   for (const entityDef of this.typeContainer.getFullSubSuperGraph(entity)) {
+              //     nodesInScope.push(entityDef);
+              //   }
+              nodesInScope.push(entity);
             }
           }
 
@@ -124,7 +118,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
             // if (!entity) console.log("couldnt read");
             if (!entity || !isEntityDefinition(entity)) return EMPTY_SCOPE;
             nodesInScope.push(entity);
-            nodesInScopeType = ScopeType.Entities;
+            nodesInScopeType = ScopeType.Entity;
           }
         }
 
@@ -161,7 +155,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
                 const entity = getContainerOfType(context.container, isEntityDefinition);
                 if (entity) {
                   nodesInScope.push(entity);
-                  nodesInScopeType = ScopeType.Entities;
+                  nodesInScopeType = ScopeType.Entity;
                 }
                 break;
             }
@@ -183,7 +177,6 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
                     )
                       return EMPTY_SCOPE;
                     const attr = attribute.$container; //reference.reference.ref?.$container as Explicit_attr;
-
                     const attributeType = this.typeContainer.resolveAttribute(attr);
                     if (attributeType.type === ExpressP11ParameterTypeResolutionType.EntityDefinition) {
                       nodesInScope.push(...attributeType.value);
@@ -200,41 +193,107 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
                 if (!isEntityDefinition(entity)) break;
                 if (entity) {
                   nodesInScope.push(entity);
-                  nodesInScopeType = ScopeType.Entities;
+                  nodesInScopeType = ScopeType.Entity;
                 }
                 break;
             }
           }
         }
 
-        const scopeElements: AstNodeDescription[] = [];
         if (searchingFor === Qualifier.Attribute) {
           if (nodesInScope.length < 1) return EMPTY_SCOPE;
-          if (nodesInScopeType === ScopeType.Entities) {
-            const attributes = nodesInScope.map((type) => this.typeContainer.getAllAttributes(type as EntityDefinition)).flat();
-            return this.createScopeForNodes(attributes, undefined, { caseInsensitive: true });
+
+          switch (nodesInScopeType) {
+            case ScopeType.Entities:
+            case ScopeType.Entity:
+              return this.resolveAttributeQualifierScope(nodesInScope, nodesInScopeType, context.reference.$refText);
+
+            case ScopeType.Enums:
+              return this.resolveEnumQualifierScope(nodesInScope);
+            default:
+              break;
           }
-          if (nodesInScopeType === ScopeType.Enums) {
-            return this.createScopeForNodes(nodesInScope, undefined, { caseInsensitive: true });
-          }
+          //   const attributes: Attribute_decl[] = [];
+          //   if (nodesInScopeType === ScopeType.Entities) {
+          //     const graphProcessed: number[] = [];
+          //     for (const type of nodesInScope) {
+          //       if (!graphProcessed.includes(this.typeContainer.getGraphKey(type as EntityDefinition))) {
+          //         for (const attribute of this.typeContainer.getAllAttributes(type as EntityDefinition, context.reference.$refText)) {
+          //           attributes.push(attribute);
+          //         }
+          //         graphProcessed.push(this.typeContainer.getGraphKey(type as EntityDefinition));
+          //       }
+          //     }
+          //     const scope = this.createScopeForNodes(attributes);
+          //     return scope;
+          //   }
+
+          //   if (nodesInScopeType === ScopeType.Entity && nodesInScope.length == 1) {
+          //     attributes.push(...this.typeContainer.getAttributesV2(nodesInScope[0] as EntityDefinition));
+          //     const scope = this.createScopeForNodes(attributes);
+          //     return scope;
+          //   }
+          //   if (nodesInScopeType === ScopeType.Enums) {
+          //     return this.resolveEnumQualifierScope(nodesInScope);
+          //   }
         }
 
         if (searchingFor === Qualifier.Group) {
-          for (const entity of nodesInScope) {
-            for (const entityDef of this.typeContainer.getFullSubSuperGraph(entity as EntityDefinition)) {
-              scopeElements.push(this.descriptions.createDescription(entityDef, entityDef.name));
-            }
-          }
+          return this.resolveGroupQualifierScope(nodesInScope, context.reference.$refText);
         }
-        return this.createScope(scopeElements, undefined, { caseInsensitive: true });
       }
 
-      return super.getScope(context);
+      const scope = super.getScope(context);
+      return scope;
     } catch (error) {
+      console.log(error);
       return EMPTY_SCOPE;
     }
   }
 
+  private resolveGroupQualifierScope(options: AstNode[], filter: string = ""): Scope {
+    const graphProcessed: string[] = [];
+    const entities: EntityDefinition[] = [];
+    for (const entity of options) {
+      if (!graphProcessed.includes(this.typeContainer.getGraphKey(entity as EntityDefinition))) {
+        for (const entityDef of this.typeContainer.getFullSubSuperGraph(entity as EntityDefinition, filter)) {
+          entities.push(entityDef);
+        }
+        graphProcessed.push(this.typeContainer.getGraphKey(entity as EntityDefinition));
+      }
+    }
+    const scopeToReturn = this.createScopeForNodes(entities);
+
+    return scopeToReturn;
+  }
+
+  private resolveEnumQualifierScope(options: AstNode[]): Scope {
+    return this.createScopeForNodes(options, undefined);
+  }
+
+  private resolveAttributeQualifierScope(options: AstNode[], type: ScopeType, filter: string = ""): Scope {
+    const attributes: Attribute_decl[] = [];
+    if (type === ScopeType.Entities) {
+      const graphProcessed: string[] = [];
+      for (const type of options) {
+        if (!graphProcessed.includes(this.typeContainer.getGraphKey(type as EntityDefinition))) {
+          for (const attribute of this.typeContainer.getAllAttributes(type as EntityDefinition, filter)) {
+            attributes.push(attribute);
+          }
+          graphProcessed.push(this.typeContainer.getGraphKey(type as EntityDefinition));
+        }
+      }
+      const scope = this.createScopeForNodes(attributes);
+      return scope;
+    }
+
+    if (type === ScopeType.Entity && options.length == 1) {
+      attributes.push(...this.typeContainer.getAttributesV2(options[0] as EntityDefinition));
+      const scope = this.createScopeForNodes(attributes);
+      return scope;
+    }
+    return EMPTY_SCOPE;
+  }
   getSimpleScopeOptions(leftNode: AstNode, schema: ExpressP11Schema): { nodes: AstNode[]; type: ScopeType } {
     if (!leftNode) return { nodes: [], type: ScopeType.Empty };
     let nodes: AstNode[] = [];
@@ -306,7 +365,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
           if (primary.head.to.ref) return this.getSimpleScopeOptions(primary.head.to.ref, schema);
         }
       }
-      if (isComplex_Primary_reference(primary.head) && isFunctionDefinition(primary.head.to.ref) && primary.body.qualifiers.length < 1) {
+      if (isComplex_Primary_reference(primary.head) && isFunctionDefinition(primary.head.to.ref) && primary.body?.qualifiers.length < 1) {
         return this.getSimpleScopeOptions(primary.head.to.ref, schema);
       }
       if (isBuilt_in_function(primary.head)) {
@@ -317,8 +376,8 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         }
       }
 
-      if (primary.body.qualifiers) {
-        const lastQualifier = primary.body.qualifiers.at(primary.body.qualifiers.length - 1);
+      if (primary.body?.qualifiers) {
+        const lastQualifier = primary.body?.qualifiers.at(primary.body?.qualifiers.length - 1);
         if (isAttribute_qualifier(lastQualifier))
           if (!isEnumeration_id(lastQualifier.target) && lastQualifier.target.ref)
             return this.getSimpleScopeOptions(lastQualifier.target.ref, schema);
@@ -330,6 +389,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
 
 enum ScopeType {
   Entities,
+  Entity,
   Enums,
   Empty,
 }
