@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1-0](https://github.com/usnistgov/easy-express/compare/0.3.0...0.3.1-0) (2024-01-09)
+
+
+### Bug Fixes
+
+* Change attribute snippet description ([bd8e7f3](https://github.com/usnistgov/easy-express/commit/bd8e7f370a80ff516847f170df561402268c344c))
+* update type system computation ([#20](https://github.com/usnistgov/easy-express/issues/20)) ([eababce](https://github.com/usnistgov/easy-express/commit/eababce945fa5e38ac5eee169eeeb6d2d4c831e5))
+
 ## [0.3.0](https://github.com/usnistgov/easy-express/compare/0.3.0-4...0.3.0) (2023-12-04)
 
 ## [0.3.0-4](https://github.com/usnistgov/easy-express/compare/0.3.0-3...0.3.0-4) (2023-12-04)
