@@ -2,6 +2,8 @@ langium-quickstart.md
 .vscode/**
 .vscode-test/**
 out/test/**
+out/shared/**
+out/utils/**
 src/**
 .gitignore
 .yarnrc
@@ -11,3 +13,11 @@ src/**
 **/*.ts
 assets/
 vitest.config.js
+esbuild.mjs
+CHANGELOG.md
+.github/**
+node_modules/
+.release-it.json
+CODEMETA.yaml
+CODEOWNERS.md
+bin/**
