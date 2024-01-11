@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.3.1](https://github.com/usnistgov/easy-express/compare/0.3.1-0...0.3.1) (2024-01-11)
+
 ## [0.3.1-0](https://github.com/usnistgov/easy-express/compare/0.3.0...0.3.1-0) (2024-01-09)
 
 
