@@ -73,7 +73,7 @@ describe("Basic completion", async () => {
       text,
       index: 5,
       assert: (completions) => {
-        assertCompletionListIsComplete(completions, []);
+        assertCompletionListIsComplete(completions, ["firstname", "lastname", "isPermanent"]);
       },
     });
   });
