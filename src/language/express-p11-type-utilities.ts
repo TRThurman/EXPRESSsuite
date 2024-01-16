@@ -665,7 +665,15 @@ export class ExpressP11OptimizedAttributeList {
     // this.resource.forEach((v, k) => {
     //   if (v.has(name)) result = v.get(name);
     // });
-    return this.resource.get(graphKey)?.get(name) ?? [];
+    if (name.length > 0) {
+      return this.resource.get(graphKey)?.get(name) ?? [];
+    } else {
+      let result: Attribute_decl[] = [];
+      this.resource.get(graphKey)?.forEach((attributes, name) => {
+        result.push(...attributes);
+      });
+      return result;
+    }
     // return result;
   }
 

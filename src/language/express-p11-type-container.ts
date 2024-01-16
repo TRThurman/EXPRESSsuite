@@ -374,12 +374,11 @@ export class ExpressP11TypeContainer {
   public getAllAttributes(entity: EntityDefinition, filter: string = ""): Attribute_decl[] {
     const expressEntity = this.getExpressP11EntityFrom(entity);
     if (!expressEntity) return [];
-    const userFilter = filter;
 
     const memoKey = expressEntity.graphKey;
     const hasBeenComputed = this.memoizedAttributesCall.resources.has(memoKey.toString());
     if (hasBeenComputed && memoKey !== NIL) {
-      return filter.length > 0 ? this.memoizedAttributesCall.findByName(memoKey.toString(), filter) : [];
+      return this.memoizedAttributesCall.findByName(memoKey.toString(), filter);
     }
 
     const typeGraph = this.getFullSubSuperGraph(entity);
@@ -399,7 +398,7 @@ export class ExpressP11TypeContainer {
     // console.timeEnd(`${memoKey}`);
 
     // return attributes;
-    return filter.length > 0 ? this.memoizedAttributesCall.findByName(expressEntity.graphKey.toString(), filter) : [];
+    return this.memoizedAttributesCall.findByName(expressEntity.graphKey.toString(), filter);
   }
 
   protected getAttributes(type: ConcreteType): Attribute_decl[] {
