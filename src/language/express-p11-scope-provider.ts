@@ -246,7 +246,6 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
       const scope = super.getScope(context);
       return scope;
     } catch (error) {
-      console.log(error);
       return EMPTY_SCOPE;
     }
   }
