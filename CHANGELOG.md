@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.3](https://github.com/usnistgov/easy-express/compare/0.3.2...0.3.3) (2024-01-23)
+
+
+### Bug Fixes
+
+* add contextual scope resolution for type extension ([59e2f8b](https://github.com/usnistgov/easy-express/commit/59e2f8bf4315743edf8fbaa8654934a6a6fad61c))
+* add processing of incomplete type extension ([e34f2de](https://github.com/usnistgov/easy-express/commit/e34f2de19c1df08b0ea8e16ccc191ed4ba1f706f))
+* update memoization of interface resolution ([cb752f8](https://github.com/usnistgov/easy-express/commit/cb752f8b90f44017e37f146ff711a6f39a881230))
+
 ## [0.3.2](https://github.com/usnistgov/easy-express/compare/0.3.1...0.3.2) (2024-01-16)
 
 
