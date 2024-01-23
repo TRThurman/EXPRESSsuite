@@ -21,6 +21,7 @@ import {
   isComplex_Primary_reference,
   isDerived_attr,
   isEntityDefinition,
+  isEnumeration_extension,
   isEnumeration_id,
   isEnumeration_type,
   isExplicit_attr,
@@ -33,6 +34,7 @@ import {
   isQualifier,
   isQuery_expression,
   isSchemaDefinition,
+  isSelect_extension,
   isSimple_expression,
   isSimple_factor,
   isVariable_id,
@@ -43,6 +45,7 @@ import { ExpressP11Services } from "./express-module.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
 import { DefinitionType, ExpressP11ParameterTypeResolutionType, ExpressP11Schema } from "./express-p11-type-utilities.js";
 import { getTypesFromParameterType } from "../utils/entity-helpers.js";
+import { isTypeExtension } from "./type-system/semantic-type.js";
 
 export type CustomExpressDescription<T> = {
   nameInScope: string;
@@ -82,6 +85,16 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
       if (!schemaNode || !schemaNode.name) return EMPTY_SCOPE;
       const schema = this.typeContainer.getSchemas().get(schemaNode.name);
       if (!schema) return EMPTY_SCOPE;
+
+      //type extension
+      if (isTypeExtension(context.container) && context.property === "type") {
+        const typeOfType = isSelect_extension(context.container) ? DefinitionType.SelectType : DefinitionType.EnumType;
+        const resources = this.typeContainer.getAllRessourcesFrom(schema, true);
+        if (!resources.resources.get(typeOfType)) return EMPTY_SCOPE;
+        const types = [...resources.resources.get(typeOfType)!.values()].map((typeObject) => typeObject.resource.getNode());
+        return this.createScopeForNodes(types);
+      }
+
       //Inverse attribute
       if (context.property === "forAttribute" && isInverse_attr(context.container)) {
         const inverseAttribute = context.container;
@@ -91,6 +104,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         const scope = this.createScopeForNodes(attributes);
         return scope;
       }
+
       if (isGroup_qualifier(context.container) || isAttribute_qualifier(context.container)) {
         enum Qualifier {
           Group,

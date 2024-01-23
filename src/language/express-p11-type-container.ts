@@ -35,6 +35,7 @@ import {
   ExpressP11ConflictManager,
   ExpressP11Entity,
   ExpressP11OptimizedAttributeList,
+  ExpressP11OptimizedResourceList,
   ExpressP11ParameterTypeResolution,
   ExpressP11ParameterTypeResolver,
   ExpressP11Schema,
@@ -539,6 +540,10 @@ export class ExpressP11TypeContainer {
     const expEntity = this.getExpressP11EntityFrom(entity);
 
     return expEntity ? expEntity.graphKey : NIL;
+  }
+
+  public getAllRessourcesFrom(schema: ExpressP11Schema, includeReference: boolean): ExpressP11OptimizedResourceList {
+    return schema.getAllResources(this.memoPool, includeReference, []);
   }
 
   getExpressP11EntityFrom(entity: EntityDefinition): ExpressP11Entity | undefined {

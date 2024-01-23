@@ -1,5 +1,13 @@
 import { AstNode } from "langium";
-import { EntityDefinition, Select_list, Select_type, TypeDefinition, Underlying_type } from "../generated/ast.js";
+import {
+  EntityDefinition,
+  Select_list,
+  Select_type,
+  TypeDefinition,
+  Underlying_type,
+  isEnumeration_extension,
+  isSelect_extension,
+} from "../generated/ast.js";
 
 export const extractTypes = (type: Underlying_type): EntityDefinition[] => {
   switch (type.$type) {
@@ -21,4 +29,8 @@ const extractFromSelectType = (selectType: AstNode): EntityDefinition[] => {
     });
   }
   return results;
+};
+
+export const isTypeExtension = (type: AstNode): boolean => {
+  return isSelect_extension(type) || isEnumeration_extension(type);
 };
