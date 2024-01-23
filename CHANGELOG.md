@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.2](https://github.com/usnistgov/easy-express/compare/0.3.1...0.3.2) (2024-01-16)
+
+
+### Bug Fixes
+
+* retrieve attributes without name from an optimized list ([6648f7e](https://github.com/usnistgov/easy-express/commit/6648f7e087c74e40ce06a0a46fdf5d757076180d))
+* update extension packaging options ([82a3354](https://github.com/usnistgov/easy-express/commit/82a3354432c539900e03f4227dd75bee567361cc))
+
 ## [0.3.1](https://github.com/usnistgov/easy-express/compare/0.3.1-0...0.3.1) (2024-01-11)
 
 ## [0.3.1-0](https://github.com/usnistgov/easy-express/compare/0.3.0...0.3.1-0) (2024-01-09)

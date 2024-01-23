@@ -10,7 +10,7 @@
   "publisher": "usnistgov",
   "license": "See License.txt",
   "icon": "nist_logo.png",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "files": [
     "bin"
   ],
