@@ -498,7 +498,7 @@ export class ExpressP11TypeFactory {
       }
       //extension
       if (enumType.extension) {
-        const baseName = enumType.extension.type.$refText;
+        const baseName = enumType.extension.type?.$refText;
         return new ExpressP11EnumType(
           def.name,
           enumType.isExtensible,
@@ -512,18 +512,9 @@ export class ExpressP11TypeFactory {
     if (isSelect_type(def.underlyingType)) {
       const selectType = def.underlyingType as Select_type;
       const isExtensible = selectType.isExtensible;
-      if (isSelect_list(selectType.select)) {
-        return new ExpressP11SelectType(
-          def.name,
-          isExtensible,
-          false,
-          undefined,
-          selectType.select.types.map((t) => t.$refText), //make sure there is no error
-          def
-        );
-      }
+
       if (isSelect_extension(selectType.select)) {
-        const baseName = selectType.select.type.$refText;
+        const baseName = selectType.select.type?.$refText;
         return new ExpressP11SelectType(
           def.name,
           isExtensible,
@@ -533,6 +524,15 @@ export class ExpressP11TypeFactory {
           def
         );
       }
+
+      return new ExpressP11SelectType(
+        def.name,
+        isExtensible,
+        false,
+        undefined,
+        selectType.select?.types.map((t) => t.$refText) ?? [], //make sure there is no error
+        def
+      );
     }
     return;
   }
