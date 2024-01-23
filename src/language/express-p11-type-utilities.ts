@@ -196,56 +196,39 @@ export class ExpressP11Schema {
   ): ExpressP11OptimizedResourceList {
     const def = new ExpressP11OptimizedResourceList();
 
-    if (memoPool.exist({ name: this.getName(), type: MemoType.Resources }))
+    if (memoPool.exist({ name: this.getName(), type: MemoType.Resources }) && includeReference)
       return memoPool.query({ name: this.getName(), type: MemoType.Resources }) as ExpressP11OptimizedResourceList;
     if (exclude.includes(this.name)) return new ExpressP11OptimizedResourceList();
     exclude.push(this.name);
-    // const definitionsInScope: Definition[] = [];
 
-    //definitionsInScope.push(...this.localResourceRegistry.values());
     for (const resource of this.localResourceRegistry.values()) {
-      //   definitionsInScope.push(resource);
       def.add(resource.type, resource.resource.getName(), resource);
     }
 
     if (includeReference) {
-      // definitionsInScope.push(...this.partiallyInterfacedResourceRegistry.values());
       for (const resource of this.partiallyInterfacedResourceRegistry.values()) {
-        // definitionsInScope.push(resource);
         def.add(resource.type, resource.resource.getName(), resource);
       }
 
-      //   this.fullInterfaces
-      //     .filter((i) => i.type === InterfaceType.ReferenceFrom)
-      //     .forEach((i) => definitionsInScope.push(...i.schema.getLocalDefinitions()));
       for (const i of this.fullInterfaces.filter((i) => i.type === InterfaceType.ReferenceFrom)) {
         for (const resource of i.schema.getLocalDefinitions()) {
-          //   definitionsInScope.push(resource);
           def.add(resource.type, resource.resource.getName(), resource);
         }
       }
     } else {
-      //   definitionsInScope.push(
-      //     ...this.partiallyInterfacedResourceRegistry.filter((elt) => elt.interface != InterfaceType.ReferenceFrom)
-      //     );
       for (const resource of this.partiallyInterfacedResourceRegistry.filter((elt) => elt.interface != InterfaceType.ReferenceFrom)) {
-        // definitionsInScope.push(resource);
         def.add(resource.type, resource.resource.getName(), resource);
       }
     }
 
     for (const useFromInterface of this.fullInterfaces.filter((i) => i.type === InterfaceType.UseFrom)) {
-      // definitionsInScope.push(...useFromInterface.schema.getAllResources(false, exclude));
       for (const resources of useFromInterface.schema.getAllResources(memoPool, false, exclude).resources.values()) {
         for (const resource of resources.values()) {
           def.add(resource.type, resource.resource.getName(), resource);
         }
-
-        // definitionsInScope.push(resource);
-        // def.add(resource.type, resource.resource.getName(), resource);
       }
     }
-    memoPool.memoize({ name: this.getName(), payload: def, type: MemoType.Resources });
+    if (includeReference) memoPool.memoize({ name: this.getName(), payload: def, type: MemoType.Resources });
 
     return def;
   }
