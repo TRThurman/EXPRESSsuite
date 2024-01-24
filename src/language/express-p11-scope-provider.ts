@@ -25,6 +25,7 @@ import {
   isComplex_Primary_reference,
   isDerived_attr,
   isEntityDefinition,
+  isEntityRef,
   isEnumeration_extension,
   isEnumeration_id,
   isEnumeration_type,
@@ -42,6 +43,8 @@ import {
   isSelect_extension,
   isSimple_expression,
   isSimple_factor,
+  isSubtype_declaration,
+  isSupertype_factor,
   isVariable_id,
 } from "./generated/ast.js";
 import { getFunctionParameterType } from "../utils/function-helpers.js";
@@ -68,31 +71,20 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
   }
 
   override getScope(context: ReferenceInfo): Scope {
-    // if we are looking for a group or attr qualifier, then
-    // retrieve type of previous member
-
-    // to retrieve the type of the previous member, few options:
-    // are we in a qualifiedAttribute, if yes, process, else:
-    // 1. previous is an attr qualifier,
-    // 2. previous is a group qualifier,
-    // 3. previous is an index qualifier
-    // 4. previous is head
-
     try {
-      //   if (context.property === "entity" && isEntityRef(context.container)) {
-      //     const schema = getContainerOfType(context.container, isSchemaDefinition);
-      //     if (!schema) return EMPTY_SCOPE;
-      //     const entities = this.typeContainer.getAllResourcesFrom(schema.name);
-      //     return this.createScopeForNodes(entities);
-      //   }
-
       const schemaNode = getContainerOfType(context.container, isSchemaDefinition);
       if (!schemaNode || !schemaNode.name) return EMPTY_SCOPE;
       const schema = this.typeContainer.getSchemas().get(schemaNode.name);
       if (!schema) return EMPTY_SCOPE;
 
+      if (isReferenceToControlledEntity(context)) {
+        const entities = this.typeContainer.getAllRessourcesFrom(schema, true);
+        if (!entities.resources.get(DefinitionType.Entity)) return EMPTY_SCOPE;
+        const entitiesInScope = [...entities.resources.get(DefinitionType.Entity)!.values()].map((e) => e.resource.getNode());
+        return this.createScopeForNodes(entitiesInScope);
+      }
       //type extension
-      if (isTypeExtension(context.container) && context.property === "type") {
+      if (isReferenceToControlledType(context)) {
         const typeOfType = isSelect_extension(context.container) ? DefinitionType.SelectType : DefinitionType.EnumType;
         const resources = this.typeContainer.getAllRessourcesFrom(schema, true);
         if (!resources.resources.get(typeOfType)) return EMPTY_SCOPE;
@@ -183,7 +175,6 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
             switch (leftMember.$type) {
               case "Attribute_qualifier":
                 const attribute = (leftMember as Attribute_qualifier).target?.ref;
-                // if (!attribute) console.log("couldnt read");
 
                 if (!attribute) break;
                 switch (attribute.$type) {
@@ -232,29 +223,6 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
             default:
               break;
           }
-          //   const attributes: Attribute_decl[] = [];
-          //   if (nodesInScopeType === ScopeType.Entities) {
-          //     const graphProcessed: number[] = [];
-          //     for (const type of nodesInScope) {
-          //       if (!graphProcessed.includes(this.typeContainer.getGraphKey(type as EntityDefinition))) {
-          //         for (const attribute of this.typeContainer.getAllAttributes(type as EntityDefinition, context.reference.$refText)) {
-          //           attributes.push(attribute);
-          //         }
-          //         graphProcessed.push(this.typeContainer.getGraphKey(type as EntityDefinition));
-          //       }
-          //     }
-          //     const scope = this.createScopeForNodes(attributes);
-          //     return scope;
-          //   }
-
-          //   if (nodesInScopeType === ScopeType.Entity && nodesInScope.length == 1) {
-          //     attributes.push(...this.typeContainer.getAttributesV2(nodesInScope[0] as EntityDefinition));
-          //     const scope = this.createScopeForNodes(attributes);
-          //     return scope;
-          //   }
-          //   if (nodesInScopeType === ScopeType.Enums) {
-          //     return this.resolveEnumQualifierScope(nodesInScope);
-          //   }
         }
 
         if (searchingFor === Qualifier.Group) {
@@ -436,6 +404,17 @@ const getStringFromSimpleFactor = (simpleFactor: Simple_factor): string | undefi
     }
   }
   return;
+};
+
+export const isReferenceToControlledEntity = (context: ReferenceInfo): boolean => {
+  return (
+    context.property === "entity" &&
+    isEntityRef(context.container) &&
+    (isSubtype_declaration(context.container.$container) || isSupertype_factor(context.container.$container))
+  );
+};
+export const isReferenceToControlledType = (context: ReferenceInfo): boolean => {
+  return context.property === "type" && isTypeExtension(context.container);
 };
 
 enum ScopeType {
