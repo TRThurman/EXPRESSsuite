@@ -189,21 +189,6 @@ export class ExpressP11TypeContainer {
         if (this.hasSuperTypes(eType.node)) {
           for (const supertype of eType.node.types.supertypes?.entities!) {
             const supertypeName = supertype.entity.$refText;
-            // let supertypeObject = localTypes.find((t) => t.name === supertypeName);
-            // let source: string | undefined = undefined;
-            // if (supertypeObject) {
-            //   source = schema.name;
-            // }
-            // if (!supertypeObject) {
-            //   const importedObject = imports.find((i) => i.name === supertypeName);
-            //   if (importedObject) source = importedObject.schema;
-            // }
-            // if (!source) continue;
-
-            // eType.supertypes.push({
-            //   name: supertypeName,
-            //   schema: source,
-            // });
             const supertypeObject = allAvailable.find((def) => def.name === supertypeName);
             if (supertypeObject) eType.supertypes.push(supertypeObject);
           }
@@ -214,8 +199,6 @@ export class ExpressP11TypeContainer {
   }
 
   protected async resolveSuperTypesV2(cancelToken: CancellationToken): Promise<void> {
-    // console.time("v2");
-
     for (const schema of this.schemas.values()) {
       await interruptAndCheck(cancelToken);
       if (schema.isResolved()) continue;
@@ -236,7 +219,6 @@ export class ExpressP11TypeContainer {
       schema.resolveTypes(this.memoPool);
       schema.markAsResolved();
     }
-    // console.timeEnd("v2");
   }
 
   protected async resolveSubTypes(cancelToken: CancellationToken): Promise<void> {
@@ -255,7 +237,6 @@ export class ExpressP11TypeContainer {
 
   public resolveAttribute(attribute: Explicit_attr | Derived_attr | Inverse_attr): ExpressP11ParameterTypeResolution {
     this.resolveAttributeTypeCall += 1;
-    // console.log(`${this.resolveAttributeTypeCall}`);
     return ExpressP11ParameterTypeResolver.resolve(attribute, this.schemas, this.memoPool);
   }
 
@@ -267,6 +248,18 @@ export class ExpressP11TypeContainer {
     const concreteSupertype = this.findType(supertype.name, supertype.schema);
     if (!concreteSupertype) return;
     concreteSupertype.subtypes.push(subtype);
+  }
+
+  public findEntityByInsensitiveName(schema: string, entity: string): ExpressP11Entity | undefined {
+    if (!schema || !entity) return;
+    for (const s of this.schemas.values()) {
+      if (s.getName().toLowerCase() === schema.toLowerCase()) {
+        for (const e of s.getEntities().values()) {
+          if (e.getName().toLowerCase() === entity.toLowerCase()) return e;
+        }
+      }
+    }
+    return;
   }
 
   /**

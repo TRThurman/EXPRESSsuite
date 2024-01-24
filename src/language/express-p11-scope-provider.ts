@@ -3,17 +3,21 @@ import {
   Attribute_decl,
   Attribute_id,
   Attribute_qualifier,
+  BinaryExpression,
   EntityDefinition,
   FunctionDefinition,
   Group_qualifier,
+  Literal,
   Parameter_id,
   Primary,
   Redeclared_attribute,
   Simple_expression,
+  Simple_factor,
   TypeDefinition,
   Variable_id,
   isAssignment_stmt_body,
   isAttribute_qualifier,
+  isBinaryExpression,
   isBuilt_in_constant_or_function,
   isBuilt_in_function,
   isComplex_Primary,
@@ -29,6 +33,7 @@ import {
   isGroup_qualifier,
   isIndex_qualifier,
   isInverse_attr,
+  isLiteral,
   isLocal_variable,
   isQualified_attribute,
   isQualifier,
@@ -382,10 +387,15 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         return this.getSimpleScopeOptions(primary.head.to.ref, schema);
       }
       if (isBuilt_in_function(primary.head)) {
-        if (primary.head === "USEDIN") {
-          const source = primary.body.parameterList?.params[0];
-          if (!source) return { nodes: [], type: ScopeType.Empty };
-          if (isSimple_expression(source)) return this.getSimpleExpressionType(source, schema);
+        if (primary.head.toLowerCase() === "USEDIN".toLowerCase()) {
+          const fullyQualifiedAttributeName = primary.body.parameterList?.params[1];
+          if (!fullyQualifiedAttributeName) return { nodes: [], type: ScopeType.Empty };
+          const namePath = resolveFullyQualifiedAttributeName(fullyQualifiedAttributeName);
+          if (!namePath) return { nodes: [], type: ScopeType.Empty };
+          if (namePath.length !== 3) return { nodes: [], type: ScopeType.Empty };
+          const entity = this.typeContainer.findEntityByInsensitiveName(namePath[0], namePath[1]);
+          if (!entity) return { nodes: [], type: ScopeType.Empty };
+          return { nodes: [entity.getNode()], type: ScopeType.Entities };
         }
       }
 
@@ -399,6 +409,34 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     return { nodes: [], type: ScopeType.Empty };
   }
 }
+
+const resolveFullyQualifiedAttributeName = (fullyQualifiedAttributeName: AstNode): string[] | undefined => {
+  let namePath: string[] = [];
+  if (isSimple_factor(fullyQualifiedAttributeName)) {
+    namePath = getStringFromSimpleFactor(fullyQualifiedAttributeName)?.split(".") ?? [];
+  }
+  if (isBinaryExpression(fullyQualifiedAttributeName)) {
+    const binaryExpressName = fullyQualifiedAttributeName as BinaryExpression;
+    if (isSimple_factor(binaryExpressName.left) && isSimple_factor(binaryExpressName.right)) {
+      const leftString = getStringFromSimpleFactor(binaryExpressName.left);
+      const rightString = getStringFromSimpleFactor(binaryExpressName.right);
+      if (!leftString || !rightString) return;
+      namePath = (leftString + rightString).split(".");
+    }
+  }
+  if (namePath.length !== 3) return;
+  return namePath;
+};
+
+const getStringFromSimpleFactor = (simpleFactor: Simple_factor): string | undefined => {
+  if (isSimple_factor(simpleFactor)) {
+    if (isLiteral((simpleFactor as Simple_factor).primary)) {
+      const namePath = ((simpleFactor as Simple_factor).primary as Literal).value.replaceAll("'", "");
+      return namePath;
+    }
+  }
+  return;
+};
 
 enum ScopeType {
   Entities,
