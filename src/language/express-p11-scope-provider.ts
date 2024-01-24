@@ -169,7 +169,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
                 const entity = getContainerOfType(context.container, isEntityDefinition);
                 if (entity) {
                   nodesInScope.push(entity);
-                  nodesInScopeType = ScopeType.Entity;
+                  nodesInScopeType = ScopeType.Entities;
                 }
                 break;
             }
