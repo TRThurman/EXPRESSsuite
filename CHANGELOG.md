@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.4](https://github.com/usnistgov/easy-express/compare/0.3.3...0.3.4) (2024-01-24)
+
+
+### Bug Fixes
+
+* update error messages ([5cbf1a5](https://github.com/usnistgov/easy-express/commit/5cbf1a5196283f6f5ab294f7f7dbfc85dfde3800))
+* update scope of entities in subtype/supertype constraints ([9d30f17](https://github.com/usnistgov/easy-express/commit/9d30f17fc46034dac41eefe1b802a39202cefec5))
+* update SELF resolution for qualifiers ([5a275bf](https://github.com/usnistgov/easy-express/commit/5a275bf368f767bb0bbf70c8018bc47bac4d073a))
+* update USEDIN resolution and return type ([631374f](https://github.com/usnistgov/easy-express/commit/631374fa12c1e71ba00f451f3bc857d06d8a5efb))
+
 ## [0.3.3](https://github.com/usnistgov/easy-express/compare/0.3.2...0.3.3) (2024-01-23)
 
 
