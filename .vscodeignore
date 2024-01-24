@@ -21,3 +21,4 @@ node_modules/
 CODEMETA.yaml
 CODEOWNERS.md
 bin/**
+langium-config.json
