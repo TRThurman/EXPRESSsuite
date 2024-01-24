@@ -76,12 +76,12 @@ export class ExpressDocumentValidator extends DefaultDocumentValidator {
             refText: linkingError.reference.$refText,
           } satisfies LinkingErrorData,
         };
+        diagnostics.push(this.toDiagnostic("error", linkingError.message, info));
+        // if (!this.isNestedQuery(linkingError.container)) {
         //   diagnostics.push(this.toDiagnostic("error", linkingError.message, info));
-        if (!this.isNestedQuery(linkingError.container)) {
-          diagnostics.push(this.toDiagnostic("error", linkingError.message, info));
-        } else {
-          diagnostics.push(this.toDiagnostic("info", "Nested query context is currently not supported", info));
-        }
+        // } else {
+        //   diagnostics.push(this.toDiagnostic("info", "Nested query context is currently not supported", info));
+        // }
       }
     }
   }
