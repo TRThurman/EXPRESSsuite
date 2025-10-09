@@ -25,6 +25,8 @@
     "langium:watch": "langium generate --watch",
     "test": "vitest --reporter=verbose",
     "coverage": "vitest --coverage",
+    "prebuild": "langium generate",
+    "pretest": "langium generate",
     "release-pre": "release-it --preRelease --ci",
     "release": "release-it --ci"
   },
