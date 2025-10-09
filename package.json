@@ -19,6 +19,7 @@
     "vscode:prepublish": "npm run esbuild-base",
     "esbuild-base": "tsc --noEmit && npm run lint && node esbuild.mjs --minify",
     "build": "tsc -b tsconfig.json && node esbuild.mjs",
+    "clean": "rm -rf out dist src/language/generated && echo '🧹 Clean complete'",
     "watch": "concurrently -n tsc,esbuild -c blue,yellow \"tsc -b tsconfig.json --watch\" \"node esbuild.mjs --watch\"",
     "lint": "eslint src --ext ts",
     "langium:generate": "langium generate",
@@ -27,9 +28,17 @@
     "coverage": "vitest --coverage",
     "prebuild": "langium generate",
     "pretest": "langium generate",
+    "rebuild": "npm run clean && npm ci && langium generate && npm run build && npm test",
+    "_comment": "deep clean removes lockfile; must use `npm install` to regenerate it",
+    "clean:deep": "rm -rf node_modules out dist src/language/generated package-lock.json && echo '🧹 Deep clean complete'",
+    "rebuild:full": "npm run clean:deep && npm install && langium generate && npm run build && npm test",
     "release-pre": "release-it --preRelease --ci",
     "release": "release-it --ci"
-  },
+},
+
+
+
+
   "dependencies": {
     "chalk": "~5.3.0",
     "commander": "~10.0.0",
