@@ -1,0 +1,52 @@
+version: 2
+updates:
+  #
+  # Node / npm dependencies
+  #
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+    # Group safe routine updates together
+    groups:
+      nonbreaking-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+    #
+    # Explicitly block known breaking / API-sensitive majors
+    #
+    ignore:
+      # VS Code API compatibility (VERY sensitive)
+      - dependency-name: "@types/vscode"
+        update-types: ["version-update:semver-major"]
+
+      # Build / language toolchain (handle manually)
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "esbuild"
+        update-types: ["version-update:semver-major"]
+
+      # ESLint major changes often require config updates
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@typescript-eslint/*"
+        update-types: ["version-update:semver-major"]
+
+      # Test runner majors can be disruptive
+      - dependency-name: "vitest"
+        update-types: ["version-update:semver-major"]
+
+  #
+  # GitHub Actions (if/when you add workflows)
+  #
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 2
