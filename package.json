@@ -41,7 +41,7 @@
 
   "dependencies": {
     "chalk": "~5.6.2",
-    "commander": "~10.0.0",
+    "commander": "~14.0.2",
     "uuidv4": "^6.2.13",
     "vscode-languageclient": "~8.0.2"
   },
