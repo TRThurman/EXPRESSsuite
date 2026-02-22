@@ -2,14 +2,13 @@
   "name": "easyexpress",
   "displayName": "easyEXPRESS",
   "description": "EXPRESS language support for Visual Studio Code",
-  "homepage": "https://github.com/usnistgov/easyexpress-public/",
+  "homepage": "https://github.com/TRThurman/easy-express-mirror",
   "bugs": {
-    "url": "https://github.com/usnistgov/easyexpress-public/issues"
+    "url": "https://github.com/TRThurman/easy-express-mirror/issues"
   },
   "preview": true,
-  "publisher": "usnistgov",
-  "license": "See License.txt",
-  "icon": "nist_logo.png",
+  "publisher": "TRThurman",
+  "license": "MIT",
   "version": "0.3.4",
   "files": [
     "bin"
