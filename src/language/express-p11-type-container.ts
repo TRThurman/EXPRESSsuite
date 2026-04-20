@@ -1,14 +1,13 @@
 import {
   AstNode,
+  AstUtils,
   ConfigurationProvider,
   DocumentState,
   LangiumDocument,
   LangiumDocuments,
   MultiMap,
   NameProvider,
-  getContainerOfType,
   interruptAndCheck,
-  streamAllContents,
 } from "langium";
 import { ExpressP11Services } from "./express-module.js";
 import {
@@ -375,7 +374,7 @@ export class ExpressP11TypeContainer {
     //this.getFullSubSuperGraph(entity).forEach((e) => this.getAttributesV2(e).forEach((a) => attributes.push(a)));
     // for (const key of this.getFullSubSuperGraph(entity)) {
     //   const ename = key.name;
-    //   const sname = getContainerOfType(key, isSchemaDefinition)?.name;
+    //   const sname = AstUtils.getContainerOfType(key, isSchemaDefinition)?.name;
     //   this.memoizedAttributesCall.set(`${ename}.${sname}`, attributes);
     // }
     //this.memoizedAttributesCall.set(memoKey.toString(), attributes);
@@ -389,7 +388,7 @@ export class ExpressP11TypeContainer {
     const attributes: Attribute_decl[] = [];
     if (!type.node.body) return [];
 
-    for (const elt of streamAllContents(type.node.body)) {
+    for (const elt of AstUtils.streamAllContents(type.node.body)) {
       if (isAttribute_decl(elt)) attributes.push(elt);
     }
 
@@ -399,14 +398,14 @@ export class ExpressP11TypeContainer {
     const attributes: Attribute_decl[] = [];
     if (!entity.body) return [];
 
-    for (const elt of streamAllContents(entity.body)) {
+    for (const elt of AstUtils.streamAllContents(entity.body)) {
       if (isAttribute_decl(elt)) attributes.push(elt);
     }
 
     return attributes;
   }
   //   protected async extractAttributes(schema: string, type: ConcreteType, cancelToken: CancellationToken): Promise<void> {
-  //     for (const elt of streamAllContents(type.node.body)) {
+  //     for (const elt of AstUtils.streamAllContents(type.node.body)) {
   //       await interruptAndCheck(cancelToken);
   //       if (isAttribute_decl(elt)) {
   //         if (isExplicit_attr(elt.$container) || isDerived_attr(elt.$container) || isInverse_attr(elt.$container)) {
@@ -490,7 +489,7 @@ export class ExpressP11TypeContainer {
   }
 
   public getSuperTypesFromDefinition(entity: EntityDefinition): EntityDefinition[] {
-    const schema = getContainerOfType(entity, isSchemaDefinition);
+    const schema = AstUtils.getContainerOfType(entity, isSchemaDefinition);
     if (!schema) {
       //   console.log(`No schema found for ${entity.name}`);
       return [];
@@ -506,7 +505,7 @@ export class ExpressP11TypeContainer {
   }
 
   public getSubTypesFromDefinition(entity: EntityDefinition): EntityDefinition[] {
-    const schema = getContainerOfType(entity, isSchemaDefinition);
+    const schema = AstUtils.getContainerOfType(entity, isSchemaDefinition);
     if (!schema) {
       return [];
     }
@@ -530,7 +529,7 @@ export class ExpressP11TypeContainer {
   }
 
   getExpressP11EntityFrom(entity: EntityDefinition): ExpressP11Entity | undefined {
-    const schema = getContainerOfType(entity, isSchemaDefinition);
+    const schema = AstUtils.getContainerOfType(entity, isSchemaDefinition);
     if (!schema || !schema.name) {
       return;
     }

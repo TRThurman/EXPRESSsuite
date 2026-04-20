@@ -1,5 +1,7 @@
 import {
   AstNode,
+  AstUtils,
+  isReference,
   LangiumDocuments,
   MultiMap,
   NameProvider,
@@ -7,10 +9,7 @@ import {
   References,
   ValidationAcceptor,
   ValidationChecks,
-  getContainerOfType,
   isNamed,
-  streamAst,
-  streamReferences,
 } from "langium";
 import {
   Attribute_decl,
@@ -156,8 +155,8 @@ export class ExpressP11Validator {
       this.buildUsedResourcesIndex(useSpecifications).forEach((value, key) => importedResourcesIndex.add(key, value));
       const currentSchemaName = schema.name;
 
-      for (const node of streamAst(schema)) {
-        streamReferences(node).forEach((resourceNeeded) => {
+      for (const node of AstUtils.streamAst(schema)) {
+        AstUtils.streamReferences(node).forEach((resourceNeeded) => {
           if (
             isResource_or_rename(resourceNeeded.container) ||
             isReference_clause(resourceNeeded.container) ||
@@ -166,8 +165,10 @@ export class ExpressP11Validator {
             return;
 
           //console.log(resourceNeeded.reference.ref);
-          if (!resourceNeeded.reference.$nodeDescription) return;
-          const reference = resourceNeeded.reference.ref;
+          if (!isReference(resourceNeeded.reference)) return;
+          const ref = resourceNeeded.reference;
+          if (!ref.$nodeDescription) return;
+          const reference = ref.ref;
           if (
             !isEntityDefinition(reference) &&
             !isTypeDefinition(reference) &&
@@ -177,11 +178,11 @@ export class ExpressP11Validator {
           )
             return;
 
-          const schemaNeeded = getContainerOfType(resourceNeeded.reference.ref, isSchemaDefinition);
+          const schemaNeeded = AstUtils.getContainerOfType(ref.ref, isSchemaDefinition);
           if (!schemaNeeded || !schemaNeeded.name) return;
           if (schemaNeeded.name === currentSchemaName) return;
 
-          const resourceImported = importedResourcesIndex.get(schemaNeeded.name).find((ref) => ref.node === resourceNeeded.reference.ref);
+          const resourceImported = importedResourcesIndex.get(schemaNeeded.name).find((r) => r.node === ref.ref);
 
           if (!resourceImported) {
             const schemaIsAlreadyImported = importedResourcesIndex.has(schemaNeeded.name);
@@ -243,13 +244,13 @@ export class ExpressP11Validator {
   //   const currentSchemaName = schema.name;
   //   const importedResources = this.resourceManager.getImportedResource(currentSchemaName);
   //   console.log(`in ${currentSchemaName}, we found ${importedResources.length} imports`);
-  //   for (const node of streamAst(schema)) {
-  //     streamReferences(node).forEach((resourceNeeded) => {
+  //   for (const node of AstUtils.streamAst(schema)) {
+  //     AstUtils.streamReferences(node).forEach((resourceNeeded) => {
   //       if (isResource_or_rename(resourceNeeded.container) || isReference_clause(resourceNeeded.container)) return;
 
   //       if (!resourceNeeded.reference.$nodeDescription) return;
 
-  //       const schemaNeeded = getContainerOfType(resourceNeeded.reference.ref, isSchema_decl);
+  //       const schemaNeeded = AstUtils.getContainerOfType(resourceNeeded.reference.ref, isSchema_decl);
   //       if (!schemaNeeded || !schemaNeeded.name) return;
   //       if (schemaNeeded.name === currentSchemaName) return;
 

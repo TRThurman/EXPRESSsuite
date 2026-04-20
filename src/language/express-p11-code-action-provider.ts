@@ -1,4 +1,5 @@
-import { CodeActionProvider, LangiumDocument, MaybePromise } from "langium";
+import { LangiumDocument, MaybePromise } from "langium";
+import type { CodeActionProvider } from "langium/lsp";
 import {
   CancellationToken,
   CodeActionKind,

@@ -3,12 +3,12 @@ import {
   DefaultDocumentBuilder,
   DocumentState,
   LangiumDocument,
-  LangiumSharedServices,
   ConfigurationProvider,
   interruptAndCheck,
   URI,
   stream,
 } from "langium";
+import type { LangiumSharedServices } from "langium/lsp";
 import { CancellationToken, Connection, WorkDoneProgress } from "vscode-languageserver";
 import { allowedDocuments } from "../utils/file-filter.js";
 import { EASYEXPRESS_TOKEN } from "../shared/notifications.js";
@@ -33,7 +33,7 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
 
   protected setupSaveHandler(services: LangiumSharedServices) {
     services.workspace.TextDocuments.onDidSave((save) => {
-      services.workspace.MutexLock.lock((token) => this.saveDocuments([URI.parse(save.document.uri)], token));
+      services.workspace.WorkspaceLock.write((token) => this.saveDocuments([URI.parse(save.document.uri)], token));
     });
   }
 
@@ -56,13 +56,13 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
     for (const deletedUri of deleted) {
       this.langiumDocuments.deleteDocument(deletedUri);
       this.buildState.delete(deletedUri.toString());
+      this.indexManager.remove(deletedUri);
     }
-    this.indexManager.remove(deleted);
     // Set the state of all changed documents to `Changed` so they are completely rebuilt
     for (const changedUri of changed) {
       const invalidated = this.langiumDocuments.invalidateDocument(changedUri);
       if (!invalidated) {
-        this.langiumDocuments.getOrCreateDocument(changedUri);
+        await this.langiumDocuments.getOrCreateDocument(changedUri);
       }
       this.buildState.delete(changedUri.toString());
     }
@@ -113,7 +113,7 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
 
     // console.log(`${needParsing.length} documents need parsing.`);
     await this.runCancelable(validDocs, DocumentState.Parsed, cancelToken, (doc) => {
-      this.langiumDocumentFactory.update(doc);
+      return this.langiumDocumentFactory.update(doc, cancelToken);
     });
     // console.log(`${validDocs.filter((e) => e.state === DocumentState.ComputedScopes).length} will need linking`);
     // 1. Index content
@@ -132,7 +132,7 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
     // console.log(`${needComputing.length} documents need computing.`);
     await this.runCancelable(validDocs, DocumentState.ComputedScopes, cancelToken, async (doc) => {
       const scopeComputation = this.serviceRegistry.getServices(doc.uri).references.ScopeComputation;
-      doc.precomputedScopes = await scopeComputation.computeLocalScopes(doc, cancelToken);
+      doc.localSymbols = await scopeComputation.collectLocalSymbols(doc, cancelToken);
     });
     // console.timeEnd("Computing");
 
@@ -179,6 +179,10 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
   }
 
   private async refreshConfiguration(): Promise<void> {
+    if (!this.connection) {
+      // No LSP connection (e.g. tests, CLI) -- use defaults
+      return;
+    }
     const useOptimizedConfiguration = await this.configurationProvider?.getConfiguration("express", "useOptimizedConfiguration");
     const excludedFolders = await this.configurationProvider?.getConfiguration("express", "excludedFolders");
     const excludedFiles = await this.configurationProvider?.getConfiguration("express", "excludedFiles");

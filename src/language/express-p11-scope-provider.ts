@@ -1,4 +1,4 @@
-import { AstNode, AstNodeDescriptionProvider, DefaultScopeProvider, EMPTY_SCOPE, ReferenceInfo, Scope, getContainerOfType } from "langium";
+import { AstNode, AstNodeDescriptionProvider, AstUtils, DefaultScopeProvider, EMPTY_SCOPE, ReferenceInfo, Scope } from "langium";
 import {
   Attribute_decl,
   Attribute_id,
@@ -70,7 +70,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
 
   override getScope(context: ReferenceInfo): Scope {
     try {
-      const schemaNode = getContainerOfType(context.container, isSchemaDefinition);
+      const schemaNode = AstUtils.getContainerOfType(context.container, isSchemaDefinition);
       if (!schemaNode || !schemaNode.name) return EMPTY_SCOPE;
       const schema = this.typeContainer.getSchemas().get(schemaNode.name);
       if (!schema) return EMPTY_SCOPE;
@@ -112,7 +112,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
 
         if (isQualified_attribute(context.container.$container)) {
           if (searchingFor === Qualifier.Group) {
-            const entity = getContainerOfType(context.container, isEntityDefinition);
+            const entity = AstUtils.getContainerOfType(context.container, isEntityDefinition);
             if (entity) {
               nodesInScopeType = ScopeType.Entities;
               //   for (const entityDef of this.typeContainer.getFullSubSuperGraph(entity)) {
@@ -161,7 +161,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
           if (isBuilt_in_constant_or_function(leftMember)) {
             switch (leftMember.toLowerCase()) {
               case "self":
-                const entity = getContainerOfType(context.container, isEntityDefinition);
+                const entity = AstUtils.getContainerOfType(context.container, isEntityDefinition);
                 if (entity) {
                   nodesInScope.push(entity);
                   nodesInScopeType = ScopeType.Entities;
@@ -282,8 +282,8 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     if (!leftNode) return { nodes: [], type: ScopeType.Empty };
     let nodes: AstNode[] = [];
     switch (leftNode.$type) {
-      case Redeclared_attribute:
-      case Attribute_id:
+      case Redeclared_attribute.$type:
+      case Attribute_id.$type:
         if (!isExplicit_attr(leftNode.$container) && !isDerived_attr(leftNode.$container) && !isInverse_attr(leftNode.$container))
           return { nodes: [], type: ScopeType.Empty };
         const attribute = leftNode.$container;
@@ -292,11 +292,11 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
           return { nodes: attributeType.value, type: ScopeType.Entities };
         }
         break;
-      case Parameter_id:
+      case Parameter_id.$type:
         nodes = getFunctionParameterType(leftNode as Parameter_id).map((type) => type.node);
         return { nodes, type: ScopeType.Entities };
 
-      case Variable_id:
+      case Variable_id.$type:
         const variable = leftNode as Variable_id;
         if (isVariable_id(variable) && isLocal_variable(variable.$container)) {
           const parameterType = variable.$container.type;
@@ -309,7 +309,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         }
         return { nodes, type: ScopeType.Entities };
 
-      case TypeDefinition:
+      case TypeDefinition.$type:
         if (!isEnumeration_type((leftNode as TypeDefinition).underlyingType)) return { nodes: [], type: ScopeType.Empty };
         const type = schema.getAllResources().findByName((leftNode as TypeDefinition).name);
         if (!type || type.type !== DefinitionType.EnumType) return { nodes: [], type: ScopeType.Empty };
@@ -318,12 +318,12 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         nodes = enums.map((e) => e.node);
         return { nodes, type: ScopeType.Enums };
 
-      case FunctionDefinition:
+      case FunctionDefinition.$type:
         if (!(leftNode as FunctionDefinition).head?.returnType) return { nodes: [], type: ScopeType.Empty };
         nodes = getTypesFromParameterType((leftNode as FunctionDefinition).head.returnType).map((type) => type.node);
         return { nodes, type: ScopeType.Entities };
 
-      case EntityDefinition:
+      case EntityDefinition.$type:
         return { nodes: [leftNode], type: ScopeType.Entities };
     }
     return { nodes: [], type: ScopeType.Empty };

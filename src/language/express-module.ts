@@ -1,5 +1,7 @@
-import type { DeepPartial, DefaultSharedModuleContext, LangiumServices, LangiumSharedServices, Module } from "langium";
-import { createDefaultModule, createDefaultSharedModule, inject } from "langium";
+import type { DeepPartial, Module } from "langium";
+import type { DefaultSharedModuleContext, LangiumServices, LangiumSharedServices } from "langium/lsp";
+import { createDefaultModule, createDefaultSharedModule } from "langium/lsp";
+import { inject } from "langium";
 import { ExpressP11GeneratedModule, ExpressGeneratedSharedModule } from "./generated/module.js";
 import { ExpressP11DocumentBuilder } from "./express-p11-document-builder.js";
 import { ExpressP11IndexManager } from "./express-p11-index-manager.js";
@@ -33,7 +35,6 @@ export type ExpressP11AddedSharedServices = {
   workspace: {
     DocumentBuilder: ExpressP11DocumentBuilder;
     IndexManager: ExpressP11IndexManager;
-    // TypeContainer: ExpressP11TypeContainer;
   };
   lsp: {
     NodeKindProvider: ExpressP11NodeKindProvider;
@@ -45,7 +46,6 @@ export const ExpressP11SharedModule: Module<ExpressP11SharedServices, DeepPartia
   workspace: {
     DocumentBuilder: (services) => new ExpressP11DocumentBuilder(services),
     IndexManager: (services) => new ExpressP11IndexManager(services),
-    // TypeContainer: (services) => new ExpressP11TypeContainer(services),
     WorkspaceManager: (services) => new ExpressP11WorkspaceManager(services),
   },
   lsp: {
@@ -111,29 +111,5 @@ export function createExpressP11Services(context: ExpressP11SharedModuleContext)
   const shared = inject(createDefaultSharedModule(context), ExpressGeneratedSharedModule, ExpressP11SharedModule, context.sharedModule);
   const ExpressP11 = inject(createDefaultModule({ shared }), ExpressP11GeneratedModule, ExpressP11Module, context.module);
   shared.ServiceRegistry.register(ExpressP11);
-  //   registerValidationChecks(ExpressP11);
   return { shared, ExpressP11 };
 }
-
-// export function createCustomSharedModule(
-//   context: DefaultSharedModuleContext
-// ): Module<LangiumSharedServices, LangiumDefaultSharedServices> {
-//   return {
-//     ServiceRegistry: () => new DefaultServiceRegistry(),
-//     lsp: {
-//       Connection: () => context.connection,
-//       LanguageServer: (services) => new DefaultLanguageServer(services),
-//     },
-//     workspace: {
-//       LangiumDocuments: (services) => new DefaultLangiumDocuments(services),
-//       LangiumDocumentFactory: (services) => new DefaultLangiumDocumentFactory(services),
-//       DocumentBuilder: (services) => new ExpressP11DocumentBuilder(services),
-//       TextDocuments: () => new TextDocuments(TextDocument),
-//       IndexManager: (services) => new DefaultIndexManager(services),
-//       WorkspaceManager: (services) => new DefaultWorkspaceManager(services),
-//       FileSystemProvider: (services) => context.fileSystemProvider(services),
-//       MutexLock: () => new MutexLock(),
-//       ConfigurationProvider: (services) => new DefaultConfigurationProvider(services),
-//     },
-//   };
-// }

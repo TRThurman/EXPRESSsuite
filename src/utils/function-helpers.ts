@@ -84,10 +84,10 @@ export const nodeIsStmtWithVariable = (stmt: AstNode): boolean => {
 
 export const extractVariableFromStmt = (stmt: AstNode): Variable_id | undefined => {
   switch (stmt.$type) {
-    case Repeat_stmt:
+    case Repeat_stmt.$type:
       const repeatStmt = stmt as Repeat_stmt;
       return repeatStmt.control.increment?.var;
-    case Query_expression:
+    case Query_expression.$type:
       const query = stmt as Query_expression;
       return query.variable;
   }

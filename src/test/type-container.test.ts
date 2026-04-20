@@ -1,4 +1,4 @@
-import { AstNode, EmptyFileSystem, LangiumDocument, streamAllContents } from "langium";
+import { AstNode, AstUtils, EmptyFileSystem, LangiumDocument } from "langium";
 import { describe, test, expect } from "vitest";
 import { createExpressP11Services } from "../language/express-module.js";
 import { parseDocument } from "langium/test";
@@ -306,7 +306,7 @@ describe("Parameter type resolver", async () => {
 });
 
 const findExplicitAttribute = (entity: EntityDefinition, attributeName: string): Explicit_attr | undefined => {
-  for (const node of streamAllContents(entity)) {
+  for (const node of AstUtils.streamAllContents(entity)) {
     if (isAttribute_decl(node) && isExplicit_attr(node.$container)) {
       if (node.name === attributeName) return node.$container;
     }

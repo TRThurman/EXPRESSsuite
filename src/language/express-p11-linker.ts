@@ -1,4 +1,4 @@
-import { AstNodeDescription, DefaultLinker, DocumentState, LinkingError, ReferenceInfo, getContainerOfType, getDocument } from "langium";
+import { AstNodeDescription, AstUtils, DefaultLinker, DocumentState, LinkingError, ReferenceInfo } from "langium";
 import {
   Attribute_decl,
   EntityDefinition,
@@ -17,13 +17,13 @@ export class ExpressP11Linker extends DefaultLinker {
     return description ?? this.createLinkingError(refInfo);
   }
   protected override createLinkingError(refInfo: ReferenceInfo, targetDescription?: AstNodeDescription | undefined): LinkingError {
-    const document = getDocument(refInfo.container);
+    const document = AstUtils.getDocument(refInfo.container);
     if (document.state < DocumentState.ComputedScopes) {
       console.warn(`Attempted reference resolution before document reached ComputedScopes state (${document.uri}).`);
     }
     const message: string = this.getErrorMessage(refInfo);
     return {
-      ...refInfo,
+      info: refInfo,
       message,
       targetDescription,
     };
@@ -34,10 +34,10 @@ export class ExpressP11Linker extends DefaultLinker {
     let message: string = "A reference could not be resolved.";
     const referenceName = refInfo.reference.$refText;
     switch (referenceType) {
-      case EntityDefinition:
-        const qualifiedAttribute = getContainerOfType(refInfo.container, isQualified_attribute);
+      case EntityDefinition.$type:
+        const qualifiedAttribute = AstUtils.getContainerOfType(refInfo.container, isQualified_attribute);
         if (qualifiedAttribute) {
-          const entityContext = getContainerOfType(qualifiedAttribute, isEntityDefinition);
+          const entityContext = AstUtils.getContainerOfType(qualifiedAttribute, isEntityDefinition);
           if (entityContext) {
             if (entityContext.name) {
               message = `The entity '${referenceName}' could not be found in the supertype/subtype of '${entityContext.name}'`;
@@ -51,13 +51,13 @@ export class ExpressP11Linker extends DefaultLinker {
         }
         message = `The entity '${referenceName}' could not be found.`;
         break;
-      case SchemaDefinition:
+      case SchemaDefinition.$type:
         message = `The schema '${referenceName}' could not be found.`;
         break;
-      case Attribute_decl:
+      case Attribute_decl.$type:
         message = `The attribute '${referenceName}' could not be found.`;
         break;
-      case TypeDefinition:
+      case TypeDefinition.$type:
         if (isReferenceToControlledType(refInfo)) {
           message = `The type '${referenceName}' is not available and may require an interface.`;
           break;
@@ -65,7 +65,7 @@ export class ExpressP11Linker extends DefaultLinker {
           message = `The type '${referenceName}' could not be found.`;
           break;
         }
-      case FunctionDefinition:
+      case FunctionDefinition.$type:
         message = `The function '${referenceName}' could not be found.`;
         break;
     }

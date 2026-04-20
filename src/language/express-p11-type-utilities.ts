@@ -1,4 +1,4 @@
-import { AstNode, MultiMap, getContainerOfType } from "langium";
+import { AstNode, AstUtils, MultiMap } from "langium";
 import { ExpressP11MemoPool, MemoQuery, MemoType } from "./express-p11-memo-pool.js";
 import {
   Attribute_decl,
@@ -526,7 +526,7 @@ export class ExpressP11ParameterTypeResolver {
     schemas: Map<string, ExpressP11Schema>,
     memoPool: ExpressP11MemoPool = new ExpressP11MemoPool()
   ): ExpressP11ParameterTypeResolution {
-    const schema = getContainerOfType(attribute, isSchemaDefinition);
+    const schema = AstUtils.getContainerOfType(attribute, isSchemaDefinition);
     if (!schema || !schema.name) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
     const schemaObj = schemas.get(schema.name);
     if (!schemaObj) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
