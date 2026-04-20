@@ -1,8 +1,7 @@
 import type { LanguageClientOptions, ServerOptions } from "vscode-languageclient/node.js";
 import * as vscode from "vscode";
 import * as path from "node:path";
-import { LanguageClient, TransportKind, WorkDoneProgress } from "vscode-languageclient/node.js";
-import { EASYEXPRESS_TOKEN } from "../shared/notifications.js";
+import { LanguageClient, TransportKind } from "vscode-languageclient/node.js";
 import { ExpressP11StatusBarItem } from "./express-p11-status-bar-item.js";
 
 let client: LanguageClient;

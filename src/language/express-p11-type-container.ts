@@ -54,13 +54,6 @@ type ConcreteType = {
   foreignSchema?: string;
 };
 
-type ConcreteAttribute = {
-  name: string;
-  node: Attribute_decl;
-  types: SubSuperTypeDefinition[];
-  unresolvedType: string;
-};
-
 type SubSuperTypeDefinition = {
   name: string;
   schema: string;
@@ -182,12 +175,11 @@ export class ExpressP11TypeContainer {
     for (const schema of file.schemas) {
       await interruptAndCheck(cancelToken);
       const localTypes = sink.localTypes.get(schema.name);
-      const imports = sink.imports.get(schema.name);
       const allAvailable = this.getAllResourceDefinitionFrom(sink, schema.name);
       for (const eType of localTypes) {
         await interruptAndCheck(cancelToken);
         if (this.hasSuperTypes(eType.node)) {
-          for (const supertype of eType.node.types.supertypes?.entities!) {
+          for (const supertype of eType.node.types.supertypes!.entities!) {
             const supertypeName = supertype.entity.$refText;
             const supertypeObject = allAvailable.find((def) => def.name === supertypeName);
             if (supertypeObject) eType.supertypes.push(supertypeObject);
@@ -207,7 +199,7 @@ export class ExpressP11TypeContainer {
 
       for (const entity of schema.getEntities().values()) {
         if (this.hasSuperTypes(entity.getNode())) {
-          for (const supertype of entity.getNode().types.supertypes?.entities!) {
+          for (const supertype of entity.getNode().types.supertypes!.entities!) {
             const supertypeName = supertype.entity.$refText;
 
             const supertypeDefinition = allAvailable.resources.get(DefinitionType.Entity)?.get(supertypeName);
@@ -222,8 +214,6 @@ export class ExpressP11TypeContainer {
   }
 
   protected async resolveSubTypes(cancelToken: CancellationToken): Promise<void> {
-    const tempoSubTypes = new MultiMap<string, SubSuperTypeDefinition>();
-    const tempSystem = new MultiMap<string, ConcreteType>();
     for (const schema of this.localEntities.keys()) {
       await interruptAndCheck(cancelToken);
       for (const eType of this.localEntities.get(schema)) {
@@ -544,7 +534,6 @@ export class ExpressP11TypeContainer {
     if (!schema || !schema.name) {
       return;
     }
-    const key = `${schema}.${entity.name}`;
     const expressSchema = this.schemas.get(schema!.name);
     if (!expressSchema) return;
 

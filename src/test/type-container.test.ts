@@ -263,7 +263,7 @@ describe("Parameter type resolver", async () => {
   test("Named_type -> EntityDefinition is resolved", () => {
     const schema = typeContainer.getSchemas().get("Zero");
     const entity = schema!.getEntity("EZeroTwo");
-    const attributeA = findExplicitAttribute(entity?.getNode()!, "a");
+    const attributeA = findExplicitAttribute(entity!.getNode(), "a");
     const resolution = ExpressP11ParameterTypeResolver.resolve(attributeA!, typeContainer.getSchemas());
     expect(resolution.type).toBe(ExpressP11ParameterTypeResolutionType.EntityDefinition);
     expect((resolution.value as EntityDefinition[]).length).toBe(1);
@@ -272,7 +272,7 @@ describe("Parameter type resolver", async () => {
   test("Named_type -> SelectTypeDefinition is resolved", () => {
     const schema = typeContainer.getSchemas().get("Zero");
     const entity = schema!.getEntity("EZeroTwo");
-    const attributeB = findExplicitAttribute(entity?.getNode()!, "b");
+    const attributeB = findExplicitAttribute(entity!.getNode(), "b");
     const resolution = ExpressP11ParameterTypeResolver.resolve(attributeB!, typeContainer.getSchemas());
     expect(resolution.type).toBe(ExpressP11ParameterTypeResolutionType.EntityDefinition);
     expect((resolution.value as EntityDefinition[]).length).toBe(2);
@@ -280,7 +280,7 @@ describe("Parameter type resolver", async () => {
   test("Named_type -> EnumTypeDefinition is resolved", () => {
     const schema = typeContainer.getSchemas().get("Zero");
     const entity = schema!.getEntity("EZeroTwo");
-    const attributeC = findExplicitAttribute(entity?.getNode()!, "c");
+    const attributeC = findExplicitAttribute(entity!.getNode(), "c");
     const resolution = ExpressP11ParameterTypeResolver.resolve(attributeC!, typeContainer.getSchemas());
     expect(resolution.type).toBe(ExpressP11ParameterTypeResolutionType.EnumValue);
     expect((resolution.value as EnumValue[]).length).toBe(3);
@@ -289,7 +289,7 @@ describe("Parameter type resolver", async () => {
   test("Named_type -> Extended EnumTypeDefinition is resolved", () => {
     const schema = typeContainer.getSchemas().get("Zero");
     const entity = schema!.getEntity("EZeroTwo");
-    const attributeD = findExplicitAttribute(entity?.getNode()!, "d");
+    const attributeD = findExplicitAttribute(entity!.getNode(), "d");
     const resolution = ExpressP11ParameterTypeResolver.resolve(attributeD!, typeContainer.getSchemas());
     expect(resolution.type).toBe(ExpressP11ParameterTypeResolutionType.EnumValue);
     expect((resolution.value as EnumValue[]).length).toBe(4);
@@ -298,7 +298,7 @@ describe("Parameter type resolver", async () => {
   test("Named_type -> Extended SelectTypeDefinition is resolved", () => {
     const schema = typeContainer.getSchemas().get("Zero");
     const entity = schema!.getEntity("EZeroTwo");
-    const attributeE = findExplicitAttribute(entity?.getNode()!, "e");
+    const attributeE = findExplicitAttribute(entity!.getNode(), "e");
     const resolution = ExpressP11ParameterTypeResolver.resolve(attributeE!, typeContainer.getSchemas());
     expect(resolution.type).toBe(ExpressP11ParameterTypeResolutionType.EntityDefinition);
     expect((resolution.value as EnumValue[]).length).toBe(3);

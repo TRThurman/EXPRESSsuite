@@ -20,7 +20,7 @@
     "build": "tsc -b tsconfig.json && node esbuild.mjs",
     "clean": "rm -rf out dist src/language/generated && echo '🧹 Clean complete'",
     "watch": "concurrently -n tsc,esbuild -c blue,yellow \"tsc -b tsconfig.json --watch\" \"node esbuild.mjs --watch\"",
-    "lint": "eslint src --ext ts",
+    "lint": "eslint src",
     "langium:generate": "langium generate",
     "langium:watch": "langium generate --watch",
     "test": "vitest --reporter=verbose",
@@ -33,11 +33,7 @@
     "rebuild:full": "npm run clean:deep && npm install && langium generate && npm run build && npm test",
     "release-pre": "release-it --preRelease --ci",
     "release": "release-it --ci"
-},
-
-
-
-
+  },
   "dependencies": {
     "chalk": "~5.6.2",
     "commander": "~10.0.0",
@@ -45,23 +41,22 @@
     "vscode-languageclient": "~8.0.2"
   },
   "devDependencies": {
-    "@release-it/conventional-changelog": "^8.0.1",
+    "@release-it/conventional-changelog": "^10.0.6",
     "@types/node": "^24.7.1",
     "@types/vscode": "~1.107.0",
-    "@typescript-eslint/eslint-plugin": "~5.62.0",
-    "@typescript-eslint/parser": "~5.62.0",
     "concurrently": "^7.6.0",
     "esbuild": "^0.27.1",
-    "eslint": "~8.33.0",
+    "eslint": "~9.27",
     "langium": "^2.1.3",
     "langium-cli": "^2.1.0",
-    "release-it": "^17.1.1",
+    "release-it": "^19.2.4",
     "typescript": "~5.9.3",
+    "typescript-eslint": "~8.59",
     "vitest": "^3.2.4"
   },
   "engines": {
     "vscode": "^1.67.0",
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "categories": [
     "Programming Languages"

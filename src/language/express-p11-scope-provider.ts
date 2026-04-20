@@ -26,7 +26,6 @@ import {
   isDerived_attr,
   isEntityDefinition,
   isEntityRef,
-  isEnumeration_extension,
   isEnumeration_id,
   isEnumeration_type,
   isExplicit_attr,
@@ -41,7 +40,6 @@ import {
   isQuery_expression,
   isSchemaDefinition,
   isSelect_extension,
-  isSimple_expression,
   isSimple_factor,
   isSubtype_declaration,
   isSupertype_factor,
@@ -142,7 +140,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
           else leftMember = complexbody.$container.head;
 
           if (isIndex_qualifier(leftMember) && isComplex_Primary_body(leftMember.$container)) {
-            let subIndex = leftMember.$containerIndex ?? -1;
+            const subIndex = leftMember.$containerIndex ?? -1;
             if (subIndex >= 0) {
               if (subIndex > 0) leftMember = complexbody.qualifiers[index - 2];
               else leftMember = complexbody.$container.head;
@@ -232,7 +230,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
 
       const scope = super.getScope(context);
       return scope;
-    } catch (error) {
+    } catch {
       return EMPTY_SCOPE;
     }
   }

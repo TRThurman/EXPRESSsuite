@@ -11,7 +11,7 @@ import {
 } from "langium";
 import { CancellationToken, Connection, WorkDoneProgress } from "vscode-languageserver";
 import { allowedDocuments } from "../utils/file-filter.js";
-import { EASYEXPRESS_FULL_BUILD_REQUIRED, EASYEXPRESS_TOKEN } from "../shared/notifications.js";
+import { EASYEXPRESS_TOKEN } from "../shared/notifications.js";
 import { Configuration } from "./express-p11-workspace-manager.js";
 import { ExpressP11BuildStrategy } from "./express-p11-build-strategy.js";
 export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
@@ -143,8 +143,6 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
     // console.profile();
     // 3. Linking
     await this.runCancelable(validDocs, DocumentState.Linked, cancelToken, async (doc) => {
-      const filename = doc.uri.toString(); //.split("/").pop();
-      //   console.time(filename);
       linked += 1;
       if (this.isFirstLoad || buildStrategy != ExpressP11BuildStrategy.PartialBuildDuringEdition)
         this.connection?.sendProgress(WorkDoneProgress.type, EASYEXPRESS_TOKEN, {
@@ -217,6 +215,6 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
         this.isFirstLoad = false;
         this.firstIndexingInitiated = false;
       }
-    } catch (e) {}
+    } catch { /* build errors are handled per-document */ }
   }
 }

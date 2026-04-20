@@ -5,7 +5,7 @@ import { ExpressKind, getDocumentSymbol } from "./general.js";
 
 export const getProcedureDocumentSymbols = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
-  var procedureDeclarations = getProcedureDeclarations(schema);
+  const procedureDeclarations = getProcedureDeclarations(schema);
   if (procedureDeclarations) {
     procedureDeclarations.forEach((t) => {
       const symbol = getProcedureDocumentSymbol(t);
@@ -20,7 +20,7 @@ export const getProcedureDocumentSymbols = (schema: SchemaDefinition): DocumentS
 export const getProcedureDeclarations = (schema: SchemaDefinition): ProcedureDefinition[] | undefined => {
   if (!schemaHasDeclarations(schema)) return;
 
-  var procedureDeclarations = schema.body.declarations.filter((d) => isProcedureDefinition(d)) as ProcedureDefinition[];
+  const procedureDeclarations = schema.body.declarations.filter((d) => isProcedureDefinition(d)) as ProcedureDefinition[];
   return procedureDeclarations.filter((p) => p.head && p.name);
 };
 

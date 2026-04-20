@@ -20,7 +20,7 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
   getCodeActions(
     document: LangiumDocument<ExpressFile>,
     params: CodeActionParams,
-    cancelToken?: CancellationToken | undefined
+    _cancelToken?: CancellationToken | undefined
   ): MaybePromise<(Command | CodeAction)[] | undefined> {
     const result: CodeAction[] = [];
     for (const diagnostic of params.context.diagnostics) {
@@ -72,7 +72,6 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
     return undefined;
   }
 
-  //@ts-ignore
   private fixReferenceStatementMissing(
     diagnostic: Diagnostic,
     document: LangiumDocument<ExpressFile>
@@ -85,12 +84,9 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
       if (!schema) return;
       const referenceClauses = getReferenceSpecifications(schema);
 
-      let position: Position;
-      if (referenceClauses.length > 0) {
-        position = referenceClauses[0].$cstNode!.range.start;
-      } else {
-        position = schema.body.$cstNode!.range.start;
-      }
+      const position: Position = referenceClauses.length > 0
+        ? referenceClauses[0].$cstNode!.range.start
+        : schema.body.$cstNode!.range.start;
 
       return {
         title: `Add a reference from ${data.schema} for ${data.resource}`,
@@ -129,9 +125,8 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
         (reference) => reference.schema.$refText === data.schema
       );
       if (!referenceClauseToUpdate) return;
-      let position: Position;
       if (referenceClauseToUpdate.resources.length < 1) return;
-      position = referenceClauseToUpdate.resources[0].$cstNode!.range.start;
+      const position: Position = referenceClauseToUpdate.resources[0].$cstNode!.range.start;
       return {
         title: `Add ${data.resource} to the list of resources imported.`,
         kind: CodeActionKind.QuickFix,

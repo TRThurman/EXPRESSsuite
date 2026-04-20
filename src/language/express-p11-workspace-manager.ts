@@ -1,14 +1,12 @@
 import {
   ConfigurationProvider,
-  DefaultConfigurationProvider,
   DefaultWorkspaceManager,
   LangiumDocument,
   LangiumSharedServices,
-  interruptAndCheck,
 } from "langium";
 import { CancellationToken, Connection, WorkDoneProgress, WorkspaceFolder } from "vscode-languageserver";
 import { URI } from "vscode-uri";
-import { isAllowedFile, isAllowedFolder } from "../utils/file-filter.js";
+import { isAllowedFile } from "../utils/file-filter.js";
 import { EASYEXPRESS_TOKEN } from "../shared/notifications.js";
 
 export type Configuration = {

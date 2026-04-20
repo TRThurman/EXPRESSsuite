@@ -89,7 +89,7 @@ export class ExpressP11Validator {
           });
         }
       }
-    } catch (e) {
+    } catch {
       return;
     }
   }
@@ -100,7 +100,7 @@ export class ExpressP11Validator {
     // var allDeclarations: Declaration[] = schema.body.declarations.filter(
     //   (d) => d.$type == "Declaration"
     // ) as Declaration[];
-    var entityDeclarations = schema.body.declarations.filter((d) => isEntityDefinition(d)) as EntityDefinition[];
+    const entityDeclarations = schema.body.declarations.filter((d) => isEntityDefinition(d)) as EntityDefinition[];
     entityDeclarations.forEach((e) => {
       if (reported.has(e.name)) {
         accept("error", `Entity has non-unique name '${e.name}'.`, {
@@ -152,7 +152,7 @@ export class ExpressP11Validator {
       const referenceSpecifications = getReferenceSpecifications(schema);
       const useSpecifications = getUseSpecifications(schema);
       if (!schema.name) return;
-      let importedResourcesIndex = this.buildImportedResourcesIndex(referenceSpecifications);
+      const importedResourcesIndex = this.buildImportedResourcesIndex(referenceSpecifications);
       this.buildUsedResourcesIndex(useSpecifications).forEach((value, key) => importedResourcesIndex.add(key, value));
       const currentSchemaName = schema.name;
 
@@ -195,7 +195,7 @@ export class ExpressP11Validator {
           }
         });
       }
-    } catch (error) {
+    } catch {
       console.log("ERROR VALIDATION");
     }
   }
@@ -207,7 +207,7 @@ export class ExpressP11Validator {
     resourceNeeded: ReferenceInfo,
     accept: ValidationAcceptor
   ) {
-    let data: ReferenceStatementData = {
+    const data: ReferenceStatementData = {
       schema: schemaNeeded.name,
       resource: resourceNeeded.reference.$refText,
       sourceSchema,

@@ -4,7 +4,7 @@ import { ExpressKind, getDocumentSymbol } from "./general.js";
 
 export const getTypesDocumentSymbol = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
-  var typeDeclarations = getTypeDeclarations(schema);
+  const typeDeclarations = getTypeDeclarations(schema);
   if (typeDeclarations) {
     typeDeclarations.forEach((t) => {
       const symbol = getTypeDocumentSymbol(t);
@@ -19,7 +19,7 @@ export const getTypesDocumentSymbol = (schema: SchemaDefinition): DocumentSymbol
 export const getTypeDeclarations = (schema: SchemaDefinition): TypeDefinition[] | undefined => {
   if (!schema) return;
 
-  var typeDeclarations = schema.body.declarations.filter((d) => isTypeDefinition(d)) as TypeDefinition[];
+  const typeDeclarations = schema.body.declarations.filter((d) => isTypeDefinition(d)) as TypeDefinition[];
   return typeDeclarations.filter((t) => t.name);
 };
 

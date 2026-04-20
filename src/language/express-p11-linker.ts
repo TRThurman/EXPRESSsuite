@@ -21,7 +21,7 @@ export class ExpressP11Linker extends DefaultLinker {
     if (document.state < DocumentState.ComputedScopes) {
       console.warn(`Attempted reference resolution before document reached ComputedScopes state (${document.uri}).`);
     }
-    let message: string = this.getErrorMessage(refInfo);
+    const message: string = this.getErrorMessage(refInfo);
     return {
       ...refInfo,
       message,
@@ -32,7 +32,7 @@ export class ExpressP11Linker extends DefaultLinker {
   private getErrorMessage(refInfo: ReferenceInfo): string {
     const referenceType = this.reflection.getReferenceType(refInfo);
     let message: string = "A reference could not be resolved.";
-    let referenceName = refInfo.reference.$refText;
+    const referenceName = refInfo.reference.$refText;
     switch (referenceType) {
       case EntityDefinition:
         const qualifiedAttribute = getContainerOfType(refInfo.container, isQualified_attribute);

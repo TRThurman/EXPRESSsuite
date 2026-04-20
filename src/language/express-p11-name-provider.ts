@@ -1,4 +1,4 @@
-import { AstNode, CstNode, DefaultNameProvider, findNodeForProperty } from "langium";
+import { AstNode, CstNode, DefaultNameProvider } from "langium";
 import {
   Attribute_decl,
   isAttribute_decl,

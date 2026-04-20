@@ -5,17 +5,13 @@ import {
   DocumentValidator,
   LangiumDocument,
   LinkingErrorData,
-  ValidationAcceptor,
   ValidationOptions,
   getContainerOfType,
   interruptAndCheck,
   isOperationCancelled,
-  streamAst,
-  tokenToRange,
 } from "langium";
 import type { Diagnostic } from "vscode-languageserver";
-import type { MismatchedTokenException } from "chevrotain";
-import { CancellationToken, DiagnosticSeverity, Position, Range } from "vscode-languageserver";
+import { CancellationToken } from "vscode-languageserver";
 import { isQuery_expression } from "./generated/ast.js";
 
 export class ExpressDocumentValidator extends DefaultDocumentValidator {

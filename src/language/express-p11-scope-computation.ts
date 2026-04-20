@@ -65,7 +65,7 @@ export class ExpressP11ScopeComputation extends DefaultScopeComputation {
             isProcedureDefinition(modelNode) ||
             isEnumeration_id(modelNode)
           ) {
-            let name = this.nameProvider.getName(modelNode);
+            const name = this.nameProvider.getName(modelNode);
             if (name) {
               exports.push(this.descriptions.createDescription(modelNode, name, document));
             }
@@ -73,7 +73,7 @@ export class ExpressP11ScopeComputation extends DefaultScopeComputation {
           if (isConstant_decl(modelNode)) {
             for (const constant of streamContents(modelNode)) {
               if (isConstant_body(constant)) {
-                let name = this.nameProvider.getName(constant);
+                const name = this.nameProvider.getName(constant);
                 if (name) {
                   exports.push(this.descriptions.createDescription(constant, name, document));
                 }
@@ -81,7 +81,7 @@ export class ExpressP11ScopeComputation extends DefaultScopeComputation {
             }
           }
         }
-      } catch (err) {}
+      } catch { /* skip schemas with parse errors */ }
     }
 
     return exports;
@@ -149,7 +149,6 @@ export class ExpressP11ScopeComputation extends DefaultScopeComputation {
     }
   }
 
-  //@ts-ignore
   //   private async addDeclarationsToExport(
   //     schema: Schema_decl,
   //     exportList: AstNodeDescription[],

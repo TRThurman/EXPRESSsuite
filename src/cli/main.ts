@@ -22,8 +22,7 @@ export default function (): void {
   const program = new Command();
 
   program
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    .version(require("../../package.json").version);
+    .version(process.env.npm_package_version ?? "0.0.0");
 
   const fileExtensions = ExpressP11LanguageMetaData.fileExtensions.join(", ");
   program

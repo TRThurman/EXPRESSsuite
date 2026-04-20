@@ -19,7 +19,6 @@ import {
   isNamed_types,
   isSchemaDefinition,
   isSelect_extension,
-  isSelect_list,
   isSelect_type,
 } from "./generated/ast.js";
 import { NIL, v4 as uuidv4 } from "uuid";
@@ -615,7 +614,7 @@ export class ExpressP11OptimizedResourceList {
 
   public findByName(name: string): Definition | undefined {
     let result: Definition | undefined;
-    this.resource.forEach((v, k) => {
+    this.resource.forEach((v) => {
       if (v.has(name)) result = v.get(name);
     });
     return result;
@@ -651,8 +650,8 @@ export class ExpressP11OptimizedAttributeList {
     if (name.length > 0) {
       return this.resource.get(graphKey)?.get(name) ?? [];
     } else {
-      let result: Attribute_decl[] = [];
-      this.resource.get(graphKey)?.forEach((attributes, name) => {
+      const result: Attribute_decl[] = [];
+      this.resource.get(graphKey)?.forEach((attributes) => {
         result.push(...attributes);
       });
       return result;

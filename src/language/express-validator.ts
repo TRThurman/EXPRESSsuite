@@ -1,4 +1,4 @@
-import type { ValidationAcceptor, ValidationChecks } from "langium";
+import type { ValidationChecks } from "langium";
 import type { ExpressAstType } from "./generated/ast.js";
 import type { ExpressP11Services } from "./express-module.js";
 

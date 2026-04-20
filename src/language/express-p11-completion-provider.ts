@@ -28,7 +28,7 @@ export class ExpressP11CompletionProvider extends DefaultCompletionProvider {
     let kind: CompletionItemKind;
     let detail: string = "";
     let documentation: string = "";
-    let processedNode = {
+    const processedNode = {
       type: nodeDescription.type,
       node: nodeDescription.node,
     };

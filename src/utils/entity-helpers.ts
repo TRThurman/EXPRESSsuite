@@ -28,7 +28,7 @@ import { CustomExpressDescription } from "../language/express-p11-scope-provider
 
 export const getEntitiesDocumentSymbol = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
-  var entityDeclarations = getEntityDeclarations(schema);
+  const entityDeclarations = getEntityDeclarations(schema);
   if (entityDeclarations) {
     entityDeclarations.forEach((e) => {
       const symbol = getEntityDocumentSymbol(e);
@@ -41,7 +41,7 @@ export const getEntitiesDocumentSymbol = (schema: SchemaDefinition): DocumentSym
 };
 export const getEntityDeclarations = (schema: SchemaDefinition): EntityDefinition[] | undefined => {
   if (!schemaHasBody(schema)) return;
-  var entityDeclarations = schema.body.declarations.filter((d) => isEntityDefinition(d)) as EntityDefinition[];
+  const entityDeclarations = schema.body.declarations.filter((d) => isEntityDefinition(d)) as EntityDefinition[];
   return entityDeclarations.filter((e) => e.name);
 };
 
@@ -97,7 +97,7 @@ export const getAttributeName = (attribute: Attribute_decl): string | undefined 
   if (!attribute) return;
   if (attribute.$type !== "Redeclared_attribute") return attribute.name;
   if (attribute.$type === "Redeclared_attribute") {
-    var redeclared = attribute as Redeclared_attribute;
+    const redeclared = attribute as Redeclared_attribute;
     if (redeclared.isRenamed) return redeclared.name;
     return redeclared.qualifiedAttribute.attribute?.target.$refText;
   }
@@ -105,7 +105,7 @@ export const getAttributeName = (attribute: Attribute_decl): string | undefined 
 };
 
 export const getSuperTypes = (entity: EntityDefinition | undefined): CustomExpressDescription<EntityDefinition>[] => {
-  let superTypes: CustomExpressDescription<EntityDefinition>[] = [];
+  const superTypes: CustomExpressDescription<EntityDefinition>[] = [];
   if (!entity || !isEntityDefinition(entity)) return superTypes;
 
   const hasSuperTypes = entity.types?.supertypes?.entities;
@@ -121,7 +121,7 @@ export const getSuperTypes = (entity: EntityDefinition | undefined): CustomExpre
 };
 
 export const getTypesFromSupertypeExpression = (expression: Supertype_expression): CustomExpressDescription<EntityDefinition>[] => {
-  let superTypes: CustomExpressDescription<EntityDefinition>[] = [];
+  const superTypes: CustomExpressDescription<EntityDefinition>[] = [];
   expression.factors.forEach((factor) => {
     if (!factor.terms) return;
     factor.terms.forEach((term) => {
@@ -132,7 +132,7 @@ export const getTypesFromSupertypeExpression = (expression: Supertype_expression
 };
 
 export const getTypesFromSupertypeTerm = (term: Supertype_term): CustomExpressDescription<EntityDefinition>[] => {
-  let superTypes: CustomExpressDescription<EntityDefinition>[] = [];
+  const superTypes: CustomExpressDescription<EntityDefinition>[] = [];
 
   switch (term.$type) {
     case "One_of":
