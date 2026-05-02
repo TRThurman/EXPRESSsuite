@@ -19,6 +19,7 @@ import { ExpressP11Linker } from "./express-p11-linker.js";
 import { ExpressP11WorkspaceManager } from "./express-p11-workspace-manager.js";
 import { ExpressP11ExecuteComandHandler } from "./express-p11-execute-command-handler.js";
 import { ExpressP11ServiceRegistry } from "./express-p11-service-registry.js";
+import { ExpressP11AnnotationIndex } from "./express-p11-annotation-index.js";
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -35,6 +36,7 @@ export type ExpressP11AddedSharedServices = {
   workspace: {
     DocumentBuilder: ExpressP11DocumentBuilder;
     IndexManager: ExpressP11IndexManager;
+    AnnotationIndex: ExpressP11AnnotationIndex;
   };
   lsp: {
     NodeKindProvider: ExpressP11NodeKindProvider;
@@ -47,6 +49,7 @@ export const ExpressP11SharedModule: Module<ExpressP11SharedServices, DeepPartia
     DocumentBuilder: (services) => new ExpressP11DocumentBuilder(services),
     IndexManager: (services) => new ExpressP11IndexManager(services),
     WorkspaceManager: (services) => new ExpressP11WorkspaceManager(services),
+    AnnotationIndex: (services) => new ExpressP11AnnotationIndex(services),
   },
   lsp: {
     NodeKindProvider: () => new ExpressP11NodeKindProvider(),

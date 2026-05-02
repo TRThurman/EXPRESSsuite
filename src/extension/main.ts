@@ -5,7 +5,7 @@ import * as fs from "node:fs/promises";
 import { LanguageClient, TransportKind } from "vscode-languageclient/node.js";
 import { ExpressP11StatusBarItem } from "./express-p11-status-bar-item.js";
 import { registerHoverProvider } from "./hover-provider.js";
-import { AnnotationIndex } from "./annotation-index.js";
+import { getAnnotationIndex } from "./annotation-client.js";
 import { showDescriptionPreview, showExpressGPreview, openMathPlayground } from "./webviews.js";
 
 let client: LanguageClient;
@@ -13,7 +13,7 @@ let client: LanguageClient;
 // This function is called when the extension is activated.
 export function activate(context: vscode.ExtensionContext): void {
   client = startLanguageClient(context);
-  registerHoverProvider(context);
+  registerHoverProvider(context, client);
   registerViewerCommands(context);
 }
 
@@ -25,7 +25,7 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
         vscode.window.showInformationMessage("Place the cursor in an EXPRESS file first.");
         return;
       }
-      const idx = new AnnotationIndex(editor.document.getText());
+      const idx = await getAnnotationIndex(editor.document, client);
       let pathArg = arg?.path;
       if (!pathArg) {
         const wordRange = editor.document.getWordRangeAtPosition(
@@ -76,7 +76,7 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
       );
       if (wordRange) {
         cursorWord = editor.document.getText(wordRange);
-        const idx = new AnnotationIndex(editor.document.getText());
+        const idx = await getAnnotationIndex(editor.document, client);
         const matchedFiles = new Set(idx.expressGForEntity(cursorWord));
         if (matchedFiles.size > 0) {
           const filtered = allCandidates.filter((u) => matchedFiles.has(path.basename(u.fsPath)));
@@ -98,8 +98,8 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
 
       // Build the hotspot index→entity-tag map from the schema's
       // __expressg remarks for the chosen SVG.
-      const idx = new AnnotationIndex(editor.document.getText());
-      const diagram = idx.expressGDiagrams().find((d) => d.svgFile === path.basename(pick.fsPath));
+      const idx2 = await getAnnotationIndex(editor.document, client);
+      const diagram = idx2.expressGDiagrams().find((d) => d.svgFile === path.basename(pick.fsPath));
       const hotspotMap = diagram?.hotspotMap ?? {};
 
       await showExpressGPreview(context, pick, editor.document.uri, hotspotMap, async (name) => {

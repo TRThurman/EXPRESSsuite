@@ -1,21 +1,12 @@
 import * as vscode from "vscode";
-import { AnnotationIndex, type RemarkAnnotation } from "./annotation-index.js";
+import type { LanguageClient } from "vscode-languageclient/node.js";
+import { type RemarkAnnotation } from "./annotation-index.js";
+import { getAnnotationIndex, invalidateAnnotationIndex } from "./annotation-client.js";
 import { renderAsciiMathSvgAsync, svgToDataUri } from "./hover-math.js";
 
 const HOVER_PREVIEW_CHAR_LIMIT = 360;
 
-const indexCache = new Map<string, { version: number; index: AnnotationIndex }>();
-
-function getIndex(doc: vscode.TextDocument): AnnotationIndex {
-  const key = doc.uri.toString();
-  const cached = indexCache.get(key);
-  if (cached && cached.version === doc.version) {
-    return cached.index;
-  }
-  const idx = new AnnotationIndex(doc.getText());
-  indexCache.set(key, { version: doc.version, index: idx });
-  return idx;
-}
+let languageClient: LanguageClient | undefined;
 
 /* ----- preview & inline transforms -------------------------------------- */
 
@@ -103,7 +94,7 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
     if (!wordRange) return undefined;
     const word = document.getText(wordRange);
 
-    const idx = getIndex(document);
+    const idx = await getAnnotationIndex(document, languageClient);
     const matches = idx.byEntityName(word);
     if (matches.length === 0) return undefined;
 
@@ -158,12 +149,13 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
   }
 }
 
-export function registerHoverProvider(context: vscode.ExtensionContext): void {
+export function registerHoverProvider(context: vscode.ExtensionContext, client?: LanguageClient): void {
+  languageClient = client;
   const provider = new ExpressHoverProvider();
   context.subscriptions.push(
     vscode.languages.registerHoverProvider({ scheme: "file", language: "express" }, provider),
   );
   context.subscriptions.push(
-    vscode.workspace.onDidCloseTextDocument((doc) => indexCache.delete(doc.uri.toString())),
+    vscode.workspace.onDidCloseTextDocument((doc) => invalidateAnnotationIndex(doc.uri)),
   );
 }
