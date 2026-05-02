@@ -137,3 +137,4 @@ dist
 .yarn/install-state.gz
 .pnp.*easyexpress-*.vsix
 ~$*
+.DS_Store
