@@ -76,7 +76,12 @@ function getWorker(): Worker {
   return worker;
 }
 
-export async function renderMath(expr: string): Promise<{ mathml?: string; error?: string }> {
+export type MathFormat = "asciimath" | "latex";
+
+export async function renderMath(
+  expr: string,
+  format: MathFormat = "asciimath",
+): Promise<{ mathml?: string; error?: string }> {
   if (expr.length === 0) return { error: "empty expression" };
   if (expr.length > MAX_EXPR_CHARS) return { error: `expression exceeds ${MAX_EXPR_CHARS} chars` };
 
@@ -95,13 +100,22 @@ export async function renderMath(expr: string): Promise<{ mathml?: string; error
     }, RENDER_TIMEOUT_MS);
 
     pending.set(id, { resolve, timer });
-    w.postMessage({ id, expr });
+    w.postMessage({ id, expr, format });
   });
 }
 
-export async function renderMathBatch(exprs: Iterable<string>): Promise<Record<string, string>> {
+/**
+ * Render a batch of typed expressions; the input map's value is the format
+ * for that key. Output map: input expression text → rendered MathML.
+ * Failed renders (parser error or timeout) are silently dropped from the
+ * output; callers fall back to the raw stem:[]/latexmath:[] code form.
+ */
+export async function renderMathBatch(
+  exprs: Map<string, MathFormat>,
+): Promise<Record<string, string>> {
+  const entries = Array.from(exprs.entries());
   const results = await Promise.all(
-    Array.from(exprs).map(async (e) => [e, await renderMath(e)] as const),
+    entries.map(async ([e, fmt]) => [e, await renderMath(e, fmt)] as const),
   );
   const out: Record<string, string> = {};
   for (const [e, r] of results) {

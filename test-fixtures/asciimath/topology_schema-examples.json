@@ -1,0 +1,125 @@
+{
+  "source": "/Users/tom/test_git/sd.iso.org/wg12-step/schemas/resources/topology_schema/topology_schema.exp",
+  "total_found": 95,
+  "selected": 10,
+  "examples": [
+    {
+      "line": 982,
+      "column": 3,
+      "raw": "bb(V)",
+      "context_before": "| stem:[V] | Vertex",
+      "context_after": "| stem:[E] | Undirected edge",
+      "features": [
+        "has_function",
+        "has_paren_group",
+        "is_short"
+      ]
+    },
+    {
+      "line": 1037,
+      "column": 395,
+      "raw": "{(x,y,0) : x^2 + y^2 < 1}",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_inequality",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 1037,
+      "column": 446,
+      "raw": "{(x,y,0) : x^2 + y^2 le 1}",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_inequality",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 1039,
+      "column": 88,
+      "raw": "{(x,y,0) : x^2 + y^2 le 1}",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_inequality",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 1041,
+      "column": 209,
+      "raw": "{(x,y,0) : x^2 + y^2 le 1}",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_inequality",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 1947,
+      "column": 527,
+      "raw": "n xx t",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_cross"
+      ]
+    },
+    {
+      "line": 1962,
+      "column": 46,
+      "raw": "i\"th\"",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_unit_string",
+        "is_short"
+      ]
+    },
+    {
+      "line": 2330,
+      "column": 15,
+      "raw": "(((S^o)[F\\])[L_l\\])[E\\]",
+      "context_before": "",
+      "context_after": "* The Euler condition <<eqn8>>, and equation <<eqn7>> shall be satisfied.",
+      "features": [
+        "has_paren_group",
+        "has_subscript",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 2450,
+      "column": 43,
+      "raw": "((S^c)[F\\]){L_l} = ((S^c)[F\\])[L_l\\]",
+      "context_before": "* Each face in the shell is unique. stem:[(S^c){F} = (S^c)[F\\]]",
+      "context_after": "* Each <<express:topology_schema.oriented_edge,oriented_edge>> in the shell is unique.",
+      "features": [
+        "has_paren_group",
+        "has_subscript",
+        "has_superscript",
+        "is_long"
+      ]
+    },
+    {
+      "line": 2463,
+      "column": 22,
+      "raw": "(((S^c)[F\\])[L_l\\])[E\\]",
+      "context_before": "",
+      "context_after": "* The Euler conditions <<eqn9>>, or optionally <<eqn7>> shall be satisfied.",
+      "features": [
+        "has_paren_group",
+        "has_subscript",
+        "has_superscript"
+      ]
+    }
+  ]
+}

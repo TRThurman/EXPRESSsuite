@@ -9,20 +9,33 @@ import { renderMath, renderMathBatch } from "./plurimath-pool.js";
 const MAX_EXPR_CHARS = 16_384;
 const MAX_STEMS_PER_DOCUMENT = 500;
 
-/** Host-side AsciiMath → MathML via the Plurimath worker pool (§3.2.4). */
+/**
+ * Host-side AsciiMath / LaTeX → MathML via the Plurimath worker pool
+ * (§3.2.4, §3.2.6). Both `stem:[…]` (default AsciiMath in Metanorma) and
+ * `latexmath:[…]` are scanned; Plurimath natively accepts either as input.
+ */
 const STEM_RE = /stem:\[((?:\\.|[^\]])*)\]/g;
+const LATEXMATH_RE = /latexmath:\[((?:\\.|[^\]])*)\]/g;
 async function prerenderMath(body: string): Promise<Record<string, string>> {
-  const exprs = new Set<string>();
-  STEM_RE.lastIndex = 0;
-  let m: RegExpExecArray | null;
+  const exprs = new Map<string, "asciimath" | "latex">();
   let dropped = 0;
-  while ((m = STEM_RE.exec(body)) !== null) {
-    if (m[1].length > MAX_EXPR_CHARS) { dropped++; continue; }
-    exprs.add(m[1]);
-    if (exprs.size >= MAX_STEMS_PER_DOCUMENT) break;
-  }
+
+  const collect = (re: RegExp, fmt: "asciimath" | "latex") => {
+    re.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(body)) !== null) {
+      if (m[1].length > MAX_EXPR_CHARS) { dropped++; continue; }
+      // First scan wins on collision (the source can't really collide since
+      // stem:[] and latexmath:[] are syntactically distinct).
+      if (!exprs.has(m[1])) exprs.set(m[1], fmt);
+      if (exprs.size >= MAX_STEMS_PER_DOCUMENT) return;
+    }
+  };
+  collect(STEM_RE, "asciimath");
+  collect(LATEXMATH_RE, "latex");
+
   if (dropped > 0) {
-    logMessage("descriptionPreview", "warn", `dropped ${dropped} stem expression(s) exceeding ${MAX_EXPR_CHARS} chars`);
+    logMessage("descriptionPreview", "warn", `dropped ${dropped} math expression(s) exceeding ${MAX_EXPR_CHARS} chars`);
   }
   if (exprs.size === 0) return {};
   return renderMathBatch(exprs);

@@ -15,6 +15,8 @@ import { parentPort } from "node:worker_threads";
 interface RenderRequest {
   id: number;
   expr: string;
+  /** "asciimath" (default) or "latex" — Plurimath supports both as input. */
+  format?: "asciimath" | "latex";
 }
 
 interface RenderResponseOk { id: number; mathml: string }
@@ -36,9 +38,10 @@ if (!parentPort) {
 
 parentPort.on("message", (msg: RenderRequest) => {
   if (!msg || typeof msg.id !== "number" || typeof msg.expr !== "string") return;
+  const format = msg.format === "latex" ? "latex" : "asciimath";
   try {
     const PM = loadPlurimath();
-    const mathml = new PM(msg.expr, "asciimath").toMathml();
+    const mathml = new PM(msg.expr, format).toMathml();
     const reply: RenderResponseOk = { id: msg.id, mathml };
     parentPort!.postMessage(reply);
   } catch (err) {

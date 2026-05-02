@@ -51,6 +51,7 @@ const HTML_PURIFY_CONFIG = {
 };
 
 const STEM_RE = /stem:\[((?:\\.|[^\]])*)\]/g;
+const LATEXMATH_RE = /latexmath:\[((?:\\.|[^\]])*)\]/g;
 
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
@@ -75,15 +76,18 @@ async function main(): Promise<void> {
 
   // Use the host-prerendered MathML map (no Plurimath in webview).
   const placeholders: string[] = [];
-  const preprocessed = payload.body.replace(STEM_RE, (_full, expr) => {
+  const splice = (label: string) => (_full: string, expr: string) => {
     const html = payload.mathRenders[expr];
     if (html) {
       const id = placeholders.length;
       placeholders.push(html);
       return ` STEM_PLACEHOLDER_${id} `;
     }
-    return `\`stem:[${expr}]\``;
-  });
+    return `\`${label}:[${expr}]\``;
+  };
+  const preprocessed = payload.body
+    .replace(STEM_RE, splice("stem"))
+    .replace(LATEXMATH_RE, splice("latexmath"));
 
   let html: string;
   try {
