@@ -25,7 +25,7 @@ ISO 10303-11 (EXPRESS) is the schema language underlying every Standard for Exch
 
 Authors edit schemas as plain `.exp` files, run a separate Metanorma toolchain to render the resulting documents to HTML/PDF/Word, and then return to the editor for the next round. The editing experience itself was minimal: VS Code with the easyEXPRESS extension provided syntax highlighting, definition jumps, references, and validation, but no rendering. A schema author hovering on `point` saw the bare ENTITY declaration with no description; embedded math (`+stem:[RR^m]+`) appeared as raw source text; cross-references rendered as `+<<express:geometry_schema.cartesian_point>>+` rather than navigable links; and EXPRESS-G diagrams stored alongside the `.exp` file appeared as XML when opened.
 
-The 0.4.0 release closes this gap by adding four viewer surfaces inside the editor while preserving the existing language-server features. The surfaces read the same annotated content the Metanorma toolchain consumes, so author-time review matches the eventual published rendering with no separate build step.
+The 0.4.0 release adds four viewer surfaces inside the editor while preserving the existing language-server features. The surfaces read the same annotated content the Metanorma toolchain consumes, so author-time review matches the eventual published rendering with no separate build step.
 
 
 == Architecture
