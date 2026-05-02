@@ -112,6 +112,26 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
         }
         const schemaHint = parts.length >= 2 ? parts[0] : undefined;
         const bareName = parts[parts.length - 1];
+
+        // First: ask the language server's IndexManager (DESIGN §3.2.3).
+        try {
+          const lspResult = await client.sendRequest("express/resolveEntity", {
+            name: bareName,
+            schemaHint,
+          }) as { uri: string; range: { start: { line: number; character: number }; end: { line: number; character: number } } | null } | null;
+          if (lspResult && lspResult.uri && lspResult.range) {
+            const { start, end } = lspResult.range;
+            return {
+              uri: vscode.Uri.parse(lspResult.uri),
+              range: new vscode.Range(start.line, start.character, end.line, end.character),
+            };
+          }
+        } catch {
+          // LSP not ready or request failed; fall through to fs-scan.
+        }
+
+        // Fallback: filesystem scan. Useful for files the language server has
+        // not yet indexed (single-file dev-host mode without a workspace).
         const re = new RegExp(`^\\s*(ENTITY|TYPE|FUNCTION|RULE|PROCEDURE|SCHEMA)\\s+${bareName}\\b`, "im");
 
         const tryFile = async (fileUri: vscode.Uri): Promise<{ uri: vscode.Uri; range: vscode.Range } | undefined> => {
