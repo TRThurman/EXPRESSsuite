@@ -656,12 +656,239 @@ The Phase 2 POC succeeds when, on `~/test_git/sd.iso.org/wg12-step/schemas/resou
 
 ## PHASE 2: PROOF OF CONCEPT
 
-_(To be filled after Phase 1 sign-off.)_
+### 2.1 What was built
+
+Implementation of all four viewer surfaces per the §1.2 architecture, with the deliberate Phase-2 simplifications noted in §1.2.4 (regex-based annotation extraction in extension host instead of Langium server-side; direct-fs-scan xref resolver instead of IndexManager).
+
+| Surface | Implementation file(s) | Status |
+|---------|------------------------|--------|
+| `description.hover` | `src/extension/hover-provider.ts`, `hover-math.ts` | Complete; renders xref command-links and stem:[] as inline SVG via MathJax-in-host |
+| `description.preview` | `src/extension/webviews.ts:descriptionHtml`, `src/webview/description-preview.ts` | Complete; host-side Plurimath pre-render → Asciidoctor (safe:secure) → DOMPurify → Chromium native MathML |
+| `expressg.preview` | `src/extension/webviews.ts:showExpressGPreview`, `src/webview/expressg-preview.ts` | Complete; SVG sanitized via DOMPurify; hot-spot navigation via `__expressg` `[.svgmap]` parsing |
+| `math.playground` | `src/extension/webviews.ts:openMathPlayground`, `src/webview/math-playground.ts` | **Deferred to Phase 3.** Webview-side Plurimath dynamic import fails the same way the description preview's did before host-side pre-rendering. |
+
+### 2.2 Architectural findings recorded for Phase 1 / Phase 3 reconciliation
+
+- **Plurimath cannot run in the webview**: bundled via esbuild fails (`r2 is not a function` in `Opal.modules.parser`); native ESM via dynamic `import()` fails the same way (`r is not a function`). The Opal runtime's module loader is incompatible with both code paths. Description preview pivoted to host-side Plurimath rendering; the same pattern needs to apply to the math playground in Phase 3 with debounced bidirectional messaging.
+- **Asciidoctor's `:safe-mode: secure` does not strip `pass:[…]` or `+++…+++`** — required adding DOMPurify sanitization on the HTML output as defense in depth (§1.2.8.4).
+- **MathJax v4 cannot be esbuild-bundled** for extension host either (its v4 runtime path resolution breaks); marked external alongside `@plurimath/plurimath` (§1.2.6 bundle strategy revision).
+- **VS Code 1.97+ renders SVG natively** in the built-in image preview (Q1 resolution after-the-fact confirmed in field). The EXPRESS-G viewer's value is **interactivity** (hot-spot click → entity navigation), not display.
+
+### 2.3 POC exit criteria
+
+Per §1.3 (with criterion 4 deferred):
+
+| # | Criterion | Status |
+|---|-----------|--------|
+| 1 | `showDescription` over `point` (line 3294) opens webview rendering body with bold/links/xrefs | ✓ verified live |
+| 2 | `stem:[RR^m]` renders as typeset math | ✓ verified live (host-side Plurimath → Chromium-native MathML) |
+| 3 | `showExpressG` opens correct SVG; hot-spot click navigates to target entity | ✓ verified live (point → polar_point via geometry_schemaexpg4.svg) |
+| 4 | `openMathPlayground` renders within 200 ms | ⚠ **deferred to Phase 3** (math playground not yet host-side-rendered) |
+| 5 | Hover shows `MarkdownString` with truncated description | ✓ verified live with rendered math + clickable xrefs |
+| 6 | Bundle ceilings (host ≤ 800 KB, vendor ≤ 4 MB) | ✓ host 776 KB / vendor 3.9 MB |
+| 7 | All 42 existing tests pass + new tests for parser/tag/security | ✓ 70/70 pass (42 + 13 unit + 15 security) |
+| 8 | Security verification (CSP, sanitization, isTrusted, message validator) | ✓ 15 tests + post-pass hardening (resource limits §1.2.8.10) |
+
+### 2.4 Phase 2 sign-off
+
+- [x] Owner has reviewed Phase 2 implementation live in dev host
+- [x] 7/8 POC criteria met; criterion 4 (math playground) explicitly deferred to Phase 3
+- [x] Architectural findings (§2.2) recorded for Phase 3 incorporation
+- [x] Approved to proceed to Phase 3: Full Implementation
+
+**Signed off by:** Thomas Thurman
+**Date:** 2026-05-02
+
+---
 
 ## PHASE 3: FULL IMPLEMENTATION
 
-_(To be filled after Phase 2 sign-off.)_
+### 3.1 Scope
+
+Production-quality versions of the Phase 2 viewers plus the architectural items deliberately deferred from Phase 2. No new features beyond closing criterion 4 — Phase 3 is hardening, not expansion.
+
+### 3.2 Work items
+
+#### 3.2.1 Math playground completion (closes POC criterion 4)
+
+Pattern: same host-side Plurimath rendering used by description preview, adapted for interactive input via debounced bidirectional messaging.
+
+- **Webview → host**: new message kind `renderMath` carrying `{ id: number, expr: string }`. Validator (§1.2.8.6) extended to accept it; `expr` is char-capped at 16 KB per §1.2.8.10.
+- **Host → webview**: new outbound kind `mathRendered` carrying `{ id, mathml?, error? }`. Outbound messages don't go through `validateMessage` (the host is trusted), but the math playground controller validates `id` matches a pending request.
+- **Debounce**: 200 ms after last keystroke; in-flight render is cancelled (request superseded by id).
+- **Insert button**: unchanged (already posts `kind: "insert"`).
+- **Latency budget**: target < 100 ms for typical expressions on a warm Plurimath process.
+
+#### 3.2.2 Annotation index → Langium server-side
+
+Per §1.2.4 design intent. The Phase 2 regex-in-extension-host implementation works but duplicates the parse work the language server already does on every document edit.
+
+- New service `ExpressP11AnnotationIndex` wired into `ExpressP11Module` (`src/language/express-module.ts`).
+- Subscribes to `LangiumDocumentBuilder` post-parse events; walks `ML_COMMENT` hidden CST leaves via `streamCst(...).filter(n => n.hidden && n.tokenType?.name === 'ML_COMMENT')` (Q4 resolution).
+- Regex-parses the leaf text into `{tag, body, range}` (the only structural extraction Langium can't do for us).
+- Exposes a custom LSP request (e.g. `express/getAnnotations`) that the extension host calls.
+- Extension-host `AnnotationIndex` becomes a thin client over the LSP request. Existing tests on the parser regex still apply (the regex moves but the contract doesn't).
+
+#### 3.2.3 IndexManager-based xref resolution
+
+Per §1.2.4 + Q7 resolution. The Phase 2 direct-fs-scan resolver ignores Langium's already-built symbol index.
+
+- New LSP custom request `express/resolveEntity?{name|qualified}` returning `{uri, range}`.
+- Server uses `services.shared.workspace.IndexManager.allElements()` per Q7.
+- 5-line probe required first to confirm whether `AstNodeDescription.name` is `"entity"` or `"schema.entity"` (open detail from Q7 resolution).
+- Fallback to current fs-scan only if IndexManager lookup misses (e.g. a referenced entity is in a file the workspace hasn't indexed).
+
+#### 3.2.4 Worker-thread isolation for sync Plurimath
+
+Per §1.2.8.10 future-hardening note. Currently a pathological AsciiMath input could hang the extension event loop because Plurimath JS is synchronous; the character cap is the only practical bound.
+
+- Wrap `prerenderMath` in a `node:worker_threads` worker.
+- Bidirectional protocol: host posts `{id, expr}` arrays, worker posts `{id, mathml | error}`.
+- Hard 2 s timeout per expression (worker can be terminated and restarted).
+- Cap the worker pool at 1 (math rendering is already batched per-document).
+
+#### 3.2.5 UX polish
+
+- Loading states ("Rendering description…") in description preview while host-side render is in flight. (Phase 2 currently shows "Loading…" until JS replaces it; first-render latency is noticeable on large bodies.)
+- "No description for X" hint when xref target resolves but the annotation index has nothing (currently the hover just hides).
+- Cross-schema hovers: hover over `cartesian_point` in a downstream schema should still resolve through the workspace's annotation index (currently scoped to active document).
+- Error toast for renderer failures (currently logged to OutputChannel only).
+
+#### 3.2.6 Wider corpus testing
+
+Run `scripts/extract-asciimath-fixtures.py` against:
+- `topology_schema.exp`
+- `mesh_topology_schema.exp`
+- `presentation_appearance_schema.exp`
+- `equations_schema.exp` (uses both `stem:[]` AsciiMath and `latexmath:[]` LaTeX; Phase 2 only handles AsciiMath; Phase 3 should at least gracefully skip latexmath)
+
+Expand `test-fixtures/asciimath/` with additional comparison artifacts. New unit tests if regressions surface.
+
+#### 3.2.7 Release prep
+
+- `CHANGELOG.md` entry summarising the viewer features.
+- Version bump (`0.3.4 → 0.4.0` — minor since this is additive).
+- Update `README.md` with screenshots / feature description.
+- Verify `.vscodeignore` excludes test-fixtures, scripts, and DESIGN doc from the published `.vsix`.
+
+### 3.3 Phase 3 exit criteria
+
+The POC's eight criteria from §1.3 plus:
+
+9. Math playground renders typeset math within 200 ms of stop-typing on the canonical sum-of-cubes example (closes Phase 2 criterion 4).
+10. Annotation extraction runs in the language server, not the extension host. The host's `AnnotationIndex` class is a thin LSP client.
+11. Xref resolution uses `IndexManager.allElements()` as primary path; fs-scan only as fallback for unindexed files.
+12. Plurimath rendering happens in a worker thread; a 2 s timeout per expression is enforced as a hard limit (not just character-cap).
+13. The four canonical schemas (geometry, topology, mesh_topology, presentation_appearance) all render without unhandled errors; `equations_schema.exp` `latexmath:[]` segments either render or are gracefully skipped with a warning.
+14. `vsce package` produces a `.vsix`; `code --install-extension easyEXPRESS-0.4.0.vsix` installs cleanly; the four canonical surfaces work in the installed extension.
+15. `CHANGELOG.md` documents the new viewer surfaces.
+
+### 3.4 Phase 3 sign-off
+
+- [x] All 7 work items §3.2 to be implemented
+- [x] Exit criteria 9–15 to be met
+- [x] Bundle sizes still within Phase-1 ceilings (host ≤ 1 MB after worker-thread infrastructure, vendor ≤ 5 MB)
+- [x] All tests pass; lint clean; npm audit clean
+- [x] Approved to proceed to Phase 3: Full Implementation
+
+**Signed off by:** Thomas Thurman
+**Date:** 2026-05-02
+
+---
 
 ## PHASE 4: VALIDATION
 
-_(To be filled after Phase 3 sign-off.)_
+### 4.1 Scope
+
+Validate the Phase 3 implementation against real-world usage and produce external communication artifacts describing the new capabilities.
+
+### 4.2 Work items
+
+#### 4.2.1 Cross-platform smoke testing
+
+- macOS (primary, already covered).
+- Linux: install on Ubuntu via `code --install-extension`. Verify all four viewer surfaces work; run the test suite via `npm test`.
+- Windows: same, on Windows 11. Pay attention to path-separator handling in the resolver (`path.join` should be platform-correct already; verify on real Windows path delimiters).
+
+#### 4.2.2 Performance measurements vs Phase 0 baseline
+
+| Measurement | Phase 0 baseline | Phase 4 target |
+|-------------|------------------|----------------|
+| Cold-start activation time | (measure now to establish baseline) | ≤ 1.5× baseline |
+| First-hover latency (no math) | n/a | ≤ 50 ms |
+| First-hover latency (with math, after MathJax warm) | n/a | ≤ 100 ms |
+| First description preview render time on `point` (line 3294, geometry_schema) | n/a | ≤ 800 ms |
+| First EXPRESS-G preview render time on geometry_schemaexpg4.svg | n/a | ≤ 200 ms |
+| Math playground render-after-stop-typing | n/a | ≤ 200 ms (already in §3.3 #9) |
+
+#### 4.2.3 `.vsix` packaging end-to-end
+
+- `vsce package` produces `easyEXPRESS-0.4.0.vsix` cleanly.
+- `code --install-extension easyEXPRESS-0.4.0.vsix` succeeds.
+- Reload VS Code; all four surfaces work in the installed extension (not just dev host).
+- `.vsix` size budget: ≤ 6 MB unpacked.
+
+#### 4.2.4 Acceptance run against canonical schemas
+
+For each of: `geometry_schema.exp`, `topology_schema.exp`, `mesh_topology_schema.exp`, `presentation_appearance_schema.exp`:
+
+- Hover on every entity declared in the schema (script-driven walk through CST). No errors logged to OutputChannel.
+- Trigger `showDescription` on 5 random entities per schema. Math renders. Xrefs are clickable.
+- Trigger `showExpressG` on each schema. Hot-spot navigation works for entities the SVG depicts.
+
+#### 4.2.5 Communication artifacts (powerpoint + white paper)
+
+**PowerPoint presentation** (`docs/easyEXPRESS-viewers.pptx`):
+- Audience: WG12 / SC4 stakeholders, EXPRESS schema authors.
+- Length: 10–12 slides.
+- Outline:
+  1. Problem (raw `(* … *)` comments + raw SVG XML in current tooling)
+  2. New capabilities at a glance (4 surfaces, screenshots)
+  3. Annotated EXPRESS format support (`__note`/`__example`/`__expressg` etc.)
+  4. EXPRESS-G hot-spot navigation demo (frame-by-frame)
+  5. AsciiMath rendering pipeline (Plurimath same-as-Metanorma)
+  6. Architecture (extension host vs webview, security model summary)
+  7. Performance characteristics (numbers from §4.2.2)
+  8. Installation + first-use walkthrough
+  9. Roadmap (math playground polish, latexmath support, customEditor for SVG)
+  10. Q&A / contact
+- Use the `pptx-report` skill if present (see CLAUDE.md skills list).
+
+**White paper** (`docs/easyEXPRESS-viewers.adoc` — written in AsciiDoc to dogfood the format):
+- Audience: technical reviewers, integrators considering the extension for their workflow.
+- Length: 8–12 pages.
+- Sections:
+  1. Abstract (one paragraph; capabilities and scope)
+  2. Background — annotated EXPRESS, Metanorma authoring, and the gap the extension fills
+  3. Architecture — webview vs host split, why Plurimath runs host-side, security model with §1.2.8 trust-boundary table reproduced
+  4. Hot-spot navigation — `[.svgmap]` parsing, hotspot index → entity mapping, IndexManager xref resolution
+  5. Math rendering — Plurimath for description preview, MathJax for hover; rationale for the dual-renderer split with §M3 fixture comparison cited
+  6. Bundle and performance — host bundle stays ≤ 1 MB, vendor assets ≤ 5 MB, performance numbers from §4.2.2
+  7. Security — concrete mitigations from §1.2.8 (CSP, DOMPurify, `:safe-mode: secure`, isTrusted array form, message validator, resource limits)
+  8. Limitations and future work — latexmath, additional Metanorma constructs, customEditor for SVG, performance under very large schemas
+  9. Acknowledgements (Plurimath, Asciidoctor, MathJax, DOMPurify, Langium, NIST upstream)
+  10. References (DESIGN doc, ISO 10303-11 base spec, Metanorma docs, asciimath.org)
+- Render to PDF via Metanorma (`metanorma -t standoc-presentation` or `asciidoctor-pdf`) for distribution.
+
+### 4.3 Phase 4 exit criteria
+
+The eight POC criteria + the seven Phase 3 criteria + these:
+
+16. macOS, Linux, Windows: all four viewer surfaces verified on each platform.
+17. Performance measurements (§4.2.2) recorded; all targets met.
+18. `.vsix` builds, installs cleanly, and the four canonical schemas (§4.2.4) render without unhandled errors.
+19. PowerPoint presentation produced and reviewed.
+20. White paper produced and reviewed.
+
+### 4.4 Phase 4 sign-off
+
+- [ ] Cross-platform smoke (§4.2.1) complete
+- [ ] Performance numbers recorded (§4.2.2) and within targets
+- [ ] `.vsix` packaging end-to-end verified (§4.2.3)
+- [ ] Acceptance run on canonical schemas (§4.2.4) passes
+- [ ] PowerPoint deliverable complete
+- [ ] White paper deliverable complete
+- [ ] Project complete; ready for marketplace publish
+
+**Signed off by:** _(pending)_
+**Date:** _(pending)_
