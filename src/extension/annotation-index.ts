@@ -19,7 +19,10 @@ export interface RemarkAnnotation {
   endOffset: number;
 }
 
-const REMARK_RE = /\(\*\s*"([^"\n]+)"([\s\S]*?)\*\)/g;
+// Tag chars exclude " and any line terminator (\n or \r) so that on Windows
+// CRLF files a stray \r doesn't get captured into the tag string. Body uses
+// [\s\S]*? which is line-ending agnostic.
+const REMARK_RE = /\(\*\s*"([^"\r\n]+)"([\s\S]*?)\*\)/g;
 
 export class AnnotationIndex {
   private readonly byTag = new Map<string, RemarkAnnotation[]>();

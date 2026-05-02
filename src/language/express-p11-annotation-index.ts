@@ -41,7 +41,9 @@ export interface ServerRemarkAnnotation {
   endOffset: number;
 }
 
-const REMARK_RE = /\(\*\s*"([^"\n]+)"([\s\S]*?)\*\)/g;
+// Cross-platform: exclude both \n and \r from the tag string so CRLF files
+// don't capture a stray \r. Body uses [\s\S]*? which is line-ending agnostic.
+const REMARK_RE = /\(\*\s*"([^"\r\n]+)"([\s\S]*?)\*\)/g;
 
 function parseRemark(text: string, baseOffset: number): ServerRemarkAnnotation | undefined {
   REMARK_RE.lastIndex = 0;
