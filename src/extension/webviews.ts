@@ -7,13 +7,25 @@ import { validateMessage } from "./webview-message.js";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
 
+/* DESIGN §1.2.8.10 resource limits — see also hover-math.ts. */
+const MAX_EXPR_CHARS = 16_384;
+const MAX_STEMS_PER_DOCUMENT = 500;
+
 /** Host-side AsciiMath → MathML via Plurimath (node). */
 const STEM_RE = /stem:\[((?:\\.|[^\]])*)\]/g;
 async function prerenderMath(body: string): Promise<Record<string, string>> {
   const exprs = new Set<string>();
   STEM_RE.lastIndex = 0;
   let m: RegExpExecArray | null;
-  while ((m = STEM_RE.exec(body)) !== null) exprs.add(m[1]);
+  let dropped = 0;
+  while ((m = STEM_RE.exec(body)) !== null) {
+    if (m[1].length > MAX_EXPR_CHARS) { dropped++; continue; }
+    exprs.add(m[1]);
+    if (exprs.size >= MAX_STEMS_PER_DOCUMENT) break;
+  }
+  if (dropped > 0) {
+    logMessage("descriptionPreview", "warn", `dropped ${dropped} stem expression(s) exceeding ${MAX_EXPR_CHARS} chars`);
+  }
   if (exprs.size === 0) return {};
   let Plurimath: any;
   try {

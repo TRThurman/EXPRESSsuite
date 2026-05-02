@@ -104,7 +104,12 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
 
       await showExpressGPreview(context, pick, editor.document.uri, hotspotMap, async (name) => {
         // Accept either bare entity name ("point") or schema.entity ("geometry_schema.point").
-        const parts = name.split(".");
+        // Defense-in-depth: the message validator already restricts characters,
+        // but reject empty, ".", ".." segments here too before any path.join.
+        const parts = name.split(".").map((s) => s.trim());
+        if (parts.some((p) => p.length === 0 || p === "." || p === ".." || p.includes("/") || p.includes("\\"))) {
+          return undefined;
+        }
         const schemaHint = parts.length >= 2 ? parts[0] : undefined;
         const bareName = parts[parts.length - 1];
         const re = new RegExp(`^\\s*(ENTITY|TYPE|FUNCTION|RULE|PROCEDURE|SCHEMA)\\s+${bareName}\\b`, "im");

@@ -523,6 +523,8 @@ const sanitized = DOMPurify.sanitize(String(html), HTML_PURIFY_CONFIG);
 
 This change adds DOMPurify to `description.preview` (it was already loaded in `expressg.preview`). The `math.playground` does not need it — its only input is the user's own AsciiMath source going to Plurimath, never HTML.
 
+**Architecture revision (post-Phase-2)**: math is pre-rendered **on the host** via Plurimath in node, and the resulting MathML is sent to the webview through the JSON payload. The webview no longer loads or executes Plurimath — its Opal runtime fails to initialize via webview dynamic `import()` (Opal's "r is not a function" inside `Opal.modules.parser`). This shrank the webview attack surface (Opal's 15× `eval()` is no longer in webview's `'unsafe-eval'` context). The host-side parser is now a new attack-surface concern; see §1.2.8.10.
+
 ##### 1.2.8.5 MarkdownString hover trust scope
 
 `MarkdownString.isTrusted: true` enables ALL `command:` URLs — including destructive ones (`workbench.action.terminal.sendSequence`, etc.). Always use the **array form**:
@@ -597,12 +599,29 @@ Never pass the user's home directory, `vscode.Uri.file('/')`, or arbitrary paths
 
 | Trust source | Treatment |
 |--------------|-----------|
-| `.exp` file content | Untrusted data; renderer input only; never executed |
-| AsciiMath in `stem:[]` | Untrusted string; goes to Plurimath parser, never to `eval` |
+| `.exp` file content | Untrusted data; goes to Asciidoctor (safe:secure) and Plurimath (host-side) parsers; renderer input only; never executed |
+| AsciiMath in `stem:[]` | Untrusted string; goes to Plurimath/MathJax parsers in **node** (extension host); not eval'd as code |
 | Co-located `*.svg` files | Untrusted; sanitized via DOMPurify before inline injection |
-| User keystrokes in math playground | Untrusted; goes to Plurimath parser; debounced and length-capped |
+| User keystrokes in math playground | Untrusted; goes to Plurimath parser (in webview when Opal works, else host round-trip); debounced and length-capped |
+| Hot-spot `targetName` from webview | Untrusted; regex-validated `[A-Za-z_][A-Za-z0-9_.]*`; no `/`, `\`, `..` |
 | Webview→host messages | Untrusted; schema-validated; whitelisted commands only |
-| Vendor JS (Asciidoctor, Plurimath, DOMPurify) | Trusted under exact-version pinning; CSP confines runtime |
+| Vendor JS (Asciidoctor, Plurimath, MathJax, DOMPurify) | Trusted under exact-version pinning; CSP confines webview runtime; host runtime relies on `npm audit` and pinned versions |
+
+##### 1.2.8.10 Resource limits (post-Phase-2)
+
+Host-side parsers (Plurimath, MathJax v4) now process untrusted AsciiMath content from `.exp` files. Bounding the work prevents pathological-input DoS and unbounded memory growth.
+
+| Limit | Value | Where | Effect |
+|-------|-------|-------|--------|
+| Per-expression chars | 16,384 | `webviews.ts:prerenderMath`, `hover-math.ts:renderAsciiMathSvgAsync` | Reject oversized stems before parser entry |
+| Stems per document (description preview) | 500 | `webviews.ts:prerenderMath` | Cap total Plurimath work per render |
+| Stems per hover preview | 32 | `hover-provider.ts:gatherMathRenders` | Hover preview is already truncated to ~360 chars; defensive |
+| MathJax SVG cache size | 1,000 entries (LRU) | `hover-math.ts` `cache` | Prevent unbounded memory growth in long sessions |
+| Async render timeout | 2,000 ms per expression | `hover-math.ts:withTimeout` (MathJax `asciimath2svgPromise`) | Timeout for async path; sync Plurimath call cannot be timed out without worker-thread isolation — character cap is the practical bound there |
+
+Future hardening (out of POC scope but tracked here):
+- Move host-side Plurimath calls into a worker thread so a hang there doesn't block the extension event loop. Current design accepts a synchronous call because Plurimath JS doesn't expose an async API.
+- Add a global per-second render budget if user reports show degraded responsiveness.
 
 #### 1.2.9 Out of scope for Phase 2
 

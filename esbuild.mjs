@@ -51,11 +51,14 @@ const watchPlugin = {
   },
 };
 
-// Extension host bundles (Node CJS, vscode + mathjax external).
-// MathJax v4 uses runtime path resolution for dynamic component loading;
-// bundling breaks that. Marking external lets it load from node_modules
-// at extension runtime (works in dev host and in packaged .vsix because
-// vsce includes node_modules of declared dependencies).
+// Extension host bundles (Node CJS, vscode + math renderers external).
+// - mathjax v4 uses runtime path resolution for dynamic component loading;
+//   bundling breaks that.
+// - @plurimath/plurimath ships an Opal-compiled blob that bloats the bundle
+//   from <1 MB to >4 MB and slows extension load; better to load from
+//   node_modules at runtime.
+// Both are loaded from node_modules at runtime — works in dev host and in
+// packaged .vsix because vsce includes node_modules of declared dependencies.
 const hostCtx = await esbuild.context({
   entryPoints: ["src/extension/main.ts", "src/language/main.ts"],
   outdir: "out",
@@ -64,7 +67,7 @@ const hostCtx = await esbuild.context({
   target: "ES2017",
   format: "cjs",
   loader: { ".ts": "ts" },
-  external: ["vscode", "mathjax"],
+  external: ["vscode", "mathjax", "@plurimath/plurimath"],
   platform: "node",
   sourcemap: !minify,
   minify,

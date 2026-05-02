@@ -62,11 +62,18 @@ function transformInline(body: string, opts: InlineTransformOptions): string {
   return out.replace(/[ \t]+\n/g, "\n").trim();
 }
 
+// Hover preview is already truncated to ~360 chars before this runs, so the
+// number of stems is small. Cap defensively anyway (DESIGN §1.2.8.10).
+const MAX_HOVER_STEMS = 32;
+
 async function gatherMathRenders(body: string): Promise<Map<string, string>> {
   const exprs = new Set<string>();
   STEM_RE.lastIndex = 0;
   let m: RegExpExecArray | null;
-  while ((m = STEM_RE.exec(body)) !== null) exprs.add(m[1]);
+  while ((m = STEM_RE.exec(body)) !== null) {
+    exprs.add(m[1]);
+    if (exprs.size >= MAX_HOVER_STEMS) break;
+  }
 
   const out = new Map<string, string>();
   await Promise.all(
