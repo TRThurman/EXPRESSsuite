@@ -296,7 +296,21 @@ export async function showExpressGPreview(
 
 /* ----- Math playground -------------------------------------------------- */
 
-export function openMathPlayground(context: vscode.ExtensionContext): void {
+/**
+ * Reuse a single math-playground panel across calls — opening "Send selection
+ * to math playground" five times in a row should overwrite the same panel,
+ * not stack up five.
+ */
+let mathPlaygroundPanel: vscode.WebviewPanel | undefined;
+
+export function openMathPlayground(context: vscode.ExtensionContext, seed?: string): void {
+  if (mathPlaygroundPanel) {
+    mathPlaygroundPanel.reveal(vscode.ViewColumn.Beside);
+    if (seed !== undefined) {
+      mathPlaygroundPanel.webview.postMessage({ kind: "setSource", text: seed });
+    }
+    return;
+  }
   const panel = vscode.window.createWebviewPanel(
     "express.mathPlayground",
     "AsciiMath Playground",
@@ -307,6 +321,21 @@ export function openMathPlayground(context: vscode.ExtensionContext): void {
       localResourceRoots: [context.extensionUri],
     },
   );
+  mathPlaygroundPanel = panel;
+  panel.onDidDispose(() => { mathPlaygroundPanel = undefined; });
+  if (seed !== undefined) {
+    // Defer the postMessage until the controller has registered its listener.
+    // The controller logs "math playground ready"; piggy-back on the first log.
+    let seeded = false;
+    const sub = panel.webview.onDidReceiveMessage((m: unknown) => {
+      if (seeded) return;
+      const ok = typeof m === "object" && m !== null && (m as { kind?: string }).kind === "log";
+      if (!ok) return;
+      seeded = true;
+      panel.webview.postMessage({ kind: "setSource", text: seed });
+      sub.dispose();
+    });
+  }
   const ctrl = panel.webview.asWebviewUri(controllerJs(context, "math-playground"));
   const n = nonce();
   const cspSrc = panel.webview.cspSource;
@@ -325,8 +354,10 @@ export function openMathPlayground(context: vscode.ExtensionContext): void {
   .panes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; height: 100vh; box-sizing: border-box; }
   textarea { width: 100%; height: 100%; resize: none; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; padding: 8px;
              background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); }
-  #out { padding: 12px; overflow: auto; border: 1px solid var(--vscode-input-border); }
-  math { font-size: 1.4em; }
+  #out { padding: 12px; overflow: auto; border: 1px solid var(--vscode-input-border); line-height: 1.6; }
+  math { font-size: 1.2em; }
+  /* In mixed prose-with-math mode we wrap each <math> in <span class="m">. */
+  #out .m { display: inline-block; vertical-align: middle; margin: 0 2px; }
   .err { color: var(--vscode-errorForeground); white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 12px; }
   .toolbar { padding: 6px 12px; border-bottom: 1px solid var(--vscode-panel-border); display: flex; gap: 8px; align-items: center; font-size: 12px; }
   button { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: none; padding: 4px 10px; cursor: pointer; }
@@ -359,7 +390,7 @@ export function openMathPlayground(context: vscode.ExtensionContext): void {
         vscode.window.showInformationMessage("No active EXPRESS editor to insert into.");
       }
     } else if (msg.kind === "renderMath") {
-      const result = await renderMath(msg.expr);
+      const result = await renderMath(msg.expr, msg.format ?? "asciimath");
       panel.webview.postMessage({
         kind: "mathRendered",
         id: msg.id,

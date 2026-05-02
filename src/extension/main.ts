@@ -212,6 +212,22 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
       openMathPlayground(context);
       stop(/* threshold */ 500);
     }),
+
+    vscode.commands.registerCommand("express.sendSelectionToMathPlayground", () => {
+      const stop = time("command.sendSelectionToMathPlayground");
+      const editor = vscode.window.activeTextEditor;
+      if (!editor || editor.document.languageId !== "express") {
+        vscode.window.showInformationMessage("Place the cursor in an EXPRESS file first.");
+        return;
+      }
+      const sel = editor.document.getText(editor.selection);
+      if (sel.length === 0) {
+        vscode.window.showInformationMessage("Select some text first (the math expression or surrounding prose).");
+        return;
+      }
+      openMathPlayground(context, sel);
+      stop(/* threshold */ 500);
+    }),
   );
 }
 

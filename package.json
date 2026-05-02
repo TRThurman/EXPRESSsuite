@@ -97,6 +97,11 @@
         "command": "express.openMathPlayground",
         "title": "Open AsciiMath Playground",
         "category": "easyEXPRESS"
+      },
+      {
+        "command": "express.sendSelectionToMathPlayground",
+        "title": "Send Selection to AsciiMath Playground",
+        "category": "easyEXPRESS"
       }
     ],
     "menus": {
@@ -110,6 +115,11 @@
           "command": "express.showExpressG",
           "when": "editorLangId == express",
           "group": "navigation@2"
+        },
+        {
+          "command": "express.sendSelectionToMathPlayground",
+          "when": "editorLangId == express && editorHasSelection",
+          "group": "navigation@3"
         }
       ]
     },
