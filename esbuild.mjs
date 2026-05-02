@@ -60,7 +60,11 @@ const watchPlugin = {
 // Both are loaded from node_modules at runtime — works in dev host and in
 // packaged .vsix because vsce includes node_modules of declared dependencies.
 const hostCtx = await esbuild.context({
-  entryPoints: ["src/extension/main.ts", "src/language/main.ts"],
+  entryPoints: [
+    "src/extension/main.ts",
+    "src/language/main.ts",
+    "src/extension/workers/plurimath-worker.ts",
+  ],
   outdir: "out",
   outExtension: { ".js": ".cjs" },
   bundle: true,

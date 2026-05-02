@@ -7,12 +7,14 @@ import { ExpressP11StatusBarItem } from "./express-p11-status-bar-item.js";
 import { registerHoverProvider } from "./hover-provider.js";
 import { getAnnotationIndex } from "./annotation-client.js";
 import { showDescriptionPreview, showExpressGPreview, openMathPlayground } from "./webviews.js";
+import { initPlurimathPool, shutdownPlurimathPool } from "./plurimath-pool.js";
 
 let client: LanguageClient;
 
 // This function is called when the extension is activated.
 export function activate(context: vscode.ExtensionContext): void {
   client = startLanguageClient(context);
+  initPlurimathPool(context);
   registerHoverProvider(context, client);
   registerViewerCommands(context);
 }
@@ -219,6 +221,7 @@ async function findExpressGSvgs(dir: string, baseName: string): Promise<vscode.U
 
 // This function is called when the extension is deactivated.
 export function deactivate(): Thenable<void> | undefined {
+  shutdownPlurimathPool();
   if (client) {
     return client.stop();
   }

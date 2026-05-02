@@ -3,15 +3,13 @@ import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import type { RemarkAnnotation } from "./annotation-index.js";
 import { validateMessage } from "./webview-message.js";
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-require-imports */
+import { renderMath, renderMathBatch } from "./plurimath-pool.js";
 
 /* DESIGN §1.2.8.10 resource limits — see also hover-math.ts. */
 const MAX_EXPR_CHARS = 16_384;
 const MAX_STEMS_PER_DOCUMENT = 500;
 
-/** Host-side AsciiMath → MathML via Plurimath (node). */
+/** Host-side AsciiMath → MathML via the Plurimath worker pool (§3.2.4). */
 const STEM_RE = /stem:\[((?:\\.|[^\]])*)\]/g;
 async function prerenderMath(body: string): Promise<Record<string, string>> {
   const exprs = new Set<string>();
@@ -27,22 +25,7 @@ async function prerenderMath(body: string): Promise<Record<string, string>> {
     logMessage("descriptionPreview", "warn", `dropped ${dropped} stem expression(s) exceeding ${MAX_EXPR_CHARS} chars`);
   }
   if (exprs.size === 0) return {};
-  let Plurimath: any;
-  try {
-    Plurimath = require("@plurimath/plurimath").default;
-  } catch (err) {
-    logMessage("descriptionPreview", "error", `failed to load Plurimath: ${(err as Error).message}`);
-    return {};
-  }
-  const out: Record<string, string> = {};
-  for (const e of exprs) {
-    try {
-      out[e] = new Plurimath(e, "asciimath").toMathml();
-    } catch (err) {
-      logMessage("descriptionPreview", "warn", `plurimath failure on "${e.slice(0, 40)}": ${(err as Error).message}`);
-    }
-  }
-  return out;
+  return renderMathBatch(exprs);
 }
 
 let logChannel: vscode.OutputChannel | undefined;
@@ -327,7 +310,7 @@ export function openMathPlayground(context: vscode.ExtensionContext): void {
         vscode.window.showInformationMessage("No active EXPRESS editor to insert into.");
       }
     } else if (msg.kind === "renderMath") {
-      const result = renderMathOnHost(msg.expr);
+      const result = await renderMath(msg.expr);
       panel.webview.postMessage({
         kind: "mathRendered",
         id: msg.id,
@@ -338,20 +321,4 @@ export function openMathPlayground(context: vscode.ExtensionContext): void {
       logMessage("mathPlayground", msg.level, msg.message);
     }
   });
-}
-
-/** Synchronous Plurimath render for math playground round-trips. */
-function renderMathOnHost(expr: string): { mathml?: string; error?: string } {
-  if (expr.length > 16_384) return { error: "expression exceeds 16 KB" };
-  let Plurimath: any;
-  try {
-    Plurimath = require("@plurimath/plurimath").default;
-  } catch (err) {
-    return { error: `Plurimath unavailable: ${(err as Error).message}` };
-  }
-  try {
-    return { mathml: new Plurimath(expr, "asciimath").toMathml() };
-  } catch (err) {
-    return { error: (err as Error).message };
-  }
 }
