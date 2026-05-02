@@ -109,11 +109,30 @@ describe("validateMessage", () => {
     expect(validateMessage({ kind: "log", level: "info", message: "x".repeat(1025) })).toBeNull();
   });
 
-  test("accepts renderMath with valid id and expr", () => {
+  test("accepts renderMath with valid id and expr; defaults format to asciimath", () => {
     expect(validateMessage({ kind: "renderMath", id: 1, expr: "x^2" })).toEqual({
       kind: "renderMath",
       id: 1,
       expr: "x^2",
+      format: "asciimath",
+    });
+  });
+
+  test("accepts renderMath with explicit latex format", () => {
+    expect(validateMessage({ kind: "renderMath", id: 2, expr: "\\frac{a}{b}", format: "latex" })).toEqual({
+      kind: "renderMath",
+      id: 2,
+      expr: "\\frac{a}{b}",
+      format: "latex",
+    });
+  });
+
+  test("normalises invalid format to asciimath", () => {
+    expect(validateMessage({ kind: "renderMath", id: 3, expr: "x", format: "mathml" })).toEqual({
+      kind: "renderMath",
+      id: 3,
+      expr: "x",
+      format: "asciimath",
     });
   });
 
