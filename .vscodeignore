@@ -22,3 +22,69 @@ CODEMETA.yaml
 CODEOWNERS.md
 bin/**
 langium-config.json
+# Phase 3 design / fixture artifacts (not shipped to marketplace)
+DESIGN-viewers-integration.md
+UPGRADE-PROTOCOL.md
+test-fixtures/
+scripts/
+eslint.config.mjs
+.claude/
+LICENSE
+LICENSE.txt
+License.txt
+# stale vendor outputs from earlier builds (ESM variants are the live ones)
+out/webview/vendor/asciidoctor.min.js
+out/webview/vendor/dompurify.min.js
+out/webview/vendor/plurimath.js
+out/webview/vendor/plurimath-opal.js
+# Re-include runtime externals (esbuild marked these external in
+# src/extension/main.cjs and src/extension/workers/plurimath-worker.cjs;
+# they MUST be present in node_modules at runtime).
+!node_modules/@plurimath/
+!node_modules/@plurimath/**
+!node_modules/mathjax/
+!node_modules/mathjax/**
+# Trim mathjax: we only use input/asciimath + output/svg + core/loader/startup.
+# Drop the prebuilt combo bundles (we don't load them) and SRE locale data
+# (only English used; speech-rule output isn't surfaced in our viewers).
+node_modules/@plurimath/plurimath/.babelrc
+node_modules/@plurimath/plurimath/.github/
+node_modules/@plurimath/plurimath/.gitmodules
+node_modules/@plurimath/plurimath/build.sh
+node_modules/@plurimath/plurimath/setup.sh
+node_modules/@plurimath/plurimath/Dockerfile
+node_modules/@plurimath/plurimath/Gemfile
+node_modules/@plurimath/plurimath/Gemfile.lock
+node_modules/@plurimath/plurimath/demo.html
+node_modules/@plurimath/plurimath/spec/
+node_modules/@plurimath/plurimath/src/
+node_modules/@plurimath/plurimath/tsconfig.json
+node_modules/@plurimath/plurimath/dist/index.js.map
+node_modules/@plurimath/plurimath/dist/plurimath-opal.js.map
+node_modules/mathjax/tex-svg.js
+node_modules/mathjax/tex-svg-nofont.js
+node_modules/mathjax/tex-chtml.js
+node_modules/mathjax/tex-chtml-nofont.js
+node_modules/mathjax/tex-mml-svg.js
+node_modules/mathjax/tex-mml-svg-nofont.js
+node_modules/mathjax/tex-mml-chtml.js
+node_modules/mathjax/tex-mml-chtml-nofont.js
+node_modules/mathjax/mml-svg.js
+node_modules/mathjax/mml-svg-nofont.js
+node_modules/mathjax/mml-chtml.js
+node_modules/mathjax/mml-chtml-nofont.js
+node_modules/mathjax/output/chtml.js
+node_modules/mathjax/output/chtml/
+node_modules/mathjax/input/tex.js
+node_modules/mathjax/input/tex/
+node_modules/mathjax/sre/mathmaps/de.json
+node_modules/mathjax/sre/mathmaps/es.json
+node_modules/mathjax/sre/mathmaps/fr.json
+node_modules/mathjax/sre/mathmaps/hi.json
+node_modules/mathjax/sre/mathmaps/it.json
+node_modules/mathjax/sre/mathmaps/ko.json
+node_modules/mathjax/sre/mathmaps/nb.json
+node_modules/mathjax/sre/mathmaps/nemeth.json
+node_modules/mathjax/sre/mathmaps/sv.json
+node_modules/mathjax/sre/mathmaps/euro.json
+node_modules/mathjax/a11y/

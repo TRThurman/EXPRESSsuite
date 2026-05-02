@@ -22,6 +22,19 @@ async function copyAsset(src, dst) {
   await copyFile(src, dst);
 }
 
+async function writeOutCjsMarker() {
+  // The repo's top-level package.json declares "type": "module", which would
+  // make Node treat every .js file in out/ as ESM. esbuild emits CJS bundles,
+  // so plant a marker package.json inside each CJS output directory to flip
+  // the module type back to commonjs for that subtree.
+  for (const dir of ["out/extension", "out/extension/workers", "out/language"]) {
+    await mkdir(dir, { recursive: true });
+    await import("node:fs/promises").then((fs) =>
+      fs.writeFile(`${dir}/package.json`, '{"type":"commonjs"}\n', "utf8"),
+    );
+  }
+}
+
 async function copyVendorAssets() {
   // Plurimath/Opal and Asciidoctor.js need to be loaded as native ESM in the
   // webview; bundling via esbuild breaks Opal's runtime module loader (TypeError
@@ -66,7 +79,6 @@ const hostCtx = await esbuild.context({
     "src/extension/workers/plurimath-worker.ts",
   ],
   outdir: "out",
-  outExtension: { ".js": ".cjs" },
   bundle: true,
   target: "ES2017",
   format: "cjs",
@@ -99,6 +111,7 @@ const webviewCtx = await esbuild.context({
 });
 
 await copyVendorAssets();
+await writeOutCjsMarker();
 
 if (watch) {
   await Promise.all([hostCtx.watch(), webviewCtx.watch()]);

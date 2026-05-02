@@ -41,7 +41,7 @@ function spawnWorker(): Worker {
     "out",
     "extension",
     "workers",
-    "plurimath-worker.cjs",
+    "plurimath-worker.js",
   );
   const w = new Worker(workerPath);
   w.on("message", (msg: { id: number; mathml?: string; error?: string }) => {
