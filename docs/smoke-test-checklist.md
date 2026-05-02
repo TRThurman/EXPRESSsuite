@@ -78,6 +78,63 @@ Reload VS Code.  Open `wg12-step/schemas/resources/geometry_schema/geometry_sche
 - Run S1–S4.  Should still work; the LSP is fine, the host-side fallback
   resolver kicks in for cross-file xrefs.
 
+## Per-schema acceptance run (DESIGN §4.2.4)
+
+After S1–S6 pass on `geometry_schema.exp`, repeat the core surfaces on
+the four other canonical schemas in the wg12-step corpus.  Each schema
+exercises a slightly different mix of features.
+
+Open each `.exp` file in turn and run the abbreviated checklist.
+
+### geometry_schema (rich AsciiMath, many entities, 16 expg diagrams)
+
+Already covered by S1–S6 above.  Includes the canonical fixture (`point`
+on line 3294 → expg4).
+
+### topology_schema
+
+| File | `~/test_git/sd.iso.org/wg12-step/schemas/resources/topology_schema/topology_schema.exp` |
+|---|---|
+| Hover (with math) | `shell` (line 78) — has stem expressions in the description |
+| Show Description | `shell`, `connected_edge_set`, `loop`, `face`, `closed_shell` |
+| Show EXPRESS-G | should narrow to the diagrams referencing the cursor entity; falls back to picker among 7 SVGs otherwise |
+| Expected math | yes — measure first-render latency |
+
+### mesh_topology_schema
+
+| File | `~/test_git/sd.iso.org/wg12-step/schemas/resources/mesh_topology_schema/mesh_topology_schema.exp` |
+|---|---|
+| Hover (with math) | `product_of_mesh` (line 212), `cell_shape` |
+| Show Description | `product_of_mesh`, `cell_shape`, `array_based_unstructured_mesh`, `connected_edge_set`, `cell` |
+| Show EXPRESS-G | only one SVG (`mesh_topology_schemaexpg1.svg`); picker should auto-select |
+| Expected math | yes |
+
+### presentation_appearance_schema
+
+| File | `~/test_git/sd.iso.org/wg12-step/schemas/resources/presentation_appearance_schema/presentation_appearance_schema.exp` |
+|---|---|
+| Hover (with math) | `one_direction_repeat_factor` (line 646), `two_direction_repeat_factor` |
+| Show Description | `one_direction_repeat_factor`, `two_direction_repeat_factor`, `fill_area_style`, `fill_area_style_hatching`, `pre_defined_tile_style` |
+| Show EXPRESS-G | 11 candidate SVGs; cursor-narrowing should reduce the picker |
+| Expected math | yes (rare — only 13 stem instances total) |
+
+### equations_schema (the latexmath case — Phase 3 §3.2.6)
+
+| File | `~/test_git/sd.iso.org/wg12-step/schemas/resources/equations_schema/equations_schema.exp` |
+|---|---|
+| Hover (with math, AsciiMath) | `force_moment_data_name` (line 52), `thermal_conductivity_model_data_name` |
+| Hover (with **latexmath**) | any entity whose description references `latexmath:[\\vec{f}]` etc.  Search for `latexmath:[` to find a fixture |
+| Show Description | `fd_diffusion_equation`, `fd_governing_equation`, `linear_acoustics_equation`, plus 2 random others |
+| Show EXPRESS-G | 6 candidate SVGs |
+| Expected math | **both AsciiMath and LaTeX must render**.  If a `latexmath:[…]` falls back to code form (` `latexmath:[\vec{f}]` `), record it as a §3.2.6 regression. |
+
+### Schema-walk regression (one-time per smoke run)
+
+For each schema above, scroll through the file once with Page Down.  No
+errors should appear in the OutputChannel `easyEXPRESS Viewers` or in
+the dev-tools console.  Any "⚠ over budget" `[perf]` line is a finding
+to record (not necessarily a failure).
+
 ## Platform-specific things to look for
 
 ### Windows
@@ -122,13 +179,22 @@ value in the smoke-test results so we can investigate.
 In `docs/smoke-test-results.md`, append a section per OS run:
 
 ```markdown
-## <OS> <date>
+## <OS> <date> (tester: <name>)
+
+### Core surfaces (geometry_schema)
 - S1 hover: PASS|FAIL — [notes]
 - S2 description preview: PASS|FAIL — [notes]
 - S3 hot-spot navigation: PASS|FAIL — [notes]
 - S4 math playground: PASS|FAIL — [notes]
 - S5 cross-schema hover: PASS|FAIL — [notes]
 - S6 single-file mode: PASS|FAIL — [notes]
+
+### Per-schema acceptance
+- topology_schema: PASS|FAIL — [notes]
+- mesh_topology_schema: PASS|FAIL — [notes]
+- presentation_appearance_schema: PASS|FAIL — [notes]
+- equations_schema (AsciiMath): PASS|FAIL — [notes]
+- equations_schema (latexmath): PASS|FAIL — [notes]
 
 ### Performance numbers (from OutputChannel)
 - activate: <ms>
@@ -138,6 +204,10 @@ In `docs/smoke-test-results.md`, append a section per OS run:
 - first showExpressG: <ms>
 - math playground render: <ms>
 - any "⚠ over budget" entries: [list]
+
+### Other observations
+- <any unexpected errors in OutputChannel or DevTools console>
+- <any UX issues or surprises>
 ```
 
 When all six pass on all three OSes, Phase 4 §4.2.1 is closed.
