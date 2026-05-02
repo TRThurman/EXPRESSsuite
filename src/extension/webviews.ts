@@ -4,6 +4,51 @@ import * as path from "node:path";
 import type { RemarkAnnotation } from "./annotation-index.js";
 import { validateMessage } from "./webview-message.js";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-require-imports */
+
+/** Host-side AsciiMath → MathML via Plurimath (node). */
+const STEM_RE = /stem:\[((?:\\.|[^\]])*)\]/g;
+async function prerenderMath(body: string): Promise<Record<string, string>> {
+  const exprs = new Set<string>();
+  STEM_RE.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = STEM_RE.exec(body)) !== null) exprs.add(m[1]);
+  if (exprs.size === 0) return {};
+  let Plurimath: any;
+  try {
+    Plurimath = require("@plurimath/plurimath").default;
+  } catch (err) {
+    logMessage("descriptionPreview", "error", `failed to load Plurimath: ${(err as Error).message}`);
+    return {};
+  }
+  const out: Record<string, string> = {};
+  for (const e of exprs) {
+    try {
+      out[e] = new Plurimath(e, "asciimath").toMathml();
+    } catch (err) {
+      logMessage("descriptionPreview", "warn", `plurimath failure on "${e.slice(0, 40)}": ${(err as Error).message}`);
+    }
+  }
+  return out;
+}
+
+let logChannel: vscode.OutputChannel | undefined;
+function getLog(): vscode.OutputChannel {
+  if (!logChannel) {
+    logChannel = vscode.window.createOutputChannel("easyEXPRESS Viewers");
+  }
+  return logChannel;
+}
+function logMessage(surface: string, level: string, message: string): void {
+  const ch = getLog();
+  const ts = new Date().toISOString().slice(11, 23);
+  ch.appendLine(`[${ts}] [${surface} ${level}] ${message}`);
+  if (level === "error") {
+    ch.show(true);
+  }
+}
+
 /* ----- Shared CSP / nonce helpers --------------------------------------- */
 
 function nonce(): string {
@@ -33,24 +78,34 @@ function controllerJs(context: vscode.ExtensionContext, name: string): vscode.Ur
 
 /* ----- Description preview ---------------------------------------------- */
 
-function descriptionHtml(
+async function descriptionHtml(
   context: vscode.ExtensionContext,
   webview: vscode.Webview,
   ann: RemarkAnnotation,
   baseDirUri: vscode.Uri,
-): string {
+): Promise<string> {
   const n = nonce();
   const cspSrc = webview.cspSource;
-  const asciidoctorJs = webview.asWebviewUri(vendor(context, "asciidoctor.min.js"));
   const asciidoctorCss = webview.asWebviewUri(vendor(context, "asciidoctor.css"));
-  const plurimathWrapper = webview.asWebviewUri(vendor(context, "plurimath.js"));
-  const plurimathOpal = webview.asWebviewUri(vendor(context, "plurimath-opal.js"));
-  const dompurify = webview.asWebviewUri(vendor(context, "dompurify.min.js"));
+  const asciidoctorUrl = webview.asWebviewUri(vendor(context, "asciidoctor.js")).toString();
+  const dompurifyUrl = webview.asWebviewUri(vendor(context, "dompurify.mjs")).toString();
   const ctrl = webview.asWebviewUri(controllerJs(context, "description-preview"));
   const baseHref = webview.asWebviewUri(baseDirUri).toString();
 
-  // Embed source as a JSON-encoded data block read by the controller.
-  const payload = JSON.stringify({ tag: ann.tag, body: ann.body, baseHref });
+  // Pre-render all stem:[…] expressions on the host via Plurimath (node-side
+  // works; the Opal runtime is fragile inside webview's import() context).
+  // Send the {expr → MathML} map to the webview so the controller never needs
+  // to load Plurimath itself.
+  const mathRenders = await prerenderMath(ann.body);
+
+  const payload = JSON.stringify({
+    tag: ann.tag,
+    body: ann.body,
+    baseHref,
+    asciidoctorUrl,
+    dompurifyUrl,
+    mathRenders,
+  });
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -78,11 +133,20 @@ function descriptionHtml(
 <h1 id="tag"></h1>
 <div id="content">Loading…</div>
 <script type="application/json" id="payload">${payload}</script>
-<script src="${plurimathOpal}" nonce="${n}"></script>
-<script src="${plurimathWrapper}" nonce="${n}"></script>
-<script src="${asciidoctorJs}" nonce="${n}"></script>
-<script src="${dompurify}" nonce="${n}"></script>
-<script type="module" src="${ctrl}" nonce="${n}"></script>
+<script nonce="${n}">
+  (function() {
+    const vscode = acquireVsCodeApi();
+    window.__vscode = vscode;
+    vscode.postMessage({ kind: "log", level: "info", message: "html parsed, about to load controller" });
+    window.addEventListener("error", function (ev) {
+      vscode.postMessage({ kind: "log", level: "error", message: "window error: " + ev.message + " at " + (ev.filename || "?") + ":" + (ev.lineno || "?") + " — " + (ev.error && ev.error.stack ? String(ev.error.stack).slice(0, 800) : "no stack") });
+    });
+    window.addEventListener("unhandledrejection", function (ev) {
+      vscode.postMessage({ kind: "log", level: "error", message: "unhandled rejection: " + (ev.reason && ev.reason.message ? ev.reason.message : String(ev.reason)) });
+    });
+  })();
+</script>
+<script type="module" src="${ctrl}" nonce="${n}" onerror="window.__vscode && window.__vscode.postMessage({ kind: 'log', level: 'error', message: 'controller script failed to load (404 or CSP blocked)' });"></script>
 </body>
 </html>`;
 }
@@ -103,13 +167,13 @@ export async function showDescriptionPreview(
     },
   );
   const baseDirUri = vscode.Uri.file(path.dirname(sourceUri.fsPath));
-  panel.webview.html = descriptionHtml(context, panel.webview, ann, baseDirUri);
+  panel.webview.html = await descriptionHtml(context, panel.webview, ann, baseDirUri);
 
   panel.webview.onDidReceiveMessage((raw) => {
     const msg = validateMessage(raw);
     if (!msg) return;
     if (msg.kind === "log") {
-      console.log(`[descriptionPreview ${msg.level}] ${msg.message}`);
+      logMessage("descriptionPreview", msg.level, msg.message);
     }
   });
 }
@@ -120,6 +184,7 @@ export async function showExpressGPreview(
   context: vscode.ExtensionContext,
   svgUri: vscode.Uri,
   schemaSourceUri: vscode.Uri,
+  hotspotMap: Record<string, string>,
   resolveTarget: (name: string) => Promise<{ uri: vscode.Uri; range: vscode.Range } | undefined>,
 ): Promise<void> {
   const panel = vscode.window.createWebviewPanel(
@@ -135,10 +200,10 @@ export async function showExpressGPreview(
 
   const svgText = await fs.readFile(svgUri.fsPath, "utf8");
   const ctrl = panel.webview.asWebviewUri(controllerJs(context, "expressg-preview"));
-  const dompurify = panel.webview.asWebviewUri(vendor(context, "dompurify.min.js"));
+  const dompurifyUrl = panel.webview.asWebviewUri(vendor(context, "dompurify.mjs")).toString();
   const n = nonce();
   const cspSrc = panel.webview.cspSource;
-  const payload = JSON.stringify({ svg: svgText });
+  const payload = JSON.stringify({ svg: svgText, dompurifyUrl, hotspotMap });
 
   panel.webview.html = `<!DOCTYPE html>
 <html lang="en">
@@ -160,7 +225,6 @@ export async function showExpressGPreview(
 <body>
 <div id="host">Rendering…</div>
 <script type="application/json" id="payload">${payload}</script>
-<script src="${dompurify}" nonce="${n}"></script>
 <script type="module" src="${ctrl}" nonce="${n}"></script>
 </body>
 </html>`;
@@ -181,7 +245,7 @@ export async function showExpressGPreview(
         vscode.window.showInformationMessage(`No definition found for ${msg.targetName}`);
       }
     } else if (msg.kind === "log") {
-      console.log(`[expressGPreview ${msg.level}] ${msg.message}`);
+      logMessage("expressGPreview", msg.level, msg.message);
     }
   });
 }
@@ -200,8 +264,7 @@ export function openMathPlayground(context: vscode.ExtensionContext): void {
     },
   );
   const ctrl = panel.webview.asWebviewUri(controllerJs(context, "math-playground"));
-  const plurimathWrapper = panel.webview.asWebviewUri(vendor(context, "plurimath.js"));
-  const plurimathOpal = panel.webview.asWebviewUri(vendor(context, "plurimath-opal.js"));
+  const plurimathUrl = panel.webview.asWebviewUri(vendor(context, "plurimath", "index.js")).toString();
   const n = nonce();
   const cspSrc = panel.webview.cspSource;
 
@@ -237,8 +300,7 @@ export function openMathPlayground(context: vscode.ExtensionContext): void {
   <textarea id="src" spellcheck="false" placeholder="Type AsciiMath, e.g.  sum_(i=1)^n i^3=((n(n+1))/2)^2">sum_(i=1)^n i^3=((n(n+1))/2)^2</textarea>
   <div id="out">Loading…</div>
 </div>
-<script src="${plurimathOpal}" nonce="${n}"></script>
-<script src="${plurimathWrapper}" nonce="${n}"></script>
+<script type="application/json" id="payload">${JSON.stringify({ plurimathUrl })}</script>
 <script type="module" src="${ctrl}" nonce="${n}"></script>
 </body>
 </html>`;
@@ -255,7 +317,7 @@ export function openMathPlayground(context: vscode.ExtensionContext): void {
         vscode.window.showInformationMessage("No active EXPRESS editor to insert into.");
       }
     } else if (msg.kind === "log") {
-      console.log(`[mathPlayground ${msg.level}] ${msg.message}`);
+      logMessage("mathPlayground", msg.level, msg.message);
     }
   });
 }

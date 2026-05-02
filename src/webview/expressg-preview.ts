@@ -1,16 +1,16 @@
-/* EXPRESS-G SVG preview controller. Sanitizes inline SVG via DOMPurify
- * and intercepts <a href="N"> hot-spot clicks → postMessage navigate.
- */
+/* EXPRESS-G SVG preview controller. Loads DOMPurify via dynamic import. */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-declare const DOMPurify: any;
+
 declare function acquireVsCodeApi(): { postMessage: (m: unknown) => void };
 
-const vscode = acquireVsCodeApi();
+const vscode = (window as any).__vscode ?? acquireVsCodeApi();
 const log = (level: "info" | "warn" | "error", message: string) =>
   vscode.postMessage({ kind: "log", level, message });
 
 interface Payload {
   svg: string;
+  dompurifyUrl: string;
+  hotspotMap: Record<string, string>;
 }
 
 const PURIFY_CONFIG = {
@@ -33,18 +33,14 @@ const PURIFY_CONFIG = {
 };
 
 function isHotspotName(s: string): boolean {
-  // Hot-spot href is a small integer in the annotated-express format.
   return /^[0-9]{1,4}$/.test(s);
 }
 
-function entityNameForHotspot(_hotspotIndex: string): string | null {
-  // Phase 2 POC: not yet wired — the index → entity-name mapping needs the
-  // [.svgmap] block from the corresponding __expressg remark. Returning the
-  // hotspot index unchanged so the host can decide how to resolve it.
-  return null;
+function entityNameForHotspot(hotspotIndex: string, map: Record<string, string>): string | null {
+  return map[hotspotIndex] ?? null;
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const payloadEl = document.getElementById("payload");
   const host = document.getElementById("host")!;
   if (!payloadEl?.textContent) {
@@ -53,20 +49,23 @@ function main(): void {
   }
   const payload: Payload = JSON.parse(payloadEl.textContent);
 
+  const dompurifyMod = await import(/* @vite-ignore */ payload.dompurifyUrl);
+  const DOMPurify = (dompurifyMod as any).default;
+
   const clean = DOMPurify.sanitize(payload.svg, PURIFY_CONFIG);
   host.innerHTML = clean;
 
-  // Wire hot-spot clicks
   host.querySelectorAll("a[href]").forEach((a) => {
     const href = a.getAttribute("href") || "";
     if (!isHotspotName(href)) return;
     a.addEventListener("click", (e) => {
       e.preventDefault();
-      const targetName = entityNameForHotspot(href);
+      const targetName = entityNameForHotspot(href, payload.hotspotMap);
       if (targetName) {
+        log("info", `hot-spot ${href} → navigate(${targetName})`);
         vscode.postMessage({ kind: "navigate", targetName });
       } else {
-        log("info", `clicked hot-spot href="${href}" — name resolution pending Phase 2 follow-up`);
+        log("info", `clicked hot-spot href="${href}" — no entity mapped`);
       }
     });
   });
@@ -74,4 +73,4 @@ function main(): void {
   log("info", `rendered SVG with ${host.querySelectorAll("a[href]").length} hot-spot anchors`);
 }
 
-main();
+main().catch((err) => log("error", `controller threw: ${(err as Error).message}`));

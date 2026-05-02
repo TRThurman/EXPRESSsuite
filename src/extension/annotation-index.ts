@@ -91,4 +91,58 @@ export class AnnotationIndex {
   size(): number {
     return this.all.length;
   }
+
+  /**
+   * For each `__expressg` named remark, parse its [.svgmap] block and return
+   * { svgFile, entities, hotspotMap }:
+   *   - svgFile: the referenced SVG filename (`image::file.svg[]`)
+   *   - entities: every entity tag the [.svgmap] block names
+   *   - hotspotMap: integer SVG href index → entity tag, parsed from
+   *     bullet entries of the form `* <<express:tag>>; N`
+   */
+  expressGDiagrams(): Array<{ svgFile: string; entities: string[]; hotspotMap: Record<string, string> }> {
+    const results: Array<{ svgFile: string; entities: string[]; hotspotMap: Record<string, string> }> = [];
+    for (const ann of this.all) {
+      if (!ann.tag.endsWith(".__expressg")) continue;
+      const imgMatch = /image::([^[\s]+\.svg)\[\]/.exec(ann.body);
+      if (!imgMatch) continue;
+      const svgFile = imgMatch[1];
+      const entities: string[] = [];
+      const hotspotMap: Record<string, string> = {};
+      const xrefRe = /<<express:([^,>]+?)(?:,[^>]*)?>>/g;
+      let m: RegExpExecArray | null;
+      while ((m = xrefRe.exec(ann.body)) !== null) entities.push(m[1].trim());
+      // Bullet entries `* <<express:tag>>; N` — N is the SVG hot-spot href.
+      const bulletRe = /^\*\s+<<express:([^,>]+?)(?:,[^>]*)?>>\s*;\s*(\d+)\s*$/gm;
+      while ((m = bulletRe.exec(ann.body)) !== null) {
+        const tag = m[1].trim();
+        const idx = m[2];
+        hotspotMap[idx] = tag;
+      }
+      results.push({ svgFile, entities, hotspotMap });
+    }
+    return results;
+  }
+
+  /**
+   * Given an entity tag (`schema.entity`) or simple entity name, return the
+   * SVG file basenames whose [.svgmap] block references it.
+   */
+  expressGForEntity(query: string): string[] {
+    const out = new Set<string>();
+    for (const d of this.expressGDiagrams()) {
+      for (const e of d.entities) {
+        if (e === query) {
+          out.add(d.svgFile);
+          break;
+        }
+        const parts = e.split(".");
+        if (parts.length >= 2 && parts[1] === query) {
+          out.add(d.svgFile);
+          break;
+        }
+      }
+    }
+    return Array.from(out);
+  }
 }

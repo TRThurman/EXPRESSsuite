@@ -61,35 +61,113 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
       }
       const dir = path.dirname(editor.document.uri.fsPath);
       const baseName = path.basename(editor.document.uri.fsPath, ".exp");
-      const candidates = await findExpressGSvgs(dir, baseName);
-      if (candidates.length === 0) {
+      const allCandidates = await findExpressGSvgs(dir, baseName);
+      if (allCandidates.length === 0) {
         vscode.window.showInformationMessage(`No EXPRESS-G SVG (${baseName}expg*.svg) found next to ${baseName}.exp.`);
         return;
       }
+
+      // Narrow to diagrams referencing the cursor word, if any.
+      let candidates = allCandidates;
+      let cursorWord: string | undefined;
+      const wordRange = editor.document.getWordRangeAtPosition(
+        editor.selection.active,
+        /[A-Za-z_][A-Za-z0-9_]*/,
+      );
+      if (wordRange) {
+        cursorWord = editor.document.getText(wordRange);
+        const idx = new AnnotationIndex(editor.document.getText());
+        const matchedFiles = new Set(idx.expressGForEntity(cursorWord));
+        if (matchedFiles.size > 0) {
+          const filtered = allCandidates.filter((u) => matchedFiles.has(path.basename(u.fsPath)));
+          if (filtered.length > 0) candidates = filtered;
+        }
+      }
+
+      const placeHolder = cursorWord && candidates !== allCandidates
+        ? `Diagrams containing "${cursorWord}"`
+        : "Select EXPRESS-G diagram";
       const pick =
         candidates.length === 1
           ? candidates[0]
           : await vscode.window.showQuickPick(
               candidates.map((u) => ({ label: path.basename(u.fsPath), uri: u })),
-              { placeHolder: "Select EXPRESS-G diagram" },
+              { placeHolder },
             ).then((p) => p?.uri);
       if (!pick) return;
 
-      await showExpressGPreview(context, pick, editor.document.uri, async (name) => {
-        // POC xref resolver: search the workspace's IndexManager-equivalent
-        // by scanning .exp files for "ENTITY name" or "TYPE name" declarations.
-        const matches = await vscode.workspace.findFiles("**/*.exp", "**/node_modules/**", 50);
-        for (const fileUri of matches) {
-          const content = await fs.readFile(fileUri.fsPath, "utf8");
-          const re = new RegExp(`^\\s*(ENTITY|TYPE|FUNCTION|RULE|PROCEDURE)\\s+${name}\\b`, "im");
-          const m = re.exec(content);
-          if (m) {
-            const before = content.slice(0, m.index);
-            const line = before.split("\n").length - 1;
-            const col = m.index - before.lastIndexOf("\n") - 1 + m[0].indexOf(name);
-            const range = new vscode.Range(line, col, line, col + name.length);
-            return { uri: fileUri, range };
+      // Build the hotspot index→entity-tag map from the schema's
+      // __expressg remarks for the chosen SVG.
+      const idx = new AnnotationIndex(editor.document.getText());
+      const diagram = idx.expressGDiagrams().find((d) => d.svgFile === path.basename(pick.fsPath));
+      const hotspotMap = diagram?.hotspotMap ?? {};
+
+      await showExpressGPreview(context, pick, editor.document.uri, hotspotMap, async (name) => {
+        // Accept either bare entity name ("point") or schema.entity ("geometry_schema.point").
+        const parts = name.split(".");
+        const schemaHint = parts.length >= 2 ? parts[0] : undefined;
+        const bareName = parts[parts.length - 1];
+        const re = new RegExp(`^\\s*(ENTITY|TYPE|FUNCTION|RULE|PROCEDURE|SCHEMA)\\s+${bareName}\\b`, "im");
+
+        const tryFile = async (fileUri: vscode.Uri): Promise<{ uri: vscode.Uri; range: vscode.Range } | undefined> => {
+          let content: string;
+          try {
+            content = await fs.readFile(fileUri.fsPath, "utf8");
+          } catch {
+            return undefined;
           }
+          const m = re.exec(content);
+          if (!m) return undefined;
+          const before = content.slice(0, m.index);
+          const line = before.split("\n").length - 1;
+          const col = m.index - before.lastIndexOf("\n") - 1 + m[0].indexOf(bareName);
+          const range = new vscode.Range(line, col, line, col + bareName.length);
+          return { uri: fileUri, range };
+        };
+
+        // Strategy:
+        //  1. Same file as the active editor (most common: same-schema xrefs).
+        //  2. Sibling .exp file matching the schema name (cross-schema, dotted-tag case).
+        //  3. Two-level walk up the directory looking for sibling schema dirs.
+        //  4. Workspace findFiles fallback.
+
+        const activeFile = editor.document.uri;
+        const activeDir = path.dirname(activeFile.fsPath);
+        const grandparent = path.dirname(activeDir);
+
+        const candidatePaths: string[] = [activeFile.fsPath];
+        if (schemaHint) {
+          // sibling schema directory pattern: ../<schemaHint>/<schemaHint>.exp
+          candidatePaths.push(path.join(grandparent, schemaHint, `${schemaHint}.exp`));
+          // and the same dir, just in case
+          candidatePaths.push(path.join(activeDir, `${schemaHint}.exp`));
+        }
+        for (const p of candidatePaths) {
+          const result = await tryFile(vscode.Uri.file(p));
+          if (result) return result;
+        }
+
+        // Walk grandparent recursively (up to 200 .exp files) — covers the
+        // wg12-step layout where schemas are sibling directories under
+        // schemas/resources/.
+        try {
+          const entries = await fs.readdir(grandparent, { withFileTypes: true });
+          let scanned = 0;
+          for (const e of entries) {
+            if (!e.isDirectory()) continue;
+            const subdir = path.join(grandparent, e.name);
+            const expFile = path.join(subdir, `${e.name}.exp`);
+            const result = await tryFile(vscode.Uri.file(expFile));
+            if (result) return result;
+            if (++scanned > 200) break;
+          }
+        } catch { /* ignore */ }
+
+        // Last resort: workspace findFiles (nothing if no workspace).
+        const matches = await vscode.workspace.findFiles("**/*.exp", "**/node_modules/**", 200);
+        for (const fileUri of matches) {
+          const result = await tryFile(fileUri);
+          if (result) return result;
         }
         return undefined;
       });

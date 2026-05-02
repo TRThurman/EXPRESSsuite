@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
 import { AnnotationIndex, type RemarkAnnotation } from "./annotation-index.js";
+import { renderAsciiMathSvgAsync, svgToDataUri } from "./hover-math.js";
 
-const HOVER_PREVIEW_CHAR_LIMIT = 320;
+const HOVER_PREVIEW_CHAR_LIMIT = 360;
 
 const indexCache = new Map<string, { version: number; index: AnnotationIndex }>();
 
@@ -16,14 +17,67 @@ function getIndex(doc: vscode.TextDocument): AnnotationIndex {
   return idx;
 }
 
-/** Strip a known prefix; trim trailing/leading whitespace. */
-function preview(body: string, limit = HOVER_PREVIEW_CHAR_LIMIT): string {
-  const text = body.replace(/\s+/g, " ").trim();
-  if (text.length <= limit) return text;
-  return text.slice(0, limit).replace(/\s+\S*$/, "") + "…";
+/* ----- preview & inline transforms -------------------------------------- */
+
+const STEM_RE = /stem:\[((?:\\.|[^\]])*)\]/g;
+const XREF_RE = /<<express:([^,>]+?)(?:,\s*([^>]+?))?>>/g;
+const STRONG_RE = /\*([^\s*][^*\n]*[^\s*]|[^\s*])\*/g; // asciidoc *strong* (single-asterisk)
+
+/** Truncate text-content while preserving inline markdown tokens we just produced. */
+function truncate(s: string, limit: number): string {
+  if (s.length <= limit) return s;
+  return s.slice(0, limit).replace(/\s+\S*$/, "") + "…";
 }
 
-/** Pick the best annotation for an entity hover: prefer the bare path; else first __note; else any. */
+interface InlineTransformOptions {
+  mathSvgs: Map<string, string>; // expr → already-rendered svg
+}
+
+function transformInline(body: string, opts: InlineTransformOptions): string {
+  let out = body;
+
+  // 1) Asciidoc *strong* → markdown **strong** (do this BEFORE other transforms
+  //    so we don't mangle within URLs etc.)
+  out = out.replace(STRONG_RE, (_m, inner) => `**${inner}**`);
+
+  // 2) <<express:tag,label>> → markdown command link
+  out = out.replace(XREF_RE, (_m, tag: string, label?: string) => {
+    const text = (label ?? tag).trim();
+    const cmd = `command:express.showDescription?${encodeURIComponent(JSON.stringify({ path: tag.trim() }))}`;
+    return `[${text}](${cmd})`;
+  });
+
+  // 3) stem:[expr] → <img src="data:image/svg+xml;base64,..."> if rendered, else `code` fallback
+  out = out.replace(STEM_RE, (_m, expr: string) => {
+    const svg = opts.mathSvgs.get(expr);
+    if (svg) {
+      const uri = svgToDataUri(svg);
+      const alt = expr.replace(/"/g, "&quot;");
+      return `<img src="${uri}" alt="${alt}" title="stem:[${alt}]" style="vertical-align: middle;">`;
+    }
+    return `\`stem:[${expr}]\``;
+  });
+
+  // Collapse whitespace globally for the truncation step.
+  return out.replace(/[ \t]+\n/g, "\n").trim();
+}
+
+async function gatherMathRenders(body: string): Promise<Map<string, string>> {
+  const exprs = new Set<string>();
+  STEM_RE.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = STEM_RE.exec(body)) !== null) exprs.add(m[1]);
+
+  const out = new Map<string, string>();
+  await Promise.all(
+    Array.from(exprs).map(async (e) => {
+      const svg = await renderAsciiMathSvgAsync(e);
+      if (svg) out.set(e, svg);
+    }),
+  );
+  return out;
+}
+
 function pickPrimary(anns: readonly RemarkAnnotation[], path: string): RemarkAnnotation | undefined {
   if (anns.length === 0) return undefined;
   const exact = anns.find((a) => a.tag === path);
@@ -34,10 +88,10 @@ function pickPrimary(anns: readonly RemarkAnnotation[], path: string): RemarkAnn
 }
 
 export class ExpressHoverProvider implements vscode.HoverProvider {
-  provideHover(
+  async provideHover(
     document: vscode.TextDocument,
     position: vscode.Position,
-  ): vscode.ProviderResult<vscode.Hover> {
+  ): Promise<vscode.Hover | undefined> {
     const wordRange = document.getWordRangeAtPosition(position, /[A-Za-z_][A-Za-z0-9_]*/);
     if (!wordRange) return undefined;
     const word = document.getText(wordRange);
@@ -46,7 +100,6 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
     const matches = idx.byEntityName(word);
     if (matches.length === 0) return undefined;
 
-    // Prefer matches that are exactly schema.entity (or its __subtypes).
     const candidatePaths = new Set<string>();
     for (const m of matches) {
       if (m.parts.length >= 2 && m.parts[1] === word) {
@@ -60,6 +113,12 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
     const primary = pickPrimary(anns, path);
     if (!primary) return undefined;
 
+    // Truncate the source body BEFORE inline transforms so we don't slice in
+    // the middle of an xref or a stem:[]. Add a small budget for transform output.
+    const truncated = truncate(primary.body, HOVER_PREVIEW_CHAR_LIMIT);
+    const mathSvgs = await gatherMathRenders(truncated);
+    const transformed = transformInline(truncated, { mathSvgs });
+
     const md = new vscode.MarkdownString();
     md.supportHtml = true;
     md.isTrusted = {
@@ -71,7 +130,7 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
     };
 
     md.appendMarkdown(`**${path}**\n\n`);
-    md.appendMarkdown(preview(primary.body));
+    md.appendMarkdown(transformed);
 
     if (anns.length > 1) {
       const subtypes = anns

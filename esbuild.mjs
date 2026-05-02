@@ -23,12 +23,16 @@ async function copyAsset(src, dst) {
 }
 
 async function copyVendorAssets() {
+  // Plurimath/Opal and Asciidoctor.js need to be loaded as native ESM in the
+  // webview; bundling via esbuild breaks Opal's runtime module loader (TypeError
+  // "r2 is not a function" inside Opal.modules.parser). Webview controllers
+  // load these via dynamic import() against the copied vendor URIs at runtime.
   const assets = [
-    ["node_modules/@asciidoctor/core/dist/browser/asciidoctor.min.js", "out/webview/vendor/asciidoctor.min.js"],
+    ["node_modules/@asciidoctor/core/dist/browser/asciidoctor.js", "out/webview/vendor/asciidoctor.js"],
     ["node_modules/@asciidoctor/core/dist/css/asciidoctor.css", "out/webview/vendor/asciidoctor.css"],
-    ["node_modules/@plurimath/plurimath/dist/index.js", "out/webview/vendor/plurimath.js"],
-    ["node_modules/@plurimath/plurimath/dist/plurimath-opal.js", "out/webview/vendor/plurimath-opal.js"],
-    ["node_modules/dompurify/dist/purify.min.js", "out/webview/vendor/dompurify.min.js"],
+    ["node_modules/@plurimath/plurimath/dist/index.js", "out/webview/vendor/plurimath/index.js"],
+    ["node_modules/@plurimath/plurimath/dist/plurimath-opal.js", "out/webview/vendor/plurimath/plurimath-opal.js"],
+    ["node_modules/dompurify/dist/purify.es.mjs", "out/webview/vendor/dompurify.mjs"],
   ];
   for (const [src, dst] of assets) {
     await copyAsset(src, dst);
@@ -47,7 +51,11 @@ const watchPlugin = {
   },
 };
 
-// Extension host bundles (Node CJS, vscode external)
+// Extension host bundles (Node CJS, vscode + mathjax external).
+// MathJax v4 uses runtime path resolution for dynamic component loading;
+// bundling breaks that. Marking external lets it load from node_modules
+// at extension runtime (works in dev host and in packaged .vsix because
+// vsce includes node_modules of declared dependencies).
 const hostCtx = await esbuild.context({
   entryPoints: ["src/extension/main.ts", "src/language/main.ts"],
   outdir: "out",
@@ -56,14 +64,16 @@ const hostCtx = await esbuild.context({
   target: "ES2017",
   format: "cjs",
   loader: { ".ts": "ts" },
-  external: ["vscode"],
+  external: ["vscode", "mathjax"],
   platform: "node",
   sourcemap: !minify,
   minify,
   plugins: [watchPlugin],
 });
 
-// Webview controllers (browser ESM, no externals)
+// Webview controllers (browser ESM). Vendors are NOT bundled — they're loaded
+// via dynamic import() against webview-vendor URIs at runtime. esbuild leaves
+// runtime-string import() expressions as-is, so the browser fetches the ESM.
 const webviewCtx = await esbuild.context({
   entryPoints: [
     "src/webview/description-preview.ts",
