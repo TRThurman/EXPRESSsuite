@@ -1,0 +1,56 @@
+cff-version: 1.2.0
+title: easyEXPRESS Viewers (Mirror)
+message: >-
+  If you use this software, please cite both this fork and the
+  NIST-developed original it is based on.  See NOTICE.md for the
+  modification history required by the NIST Software Licensing
+  Statement.
+type: software
+version: "0.4.0"
+date-released: "2026-05-02"
+authors:
+  - given-names: Thomas
+    family-names: Thurman
+    affiliation: TRThurman Consulting
+    email: thomas@trthurman.consulting
+license: MIT
+license-url: https://github.com/TRThurman/easy-express-mirror/blob/main/LICENSE
+repository-code: https://github.com/TRThurman/easy-express-mirror
+url: https://github.com/TRThurman/easy-express-mirror
+abstract: >-
+  A Visual Studio Code extension that provides language support and
+  rich-content viewers (annotated AsciiDoc descriptions, EXPRESS-G
+  diagram navigation, AsciiMath/LaTeX math rendering) for the
+  EXPRESS (ISO 10303-11) information modeling language.  Forked
+  from and substantially extending the NIST-developed easyEXPRESS.
+keywords:
+  - EXPRESS
+  - "ISO 10303-11"
+  - STEP
+  - "Visual Studio Code"
+  - language-server
+  - annotated-EXPRESS
+  - Metanorma
+  - Plurimath
+references:
+  - type: software
+    title: easyEXPRESS
+    authors:
+      - given-names: Sylvere
+        family-names: Krima
+        affiliation: National Institute of Standards and Technology
+      - given-names: Allison
+        family-names: Barnard Feeney
+        affiliation: National Institute of Standards and Technology
+      - given-names: Rosemary
+        family-names: Astheimer
+        affiliation: National Institute of Standards and Technology
+    institution:
+      name: U.S. National Institute of Standards and Technology
+    url: https://github.com/usnistgov/easy-express
+    repository-code: https://github.com/usnistgov/easy-express
+    notes: >-
+      Public-domain within the United States under 17 U.S.C. § 105.
+      Outside the United States, distribution remains subject to the
+      NIST Software Licensing Statement preserved in this
+      repository's LICENSE.md.

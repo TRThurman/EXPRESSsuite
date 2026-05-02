@@ -16,7 +16,7 @@ Thomas Thurman <thomas@trthurman.consulting>
 [abstract]
 == Abstract
 
-The easyEXPRESS extension for Visual Studio Code provides language-server support for ISO 10303-11 (EXPRESS) schemas. Version 0.4.0 adds four viewer surfaces that read the *annotated EXPRESS* convention used by ISO TC 184/SC 4 schema authors: rich-text descriptions in named-remark comments, EXPRESS-G diagrams as interactive SVG, AsciiMath and LaTeX math rendered via the Plurimath converter Metanorma uses, and a popup math playground. The extension makes zero outbound network calls; rendering happens entirely on the user's machine. This paper documents the architecture, security model, and operational characteristics of the new surfaces, and explains how to keep pre-publication standards content confidential against unrelated AI-assistant features that ship in the surrounding VS Code editor shell.
+The easyEXPRESS extension for Visual Studio Code provides language-server support for ISO 10303-11 (EXPRESS) schemas. Version 0.4.0 is a fork of Version 0.4.0 adds four viewer surfaces that read the *annotated EXPRESS* convention used by ISO TC 184/SC 4 schema authors: rich-text descriptions in named-remark comments, EXPRESS-G diagrams as interactive SVG, AsciiMath and LaTeX math rendered via the Plurimath converter Metanorma uses, and a popup math playground. The extension makes zero outbound network calls; rendering happens entirely on the user's machine. This paper documents the architecture, security model, and operational characteristics of the new surfaces, and explains how to keep pre-publication standards content confidential against unrelated AI-assistant features that ship in the surrounding VS Code editor shell.
 
 
 == Background
@@ -323,6 +323,8 @@ Cold-start activation does not load Plurimath, MathJax, or any webview. The firs
 
 == Acknowledgements
 
+This work is **derived from** the NIST-developed software *easyEXPRESS*, and acknowledges the U.S. National Institute of Standards and Technology as the source of the original software (see <<nist-easyexpress>> in the References).  NIST-developed software is not subject to copyright protection within the United States under 17 U.S.C. § 105.  The original NIST Software Licensing Statement is preserved in this repository's `LICENSE.md`, and a notice of modifications required by that statement is included in `NOTICE.md`.
+
 The viewer surfaces stand on the shoulders of:
 
 * *Plurimath* (Ribose, BSD-2-Clause) — the math conversion library that underpins Metanorma's authoring pipeline.
@@ -330,13 +332,14 @@ The viewer surfaces stand on the shoulders of:
 * *MathJax v4* (Apache-2.0) — for the hover-side AsciiMath-to-SVG path.
 * *DOMPurify* (Cure53, MIT/Apache) — defence-in-depth sanitisation.
 * *Langium* (TypeFox, MIT) — the language-server framework on which the entire EXPRESS LSP is built.
-* *NIST upstream easyEXPRESS* (`+usnistgov/easy-express+`) — the original LSP and validation infrastructure on which 0.4.0's viewer surfaces are layered.
 
 The ten-example fixture sets in `+test-fixtures/asciimath/+` are extracted from `+sd.iso.org/wg12-step/schemas/resources/+`.
 
 == References
 
+* [[nist-easyexpress]]Krima, S., Barnard Feeney, A., and Astheimer, R. _easyEXPRESS: A Visual Studio Code Extension for ISO 10303-11._ U.S. National Institute of Standards and Technology, 2024.  https://github.com/usnistgov/easy-express.  Public-domain in the U.S. under 17 U.S.C. § 105.
 * DESIGN-viewers-integration.md — internal design protocol document (project repository, root).
+* NOTICE.md — modifications notice required by the NIST Software Licensing Statement (project repository, root).
 * ISO 10303-11:2004 — _Industrial automation systems and integration — Product data representation and exchange — Part 11: Description methods: The EXPRESS language reference manual_.
 * https://github.com/metanorma/annotated-express[Annotated EXPRESS specification] — Metanorma project.
 * https://www.metanorma.org/[Metanorma project] — author's docs.

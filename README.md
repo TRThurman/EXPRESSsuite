@@ -2,7 +2,9 @@
 
 A Visual Studio Code extension that provides language support and rich-content viewers for the [EXPRESS (ISO 10303-11)](https://www.iso.org/standard/38047.html) information modeling language used by ISO TC 184/SC 4 STEP standards.
 
-This is an independently maintained fork of [usnistgov/easy-express](https://github.com/usnistgov/easy-express), originally developed at the National Institute of Standards and Technology (NIST).
+This software is **based on** the NIST-developed [easyEXPRESS](https://github.com/usnistgov/easy-express) (Sylvere Krima, Allison Barnard Feeney, Rosemary Astheimer; U.S. National Institute of Standards and Technology). Pursuant to NIST's [Software Licensing Statement](LICENSE.md), this fork carries a notice of modifications in [`NOTICE.md`](NOTICE.md) and acknowledges NIST as the source of the original software. NIST-developed software is not subject to copyright protection within the United States under 17 U.S.C. § 105.
+
+If you reference, cite, or build on this work, see [§ Citation](#citation) below or the machine-readable [`CITATION.cff`](CITATION.cff).
 
 ## Features
 
@@ -149,9 +151,27 @@ Continuous integration runs the build/lint/test matrix on macOS, Ubuntu, and Win
 
 ## Origin and licensing
 
-The original easyEXPRESS was developed at NIST by Sylvere Krima, Allison Barnard Feeney, and Rosemary Astheimer. The original NIST-developed software is not subject to copyright protection within the United States under 17 U.S.C. Section 105. See [`LICENSE.md`](LICENSE.md) for the original NIST software licensing statement.
+The original **easyEXPRESS** was developed at the U.S. National Institute of Standards and Technology by **Sylvere Krima**, **Allison Barnard Feeney**, and **Rosemary Astheimer**. The original NIST-developed software is not subject to copyright protection within the United States under 17 U.S.C. § 105. The complete NIST Software Licensing Statement is preserved in [`LICENSE.md`](LICENSE.md).
 
-This fork is maintained by Thomas Thurman under the [MIT License](LICENSE).
+In compliance with NIST's stated requirement that *modified works should carry a notice stating that you changed the software and should note the date and nature of any such change*, this repository includes [`NOTICE.md`](NOTICE.md) summarising the modifications since the fork point.
+
+This fork is maintained by **Thomas Thurman** (TRThurman Consulting) under the [MIT License](LICENSE) for code originating in this fork.
+
+## Citation
+
+If you use this software in academic, standards, or regulatory work, please cite both:
+
+**The NIST original** (the substrate this work builds on):
+
+> Krima, S., Barnard Feeney, A., and Astheimer, R. *easyEXPRESS: A Visual Studio Code Extension for ISO 10303-11.* U.S. National Institute of Standards and Technology, 2024. https://github.com/usnistgov/easy-express. Public-domain in the U.S. under 17 U.S.C. § 105.
+
+**This fork** (when the modifications are material to the work cited):
+
+> Thurman, T. *easyEXPRESS Viewers Mirror.* TRThurman Consulting, 2025–. https://github.com/TRThurman/easy-express-mirror. MIT-licensed for code originating in this fork.
+
+A machine-readable [Citation File Format](https://citation-file-format.github.io/) entry is provided as [`CITATION.cff`](CITATION.cff). GitHub renders this as a "Cite this repository" button on the repository home page; tools such as Zenodo and CFF-aware reference managers consume it directly.
+
+> If you have downstream-renamed or rebadged this software (e.g. as a derivative product with a different name), the citation requirement still applies to both the NIST original and this intermediate fork; see [`NOTICE.md`](NOTICE.md) for the chain of attribution.
 
 ## Contributing
 
