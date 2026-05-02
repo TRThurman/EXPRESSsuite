@@ -840,7 +840,7 @@ For each of: `geometry_schema.exp`, `topology_schema.exp`, `mesh_topology_schema
 
 **PowerPoint presentation** (`docs/easyEXPRESS-viewers.pptx`):
 - Audience: WG12 / SC4 stakeholders, EXPRESS schema authors.
-- Length: 10–12 slides.
+- Length: 11–13 slides.
 - Outline:
   1. Problem (raw `(* … *)` comments + raw SVG XML in current tooling)
   2. New capabilities at a glance (4 surfaces, screenshots)
@@ -848,15 +848,16 @@ For each of: `geometry_schema.exp`, `topology_schema.exp`, `mesh_topology_schema
   4. EXPRESS-G hot-spot navigation demo (frame-by-frame)
   5. AsciiMath rendering pipeline (Plurimath same-as-Metanorma)
   6. Architecture (extension host vs webview, security model summary)
-  7. Performance characteristics (numbers from §4.2.2)
-  8. Installation + first-use walkthrough
-  9. Roadmap (math playground polish, latexmath support, customEditor for SVG)
-  10. Q&A / contact
+  7. **Data privacy and confidentiality**: easyEXPRESS makes zero outbound network calls (CSP `connect-src 'none'` in webviews; no `fetch`/`http(s)` import in extension host). However VS Code Insiders ships GitHub Copilot Chat as a **built-in** feature whose **Explain / Add File to Chat / Open Inline Chat / Review** context-menu entries DO send the cursor word, enclosing scope (via DocumentSymbolProvider), surrounding ±N lines, and possibly snippets from other open editors to GitHub/Microsoft endpoints. For pre-publication TC184/SC4 work, sign out of GitHub in VS Code OR set `chat.disableAIFeatures: true` to neutralise the surface entirely. Step-by-step screenshots required.
+  8. Performance characteristics (numbers from §4.2.2)
+  9. Installation + first-use walkthrough
+  10. Roadmap (math playground polish, customEditor for SVG, sibling `[asciimath]`/`[latexmath]` block forms)
+  11. Q&A / contact
 - Use the `pptx-report` skill if present (see CLAUDE.md skills list).
 
 **White paper** (`docs/easyEXPRESS-viewers.adoc` — written in AsciiDoc to dogfood the format):
 - Audience: technical reviewers, integrators considering the extension for their workflow.
-- Length: 8–12 pages.
+- Length: 9–13 pages.
 - Sections:
   1. Abstract (one paragraph; capabilities and scope)
   2. Background — annotated EXPRESS, Metanorma authoring, and the gap the extension fills
@@ -865,9 +866,10 @@ For each of: `geometry_schema.exp`, `topology_schema.exp`, `mesh_topology_schema
   5. Math rendering — Plurimath for description preview, MathJax for hover; rationale for the dual-renderer split with §M3 fixture comparison cited
   6. Bundle and performance — host bundle stays ≤ 1 MB, vendor assets ≤ 5 MB, performance numbers from §4.2.2
   7. Security — concrete mitigations from §1.2.8 (CSP, DOMPurify, `:safe-mode: secure`, isTrusted array form, message validator, resource limits)
-  8. Limitations and future work — latexmath, additional Metanorma constructs, customEditor for SVG, performance under very large schemas
-  9. Acknowledgements (Plurimath, Asciidoctor, MathJax, DOMPurify, Langium, NIST upstream)
-  10. References (DESIGN doc, ISO 10303-11 base spec, Metanorma docs, asciimath.org)
+  8. **Data privacy and confidentiality** — explicit no-outbound posture of easyEXPRESS itself (CSP `connect-src 'none'` in every webview; no `fetch`/`require('http(s)')` in extension host or language server; verifiable with the grep audit cited in §1.2.8.9). Counterpoint: VS Code Insiders bundles GitHub Copilot Chat as a built-in feature whose context-menu entries (Explain / Add File to Chat / Open Inline Chat / Review) send the cursor word, enclosing scope, surrounding lines, and potentially snippets from other open editors to external LLM endpoints. The chapter documents the data flow, names the settings that disable it (`chat.disableAIFeatures`, sign-out from GitHub account icon), and recommends that pre-publication standards work be done in a VS Code window where Copilot Chat is signed out. Includes screenshot of the right-click menu before/after sign-out for unambiguous reader guidance.
+  9. Limitations and future work — additional Metanorma constructs (`[asciimath]`/`[latexmath]` block forms beyond inline), customEditor for SVG, performance under very large schemas, language-server-side annotation index expansion to more workspace types
+  10. Acknowledgements (Plurimath, Asciidoctor, MathJax, DOMPurify, Langium, NIST upstream)
+  11. References (DESIGN doc, ISO 10303-11 base spec, Metanorma docs, asciimath.org)
 - Render to PDF via Metanorma (`metanorma -t standoc-presentation` or `asciidoctor-pdf`) for distribution.
 
 ### 4.3 Phase 4 exit criteria
