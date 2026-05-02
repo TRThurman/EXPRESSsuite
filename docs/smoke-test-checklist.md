@@ -99,6 +99,24 @@ Reload VS Code.  Open `wg12-step/schemas/resources/geometry_schema/geometry_sche
 - Already exercised in dev-host workflow.  Re-run as regression check
   after each Phase 3 commit.
 
+## Performance targets (DESIGN §4.2.2)
+
+The extension instruments key paths with `perf.time()`.  Numbers land in
+the **easyEXPRESS Viewers** OutputChannel as `[perf] <label>: <Nms>`.
+During the smoke test, capture the values and compare to these targets:
+
+| Label | Target | Triggers warning if over |
+|-------|--------|--------------------------|
+| `activate` | ≤ 500 ms typical | 1500 ms |
+| `hover.<word>` | ≤ 100 ms warm, ≤ 250 ms first-with-math | 200 ms |
+| `command.showDescription` | ≤ 600 ms first call, ≤ 200 ms warm | 1000 ms |
+| `command.showExpressG` | ≤ 400 ms | 800 ms |
+| `command.openMathPlayground` | ≤ 200 ms | 500 ms |
+| math-playground render-after-stop-typing | ≤ 200 ms (visible in webview status line) | (manual) |
+
+If a `[perf]` line includes "⚠ over budget", record which one and the
+value in the smoke-test results so we can investigate.
+
 ## Recording results
 
 In `docs/smoke-test-results.md`, append a section per OS run:
@@ -111,6 +129,15 @@ In `docs/smoke-test-results.md`, append a section per OS run:
 - S4 math playground: PASS|FAIL — [notes]
 - S5 cross-schema hover: PASS|FAIL — [notes]
 - S6 single-file mode: PASS|FAIL — [notes]
+
+### Performance numbers (from OutputChannel)
+- activate: <ms>
+- first hover (no math): <ms>
+- first hover (with math): <ms>
+- first showDescription: <ms>
+- first showExpressG: <ms>
+- math playground render: <ms>
+- any "⚠ over budget" entries: [list]
 ```
 
 When all six pass on all three OSes, Phase 4 §4.2.1 is closed.

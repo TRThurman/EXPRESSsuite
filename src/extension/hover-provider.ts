@@ -3,6 +3,7 @@ import type { LanguageClient } from "vscode-languageclient/node.js";
 import { type RemarkAnnotation } from "./annotation-index.js";
 import { getAnnotationIndex, invalidateAnnotationIndex } from "./annotation-client.js";
 import { renderAsciiMathSvgAsync, svgToDataUri } from "./hover-math.js";
+import { time } from "./perf.js";
 
 const HOVER_PREVIEW_CHAR_LIMIT = 360;
 
@@ -93,6 +94,7 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
     const wordRange = document.getWordRangeAtPosition(position, /[A-Za-z_][A-Za-z0-9_]*/);
     if (!wordRange) return undefined;
     const word = document.getText(wordRange);
+    const stop = time(`hover.${word}`);
 
     const idx = await getAnnotationIndex(document, languageClient);
     let matches = idx.byEntityName(word);
@@ -111,7 +113,7 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
         /* server not ready; fall through */
       }
     }
-    if (matches.length === 0) return undefined;
+    if (matches.length === 0) { stop(); return undefined; }
 
     const candidatePaths = new Set<string>();
     for (const m of matches) {
@@ -120,11 +122,11 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
       }
     }
     const path = candidatePaths.size > 0 ? Array.from(candidatePaths)[0] : undefined;
-    if (!path) return undefined;
+    if (!path) { stop(); return undefined; }
 
     const anns = idx.byPath(path);
     const primary = pickPrimary(anns, path);
-    if (!primary) return undefined;
+    if (!primary) { stop(); return undefined; }
 
     // Truncate the source body BEFORE inline transforms so we don't slice in
     // the middle of an xref or a stem:[]. Add a small budget for transform output.
@@ -160,6 +162,7 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
     );
     md.appendMarkdown(`\n\n[Show full description](${showCmd})`);
 
+    stop(/* threshold */ 200);
     return new vscode.Hover(md, wordRange);
   }
 }

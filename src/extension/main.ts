@@ -8,20 +8,24 @@ import { registerHoverProvider } from "./hover-provider.js";
 import { getAnnotationIndex } from "./annotation-client.js";
 import { showDescriptionPreview, showExpressGPreview, openMathPlayground } from "./webviews.js";
 import { initPlurimathPool, shutdownPlurimathPool } from "./plurimath-pool.js";
+import { time } from "./perf.js";
 
 let client: LanguageClient;
 
 // This function is called when the extension is activated.
 export function activate(context: vscode.ExtensionContext): void {
+  const stop = time("activate");
   client = startLanguageClient(context);
   initPlurimathPool(context);
   registerHoverProvider(context, client);
   registerViewerCommands(context);
+  stop(/* threshold */ 1500);
 }
 
 function registerViewerCommands(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand("express.showDescription", async (arg?: { path?: string }) => {
+      const stop = time("command.showDescription");
       const editor = vscode.window.activeTextEditor;
       if (!editor || editor.document.languageId !== "express") {
         vscode.window.showInformationMessage("Place the cursor in an EXPRESS file first.");
@@ -53,9 +57,11 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
         return;
       }
       await showDescriptionPreview(context, primary, editor.document.uri);
+      stop(/* threshold */ 1000);
     }),
 
     vscode.commands.registerCommand("express.showExpressG", async () => {
+      const stop = time("command.showExpressG");
       const editor = vscode.window.activeTextEditor;
       if (!editor || editor.document.languageId !== "express") {
         vscode.window.showInformationMessage("Place the cursor in an EXPRESS file first.");
@@ -198,10 +204,13 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
         }
         return undefined;
       });
+      stop(/* threshold */ 800);
     }),
 
     vscode.commands.registerCommand("express.openMathPlayground", () => {
+      const stop = time("command.openMathPlayground");
       openMathPlayground(context);
+      stop(/* threshold */ 500);
     }),
   );
 }
