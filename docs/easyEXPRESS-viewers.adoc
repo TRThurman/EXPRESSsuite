@@ -1,0 +1,348 @@
+= easyEXPRESS Viewers: Annotated EXPRESS, EXPRESS-G, and Math Rendering in VS Code
+Thomas Thurman <thomas@trthurman.consulting>
+:revdate: 2026-05-02
+:revnumber: 0.4.0
+:doctype: article
+:toc: left
+:toclevels: 2
+:sectnums:
+:sectanchors:
+:icons: font
+:source-highlighter: rouge
+:stem: asciimath
+:imagesdir: images
+
+
+[abstract]
+== Abstract
+
+The easyEXPRESS extension for Visual Studio Code provides language-server support for ISO 10303-11 (EXPRESS) schemas. Version 0.4.0 adds four viewer surfaces that read the *annotated EXPRESS* convention used by ISO TC 184/SC 4 schema authors: rich-text descriptions in named-remark comments, EXPRESS-G diagrams as interactive SVG, AsciiMath and LaTeX math rendered via the Plurimath converter Metanorma uses, and a popup math playground. The extension makes zero outbound network calls; rendering happens entirely on the user's machine. This paper documents the architecture, security model, and operational characteristics of the new surfaces, and explains how to keep pre-publication standards content confidential against unrelated AI-assistant features that ship in the surrounding VS Code editor shell.
+
+
+== Background
+
+ISO 10303-11 (EXPRESS) is the schema language underlying every Standard for Exchange of Product model data published under ISO TC 184/SC 4 (STEP). Schema authors annotate their schemas with prose descriptions, examples, and EXPRESS-G diagrams using the *annotated EXPRESS* convention specified at https://github.com/metanorma/annotated-express[github.com/metanorma/annotated-express]: named-remark comments of the form `+(*"tag" body *)+` where `+tag+` is a dotted path (`+schema_name.entity_name.__note+`) and `+body+` is Metanorma AsciiDoc.
+
+Authors edit schemas as plain `.exp` files, run a separate Metanorma toolchain to render the resulting documents to HTML/PDF/Word, and then return to the editor for the next round. The editing experience itself was minimal: VS Code with the easyEXPRESS extension provided syntax highlighting, definition jumps, references, and validation, but no rendering. A schema author hovering on `point` saw the bare ENTITY declaration with no description; embedded math (`+stem:[RR^m]+`) appeared as raw source text; cross-references rendered as `+<<express:geometry_schema.cartesian_point>>+` rather than navigable links; and EXPRESS-G diagrams stored alongside the `.exp` file appeared as XML when opened.
+
+The 0.4.0 release closes this gap by adding four viewer surfaces inside the editor while preserving the existing language-server features. The surfaces read the same annotated content the Metanorma toolchain consumes, so author-time review matches the eventual published rendering with no separate build step.
+
+
+== Architecture
+
+=== Process layout
+
+easyEXPRESS runs as a standard VS Code extension with three cooperating pieces:
+
+- *Extension host* (Node.js process owned by VS Code). Hosts the language-client, the hover provider, command handlers, and the webview orchestration. Bundle size after esbuild + tree-shake: 780 KB.
+- *Language server* (separate Node.js process spawned by the extension host over IPC). A Langium-based server with custom services for scope, references, validation, and (new in 0.4.0) the annotation index. Bundle size: 1.7 MB.
+- *Webview render targets* (Chromium browser frames hosted inside VS Code). Each viewer surface is its own `+WebviewPanel+` with its own Content Security Policy and message channel.
+
+Math rendering uses two engines:
+
+- *Plurimath* (a Ruby gem compiled to JavaScript via Opal) for the description preview and the math playground. This is the same converter the upstream Metanorma toolchain uses, so the rendering at author time is identical to the eventual published output.
+- *MathJax v4* for the hover surface. Hover popups cannot host MathML or scripts (see <<security>>), so the only viable in-hover render path is a pre-rasterised SVG embedded as a `+data:+` URI in an `+<img>+` tag. MathJax exposes an `+asciimath2svgPromise+` API that returns this directly. The cosmetic mismatch with Plurimath is acknowledged: the hover is a glance preview, not the canonical render.
+
+=== Why Plurimath runs host-side, not in the webview
+
+A natural first design loaded Plurimath into each webview as a vendor asset and called it directly from the controller. This failed at runtime: Plurimath/Opal's module loader emits `+TypeError: r is not a function+` inside `+Opal.modules.parser+` whether bundled by esbuild or imported as native ESM via dynamic `+import()+`. The Opal runtime makes assumptions about the module loader that webview's CSP-constrained `+'unsafe-eval'+` context does not honour.
+
+The actual architecture pre-renders math on the host. When `+showDescription+` opens, the host:
+
+1. Scans the remark body for `+stem:[…]+` and `+latexmath:[…]+` matches.
+2. Sends each match through the Plurimath worker pool (one `+node:worker_threads+` worker, single instance, lazily spawned).
+3. Builds an `+expr → MathML+` map.
+4. Sends the map to the webview as part of the JSON payload.
+
+The webview controller then splices the pre-rendered MathML into the AsciiDoctor output via placeholder substitution. The webview never loads Plurimath; Chromium's native MathML rendering displays the spliced output.
+
+The math playground's interactive case uses a debounced postMessage round-trip to the same host worker pool. End-to-end latency from keystroke to rendered MathML is typically under 100 ms once the worker is warm.
+
+
+[#security]
+== Security
+
+=== Trust boundaries
+
+`.exp` files in the user's workspace are treated as *untrusted data*, on the same trust footing as a Markdown preview's source. Anything they contain — named-remark text, AsciiDoc passthroughs, embedded SVG references, math expressions — is parser input only and is never executed.
+
+[cols="1,2", options="header"]
+|===
+| Trust source | Treatment
+
+| `.exp` file content
+| Untrusted; goes to Asciidoctor (`safe-mode: secure`) and Plurimath/MathJax host-side parsers; renderer input only
+
+| AsciiMath / LaTeX in `stem:[…]` / `latexmath:[…]`
+| Untrusted; parsed in node, never `eval`-ed as code
+
+| Co-located `*.svg` files
+| Untrusted; sanitised via DOMPurify before inline injection
+
+| Math-playground keystrokes
+| Untrusted; debounced; per-expression char-capped at 16 KB
+
+| Hot-spot `targetName` from webview
+| Untrusted; regex-validated `+[A-Za-z_][A-Za-z0-9_.]*+`; no `+/+`, `+\+`, `+..+`
+
+| Webview→host messages
+| Schema-validated; whitelisted command kinds only
+
+| Vendor JS (Asciidoctor, Plurimath, MathJax, DOMPurify)
+| Trusted under exact-version pinning; CSP confines runtime
+|===
+
+=== Webview Content Security Policy
+
+Each viewer surface is its own `+WebviewPanel+` with its own CSP. A compromise of one cannot escalate to another. Both Plurimath/Opal and Asciidoctor.js use runtime-generated function dispatch (`+eval+` and `+new Function+`) inherent to Opal-compiled code, so `+'unsafe-eval'+` is required for the description-preview surface. The math-playground does not run Plurimath in-webview and gets the stricter `+script-src 'self' 'unsafe-eval' 'nonce-…'+` only because of the inline diagnostic shim. The EXPRESS-G preview gets the strictest `+script-src 'self' 'nonce-…'+` — no `+'unsafe-eval'+` at all.
+
+`+connect-src 'none'+` is set in every webview, so even a compromised webview cannot make outbound network requests. See <<privacy>>.
+
+=== Defence-in-depth output sanitisation
+
+Two findings drove explicit sanitisation:
+
+. *SVG content is XSS-capable*. EXPRESS-G hot-spot interaction requires the SVG to be inlined (an `+<img src>+` element does not propagate `+<a href>+` clicks back to JavaScript). Inlined SVG can carry `+<script>+`, `+<foreignObject>+` with HTML, `+javascript:+` URLs, and `+on*+` event handlers. The viewer sanitises every SVG via DOMPurify before injection with an explicit ALLOWED_TAGS / ALLOWED_ATTR allow-list and a URI-scheme regex that permits `+#fragment+`, base64-encoded image data URIs, and bare integer hot-spot indices, but strips all other URI schemes.
+. *Asciidoctor `+:safe-mode: secure+` does not strip `+pass:[…]+` or `++++…+++++` passthroughs*. The empirical test against a `+pass:[<script>alert(1)</script>]+` payload showed the script element appearing verbatim in the output. The viewer therefore applies DOMPurify HTML sanitisation to Asciidoctor output as well, with an allow-list that includes MathML elements (so pre-rendered math survives) and a `+command:+` URI filter that permits only `+vscode.open+` and the extension's own `+express.*+` commands.
+
+=== Hover trust scope
+
+`+MarkdownString.isTrusted+` defaults to `+false+`, in which case `+command:+` URLs do not fire. Setting it to `+true+` allows *any* command, including destructive ones such as `+workbench.action.terminal.sendSequence+`. The viewer uses the array form:
+
+[source,typescript]
+----
+md.isTrusted = {
+  enabledCommands: [
+    "vscode.open",
+    "express.showDescription",
+    "express.showExpressG",
+  ],
+};
+----
+
+so the hover's "Show full description" link can fire `+express.showDescription+` but no other commands.
+
+=== Resource limits
+
+Pathological AsciiMath inputs (deeply nested constructs, repeated subscripts) can drive Plurimath into long parses. The host enforces:
+
+[cols="2,1,2", options="header"]
+|===
+| Limit | Value | Mitigates
+
+| per-expression chars | 16 384 | character bombs
+| stems per description | 500 | per-document amplification
+| stems per hover | 32 | belt-and-suspenders (hover is char-capped at 360)
+| MathJax LRU cache size | 1 000 entries | unbounded memory growth across sessions
+| async render timeout (MathJax) | 2 000 ms | pathological async parses
+| sync Plurimath isolation | worker thread, terminate-on-timeout | event-loop blocking
+|===
+
+The Plurimath synchronous JS API cannot be cancelled mid-evaluation. Wrapping it in a `+node:worker_threads+` worker is the only way to enforce a hard timeout: when 2 seconds elapse, the host terminates the worker and respawns a fresh one for the next request. The character cap is the first-line defence; the worker termination is the second.
+
+
+[#privacy]
+== Data privacy and confidentiality
+
+=== easyEXPRESS makes zero outbound network calls
+
+This is verifiable in three independent ways:
+
+. Every webview the extension creates carries CSP `+connect-src 'none'+`. Chromium refuses every `+fetch+`, `+XMLHttpRequest+`, and WebSocket from inside the webview. A compromised webview cannot exfiltrate.
+. The extension host source contains no `+fetch+` invocations, no `+http+`/`+https+` requires, no telemetry or analytics SDKs:
++
+[source]
+----
+$ grep -rE 'fetch\(|require\(.https?.\)|@?(amplitude|mixpanel|sentry|segment|datadog)' src/
+(no output)
+----
+. The language server runs as a child Node process over local IPC (`+TransportKind.ipc+` in `+src/extension/main.ts+`) and is subject to the same audit.
+
+The Plurimath and MathJax workers operate on AsciiMath strings in node and produce MathML strings as output; neither makes network calls in the configurations the extension uses (`+input/asciimath+` + `+output/svg+` for MathJax, `+toMathml+` for Plurimath). Vendor packages are pinned to exact versions in `+package.json+` and verified by `+npm audit+`.
+
+=== The surrounding editor is not silent
+
+VS Code Insiders ships *GitHub Copilot Chat* as a built-in feature. It is not removed by `+--disable-extensions+` because it is integrated into the editor shell rather than installed as an extension. Its right-click context-menu entries — *Add File to Chat*, *Open Inline Chat*, *Explain*, *Review* — appear above the easyEXPRESS entries on every `.exp` file.
+
+When a user clicks *Explain* with the cursor on `+point+`:
+
+. Copilot Chat takes the selection if any, or the cursor word otherwise.
+. It asks VS Code's `+DocumentSymbolProvider+` for the enclosing scope. easyEXPRESS implements this provider, so for `+point+` the enclosing scope is the entire `+ENTITY point ... END_ENTITY;+` block.
+. It includes a window of surrounding source lines (the exact byte budget is not publicly documented; observed values are in the 20–50-line range).
+. With `+github.copilot.chat.useProjectContext+` enabled (its default in recent VS Code releases), Copilot may attach snippets from *other open editors* in the workspace.
+. The combined prompt is sent to GitHub/Microsoft endpoints (typically `+api.githubcopilot.com+`).
+
+For pre-publication TC 184/SC 4 content under non-disclosure, this is the kind of data egress the project teams need to be explicit about.
+
+=== Recommended workflow for confidential schemas
+
+Two complementary mitigations:
+
+* *Sign out of GitHub in the affected VS Code window.* Click the account icon (silhouette) in the bottom-left, choose Sign Out. Without authentication Copilot Chat cannot reach its API. The menu entries remain visible but clicking them errors locally; no outbound traffic.
+* *Set `+chat.disableAIFeatures: true+`* in the workspace settings (`+.vscode/settings.json+`) for the schema repository. Recent VS Code releases honour this as a hard switch. Combine with sign-out for redundancy.
+
+The published recommendation in the project README is: *use a separate, signed-out VS Code window for any pre-publication standards work*. This is independent of easyEXPRESS itself, but is the most consequential single piece of advice the project has for its audience.
+
+
+== Hot-spot navigation
+
+=== Annotated-EXPRESS `+[.svgmap]+` blocks
+
+Every `+__expressg+` named-remark in the wg12-step corpus follows the same shape:
+
+[source,asciidoc]
+----
+(*"geometry_schema.__expressg"
+[[geometry_schema_expg4]]
+[.svgmap]
+====
+image::geometry_schemaexpg4.svg[]
+
+* <<express:geometry_schema.point_in_volume>>; 27
+* <<express:geometry_schema.spherical_point>>; 28
+* <<express:geometry_schema.point_on_curve>>; 29
+* <<express:geometry_schema.polar_point>>; 30
+...
+====
+*)
+----
+
+The bullet entries map *integer hot-spot indices* (28, 29, 30, …) to *qualified entity tags*. The corresponding SVG file contains anchor elements `+<a href="N"><rect …/></a>+` whose `+href+` values are these same integers; the rectangles are invisible overlays on top of the diagram boxes.
+
+=== Implementation
+
+The annotation index parser walks every `+__expressg+` remark, runs two regexes against the body — one for `+image::*.svg[]+` and one for the bullet entries `+* <<express:tag>>; N+` — and emits `+{ svgFile, entities, hotspotMap }+` triples. The map is per-diagram.
+
+When the user invokes *Show EXPRESS-G Diagram*, the host:
+
+. Determines which SVG the user wants. If the cursor word matches an entity in any `+[.svgmap]+`, the picker narrows to those SVGs (often a single result — direct open).
+. Reads the SVG file from disk and runs DOMPurify with the SVG profile.
+. Builds an HTML page that inlines the sanitised SVG, scoped to a webview with CSP `+script-src 'self' 'nonce-…'+` (no `+'unsafe-eval'+` needed).
+. Sends the hotspotMap as part of the payload.
+. The webview controller attaches a click handler to every `+<a href="N">+` whose `+href+` is an integer; on click, it looks up the entity in the hotspot map, validates the result, and posts a `+{ kind: "navigate", targetName }+` message to the host.
+
+=== Resolver
+
+The host's xref resolver tries the language server first via the custom LSP request `+express/resolveEntity?{name, schemaHint?}+`. The server iterates `+IndexManager.allElements()+`, matches by simple name, and (if a schemaHint is provided) restricts to descriptions whose `+documentUri.path+` ends with `+/<schemaHint>.exp+`. On no LSP match — a common case in dev-host single-file mode without a workspace folder — the host falls back to a four-stage filesystem scan:
+
+. Same file as the active editor.
+. Sibling-schema directory `+../<schemaHint>/<schemaHint>.exp+`.
+. Grandparent directory walk (covers the wg12-step `+schemas/resources/+` layout).
+. `+vscode.workspace.findFiles+` over `+**/*.exp+` (only useful when a workspace is open).
+
+Path components from the entity tag are validated for emptiness and `+.+`/`+..+`/separator characters before any `+path.join+` to defend against malicious tags inside untrusted `.exp` content.
+
+
+== Math rendering
+
+=== Three candidates, one chosen
+
+Phase 0 reconnaissance evaluated three rendering paths against ten fixture expressions extracted from `+geometry_schema.exp+`:
+
+[cols="2,1,1,2", options="header"]
+|===
+| Renderer | Bundle (gz) | Metanorma fidelity | Failure modes
+
+| Plurimath JS (Opal-compiled) | ~480 KB | full — same converter Metanorma uses | webview-incompatible (Opal `eval` semantics)
+| MathJax v4 (input/asciimath + output/svg) | ~270 KB | partial — ASCIIMathML 1.4.7 only | misses some Metanorma extensions
+| KaTeX + asciimath2tex shim | ~325 KB | partial — LaTeX intermediate, custom command gaps | requires `\abs`/`\langle` macro definitions
+|===
+
+Plurimath was chosen for description preview because the Metanorma project will publish the same documents the schemas eventually go into, and matching that toolchain at author time is a hard product requirement. MathJax is used in the hover surface only because hovers cannot host MathML or scripts (see <<security>>), and MathJax's SVG-output path produces a self-contained `+<svg>+` element suitable for a `+data:+` URI inside an `+<img>+` element. The two-engine split is a deliberate trade-off, not an oversight.
+
+=== Test fixtures
+
+`+test-fixtures/asciimath/+` contains feature-diversity-aware extracts from each canonical schema:
+
+[cols="2,1,1,1", options="header"]
+|===
+| Schema | stem:[…] | latexmath:[…] | Examples extracted
+
+| geometry_schema | 754 | 0 | 10
+| topology_schema | 95 | 0 | 10
+| mesh_topology_schema | 64 | 0 | 10
+| presentation_appearance_schema | 13 | 0 | 10
+| equations_schema | 62 | 82 | 10
+|===
+
+The extractor scans for `+stem:[…]+` (and, for equations_schema, `+latexmath:[…]+`), classifies each by feature flags (Greek, fraction, subscript, function, inequality, …), and greedy-picks ten that maximise feature coverage. The `+render-comparison.html+` artifact for `+geometry_schema+` shows all three renderers' output side-by-side; visual inspection confirmed they agree on every fixture.
+
+=== LaTeX (latexmath:[…]) handling
+
+The `+equations_schema.exp+` file is the corpus's outlier — 82 `+latexmath:[…]+` instances alongside 62 `+stem:[…]+`. Plurimath natively accepts `+'latex'+` as its second-argument format, so the host worker pool is parameterised: `+renderMath(expr, "asciimath" | "latex")+`. The description-preview pre-render step scans both regexes and tags each match with its format. LaTeX expressions render as MathML alongside AsciiMath expressions in the same panel, with no quality gap.
+
+
+== Bundle and performance
+
+=== Distribution shape
+
+After Phase 3 hardening, the published `.vsix` (8.3 MB raw, 195 files) breaks down as:
+
+[cols="2,1,3", options="header"]
+|===
+| Category | Size | Notes
+
+| Extension host (`+out/extension/main.js+`) | 780 KB | single CJS bundle from esbuild
+| Language server (`+out/language/main.js+`) | 1.7 MB | Langium services + grammar
+| Plurimath worker | 4 KB | tiny shim; loads `+@plurimath/plurimath+` from node_modules at runtime
+| Webview controllers | ~12 KB | three IIFE bundles
+| Webview vendor assets | ~3.9 MB | Asciidoctor.js (ESM), DOMPurify, Plurimath dist
+| `+node_modules/@plurimath/plurimath+` | ~3 MB | external runtime; not bundled
+| `+node_modules/mathjax+` | ~2 MB | external runtime; not bundled
+| Other (manifests, language config, snippets) | ~50 KB |
+|===
+
+The extension host bundle is the relevant working-set figure for VS Code activation cost. Worker thread spawn is lazy: cost is paid only on first math render.
+
+=== Performance instrumentation
+
+Every user-facing path is wrapped in a `+perf.time(label)+` call that emits to the *easyEXPRESS Viewers* OutputChannel. Targets and warning thresholds (the threshold flags an "⚠ over budget" entry):
+
+[cols="2,1,1", options="header"]
+|===
+| Path | Target | Warn at
+
+| `+activate+` | ≤ 500 ms typical | 1 500 ms
+| `+hover.<word>+` warm | ≤ 100 ms | 200 ms
+| `+hover.<word>+` first-with-math | ≤ 250 ms | 200 ms (frequent over-budget on first hover, expected)
+| `+command.showDescription+` first call | ≤ 600 ms | 1 000 ms
+| `+command.showExpressG+` | ≤ 400 ms | 800 ms
+| `+command.openMathPlayground+` | ≤ 200 ms | 500 ms
+| math playground render-after-stop-typing | ≤ 200 ms | (in-webview status line)
+|===
+
+Cold-start activation does not load Plurimath, MathJax, or any webview. The first hover with math triggers MathJax initialisation (~100 ms cost), which is cached for subsequent hovers in an LRU keyed by the AsciiMath source string.
+
+== Limitations and future work
+
+* *Block-form math*. Inline `+stem:[…]+` and `+latexmath:[…]+` are supported; the block forms `+[stem]+` … `+++++…+++++` and `+[asciimath]+`/`+[latexmath]+` open-blocks are not yet recognised. The extractor and renderer do not pick them up. Not currently a corpus issue (the wg12-step schemas use only the inline form), but worth tracking.
+* *EXPRESS-G `+customEditor+` registration*. VS Code 1.97+ renders `.svg` files natively in the built-in image preview, which is fine for simple inspection. Registering the easyEXPRESS-G viewer as a `+customEditor+` with `+priority: option+` would give the user "Reopen with EXPRESS-G Viewer" in the right-click menu of any `.svg` file in their workspace. Currently the viewer is only reachable via the `+express.showExpressG+` command from a `.exp` file.
+* *Performance under very large schemas*. The annotation index walks the CST on every parse. For schemas with thousands of named-remarks (none observed in the wg12-step corpus, but plausibly in domain-specific extensions), the per-parse cost may need to drop to incremental updates.
+* *Cross-extension API*. The upstream `+asciidoctor.asciidoctor-vscode+` extension exposes no public API. If it ever publishes one, easyEXPRESS could delegate AsciiDoc rendering to it and avoid maintaining its own Asciidoctor.js bundle.
+* *Hover math fidelity*. MathJax in hover does not match Plurimath in description preview. The two engines render the wg12-step fixture set equivalently, but Metanorma-specific extensions (`+|:+`, `+:|+`, `+bii+`) may diverge for some inputs. The "Show full description" link in every hover gives the user one-click access to the canonical render.
+
+== Acknowledgements
+
+The viewer surfaces stand on the shoulders of:
+
+* *Plurimath* (Ribose, BSD-2-Clause) — the math conversion library that underpins Metanorma's authoring pipeline.
+* *Asciidoctor.js* (`+@asciidoctor/core+`, MIT) — the reference AsciiDoc renderer.
+* *MathJax v4* (Apache-2.0) — for the hover-side AsciiMath-to-SVG path.
+* *DOMPurify* (Cure53, MIT/Apache) — defence-in-depth sanitisation.
+* *Langium* (TypeFox, MIT) — the language-server framework on which the entire EXPRESS LSP is built.
+* *NIST upstream easyEXPRESS* (`+usnistgov/easy-express+`) — the original LSP and validation infrastructure on which 0.4.0's viewer surfaces are layered.
+
+The ten-example fixture sets in `+test-fixtures/asciimath/+` are extracted from `+sd.iso.org/wg12-step/schemas/resources/+`.
+
+== References
+
+* DESIGN-viewers-integration.md — internal design protocol document (project repository, root).
+* ISO 10303-11:2004 — _Industrial automation systems and integration — Product data representation and exchange — Part 11: Description methods: The EXPRESS language reference manual_.
+* https://github.com/metanorma/annotated-express[Annotated EXPRESS specification] — Metanorma project.
+* https://www.metanorma.org/[Metanorma project] — author's docs.
+* https://www.plurimath.org/[Plurimath] — converter project.
+* https://asciimath.org/[AsciiMath] — base specification (per-page BNF).
+* https://docs.asciidoctor.org/asciidoc/latest/stem/stem/[Asciidoctor STEM syntax] — `stem:[]` and `[stem]` forms.
+* https://docs.mathjax.org/en/latest/input/asciimath.html[MathJax v4 AsciiMath input documentation].
+* https://github.com/cure53/DOMPurify[DOMPurify].
+* https://langium.org/[Langium] — language workbench.
