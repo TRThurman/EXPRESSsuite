@@ -108,4 +108,25 @@ describe("validateMessage", () => {
   test("rejects log message exceeding 1024 chars", () => {
     expect(validateMessage({ kind: "log", level: "info", message: "x".repeat(1025) })).toBeNull();
   });
+
+  test("accepts renderMath with valid id and expr", () => {
+    expect(validateMessage({ kind: "renderMath", id: 1, expr: "x^2" })).toEqual({
+      kind: "renderMath",
+      id: 1,
+      expr: "x^2",
+    });
+  });
+
+  test("rejects renderMath with non-integer id", () => {
+    expect(validateMessage({ kind: "renderMath", id: "1", expr: "x^2" })).toBeNull();
+    expect(validateMessage({ kind: "renderMath", id: 1.5, expr: "x^2" })).toBeNull();
+    expect(validateMessage({ kind: "renderMath", id: -1, expr: "x^2" })).toBeNull();
+    expect(validateMessage({ kind: "renderMath", id: NaN, expr: "x^2" })).toBeNull();
+  });
+
+  test("rejects renderMath with empty or oversized expr", () => {
+    expect(validateMessage({ kind: "renderMath", id: 1, expr: "" })).toBeNull();
+    expect(validateMessage({ kind: "renderMath", id: 1, expr: "x".repeat(16385) })).toBeNull();
+    expect(validateMessage({ kind: "renderMath", id: 1, expr: "x".repeat(16384) })).not.toBeNull();
+  });
 });

@@ -276,7 +276,6 @@ export function openMathPlayground(context: vscode.ExtensionContext): void {
     },
   );
   const ctrl = panel.webview.asWebviewUri(controllerJs(context, "math-playground"));
-  const plurimathUrl = panel.webview.asWebviewUri(vendor(context, "plurimath", "index.js")).toString();
   const n = nonce();
   const cspSrc = panel.webview.cspSource;
 
@@ -310,10 +309,9 @@ export function openMathPlayground(context: vscode.ExtensionContext): void {
 </div>
 <div class="panes">
   <textarea id="src" spellcheck="false" placeholder="Type AsciiMath, e.g.  sum_(i=1)^n i^3=((n(n+1))/2)^2">sum_(i=1)^n i^3=((n(n+1))/2)^2</textarea>
-  <div id="out">Loading…</div>
+  <div id="out">Ready.</div>
 </div>
-<script type="application/json" id="payload">${JSON.stringify({ plurimathUrl })}</script>
-<script type="module" src="${ctrl}" nonce="${n}"></script>
+<script src="${ctrl}" nonce="${n}"></script>
 </body>
 </html>`;
 
@@ -328,8 +326,32 @@ export function openMathPlayground(context: vscode.ExtensionContext): void {
       } else {
         vscode.window.showInformationMessage("No active EXPRESS editor to insert into.");
       }
+    } else if (msg.kind === "renderMath") {
+      const result = renderMathOnHost(msg.expr);
+      panel.webview.postMessage({
+        kind: "mathRendered",
+        id: msg.id,
+        mathml: result.mathml,
+        error: result.error,
+      });
     } else if (msg.kind === "log") {
       logMessage("mathPlayground", msg.level, msg.message);
     }
   });
+}
+
+/** Synchronous Plurimath render for math playground round-trips. */
+function renderMathOnHost(expr: string): { mathml?: string; error?: string } {
+  if (expr.length > 16_384) return { error: "expression exceeds 16 KB" };
+  let Plurimath: any;
+  try {
+    Plurimath = require("@plurimath/plurimath").default;
+  } catch (err) {
+    return { error: `Plurimath unavailable: ${(err as Error).message}` };
+  }
+  try {
+    return { mathml: new Plurimath(expr, "asciimath").toMathml() };
+  } catch (err) {
+    return { error: (err as Error).message };
+  }
 }
