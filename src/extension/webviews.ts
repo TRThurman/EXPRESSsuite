@@ -41,6 +41,12 @@ function logMessage(surface: string, level: string, message: string): void {
   ch.appendLine(`[${ts}] [${surface} ${level}] ${message}`);
   if (level === "error") {
     ch.show(true);
+    // §3.2.5d: surface user-actionable errors in a toast, not just the
+    // OutputChannel. Keep the toast text short.
+    void vscode.window.showErrorMessage(
+      `easyEXPRESS ${surface}: ${message.length > 200 ? message.slice(0, 200) + "…" : message}`,
+      "Show Output",
+    ).then((picked) => { if (picked === "Show Output") ch.show(); });
   }
 }
 
@@ -161,6 +167,11 @@ export async function showDescriptionPreview(
       localResourceRoots: localResourceRoots(context, sourceUri),
     },
   );
+
+  // §3.2.5: paint a loading state immediately so the panel isn't blank
+  // while host-side Plurimath pre-render is in flight.
+  panel.webview.html = loadingHtml(panel.webview, ann.tag);
+
   const baseDirUri = vscode.Uri.file(path.dirname(sourceUri.fsPath));
   panel.webview.html = await descriptionHtml(context, panel.webview, ann, baseDirUri);
 
@@ -171,6 +182,31 @@ export async function showDescriptionPreview(
       logMessage("descriptionPreview", msg.level, msg.message);
     }
   });
+}
+
+function loadingHtml(webview: vscode.Webview, tag: string): string {
+  const cspSrc = webview.cspSource;
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src ${cspSrc} 'unsafe-inline';">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 24px;
+         color: var(--vscode-descriptionForeground); background: var(--vscode-editor-background); }
+  h1 { font-size: 14px; margin: 0 0 12px; opacity: 0.7; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor;
+             border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;
+             vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head><body>
+<h1>${escapeHtml(tag)}</h1>
+<div><span class="spinner"></span>Rendering description…</div>
+</body></html>`;
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
 }
 
 /* ----- EXPRESS-G SVG preview -------------------------------------------- */

@@ -95,7 +95,22 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
     const word = document.getText(wordRange);
 
     const idx = await getAnnotationIndex(document, languageClient);
-    const matches = idx.byEntityName(word);
+    let matches = idx.byEntityName(word);
+    if (matches.length === 0 && languageClient) {
+      // §3.2.5c — workspace-wide lookup for cross-schema hovers. The active
+      // file may not contain the description; e.g. hovering `cartesian_point`
+      // in a downstream schema where the description lives in geometry_schema.
+      try {
+        const remote = (await languageClient.sendRequest("express/findAnnotationsForEntity", {
+          entityName: word,
+        })) as Array<{ uri: string; annotation: RemarkAnnotation }>;
+        if (Array.isArray(remote) && remote.length > 0) {
+          matches = remote.map((r) => r.annotation);
+        }
+      } catch {
+        /* server not ready; fall through */
+      }
+    }
     if (matches.length === 0) return undefined;
 
     const candidatePaths = new Set<string>();

@@ -17,6 +17,12 @@ connection.onRequest("express/getAnnotations", (params: { uri: string }) => {
   return shared.workspace.AnnotationIndex.getAnnotations(params.uri);
 });
 
+connection.onRequest("express/findAnnotationsForEntity", (params: { entityName: string }) => {
+  if (!params || typeof params.entityName !== "string") return [];
+  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(params.entityName)) return [];
+  return shared.workspace.AnnotationIndex.findByEntityName(params.entityName);
+});
+
 connection.onRequest(
   "express/resolveEntity",
   (params: { name: string; schemaHint?: string }) => {

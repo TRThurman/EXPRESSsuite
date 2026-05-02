@@ -95,6 +95,23 @@ export class ExpressP11AnnotationIndex {
     const key = typeof uri === "string" ? uri : uri.toString();
     return this.index.get(key) ?? [];
   }
+
+  /**
+   * Find annotations across every indexed document whose tag has
+   * `entityName` as the second segment (i.e. `*.entityName` or
+   * `*.entityName.__*`). Used by hover provider for cross-schema lookup.
+   */
+  findByEntityName(entityName: string): Array<{ uri: string; annotation: ServerRemarkAnnotation }> {
+    const out: Array<{ uri: string; annotation: ServerRemarkAnnotation }> = [];
+    for (const [uri, anns] of this.index) {
+      for (const ann of anns) {
+        if (ann.parts.length >= 2 && ann.parts[1] === entityName) {
+          out.push({ uri, annotation: ann });
+        }
+      }
+    }
+    return out;
+  }
 }
 
 function isHiddenMlComment(node: CstNode): boolean {
