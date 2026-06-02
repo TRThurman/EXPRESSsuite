@@ -61,7 +61,7 @@
     "vitest": "^3.2.4"
   },
   "engines": {
-    "vscode": "^1.67.0",
+    "vscode": "^1.82.0",
     "node": ">=16.0.0"
   },
   "categories": [
