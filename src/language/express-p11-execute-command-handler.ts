@@ -1,4 +1,5 @@
-import { AbstractExecuteCommandHandler, ExecuteCommandAcceptor, interruptAndCheck } from "langium";
+import { interruptAndCheck } from "langium";
+import { AbstractExecuteCommandHandler, ExecuteCommandAcceptor } from "langium/lsp";
 import { ExpressP11SharedServices } from "./express-module.js";
 import { ExpressP11DocumentBuilder } from "./express-p11-document-builder.js";
 import { CancellationToken } from "vscode-languageserver";

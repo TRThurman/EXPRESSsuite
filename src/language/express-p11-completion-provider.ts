@@ -1,12 +1,15 @@
 import {
   AstNodeDescription,
+  MaybePromise,
+} from "langium";
+import type { ReferenceInfo } from "langium";
+import {
   CompletionAcceptor,
   CompletionContext,
-  CompletionValueItem,
+  type CompletionValueItem,
   DefaultCompletionProvider,
-  MaybePromise,
   NextFeature,
-} from "langium";
+} from "langium/lsp";
 import { CompletionItemKind } from "vscode-languageserver";
 import {
   Attribute_decl,
@@ -23,51 +26,53 @@ import {
 
 export class ExpressP11CompletionProvider extends DefaultCompletionProvider {
   protected override createReferenceCompletionItem(
-    nodeDescription: AstNodeDescription
+    nodeDescription: AstNodeDescription,
+    _refInfo: ReferenceInfo,
+    _context: CompletionContext
   ): CompletionValueItem {
     let kind: CompletionItemKind;
     let detail: string = "";
     let documentation: string = "";
-    let processedNode = {
+    const processedNode = {
       type: nodeDescription.type,
       node: nodeDescription.node,
     };
-    if (processedNode.type === Resource_or_rename) {
+    if (processedNode.type === Resource_or_rename.$type) {
       if (nodeDescription.node)
         processedNode.type =
           (nodeDescription.node as Resource_or_rename).resource.ref?.$type ??
           "";
     }
     switch (processedNode.type) {
-      case SchemaDefinition:
+      case SchemaDefinition.$type:
         kind = CompletionItemKind.Module;
         detail = "Schema";
         break;
-      case EntityDefinition:
+      case EntityDefinition.$type:
         kind = CompletionItemKind.Class;
         detail = "Entity";
         documentation = nodeDescription.node?.$container?.$cstNode?.text ?? "";
         break;
-      case TypeDefinition:
+      case TypeDefinition.$type:
         kind = CompletionItemKind.Variable;
         detail = "Type";
         break;
-      case Parameter_id:
-      case Variable_id:
+      case Parameter_id.$type:
+      case Variable_id.$type:
         kind = CompletionItemKind.Variable;
         detail = "Variable";
         break;
-      case FunctionDefinition:
+      case FunctionDefinition.$type:
         kind = CompletionItemKind.Function;
         //const returnType = (nodeDescription.node as Function_head).returnType.$cstNode?.text;
         detail = "Function";
         break;
-      case Attribute_decl:
-      case Attribute_id:
+      case Attribute_decl.$type:
+      case Attribute_id.$type:
         kind = CompletionItemKind.Property;
         detail = "Attribute";
         break;
-      case Constant_body:
+      case Constant_body.$type:
         kind = CompletionItemKind.Constant;
         detail = "Constant";
         break;

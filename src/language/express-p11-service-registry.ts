@@ -4,15 +4,14 @@ import { ExpressP11Services } from "./express-module.js";
 
 export class ExpressP11ServiceRegistry extends DefaultServiceRegistry {
   getTypeContainer(): ExpressP11TypeContainer | undefined {
-    if (this.singleton !== undefined) {
-      return (this.singleton as ExpressP11Services).validation.TypeContainer;
-    }
-    if (this.map === undefined) {
-      return;
-    }
-
-    const services = this.map["exp"];
+    const services = this.fileExtensionMap.get("exp");
     if (!services) {
+      // Fall back: try to find any registered service
+      for (const svc of this.all) {
+        if ((svc as ExpressP11Services).validation?.TypeContainer) {
+          return (svc as ExpressP11Services).validation.TypeContainer;
+        }
+      }
       return;
     }
     return (services as ExpressP11Services).validation.TypeContainer;

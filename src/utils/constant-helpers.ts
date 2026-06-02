@@ -17,7 +17,7 @@ import { ExpressKind, getDocumentSymbol } from "./general.js";
  */
 export const getConstantDocumentSymbols = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
-  var constantDeclarations = getConstantDeclarations(schema);
+  const constantDeclarations = getConstantDeclarations(schema);
   if (constantDeclarations) {
     constantDeclarations.forEach((t) => {
       const symbol = getConstantDocumentSymbol(t);
@@ -37,7 +37,7 @@ export const getConstantDocumentSymbols = (schema: SchemaDefinition): DocumentSy
 export const getConstantDeclarations = (schema: SchemaDefinition): Constant_body[] | undefined => {
   if (!schemaHasConstants(schema)) return;
 
-  var constantDeclarations = schema.body.constant?.items;
+  const constantDeclarations = schema.body.constant?.items;
   return constantDeclarations?.filter((c) => c.name);
 };
 

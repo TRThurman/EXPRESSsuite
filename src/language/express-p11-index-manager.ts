@@ -1,5 +1,4 @@
-import { AstNode, DefaultIndexManager, LangiumDocument, equalURI } from "langium";
-import { URI } from "vscode-uri";
+import { DefaultIndexManager } from "langium";
 
 export class ExpressP11IndexManager extends DefaultIndexManager {
   //   protected override isAffected(document: LangiumDocument<AstNode>, changed: URI): boolean {

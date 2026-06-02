@@ -1,4 +1,4 @@
-import { AstNode, MultiMap, getContainerOfType } from "langium";
+import { AstNode, AstUtils, MultiMap } from "langium";
 import { ExpressP11MemoPool, MemoQuery, MemoType } from "./express-p11-memo-pool.js";
 import {
   Attribute_decl,
@@ -19,7 +19,6 @@ import {
   isNamed_types,
   isSchemaDefinition,
   isSelect_extension,
-  isSelect_list,
   isSelect_type,
 } from "./generated/ast.js";
 import { NIL, v4 as uuidv4 } from "uuid";
@@ -527,7 +526,7 @@ export class ExpressP11ParameterTypeResolver {
     schemas: Map<string, ExpressP11Schema>,
     memoPool: ExpressP11MemoPool = new ExpressP11MemoPool()
   ): ExpressP11ParameterTypeResolution {
-    const schema = getContainerOfType(attribute, isSchemaDefinition);
+    const schema = AstUtils.getContainerOfType(attribute, isSchemaDefinition);
     if (!schema || !schema.name) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
     const schemaObj = schemas.get(schema.name);
     if (!schemaObj) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
@@ -615,7 +614,7 @@ export class ExpressP11OptimizedResourceList {
 
   public findByName(name: string): Definition | undefined {
     let result: Definition | undefined;
-    this.resource.forEach((v, k) => {
+    this.resource.forEach((v) => {
       if (v.has(name)) result = v.get(name);
     });
     return result;
@@ -651,8 +650,8 @@ export class ExpressP11OptimizedAttributeList {
     if (name.length > 0) {
       return this.resource.get(graphKey)?.get(name) ?? [];
     } else {
-      let result: Attribute_decl[] = [];
-      this.resource.get(graphKey)?.forEach((attributes, name) => {
+      const result: Attribute_decl[] = [];
+      this.resource.get(graphKey)?.forEach((attributes) => {
         result.push(...attributes);
       });
       return result;

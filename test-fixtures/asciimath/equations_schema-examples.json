@@ -1,0 +1,127 @@
+{
+  "source": "/Users/tom/test_git/sd.iso.org/wg12-step/schemas/resources/equations_schema/equations_schema.exp",
+  "total_found": 62,
+  "selected": 10,
+  "examples": [
+    {
+      "line": 423,
+      "column": 60,
+      "raw": "bb(M L^2//T^2)",
+      "context_before": "",
+      "context_after": "| *moment_y* | latexmath:[M_y = \\vec{M} \\cdot \\hat{e}_y] | stem:[bb(M L^2//T^2)]",
+      "features": [
+        "has_function",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 424,
+      "column": 60,
+      "raw": "bb(M L^2//T^2)",
+      "context_before": "| *moment_x* | latexmath:[M_x = \\vec{M} \\cdot \\hat{e}_x] | stem:[bb(M L^2//T^2)]",
+      "context_after": "| *moment_z* | latexmath:[M_z = \\vec{M} \\cdot \\hat{e}_z] | stem:[bb(M L^2//T^2)]",
+      "features": [
+        "has_function",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 425,
+      "column": 60,
+      "raw": "bb(M L^2//T^2)",
+      "context_before": "| *moment_y* | latexmath:[M_y = \\vec{M} \\cdot \\hat{e}_y] | stem:[bb(M L^2//T^2)]",
+      "context_after": "| *moment_r* | latexmath:[M_r = \\vec{M} \\cdot \\hat{e}_{r}] | stem:[bb(M L^2//T^2)]",
+      "features": [
+        "has_function",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 426,
+      "column": 62,
+      "raw": "bb(M L^2//T^2)",
+      "context_before": "| *moment_z* | latexmath:[M_z = \\vec{M} \\cdot \\hat{e}_z] | stem:[bb(M L^2//T^2)]",
+      "context_after": "| *moment_theta* | latexmath:[M_\\theta = \\vec{M} \\cdot \\theta] | stem:[bb(M L^2//T^2)]",
+      "features": [
+        "has_function",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 427,
+      "column": 66,
+      "raw": "bb(M L^2//T^2)",
+      "context_before": "| *moment_r* | latexmath:[M_r = \\vec{M} \\cdot \\hat{e}_{r}] | stem:[bb(M L^2//T^2)]",
+      "context_after": "| *moment_phi* | latexmath:[M_\\phi = \\vec{M} \\cdot \\phi] | stem:[bb(M L^2//T^2)]",
+      "features": [
+        "has_function",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 428,
+      "column": 60,
+      "raw": "bb(M L^2//T^2)",
+      "context_before": "| *moment_theta* | latexmath:[M_\\theta = \\vec{M} \\cdot \\theta] | stem:[bb(M L^2//T^2)]",
+      "context_after": "| *moment_xi* | latexmath:[M_\\xi = \\vec{M} \\cdot \\hat{e}_{\\xi}] | stem:[bb(M L^2//T^2)]",
+      "features": [
+        "has_function",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 429,
+      "column": 67,
+      "raw": "bb(M L^2//T^2)",
+      "context_before": "| *moment_phi* | latexmath:[M_\\phi = \\vec{M} \\cdot \\phi] | stem:[bb(M L^2//T^2)]",
+      "context_after": "| *moment_eta* | latexmath:[M_\\eta = \\vec{M} \\cdot \\hat{e}_{\\eta}] | stem:[bb(M L^2//T^2)]",
+      "features": [
+        "has_function",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 430,
+      "column": 70,
+      "raw": "bb(M L^2//T^2)",
+      "context_before": "| *moment_xi* | latexmath:[M_\\xi = \\vec{M} \\cdot \\hat{e}_{\\xi}] | stem:[bb(M L^2//T^2)]",
+      "context_after": "| *moment_zeta* | latexmath:[M_\\zeta = \\vec{M} \\cdot \\hat{e}_{\\zeta}] | stem:[bb(M L^2//T^2)]",
+      "features": [
+        "has_function",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 439,
+      "column": 18,
+      "raw": "C_L",
+      "context_before": "| *drag* | stem:[D] or latexmath:[D'] | stem:[bb(M L//T^2)]",
+      "context_after": "| *coef_drag*\t | stem:[C_D] or stem:[c_d] | -",
+      "features": [
+        "has_subscript",
+        "is_short"
+      ]
+    },
+    {
+      "line": 541,
+      "column": 70,
+      "raw": "bb(ML//(T^2 Theta))",
+      "context_before": "| *temperature_reference*\t | latexmath:[T_{\\textrm{ref}}] | stem:[bb Theta]",
+      "context_after": "| *Sutherland_constant_conductivity* | latexmath:[T_{s}] | stem:[bb Theta]",
+      "features": [
+        "has_function",
+        "has_greek",
+        "has_paren_group",
+        "has_superscript"
+      ]
+    }
+  ]
+}

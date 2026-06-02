@@ -1,7 +1,5 @@
 import { MultiMap } from "langium";
 import {
-  Definition,
-  DefinitionType,
   ExpressP11Entity,
   ExpressP11OptimizedResourceList,
   ExpressP11ParameterTypeResolution,

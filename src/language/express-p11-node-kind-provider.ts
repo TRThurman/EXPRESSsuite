@@ -1,4 +1,5 @@
-import { AstNode, AstNodeDescription, NodeKindProvider } from "langium";
+import { AstNode, AstNodeDescription } from "langium";
+import type { NodeKindProvider } from "langium/lsp";
 import { SymbolKind, CompletionItemKind } from "vscode-languageserver";
 import { isAttribute_id, isEntityDefinition, isFunctionDefinition, isSchemaDefinition, isTypeDefinition } from "./generated/ast.js";
 import { ExpressKind } from "../utils/general.js";

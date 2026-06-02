@@ -1,5 +1,79 @@
 # Changelog
 
+## [0.4.0] (2026-05-02)
+
+### Features
+
+- **Description preview**: AsciiDoc renderer for `(*"tag" body *)` named-remark
+  comments in EXPRESS schemas. Renders Metanorma constructs (cross-refs,
+  emphasis, listings, tables) and embedded math via Plurimath → MathML →
+  Chromium-native rendering.
+- **EXPRESS-G SVG preview**: interactive viewer for `<schema>expg<N>.svg`
+  diagrams with hot-spot navigation. Click a labeled box to jump to the
+  entity's source declaration. The diagram picker narrows to SVGs that
+  reference the cursor entity.
+- **AsciiMath playground**: live-render webview that converts AsciiMath
+  input to MathML (debounced ~200 ms after last keystroke). "Insert at
+  cursor" pastes the source as `stem:[…]` into the active EXPRESS file.
+- **Hover provider**: rich `MarkdownString` hovers showing the named-remark
+  description of the entity at the cursor, with `<<express:…>>` xrefs
+  rendered as clickable command-links and `stem:[…]` rendered as inline
+  SVG (via MathJax v4). Cross-schema lookup falls back to a workspace-wide
+  annotation index.
+- Three new commands and two context-menu entries:
+  - `easyEXPRESS: Show Description`
+  - `easyEXPRESS: Show EXPRESS-G Diagram`
+  - `easyEXPRESS: Open AsciiMath Playground`
+
+### Architecture
+
+- New language-server-side `ExpressP11AnnotationIndex` service walks the CST
+  for hidden `ML_COMMENT` tokens on each parse and maintains a per-document
+  annotation map. Exposed via custom LSP requests `express/getAnnotations`
+  and `express/findAnnotationsForEntity`.
+- New custom LSP request `express/resolveEntity` uses Langium's
+  `IndexManager.allElements()` for entity-name → source-location lookup
+  (used for EXPRESS-G hot-spot navigation). Falls back to a filesystem
+  scan for files the language server has not yet indexed.
+- Plurimath rendering runs in an isolated `node:worker_threads` worker with
+  a 2-second per-render timeout. Hung renders terminate the worker; the
+  next call respawns it.
+- Webview vendor assets ship as native ESM under `out/webview/vendor/`;
+  controllers load them via dynamic `import()`. Math rendering happens
+  host-side because the Opal-runtime backed Plurimath cannot be bundled by
+  esbuild and cannot run inside a webview's CSP `unsafe-eval` context —
+  the resulting MathML is sent to the webview through the JSON payload.
+
+### Security model
+
+Per-surface webview isolation with strict CSP, `unsafe-eval` confined to
+surfaces that need it. SVG sanitized via DOMPurify with explicit tag/attr
+allow-list and a URI-scheme filter that permits the EXPRESS-G
+integer-href hot-spot convention while stripping `javascript:`,
+`data:text/html`, etc. Asciidoctor runs with `:safe-mode: secure`; output
+is also DOMPurified because secure mode does not strip `pass:[]` /
+`+++…+++` passthroughs. `MarkdownString.isTrusted` uses the array form to
+whitelist only `vscode.open` and `express.*` commands. Webview→host
+messages are schema-validated; resource limits cap per-expression and
+per-document math work to prevent DoS via pathological input.
+
+### Tests
+
+- 73 tests (was 42) covering remark parsing, message validation, and
+  defense-in-depth security mitigations (SVG sanitization, Asciidoctor
+  passthrough stripping, MathML preservation, command-URI whitelisting).
+- Renderer comparison fixtures for geometry_schema, topology_schema,
+  mesh_topology_schema, presentation_appearance_schema, and
+  equations_schema in `test-fixtures/asciimath/`.
+
+### Dependencies
+
+- Added (runtime, exact-pinned): `@asciidoctor/core@3.0.4`,
+  `@plurimath/plurimath@0.2.2`, `dompurify@3.4.2`, `mathjax@4.1.1`.
+- `@plurimath/plurimath` and `mathjax` are esbuild externals; they ship
+  in `node_modules` of the published `.vsix` (whitelisted in
+  `.vscodeignore`).
+
 ## [0.3.4](https://github.com/usnistgov/easy-express/compare/0.3.3...0.3.4) (2024-01-24)
 
 

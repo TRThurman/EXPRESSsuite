@@ -23,7 +23,7 @@ import { CustomExpressDescription } from "../language/express-p11-scope-provider
 
 export const getFunctionDocumentSymbols = (schema: SchemaDefinition): DocumentSymbol[] => {
   const symbols: DocumentSymbol[] = [];
-  var funcDeclarations = getFunctionDeclarations(schema);
+  const funcDeclarations = getFunctionDeclarations(schema);
   if (funcDeclarations) {
     funcDeclarations.forEach((t) => {
       const symbol = getFunctionDocumentSymbol(t);
@@ -38,7 +38,7 @@ export const getFunctionDocumentSymbols = (schema: SchemaDefinition): DocumentSy
 export const getFunctionDeclarations = (schema: SchemaDefinition): FunctionDefinition[] | undefined => {
   if (!schema) return;
 
-  var typeDeclarations = schema.body.declarations.filter((d) => isFunctionDefinition(d)) as FunctionDefinition[];
+  const typeDeclarations = schema.body.declarations.filter((d) => isFunctionDefinition(d)) as FunctionDefinition[];
   return typeDeclarations.filter((f) => f.head && f.name);
 };
 
@@ -84,10 +84,10 @@ export const nodeIsStmtWithVariable = (stmt: AstNode): boolean => {
 
 export const extractVariableFromStmt = (stmt: AstNode): Variable_id | undefined => {
   switch (stmt.$type) {
-    case Repeat_stmt:
+    case Repeat_stmt.$type:
       const repeatStmt = stmt as Repeat_stmt;
       return repeatStmt.control.increment?.var;
-    case Query_expression:
+    case Query_expression.$type:
       const query = stmt as Query_expression;
       return query.variable;
   }

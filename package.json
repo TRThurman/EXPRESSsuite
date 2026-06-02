@@ -2,18 +2,18 @@
   "name": "easyexpress",
   "displayName": "easyEXPRESS",
   "description": "EXPRESS language support for Visual Studio Code",
-  "homepage": "https://github.com/usnistgov/easyexpress-public/",
+  "homepage": "https://github.com/TRThurman/easy-express-mirror",
   "bugs": {
-    "url": "https://github.com/usnistgov/easyexpress-public/issues"
+    "url": "https://github.com/TRThurman/easy-express-mirror/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TRThurman/easy-express-mirror.git"
   },
   "preview": true,
-  "publisher": "usnistgov",
-  "license": "See License.txt",
-  "icon": "nist_logo.png",
-  "version": "0.3.4",
-  "files": [
-    "bin"
-  ],
+  "publisher": "TRThurman",
+  "license": "MIT",
+  "version": "0.4.0",
   "type": "module",
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base",
@@ -21,7 +21,7 @@
     "build": "tsc -b tsconfig.json && node esbuild.mjs",
     "clean": "rm -rf out dist src/language/generated && echo '🧹 Clean complete'",
     "watch": "concurrently -n tsc,esbuild -c blue,yellow \"tsc -b tsconfig.json --watch\" \"node esbuild.mjs --watch\"",
-    "lint": "eslint src --ext ts",
+    "lint": "eslint src",
     "langium:generate": "langium generate",
     "langium:watch": "langium generate --watch",
     "test": "vitest --reporter=verbose",
@@ -34,35 +34,36 @@
     "rebuild:full": "npm run clean:deep && npm install && langium generate && npm run build && npm test",
     "release-pre": "release-it --preRelease --ci",
     "release": "release-it --ci"
-},
-
-
-
-
+  },
   "dependencies": {
+    "@asciidoctor/core": "3.0.4",
+    "@plurimath/plurimath": "0.2.2",
     "chalk": "~5.6.2",
     "commander": "~10.0.0",
-    "uuidv4": "^6.2.13",
+    "dompurify": "3.4.2",
+    "mathjax": "4.1.1",
+    "uuid": "^14.0.0",
     "vscode-languageclient": "~9.0.1"
   },
   "devDependencies": {
-    "@release-it/conventional-changelog": "^8.0.1",
+    "@release-it/conventional-changelog": "^11.0.0",
     "@types/node": "^24.7.1",
     "@types/vscode": "~1.107.0",
-    "@typescript-eslint/eslint-plugin": "~5.62.0",
-    "@typescript-eslint/parser": "~5.62.0",
-    "concurrently": "^7.6.0",
+    "concurrently": "^9.2.1",
     "esbuild": "^0.27.1",
-    "eslint": "~8.33.0",
-    "langium": "^2.1.3",
-    "langium-cli": "^2.1.0",
-    "release-it": "^17.1.1",
+    "eslint": "~9.27",
+    "happy-dom": "20.9.0",
+    "jsdom": "26.1.0",
+    "langium": "^4.2.2",
+    "langium-cli": "^4.2.1",
+    "release-it": "^20.0.1",
     "typescript": "~5.9.3",
+    "typescript-eslint": "~8.59",
     "vitest": "^3.2.4"
   },
   "engines": {
-    "vscode": "^1.82.0",
-    "node": ">=16.0.0"
+    "vscode": "^1.107.0",
+    "node": ">=22.0.0"
   },
   "categories": [
     "Programming Languages"
@@ -78,8 +79,47 @@
         "command": "express.buildGraph",
         "title": "Generate type graphs",
         "category": "easyEXPRESS"
+      },
+      {
+        "command": "express.showDescription",
+        "title": "Show Description",
+        "category": "easyEXPRESS"
+      },
+      {
+        "command": "express.showExpressG",
+        "title": "Show EXPRESS-G Diagram",
+        "category": "easyEXPRESS"
+      },
+      {
+        "command": "express.openMathPlayground",
+        "title": "Open AsciiMath Playground",
+        "category": "easyEXPRESS"
+      },
+      {
+        "command": "express.sendSelectionToMathPlayground",
+        "title": "Send Selection to AsciiMath Playground",
+        "category": "easyEXPRESS"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "express.showDescription",
+          "when": "editorLangId == express",
+          "group": "navigation@1"
+        },
+        {
+          "command": "express.showExpressG",
+          "when": "editorLangId == express",
+          "group": "navigation@2"
+        },
+        {
+          "command": "express.sendSelectionToMathPlayground",
+          "when": "editorLangId == express && editorHasSelection",
+          "group": "navigation@3"
+        }
+      ]
+    },
     "configuration": {
       "title": "easyEXPRESS language server",
       "properties": {
@@ -156,7 +196,7 @@
   "activationEvents": [
     "workspaceContains:**/*.exp"
   ],
-  "main": "./out/extension/main.cjs",
+  "main": "./out/extension/main.js",
   "bin": {
     "express-cli": "./bin/cli.js"
   }

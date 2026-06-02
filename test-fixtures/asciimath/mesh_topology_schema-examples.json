@@ -1,0 +1,106 @@
+{
+  "source": "/Users/tom/test_git/sd.iso.org/wg12-step/schemas/resources/mesh_topology_schema/mesh_topology_schema.exp",
+  "total_found": 64,
+  "selected": 10,
+  "examples": [
+    {
+      "line": 429,
+      "column": 112,
+      "raw": "(i)",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_paren_group",
+        "is_short"
+      ]
+    },
+    {
+      "line": 697,
+      "column": 31,
+      "raw": "i = 5, j = 4, k = 3",
+      "context_before": "[[figure-mesh_topology_schema-fig6]]",
+      "context_after": "image::images/fig06.svg[]",
+      "features": []
+    },
+    {
+      "line": 705,
+      "column": 31,
+      "raw": "i = 5, j = 4, k = 3",
+      "context_before": "[[figure-mesh_topology_schema-fig8]]",
+      "context_after": "image::images/fig08.svg[]",
+      "features": []
+    },
+    {
+      "line": 709,
+      "column": 29,
+      "raw": "i = 5, j = 4, k = 3",
+      "context_before": "[[figure-mesh_topology_schema-fig9]]",
+      "context_after": "image::images/fig09.svg[]",
+      "features": []
+    },
+    {
+      "line": 713,
+      "column": 31,
+      "raw": "i = 5, j = 4, k = 3",
+      "context_before": "[[figure-mesh_topology_schema-fig10]]",
+      "context_after": "image::images/fig10.svg[]",
+      "features": []
+    },
+    {
+      "line": 1139,
+      "column": 1,
+      "raw": "n = 1 -> i_{min}",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_arrow",
+        "has_function",
+        "has_subscript"
+      ]
+    },
+    {
+      "line": 1139,
+      "column": 25,
+      "raw": "n = 2 -> i_{max}",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_arrow",
+        "has_function",
+        "has_subscript"
+      ]
+    },
+    {
+      "line": 1141,
+      "column": 1,
+      "raw": "n = 3 -> j_{min}",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_arrow",
+        "has_function",
+        "has_subscript"
+      ]
+    },
+    {
+      "line": 1147,
+      "column": 37,
+      "raw": "II xx JJ xx KK",
+      "context_before": "====",
+      "context_after": "",
+      "features": [
+        "has_cross"
+      ]
+    },
+    {
+      "line": 1221,
+      "column": 66,
+      "raw": "jk(i - 1) - (i - 2)(j - 1)",
+      "context_before": "| 2 | stem:[ij] | stem:[j(i - 1) + 1] | stem:[j(i - 1) + 1] | stem:[j(i - 1) + 1]",
+      "context_after": "|===",
+      "features": [
+        "has_paren_group"
+      ]
+    }
+  ]
+}

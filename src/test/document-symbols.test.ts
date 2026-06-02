@@ -48,9 +48,9 @@ describe("Symbol provider", async () => {
       assert: (symbols: DocumentSymbol[]) => {
         expect(symbols[0].name).toBe("Nist");
 
-        expect(symbols[0].children?.find((c) => c.name === "TSelect")).toBeDefined;
-        expect(symbols[0].children?.find((c) => c.name === "EntA")).toBeDefined;
-        expect(symbols[0].children?.find((c) => c.name === "EntB")).toBeDefined;
+        expect(symbols[0].children?.find((c) => c.name === "TSelect")).toBeDefined();
+        expect(symbols[0].children?.find((c) => c.name === "EntA")).toBeDefined();
+        expect(symbols[0].children?.find((c) => c.name === "EntB")).toBeDefined();
       },
     });
   });

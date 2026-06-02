@@ -1,14 +1,13 @@
 import {
   AstNode,
+  AstUtils,
   ConfigurationProvider,
   DocumentState,
   LangiumDocument,
   LangiumDocuments,
   MultiMap,
   NameProvider,
-  getContainerOfType,
   interruptAndCheck,
-  streamAllContents,
 } from "langium";
 import { ExpressP11Services } from "./express-module.js";
 import {
@@ -52,13 +51,6 @@ type ConcreteType = {
   local: boolean;
   node: EntityDefinition;
   foreignSchema?: string;
-};
-
-type ConcreteAttribute = {
-  name: string;
-  node: Attribute_decl;
-  types: SubSuperTypeDefinition[];
-  unresolvedType: string;
 };
 
 type SubSuperTypeDefinition = {
@@ -182,12 +174,11 @@ export class ExpressP11TypeContainer {
     for (const schema of file.schemas) {
       await interruptAndCheck(cancelToken);
       const localTypes = sink.localTypes.get(schema.name);
-      const imports = sink.imports.get(schema.name);
       const allAvailable = this.getAllResourceDefinitionFrom(sink, schema.name);
       for (const eType of localTypes) {
         await interruptAndCheck(cancelToken);
         if (this.hasSuperTypes(eType.node)) {
-          for (const supertype of eType.node.types.supertypes?.entities!) {
+          for (const supertype of eType.node.types.supertypes!.entities!) {
             const supertypeName = supertype.entity.$refText;
             const supertypeObject = allAvailable.find((def) => def.name === supertypeName);
             if (supertypeObject) eType.supertypes.push(supertypeObject);
@@ -207,7 +198,7 @@ export class ExpressP11TypeContainer {
 
       for (const entity of schema.getEntities().values()) {
         if (this.hasSuperTypes(entity.getNode())) {
-          for (const supertype of entity.getNode().types.supertypes?.entities!) {
+          for (const supertype of entity.getNode().types.supertypes!.entities!) {
             const supertypeName = supertype.entity.$refText;
 
             const supertypeDefinition = allAvailable.resources.get(DefinitionType.Entity)?.get(supertypeName);
@@ -222,8 +213,6 @@ export class ExpressP11TypeContainer {
   }
 
   protected async resolveSubTypes(cancelToken: CancellationToken): Promise<void> {
-    const tempoSubTypes = new MultiMap<string, SubSuperTypeDefinition>();
-    const tempSystem = new MultiMap<string, ConcreteType>();
     for (const schema of this.localEntities.keys()) {
       await interruptAndCheck(cancelToken);
       for (const eType of this.localEntities.get(schema)) {
@@ -385,7 +374,7 @@ export class ExpressP11TypeContainer {
     //this.getFullSubSuperGraph(entity).forEach((e) => this.getAttributesV2(e).forEach((a) => attributes.push(a)));
     // for (const key of this.getFullSubSuperGraph(entity)) {
     //   const ename = key.name;
-    //   const sname = getContainerOfType(key, isSchemaDefinition)?.name;
+    //   const sname = AstUtils.getContainerOfType(key, isSchemaDefinition)?.name;
     //   this.memoizedAttributesCall.set(`${ename}.${sname}`, attributes);
     // }
     //this.memoizedAttributesCall.set(memoKey.toString(), attributes);
@@ -399,7 +388,7 @@ export class ExpressP11TypeContainer {
     const attributes: Attribute_decl[] = [];
     if (!type.node.body) return [];
 
-    for (const elt of streamAllContents(type.node.body)) {
+    for (const elt of AstUtils.streamAllContents(type.node.body)) {
       if (isAttribute_decl(elt)) attributes.push(elt);
     }
 
@@ -409,14 +398,14 @@ export class ExpressP11TypeContainer {
     const attributes: Attribute_decl[] = [];
     if (!entity.body) return [];
 
-    for (const elt of streamAllContents(entity.body)) {
+    for (const elt of AstUtils.streamAllContents(entity.body)) {
       if (isAttribute_decl(elt)) attributes.push(elt);
     }
 
     return attributes;
   }
   //   protected async extractAttributes(schema: string, type: ConcreteType, cancelToken: CancellationToken): Promise<void> {
-  //     for (const elt of streamAllContents(type.node.body)) {
+  //     for (const elt of AstUtils.streamAllContents(type.node.body)) {
   //       await interruptAndCheck(cancelToken);
   //       if (isAttribute_decl(elt)) {
   //         if (isExplicit_attr(elt.$container) || isDerived_attr(elt.$container) || isInverse_attr(elt.$container)) {
@@ -500,7 +489,7 @@ export class ExpressP11TypeContainer {
   }
 
   public getSuperTypesFromDefinition(entity: EntityDefinition): EntityDefinition[] {
-    const schema = getContainerOfType(entity, isSchemaDefinition);
+    const schema = AstUtils.getContainerOfType(entity, isSchemaDefinition);
     if (!schema) {
       //   console.log(`No schema found for ${entity.name}`);
       return [];
@@ -516,7 +505,7 @@ export class ExpressP11TypeContainer {
   }
 
   public getSubTypesFromDefinition(entity: EntityDefinition): EntityDefinition[] {
-    const schema = getContainerOfType(entity, isSchemaDefinition);
+    const schema = AstUtils.getContainerOfType(entity, isSchemaDefinition);
     if (!schema) {
       return [];
     }
@@ -540,11 +529,10 @@ export class ExpressP11TypeContainer {
   }
 
   getExpressP11EntityFrom(entity: EntityDefinition): ExpressP11Entity | undefined {
-    const schema = getContainerOfType(entity, isSchemaDefinition);
+    const schema = AstUtils.getContainerOfType(entity, isSchemaDefinition);
     if (!schema || !schema.name) {
       return;
     }
-    const key = `${schema}.${entity.name}`;
     const expressSchema = this.schemas.get(schema!.name);
     if (!expressSchema) return;
 

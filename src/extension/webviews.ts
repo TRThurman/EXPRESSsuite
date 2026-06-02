@@ -1,0 +1,404 @@
+import * as vscode from "vscode";
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
+import type { RemarkAnnotation } from "./annotation-index.js";
+import { validateMessage } from "./webview-message.js";
+import { renderMath, renderMathBatch } from "./plurimath-pool.js";
+
+/* DESIGN §1.2.8.10 resource limits — see also hover-math.ts. */
+const MAX_EXPR_CHARS = 16_384;
+const MAX_STEMS_PER_DOCUMENT = 500;
+
+/**
+ * Host-side AsciiMath / LaTeX → MathML via the Plurimath worker pool
+ * (§3.2.4, §3.2.6). Both `stem:[…]` (default AsciiMath in Metanorma) and
+ * `latexmath:[…]` are scanned; Plurimath natively accepts either as input.
+ */
+const STEM_RE = /stem:\[((?:\\.|[^\]])*)\]/g;
+const LATEXMATH_RE = /latexmath:\[((?:\\.|[^\]])*)\]/g;
+async function prerenderMath(body: string): Promise<Record<string, string>> {
+  const exprs = new Map<string, "asciimath" | "latex">();
+  let dropped = 0;
+
+  const collect = (re: RegExp, fmt: "asciimath" | "latex") => {
+    re.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(body)) !== null) {
+      if (m[1].length > MAX_EXPR_CHARS) { dropped++; continue; }
+      // First scan wins on collision (the source can't really collide since
+      // stem:[] and latexmath:[] are syntactically distinct).
+      if (!exprs.has(m[1])) exprs.set(m[1], fmt);
+      if (exprs.size >= MAX_STEMS_PER_DOCUMENT) return;
+    }
+  };
+  collect(STEM_RE, "asciimath");
+  collect(LATEXMATH_RE, "latex");
+
+  if (dropped > 0) {
+    logMessage("descriptionPreview", "warn", `dropped ${dropped} math expression(s) exceeding ${MAX_EXPR_CHARS} chars`);
+  }
+  if (exprs.size === 0) return {};
+  return renderMathBatch(exprs);
+}
+
+let logChannel: vscode.OutputChannel | undefined;
+function getLog(): vscode.OutputChannel {
+  if (!logChannel) {
+    logChannel = vscode.window.createOutputChannel("easyEXPRESS Viewers");
+  }
+  return logChannel;
+}
+function logMessage(surface: string, level: string, message: string): void {
+  const ch = getLog();
+  const ts = new Date().toISOString().slice(11, 23);
+  ch.appendLine(`[${ts}] [${surface} ${level}] ${message}`);
+  if (level === "error") {
+    ch.show(true);
+    // §3.2.5d: surface user-actionable errors in a toast, not just the
+    // OutputChannel. Keep the toast text short.
+    void vscode.window.showErrorMessage(
+      `easyEXPRESS ${surface}: ${message.length > 200 ? message.slice(0, 200) + "…" : message}`,
+      "Show Output",
+    ).then((picked) => { if (picked === "Show Output") ch.show(); });
+  }
+}
+
+/* ----- Shared CSP / nonce helpers --------------------------------------- */
+
+function nonce(): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let out = "";
+  for (let i = 0; i < 32; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  return out;
+}
+
+function localResourceRoots(context: vscode.ExtensionContext, docUri?: vscode.Uri): vscode.Uri[] {
+  const roots: vscode.Uri[] = [context.extensionUri];
+  if (docUri) {
+    const folder = vscode.workspace.getWorkspaceFolder(docUri);
+    if (folder) roots.push(folder.uri);
+    else roots.push(vscode.Uri.file(path.dirname(docUri.fsPath)));
+  }
+  return roots;
+}
+
+function vendor(context: vscode.ExtensionContext, ...segments: string[]): vscode.Uri {
+  return vscode.Uri.joinPath(context.extensionUri, "out", "webview", "vendor", ...segments);
+}
+
+function controllerJs(context: vscode.ExtensionContext, name: string): vscode.Uri {
+  return vscode.Uri.joinPath(context.extensionUri, "out", "webview", `${name}.js`);
+}
+
+/* ----- Description preview ---------------------------------------------- */
+
+async function descriptionHtml(
+  context: vscode.ExtensionContext,
+  webview: vscode.Webview,
+  ann: RemarkAnnotation,
+  baseDirUri: vscode.Uri,
+): Promise<string> {
+  const n = nonce();
+  const cspSrc = webview.cspSource;
+  const asciidoctorCss = webview.asWebviewUri(vendor(context, "asciidoctor.css"));
+  const asciidoctorUrl = webview.asWebviewUri(vendor(context, "asciidoctor.js")).toString();
+  const dompurifyUrl = webview.asWebviewUri(vendor(context, "dompurify.mjs")).toString();
+  const ctrl = webview.asWebviewUri(controllerJs(context, "description-preview"));
+  const baseHref = webview.asWebviewUri(baseDirUri).toString();
+
+  // Pre-render all stem:[…] expressions on the host via Plurimath (node-side
+  // works; the Opal runtime is fragile inside webview's import() context).
+  // Send the {expr → MathML} map to the webview so the controller never needs
+  // to load Plurimath itself.
+  const mathRenders = await prerenderMath(ann.body);
+
+  const payload = JSON.stringify({
+    tag: ann.tag,
+    body: ann.body,
+    baseHref,
+    asciidoctorUrl,
+    dompurifyUrl,
+    mathRenders,
+  });
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none';
+               script-src ${cspSrc} 'unsafe-eval' 'nonce-${n}';
+               style-src ${cspSrc} 'unsafe-inline';
+               img-src ${cspSrc} data: https:;
+               font-src ${cspSrc};
+               connect-src 'none';">
+<link rel="stylesheet" href="${asciidoctorCss}">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; padding: 16px; max-width: 900px; }
+  body { color: var(--vscode-editor-foreground); background: var(--vscode-editor-background); }
+  pre { background: var(--vscode-editorWidget-background); padding: 8px; }
+  math { font-size: 1.1em; }
+  a { color: var(--vscode-textLink-foreground); }
+  .err { color: var(--vscode-errorForeground); }
+  h1 { font-size: 16px; color: var(--vscode-descriptionForeground); margin-top: 0; }
+</style>
+</head>
+<body>
+<h1 id="tag"></h1>
+<div id="content">Loading…</div>
+<script type="application/json" id="payload">${payload}</script>
+<script nonce="${n}">
+  (function() {
+    const vscode = acquireVsCodeApi();
+    window.__vscode = vscode;
+    vscode.postMessage({ kind: "log", level: "info", message: "html parsed, about to load controller" });
+    window.addEventListener("error", function (ev) {
+      vscode.postMessage({ kind: "log", level: "error", message: "window error: " + ev.message + " at " + (ev.filename || "?") + ":" + (ev.lineno || "?") + " — " + (ev.error && ev.error.stack ? String(ev.error.stack).slice(0, 800) : "no stack") });
+    });
+    window.addEventListener("unhandledrejection", function (ev) {
+      vscode.postMessage({ kind: "log", level: "error", message: "unhandled rejection: " + (ev.reason && ev.reason.message ? ev.reason.message : String(ev.reason)) });
+    });
+  })();
+</script>
+<script type="module" src="${ctrl}" nonce="${n}" onerror="window.__vscode && window.__vscode.postMessage({ kind: 'log', level: 'error', message: 'controller script failed to load (404 or CSP blocked)' });"></script>
+</body>
+</html>`;
+}
+
+export async function showDescriptionPreview(
+  context: vscode.ExtensionContext,
+  ann: RemarkAnnotation,
+  sourceUri: vscode.Uri,
+): Promise<void> {
+  const panel = vscode.window.createWebviewPanel(
+    "express.descriptionPreview",
+    `Description · ${ann.tag}`,
+    vscode.ViewColumn.Beside,
+    {
+      enableScripts: true,
+      retainContextWhenHidden: true,
+      localResourceRoots: localResourceRoots(context, sourceUri),
+    },
+  );
+
+  // §3.2.5: paint a loading state immediately so the panel isn't blank
+  // while host-side Plurimath pre-render is in flight.
+  panel.webview.html = loadingHtml(panel.webview, ann.tag);
+
+  const baseDirUri = vscode.Uri.file(path.dirname(sourceUri.fsPath));
+  panel.webview.html = await descriptionHtml(context, panel.webview, ann, baseDirUri);
+
+  panel.webview.onDidReceiveMessage((raw) => {
+    const msg = validateMessage(raw);
+    if (!msg) return;
+    if (msg.kind === "log") {
+      logMessage("descriptionPreview", msg.level, msg.message);
+    }
+  });
+}
+
+function loadingHtml(webview: vscode.Webview, tag: string): string {
+  const cspSrc = webview.cspSource;
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src ${cspSrc} 'unsafe-inline';">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 24px;
+         color: var(--vscode-descriptionForeground); background: var(--vscode-editor-background); }
+  h1 { font-size: 14px; margin: 0 0 12px; opacity: 0.7; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor;
+             border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;
+             vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head><body>
+<h1>${escapeHtml(tag)}</h1>
+<div><span class="spinner"></span>Rendering description…</div>
+</body></html>`;
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+}
+
+/* ----- EXPRESS-G SVG preview -------------------------------------------- */
+
+export async function showExpressGPreview(
+  context: vscode.ExtensionContext,
+  svgUri: vscode.Uri,
+  schemaSourceUri: vscode.Uri,
+  hotspotMap: Record<string, string>,
+  resolveTarget: (name: string) => Promise<{ uri: vscode.Uri; range: vscode.Range } | undefined>,
+): Promise<void> {
+  const panel = vscode.window.createWebviewPanel(
+    "express.expressGPreview",
+    `EXPRESS-G · ${path.basename(svgUri.fsPath)}`,
+    vscode.ViewColumn.Beside,
+    {
+      enableScripts: true,
+      retainContextWhenHidden: true,
+      localResourceRoots: localResourceRoots(context, schemaSourceUri),
+    },
+  );
+
+  const svgText = await fs.readFile(svgUri.fsPath, "utf8");
+  const ctrl = panel.webview.asWebviewUri(controllerJs(context, "expressg-preview"));
+  const dompurifyUrl = panel.webview.asWebviewUri(vendor(context, "dompurify.mjs")).toString();
+  const n = nonce();
+  const cspSrc = panel.webview.cspSource;
+  const payload = JSON.stringify({ svg: svgText, dompurifyUrl, hotspotMap });
+
+  panel.webview.html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none';
+               script-src ${cspSrc} 'nonce-${n}';
+               style-src ${cspSrc} 'unsafe-inline';
+               img-src ${cspSrc} data:;
+               connect-src 'none';">
+<style>
+  body { margin: 0; background: var(--vscode-editor-background); }
+  #host { width: 100vw; height: 100vh; overflow: auto; padding: 16px; box-sizing: border-box; }
+  #host svg { max-width: 100%; height: auto; cursor: default; }
+  #host a[href] { cursor: pointer; }
+</style>
+</head>
+<body>
+<div id="host">Rendering…</div>
+<script type="application/json" id="payload">${payload}</script>
+<script type="module" src="${ctrl}" nonce="${n}"></script>
+</body>
+</html>`;
+
+  panel.webview.onDidReceiveMessage(async (raw) => {
+    const msg = validateMessage(raw);
+    if (!msg) return;
+    if (msg.kind === "navigate") {
+      const target = await resolveTarget(msg.targetName);
+      if (target) {
+        const editor = await vscode.window.showTextDocument(target.uri, {
+          selection: target.range,
+          preview: true,
+          viewColumn: vscode.ViewColumn.One,
+        });
+        editor.revealRange(target.range, vscode.TextEditorRevealType.InCenter);
+      } else {
+        vscode.window.showInformationMessage(`No definition found for ${msg.targetName}`);
+      }
+    } else if (msg.kind === "log") {
+      logMessage("expressGPreview", msg.level, msg.message);
+    }
+  });
+}
+
+/* ----- Math playground -------------------------------------------------- */
+
+/**
+ * Reuse a single math-playground panel across calls — opening "Send selection
+ * to math playground" five times in a row should overwrite the same panel,
+ * not stack up five.
+ */
+let mathPlaygroundPanel: vscode.WebviewPanel | undefined;
+
+export function openMathPlayground(context: vscode.ExtensionContext, seed?: string): void {
+  if (mathPlaygroundPanel) {
+    mathPlaygroundPanel.reveal(vscode.ViewColumn.Beside);
+    if (seed !== undefined) {
+      mathPlaygroundPanel.webview.postMessage({ kind: "setSource", text: seed });
+    }
+    return;
+  }
+  const panel = vscode.window.createWebviewPanel(
+    "express.mathPlayground",
+    "AsciiMath Playground",
+    vscode.ViewColumn.Beside,
+    {
+      enableScripts: true,
+      retainContextWhenHidden: true,
+      localResourceRoots: [context.extensionUri],
+    },
+  );
+  mathPlaygroundPanel = panel;
+  panel.onDidDispose(() => { mathPlaygroundPanel = undefined; });
+  if (seed !== undefined) {
+    // Defer the postMessage until the controller has registered its listener.
+    // The controller logs "math playground ready"; piggy-back on the first log.
+    let seeded = false;
+    const sub = panel.webview.onDidReceiveMessage((m: unknown) => {
+      if (seeded) return;
+      const ok = typeof m === "object" && m !== null && (m as { kind?: string }).kind === "log";
+      if (!ok) return;
+      seeded = true;
+      panel.webview.postMessage({ kind: "setSource", text: seed });
+      sub.dispose();
+    });
+  }
+  const ctrl = panel.webview.asWebviewUri(controllerJs(context, "math-playground"));
+  const n = nonce();
+  const cspSrc = panel.webview.cspSource;
+
+  panel.webview.html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none';
+               script-src ${cspSrc} 'unsafe-eval' 'nonce-${n}';
+               style-src ${cspSrc} 'unsafe-inline';
+               connect-src 'none';">
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: var(--vscode-editor-foreground); background: var(--vscode-editor-background); }
+  .panes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; height: 100vh; box-sizing: border-box; }
+  textarea { width: 100%; height: 100%; resize: none; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; padding: 8px;
+             background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); }
+  #out { padding: 12px; overflow: auto; border: 1px solid var(--vscode-input-border); line-height: 1.6; }
+  math { font-size: 1.2em; }
+  /* In mixed prose-with-math mode we wrap each <math> in <span class="m">. */
+  #out .m { display: inline-block; vertical-align: middle; margin: 0 2px; }
+  .err { color: var(--vscode-errorForeground); white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 12px; }
+  .toolbar { padding: 6px 12px; border-bottom: 1px solid var(--vscode-panel-border); display: flex; gap: 8px; align-items: center; font-size: 12px; }
+  button { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: none; padding: 4px 10px; cursor: pointer; }
+  button:hover { background: var(--vscode-button-hoverBackground); }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <span>AsciiMath input → live MathML render. </span>
+  <button id="insert">Insert at cursor</button>
+  <span id="status"></span>
+</div>
+<div class="panes">
+  <textarea id="src" spellcheck="false" placeholder="Type AsciiMath, e.g.  sum_(i=1)^n i^3=((n(n+1))/2)^2">sum_(i=1)^n i^3=((n(n+1))/2)^2</textarea>
+  <div id="out">Ready.</div>
+</div>
+<script src="${ctrl}" nonce="${n}"></script>
+</body>
+</html>`;
+
+  panel.webview.onDidReceiveMessage(async (raw) => {
+    const msg = validateMessage(raw);
+    if (!msg) return;
+    if (msg.kind === "insert") {
+      const editor = vscode.window.visibleTextEditors.find((e) => e.document.languageId === "express");
+      if (editor) {
+        await editor.edit((b) => b.insert(editor.selection.active, msg.text));
+        await vscode.window.showTextDocument(editor.document, editor.viewColumn);
+      } else {
+        vscode.window.showInformationMessage("No active EXPRESS editor to insert into.");
+      }
+    } else if (msg.kind === "renderMath") {
+      const result = await renderMath(msg.expr, msg.format ?? "asciimath");
+      panel.webview.postMessage({
+        kind: "mathRendered",
+        id: msg.id,
+        mathml: result.mathml,
+        error: result.error,
+      });
+    } else if (msg.kind === "log") {
+      logMessage("mathPlayground", msg.level, msg.message);
+    }
+  });
+}

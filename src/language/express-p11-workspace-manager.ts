@@ -1,14 +1,11 @@
 import {
   ConfigurationProvider,
-  DefaultConfigurationProvider,
   DefaultWorkspaceManager,
-  LangiumDocument,
-  LangiumSharedServices,
-  interruptAndCheck,
 } from "langium";
+import type { LangiumSharedServices } from "langium/lsp";
+import type { FileSystemNode } from "langium";
 import { CancellationToken, Connection, WorkDoneProgress, WorkspaceFolder } from "vscode-languageserver";
-import { URI } from "vscode-uri";
-import { isAllowedFile, isAllowedFolder } from "../utils/file-filter.js";
+import { isAllowedFile } from "../utils/file-filter.js";
 import { EASYEXPRESS_TOKEN } from "../shared/notifications.js";
 
 export type Configuration = {
@@ -40,26 +37,13 @@ export class ExpressP11WorkspaceManager extends DefaultWorkspaceManager {
     this.workspaceConfiguration = { useOptimizedConfiguration, excludedFiles, excludedFolders };
     await super.initializeWorkspace(folders, cancelToken);
   }
-  protected override async traverseFolder(
-    workspaceFolder: WorkspaceFolder,
-    folderPath: URI,
-    fileExtensions: string[],
-    collector: (document: LangiumDocument) => void
-  ): Promise<void> {
-    const content = await this.fileSystemProvider.readDirectory(folderPath);
-    await Promise.all(
-      content.map(async (entry) => {
-        if (this.includeEntry(workspaceFolder, entry, fileExtensions)) {
-          if (entry.isDirectory) {
-            await this.traverseFolder(workspaceFolder, entry.uri, fileExtensions, collector);
-          } else if (entry.isFile) {
-            if (isAllowedFile(entry.uri, this.workspaceConfiguration)) {
-              const document = this.langiumDocuments.getOrCreateDocument(entry.uri);
-              collector(document);
-            }
-          }
-        }
-      })
-    );
+  override shouldIncludeEntry(entry: FileSystemNode): boolean {
+    if (!super.shouldIncludeEntry(entry)) {
+      return false;
+    }
+    if (entry.isFile) {
+      return isAllowedFile(entry.uri, this.workspaceConfiguration);
+    }
+    return true;
   }
 }

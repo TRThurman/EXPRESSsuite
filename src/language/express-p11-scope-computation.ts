@@ -1,13 +1,11 @@
 import {
   AstNode,
   AstNodeDescription,
+  AstUtils,
   DefaultScopeComputation,
   LangiumDocument,
   MultiMap,
-  PrecomputedScopes,
-  getContainerOfType,
   interruptAndCheck,
-  streamContents,
 } from "langium";
 import {
   ExpressFile,
@@ -43,9 +41,9 @@ import { getSchemaDeclarations } from "../utils/schema-helpers.js";
 import { getFirstContainerOfType } from "../utils/ast-utils.js";
 
 export class ExpressP11ScopeComputation extends DefaultScopeComputation {
-  //protected override processNode(node: AstNode, document: LangiumDocument<AstNode>, scopes: PrecomputedScopes): void {}
+  //protected override processNode(node: AstNode, document: LangiumDocument<AstNode>, scopes: LocalSymbols): void {}
 
-  override async computeExports(
+  override async collectExportedSymbols(
     document: LangiumDocument<ExpressFile>,
     cancelToken = CancellationToken.None
   ): Promise<AstNodeDescription[]> {
@@ -56,7 +54,7 @@ export class ExpressP11ScopeComputation extends DefaultScopeComputation {
       if (schema.name) exports.push(this.descriptions.createDescription(schema, schema.name, document));
       try {
         if (!schema.body) continue;
-        for (const modelNode of streamContents(schema.body)) {
+        for (const modelNode of AstUtils.streamContents(schema.body)) {
           await interruptAndCheck(cancelToken);
           if (
             isEntityDefinition(modelNode) ||
@@ -65,15 +63,15 @@ export class ExpressP11ScopeComputation extends DefaultScopeComputation {
             isProcedureDefinition(modelNode) ||
             isEnumeration_id(modelNode)
           ) {
-            let name = this.nameProvider.getName(modelNode);
+            const name = this.nameProvider.getName(modelNode);
             if (name) {
               exports.push(this.descriptions.createDescription(modelNode, name, document));
             }
           }
           if (isConstant_decl(modelNode)) {
-            for (const constant of streamContents(modelNode)) {
+            for (const constant of AstUtils.streamContents(modelNode)) {
               if (isConstant_body(constant)) {
-                let name = this.nameProvider.getName(constant);
+                const name = this.nameProvider.getName(constant);
                 if (name) {
                   exports.push(this.descriptions.createDescription(constant, name, document));
                 }
@@ -81,16 +79,16 @@ export class ExpressP11ScopeComputation extends DefaultScopeComputation {
             }
           }
         }
-      } catch (err) {}
+      } catch { /* skip schemas with parse errors */ }
     }
 
     return exports;
   }
 
-  protected override processNode(node: AstNode, document: LangiumDocument<AstNode>, scopes: PrecomputedScopes): void {
+  protected override addLocalSymbol(node: AstNode, document: LangiumDocument<AstNode>, scopes: MultiMap<AstNode, AstNodeDescription>): void {
     //declarations, constants, and enumerations are visible to the whole subtree of the schema they belong to
     if (isDeclaration(node) || isConstant_body(node) || isEnumeration_id(node)) {
-      const schema = getContainerOfType(node, isSchemaDefinition);
+      const schema = AstUtils.getContainerOfType(node, isSchemaDefinition);
       if (!schema) return;
       this.addToLocalScope(node, schema, document, scopes);
       return;
@@ -99,32 +97,32 @@ export class ExpressP11ScopeComputation extends DefaultScopeComputation {
     //parameters or local variables are visible to the subtree of the function, procedure, or statement they belong to
     if (isParameter_id(node) || isVariable_id(node) || isConstant_body(node)) {
       const scopingContainer = getFirstContainerOfType(node, [
-        FunctionDefinition,
-        ProcedureDefinition,
-        Repeat_stmt,
-        Query_expression,
-        Rule_decl,
+        FunctionDefinition.$type,
+        ProcedureDefinition.$type,
+        Repeat_stmt.$type,
+        Query_expression.$type,
+        Rule_decl.$type,
       ]);
       if (!scopingContainer) return;
       this.addToLocalScope(node, scopingContainer, document, scopes);
     }
 
     if (isAttribute_decl(node)) {
-      const entity = getContainerOfType(node, isEntityDefinition);
+      const entity = AstUtils.getContainerOfType(node, isEntityDefinition);
       if (!entity) return;
       this.addToLocalScope(node, entity, document, scopes);
     }
   }
 
-  private addToLocalScope(node: AstNode, container: AstNode, document: LangiumDocument<AstNode>, scopes: PrecomputedScopes): void {
+  private addToLocalScope(node: AstNode, container: AstNode, document: LangiumDocument<AstNode>, scopes: MultiMap<AstNode, AstNodeDescription>): void {
     const name = this.nameProvider.getName(node);
     scopes.add(container, this.descriptions.createDescription(node, name, document));
   }
 
-  //   override async computeLocalScopes(
+  //   override async collectLocalSymbols(
   //     document: LangiumDocument<ExpressFile>,
   //     cancelToken = CancellationToken.None
-  //   ): Promise<PrecomputedScopes> {
+  //   ): Promise<LocalSymbols> {
   //     //const schema = document.parseResult.value.schema;
   //     const scopes = new MultiMap<AstNode, AstNodeDescription>();
   //     await getSchemaDeclarations(document).forEach(async (schema) => {
@@ -149,7 +147,6 @@ export class ExpressP11ScopeComputation extends DefaultScopeComputation {
     }
   }
 
-  //@ts-ignore
   //   private async addDeclarationsToExport(
   //     schema: Schema_decl,
   //     exportList: AstNodeDescription[],

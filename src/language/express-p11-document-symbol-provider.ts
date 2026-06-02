@@ -1,4 +1,5 @@
-import { DefaultDocumentSymbolProvider, LangiumDocument, MaybePromise } from "langium";
+import { LangiumDocument, MaybePromise } from "langium";
+import { DefaultDocumentSymbolProvider } from "langium/lsp";
 import { DocumentSymbol } from "vscode-languageserver";
 import { ExpressFile } from "./generated/ast.js";
 import { getSchemaDeclarations, getSchemaDocumentSymbol } from "../utils/schema-helpers.js";

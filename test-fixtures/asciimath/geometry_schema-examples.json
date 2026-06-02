@@ -1,0 +1,126 @@
+{
+  "source": "/Users/tom/test_git/sd.iso.org/wg12-step/schemas/resources/geometry_schema/geometry_schema.exp",
+  "total_found": 754,
+  "selected": 10,
+  "examples": [
+    {
+      "line": 2395,
+      "column": 3,
+      "raw": "xx",
+      "context_before": "| stem:[a] | Normalised vector stem:[A = A / abs(A)]",
+      "context_after": "| stem:[cdot] | Scalar product",
+      "features": [
+        "has_cross",
+        "is_short"
+      ]
+    },
+    {
+      "line": 3404,
+      "column": 47,
+      "raw": "0 le theta le 180 \"P{degree}\"",
+      "context_before": "(*\"geometry_schema.spherical_point.wr:IP1\"",
+      "context_after": "*)",
+      "features": [
+        "has_greek",
+        "has_inequality",
+        "has_unit_string"
+      ]
+    },
+    {
+      "line": 3741,
+      "column": 1,
+      "raw": "x = langle a - (a cdot z) z rangle ",
+      "context_before": ". The vector stem:[a] is projected onto the plane defined by the origin point stem:[P] and the vector stem:[bb z] to give the placement X axis direction as",
+      "context_after": "The placement Y axis direction is then given by stem:[y = langle z xx x rangle ].",
+      "features": [
+        "has_angle_bracket",
+        "has_dot_product",
+        "has_paren_group",
+        "is_long"
+      ]
+    },
+    {
+      "line": 3816,
+      "column": 1,
+      "raw": "bb\"P\" -> bb\"A\" + bb\"S TP\"",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_arrow",
+        "has_function",
+        "has_unit_string"
+      ]
+    },
+    {
+      "line": 4379,
+      "column": 93,
+      "raw": "s = 1 / 2 r u^2",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_fraction",
+        "has_superscript"
+      ]
+    },
+    {
+      "line": 4814,
+      "column": 1,
+      "raw": "(d + 2 + k) = N = (d + 1) + md + (d + 1)",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_paren_group",
+        "is_long"
+      ]
+    },
+    {
+      "line": 8088,
+      "column": 142,
+      "raw": "(bb \"x_offset\", bb \"y_offset\", bb \"height\")",
+      "context_before": "(*\"geometry_schema.eccentric_conical_volume.__note\"",
+      "context_after": "*)",
+      "features": [
+        "has_function",
+        "has_paren_group",
+        "has_subscript",
+        "has_unit_string",
+        "is_long"
+      ]
+    },
+    {
+      "line": 9342,
+      "column": 3,
+      "raw": "\"Upper index on control points\" ge \"degree\"",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_inequality",
+        "has_unit_string",
+        "is_long"
+      ]
+    },
+    {
+      "line": 9344,
+      "column": 3,
+      "raw": "\"Sum of knot multiplicities\" = \"degree\" + \"(upper index on control points)\" + 2",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_paren_group",
+        "has_unit_string",
+        "is_long"
+      ]
+    },
+    {
+      "line": 9388,
+      "column": 3,
+      "raw": "\"Sum of knot multiplicities\" = \"degree\" + 2",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "has_unit_string",
+        "is_long"
+      ]
+    }
+  ]
+}

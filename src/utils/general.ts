@@ -14,7 +14,6 @@ export enum ExpressKind {
   Interface = 11,
   Function = 12,
   Variable = 13,
-  Type = 13,
   Constant = 14,
   String = 15,
   Number = 16,
@@ -27,7 +26,7 @@ export enum ExpressKind {
   Struct = 23,
   Event = 24,
   Operator = 25,
-  TypeParameter = 26,
+  Type = 26,
 }
 
 export const getDocumentSymbol = (

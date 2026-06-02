@@ -12,7 +12,6 @@ export function isAllowedFile(filepath: URI, configuration: Configuration): bool
   if (!isInAllowedFolder) return false;
   const filename = filepath.toString().split("/").pop();
   if (!filename) return false;
-  const skip = ["lf", "concatenated"];
   const exception = configuration.excludedFiles.find((elt) => filename.includes(elt));
   if (!exception) return true;
   return false;
@@ -20,24 +19,6 @@ export function isAllowedFile(filepath: URI, configuration: Configuration): bool
   //   return true;
 }
 export function isAllowedFolder(path: URI, configuration: Configuration): boolean {
-  const skip = [
-    "dvlp",
-    "sys",
-    "nav",
-    "ap233_system_engineering_and_design",
-    "css",
-    "doc",
-    "dtd",
-    "help",
-    "images",
-    "publication",
-    "utils",
-    "xsl",
-    "basic",
-    "library",
-    "resource_docs",
-    "business_object_models",
-  ];
   if (!configuration.useOptimizedConfiguration) return true;
 
   const exception = path

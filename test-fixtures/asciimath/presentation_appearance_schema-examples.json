@@ -1,0 +1,106 @@
+{
+  "source": "/Users/tom/test_git/sd.iso.org/wg12-step/schemas/resources/presentation_appearance_schema/presentation_appearance_schema.exp",
+  "total_found": 13,
+  "selected": 10,
+  "examples": [
+    {
+      "line": 1741,
+      "column": 34,
+      "raw": "square",
+      "context_before": "(*\"presentation_appearance_schema.marker_type.square\"",
+      "context_after": "*)",
+      "features": []
+    },
+    {
+      "line": 1746,
+      "column": 36,
+      "raw": "/_\\",
+      "context_before": "(*\"presentation_appearance_schema.marker_type.triangle\"",
+      "context_after": "*)",
+      "features": [
+        "has_subscript",
+        "is_short"
+      ]
+    },
+    {
+      "line": 1751,
+      "column": 34,
+      "raw": "circ",
+      "context_before": "(*\"presentation_appearance_schema.marker_type.ring\"",
+      "context_after": "*)",
+      "features": [
+        "is_short"
+      ]
+    },
+    {
+      "line": 2858,
+      "column": 416,
+      "raw": "I",
+      "context_before": "(*\"presentation_appearance_schema.one_direction_repeat_factor\"",
+      "context_after": "*)",
+      "features": [
+        "is_short"
+      ]
+    },
+    {
+      "line": 2858,
+      "column": 480,
+      "raw": "R",
+      "context_before": "(*\"presentation_appearance_schema.one_direction_repeat_factor\"",
+      "context_after": "*)",
+      "features": [
+        "is_short"
+      ]
+    },
+    {
+      "line": 2879,
+      "column": 395,
+      "raw": "I",
+      "context_before": "(*\"presentation_appearance_schema.two_direction_repeat_factor\"",
+      "context_after": "*)",
+      "features": [
+        "is_short"
+      ]
+    },
+    {
+      "line": 2879,
+      "column": 453,
+      "raw": "R = (R1, R2)",
+      "context_before": "(*\"presentation_appearance_schema.two_direction_repeat_factor\"",
+      "context_after": "*)",
+      "features": [
+        "has_paren_group"
+      ]
+    },
+    {
+      "line": 3443,
+      "column": 44,
+      "raw": "A",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "is_short"
+      ]
+    },
+    {
+      "line": 3443,
+      "column": 66,
+      "raw": "B",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "is_short"
+      ]
+    },
+    {
+      "line": 3443,
+      "column": 87,
+      "raw": "B",
+      "context_before": "",
+      "context_after": "",
+      "features": [
+        "is_short"
+      ]
+    }
+  ]
+}
