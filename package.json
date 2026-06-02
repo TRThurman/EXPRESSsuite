@@ -43,7 +43,7 @@
     "dompurify": "3.4.2",
     "mathjax": "4.1.1",
     "uuid": "^14.0.0",
-    "vscode-languageclient": "~8.0.2"
+    "vscode-languageclient": "~9.0.1"
   },
   "devDependencies": {
     "@release-it/conventional-changelog": "^11.0.0",
