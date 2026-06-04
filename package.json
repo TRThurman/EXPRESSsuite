@@ -40,7 +40,7 @@
     "@plurimath/plurimath": "0.2.2",
     "chalk": "~5.6.2",
     "commander": "~10.0.0",
-    "dompurify": "3.4.7",
+    "dompurify": "3.4.8",
     "mathjax": "4.1.2",
     "uuid": "^14.0.0",
     "vscode-languageclient": "~9.0.1"
@@ -52,7 +52,7 @@
     "concurrently": "^9.2.1",
     "esbuild": "^0.28.0",
     "eslint": "~9.39",
-    "happy-dom": "20.9.0",
+    "happy-dom": "20.10.1",
     "jsdom": "26.1.0",
     "langium": "^4.2.2",
     "langium-cli": "^4.2.1",
