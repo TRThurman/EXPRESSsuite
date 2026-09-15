@@ -8,6 +8,7 @@ import {
   FunctionDefinition,
   Group_qualifier,
   Literal,
+  NamedType,
   Parameter_id,
   Primary,
   Redeclared_attribute,
@@ -74,6 +75,16 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
       if (!schemaNode || !schemaNode.name) return EMPTY_SCOPE;
       const schema = this.typeContainer.getSchemas().get(schemaNode.name);
       if (!schema) return EMPTY_SCOPE;
+
+      if (this.reflection.getReferenceType(context) === NamedType.$type) {
+        const visibleResources = this.typeContainer.getAllRessourcesFrom(schema, true);
+        const visibleTypes = [
+          ...visibleResources.resources.get(DefinitionType.Entity)?.values() ?? [],
+          ...visibleResources.resources.get(DefinitionType.EnumType)?.values() ?? [],
+          ...visibleResources.resources.get(DefinitionType.SelectType)?.values() ?? [],
+        ].map((definition) => definition.resource.getNode());
+        return this.createScopeForNodes(visibleTypes);
+      }
 
       if (isReferenceToControlledEntity(context)) {
         const entities = this.typeContainer.getAllRessourcesFrom(schema, true);
