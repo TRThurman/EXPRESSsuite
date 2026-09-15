@@ -60,7 +60,7 @@
     "esbuild": "^0.28.2",
     "eslint": "~9.39",
     "happy-dom": "20.14.3",
-    "jsdom": "26.1.0",
+    "jsdom": "30.0.1",
     "langium": "^4.4.0",
     "langium-cli": "^4.4.0",
     "release-it": "^20.0.1",
