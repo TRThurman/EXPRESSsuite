@@ -17,7 +17,6 @@ import { Configuration } from "./express-p11-workspace-manager.js";
 import { ExpressP11BuildStrategy } from "./express-p11-build-strategy.js";
 export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
   private isFirstLoad: boolean = true;
-  private firstIndexingInitiated: boolean = false;
   private connection: Connection | undefined;
   private configurationProvider: ConfigurationProvider | undefined;
   private workspaceConfiguration: Configuration = {
@@ -197,12 +196,11 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
   ): Promise<void> {
     try {
       await this.refreshConfiguration();
-      if ((this.isFirstLoad && !this.firstIndexingInitiated) || buildStrategy != ExpressP11BuildStrategy.PartialBuildDuringEdition) {
+      if (buildStrategy != ExpressP11BuildStrategy.PartialBuildDuringEdition) {
         this.connection?.sendProgress(WorkDoneProgress.type, EXPRESSSUITE_TOKEN, {
           kind: "begin",
           title: "initiated",
         });
-        this.firstIndexingInitiated = true;
       }
       const validDocs = allowedDocuments(documents, this.workspaceConfiguration);
 
@@ -214,11 +212,10 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
       //   }
 
       await interruptAndCheck(cancelToken);
-      if ((this.isFirstLoad && this.firstIndexingInitiated) || buildStrategy != ExpressP11BuildStrategy.PartialBuildDuringEdition) {
+      if (buildStrategy != ExpressP11BuildStrategy.PartialBuildDuringEdition) {
         this.connection?.sendProgress(WorkDoneProgress.type, EXPRESSSUITE_TOKEN, { kind: "end" });
 
         this.isFirstLoad = false;
-        this.firstIndexingInitiated = false;
       }
     } catch { /* build errors are handled per-document */ }
   }
