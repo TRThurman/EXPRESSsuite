@@ -65,4 +65,43 @@ describe("full interface imports", () => {
     }
     expect(measureValueTargetSchema).toBe("Value_with_unit_arm");
   });
+
+  test("transitive ARM declarations do not require redundant direct imports", async () => {
+    const result = await validate(`
+      SCHEMA Elemental_geometric_shape_arm;
+      ENTITY Axis_placement_3d;
+      END_ENTITY;
+      ENTITY Geometric_model;
+      END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA Basic_geometry_arm;
+      USE FROM Elemental_geometric_shape_arm;
+      END_SCHEMA;
+
+      SCHEMA Topologically_bounded_surface_arm;
+      USE FROM Basic_geometry_arm;
+      END_SCHEMA;
+
+      SCHEMA Manifold_surface_arm;
+      USE FROM Topologically_bounded_surface_arm;
+      END_SCHEMA;
+
+      SCHEMA Manifold_subsurface_arm;
+      USE FROM Manifold_surface_arm;
+      USE FROM Topologically_bounded_surface_arm;
+      TYPE item = SELECT (Axis_placement_3d);
+      END_TYPE;
+      ENTITY Manifold_subsurface_model
+        SUBTYPE OF (Geometric_model);
+      END_ENTITY;
+      END_SCHEMA;
+    `);
+
+    const importDiagnostics = result.diagnostics.filter((diagnostic) =>
+      diagnostic.code === ExpressP11Issues.ReferenceStatementMissing ||
+      diagnostic.code === ExpressP11Issues.ReferenceStatementIncomplete
+    );
+    expect(importDiagnostics).toEqual([]);
+  });
 });

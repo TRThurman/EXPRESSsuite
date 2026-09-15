@@ -33,6 +33,7 @@ import {
 import type { ExpressP11Services } from "./express-module.js";
 import { schemaHasDeclarations } from "../utils/schema-helpers.js";
 import { getReferenceSpecifications, getUseSpecifications } from "../utils/interface-helpers.js";
+import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
 
 /**
  * Register custom validation checks.
@@ -82,12 +83,14 @@ export class ExpressP11Validator {
   protected readonly references: References;
   protected readonly documents: LangiumDocuments;
   protected readonly nameProvider: NameProvider;
+  protected readonly typeContainer: ExpressP11TypeContainer;
   // protected readonly resourceManager: ExpressP11ResourceManager;
 
   constructor(services: ExpressP11Services) {
     this.references = services.references.References;
     this.documents = services.shared.workspace.LangiumDocuments;
     this.nameProvider = services.references.NameProvider;
+    this.typeContainer = services.validation.TypeContainer;
     // this.resourceManager = services.resources.ResourceManager;
   }
 
@@ -227,6 +230,13 @@ export class ExpressP11Validator {
           .map((specification) => specification.schema.$refText)
       );
       const currentSchemaName = schema.name;
+      const currentSchema = this.typeContainer.getSchemas().get(currentSchemaName);
+      const visibleDefinitions = new Set<AstNode>();
+      if (currentSchema) {
+        for (const definitions of this.typeContainer.getAllRessourcesFrom(currentSchema, true).resources.values()) {
+          for (const definition of definitions.values()) visibleDefinitions.add(definition.resource.getNode());
+        }
+      }
 
       for (const node of AstUtils.streamAst(schema)) {
         AstUtils.streamReferences(node).forEach((resourceNeeded) => {
@@ -259,6 +269,9 @@ export class ExpressP11Validator {
           const resourceImported = importedResourcesIndex.get(schemaNeeded.name).find((r) => r.node === ref.ref);
 
           if (!resourceImported) {
+            // A declaration reached through the current schema's transitive
+            // interface closure does not require another direct import.
+            if (visibleDefinitions.has(reference)) return;
             const schemaIsAlreadyImported = importedResourcesIndex.has(schemaNeeded.name);
             this.issueReferenceStatementDiagnostic(currentSchemaName, schemaIsAlreadyImported, schemaNeeded, resourceNeeded, accept);
             return;
