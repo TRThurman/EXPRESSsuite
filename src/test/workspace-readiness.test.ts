@@ -43,9 +43,6 @@ describe("workspace readiness", () => {
     );
     shared.workspace.LangiumDocuments.addDocument(document);
 
-    const textDocuments = shared.workspace.TextDocuments;
-    const originalKeys = textDocuments.keys.bind(textDocuments);
-    textDocuments.keys = () => [uri.toString()];
     const builder = shared.workspace.DocumentBuilder;
     const originalBuild = builder.build.bind(builder);
     const originalUpdate = builder.update.bind(builder);
@@ -54,12 +51,15 @@ describe("workspace readiness", () => {
     builder.update = async (changed) => {
       updates.push(changed.map((changedUri) => changedUri.toString()));
     };
+    shared.lsp.DocumentUpdateHandler.didChangeContent?.({ document: document.textDocument });
 
     await shared.workspace.WorkspaceManager.initializeWorkspace([]);
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
 
+    // The pre-ready document notification is consumed by the startup refresh;
+    // it must not schedule a duplicate update after readiness resolves.
     expect(updates).toEqual([[uri.toString()]]);
     builder.build = originalBuild;
     builder.update = originalUpdate;
-    textDocuments.keys = originalKeys;
   });
 });

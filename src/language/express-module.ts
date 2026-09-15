@@ -22,6 +22,7 @@ import { ExpressP11ServiceRegistry } from "./express-p11-service-registry.js";
 import { ExpressP11AnnotationIndex } from "./express-p11-annotation-index.js";
 import { registerValidationChecks } from "./express-p11-validator.js";
 import { ExpressP11ConfigurationProvider } from "./express-p11-configuration-provider.js";
+import { ExpressP11DocumentUpdateHandler } from "./express-p11-document-update-handler.js";
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -57,6 +58,7 @@ export const ExpressP11SharedModule: Module<ExpressP11SharedServices, DeepPartia
   lsp: {
     NodeKindProvider: () => new ExpressP11NodeKindProvider(),
     ExecuteCommandHandler: (services) => new ExpressP11ExecuteComandHandler(services),
+    DocumentUpdateHandler: (services) => new ExpressP11DocumentUpdateHandler(services),
   },
   ServiceRegistry: () => new ExpressP11ServiceRegistry(),
 };
