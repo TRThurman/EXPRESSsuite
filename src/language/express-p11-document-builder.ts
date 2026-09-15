@@ -214,9 +214,11 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
       await interruptAndCheck(cancelToken);
       if (buildStrategy != ExpressP11BuildStrategy.PartialBuildDuringEdition) {
         this.connection?.sendProgress(WorkDoneProgress.type, EXPRESSSUITE_TOKEN, { kind: "end" });
-
-        this.isFirstLoad = false;
       }
+      // The workspace manager's initial build uses the default (editing)
+      // strategy. Mark it complete after the first successful pass so the first
+      // editor request does not unnecessarily relink the entire workspace.
+      this.isFirstLoad = false;
     } catch { /* build errors are handled per-document */ }
   }
 }

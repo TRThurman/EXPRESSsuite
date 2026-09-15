@@ -2,6 +2,7 @@ import {
   ConfigurationProvider,
   Deferred,
   DefaultWorkspaceManager,
+  URI,
 } from "langium";
 import type { LangiumSharedServices } from "langium/lsp";
 import type { FileSystemNode } from "langium";
@@ -18,6 +19,7 @@ export type Configuration = {
 export class ExpressP11WorkspaceManager extends DefaultWorkspaceManager {
   private readonly fullyReady = new Deferred<void>();
   private connection: Connection | undefined;
+  private readonly textDocuments: LangiumSharedServices["workspace"]["TextDocuments"];
   private workspaceConfiguration: Configuration = {
     useOptimizedConfiguration: true,
     excludedFiles: [],
@@ -27,6 +29,7 @@ export class ExpressP11WorkspaceManager extends DefaultWorkspaceManager {
   constructor(services: LangiumSharedServices) {
     super(services);
     this.connection = services.lsp.Connection;
+    this.textDocuments = services.workspace.TextDocuments;
     this.configurationProvider = services.workspace.ConfigurationProvider;
   }
   override get ready(): Promise<void> {
@@ -43,12 +46,25 @@ export class ExpressP11WorkspaceManager extends DefaultWorkspaceManager {
       const excludedFiles = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFiles");
       this.workspaceConfiguration = { useOptimizedConfiguration, excludedFiles, excludedFolders };
       await super.initializeWorkspace(folders, cancelToken);
+      await this.validateOpenDocuments(cancelToken);
       this.fullyReady.resolve();
     } catch (error) {
       this.fullyReady.reject(error);
       throw error;
     } finally {
       this.connection?.sendProgress(WorkDoneProgress.type, EXPRESSSUITE_TOKEN, { kind: "end" });
+    }
+  }
+  private async validateOpenDocuments(cancelToken: CancellationToken): Promise<void> {
+    const openDocuments = await Promise.all(
+      this.textDocuments.keys().map((uri) => this.langiumDocuments.getOrCreateDocument(URI.parse(uri)))
+    );
+    if (openDocuments.length > 0) {
+      // The initial workspace pass intentionally indexes without validating every
+      // file. Validate open editors now so the client receives a fresh diagnostic
+      // set as soon as indexing completes, without waiting for a later request
+      // such as Peek Definition to touch the document.
+      await this.documentBuilder.build(openDocuments, this.documentBuilder.updateBuildOptions, cancelToken);
     }
   }
   override shouldIncludeEntry(entry: FileSystemNode): boolean {
