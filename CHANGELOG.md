@@ -25,6 +25,8 @@
 
 ### Validation
 
+- Resolve schema, entity, type, and qualified-attribute references without
+  regard to identifier case, as required by EXPRESS.
 - Enforce SC4 declaration-name casing: initial-uppercase entity names in ARM
   schemas, lowercase entity names outside ARM schemas, and lowercase type
   names everywhere. Casing diagnostics provide a rename quick fix.

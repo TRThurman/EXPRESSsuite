@@ -1,4 +1,5 @@
 import {
+  DefinitionType,
   AstNode,
   AstUtils,
   ConfigurationProvider,
@@ -30,7 +31,6 @@ import { CancellationToken } from "vscode-languageserver";
 import { allowedDocuments } from "../utils/file-filter.js";
 import { Configuration } from "./express-p11-workspace-manager.js";
 import {
-  DefinitionType,
   ExpressConflict,
   ExpressP11ConflictManager,
   ExpressP11Entity,
@@ -202,7 +202,10 @@ export class ExpressP11TypeContainer {
           for (const supertype of entity.getNode().types.supertypes!.entities!) {
             const supertypeName = supertype.entity.$refText;
 
-            const supertypeDefinition = allAvailable.resources.get(DefinitionType.Entity)?.get(supertypeName);
+            const entities = allAvailable.resources.get(DefinitionType.Entity);
+            const supertypeDefinition = entities?.get(supertypeName) ?? [...entities?.entries() ?? []].find(
+              ([candidate]) => candidate.toLowerCase() === supertypeName.toLowerCase(),
+            )?.[1];
             if (supertypeDefinition) entity.addSuperType(supertypeDefinition.resource as ExpressP11Entity);
           }
         }
@@ -265,27 +268,33 @@ export class ExpressP11TypeContainer {
       for (const specification of schema.body.specifications) {
         await interruptAndCheck(cancelToken);
 
-        const interfacedSchema = this.schemas.get(specification.schema.$refText);
+        const requestedSchemaName = specification.schema.$refText;
+        const interfacedSchema = [...this.schemas.values()].find(
+          (candidate) => candidate.getName().toLowerCase() === requestedSchemaName.toLowerCase(),
+        );
+        const interfacedSchemaName = interfacedSchema?.getName() ?? requestedSchemaName;
         if (isReference_clause(specification)) {
           if (specification.resources.length < 1) {
             //import all from schema
             const imports: SubSuperTypeDefinition[] = [];
-            sink.localTypes.get(specification.schema.$refText).forEach((t) => {
-              imports.push({ name: t.name, schema: specification.schema.$refText });
+            sink.localTypes.get(interfacedSchemaName).forEach((t) => {
+              imports.push({ name: t.name, schema: interfacedSchemaName });
             });
             sink.imports.addAll(schema.name, imports);
-            this.localFullReferenceFrom.add(schema.name, specification.schema.$refText);
+            this.localFullReferenceFrom.add(schema.name, interfacedSchemaName);
             //new
             if (interfacedSchema) expressSchema.fullyInterfaceWith(interfacedSchema, InterfaceType.ReferenceFrom);
           }
           if (specification.resources.length >= 1) {
             for (const resource of specification.resources) {
-              const imp0rt = sink.localTypes.get(specification.schema.$refText).find((t) => t.name === resource.resource.$refText);
+              const imp0rt = sink.localTypes.get(interfacedSchemaName).find(
+                (type) => type.name.toLowerCase() === resource.resource.$refText.toLowerCase(),
+              );
               if (imp0rt) {
-                sink.imports.add(schema.name, { name: imp0rt.name, schema: specification.schema.$refText });
+                sink.imports.add(schema.name, { name: imp0rt.name, schema: interfacedSchemaName });
                 this.localPartialReferenceFrom.add(schema.name, {
                   name: imp0rt.name,
-                  schema: specification.schema.$refText,
+                  schema: interfacedSchemaName,
                 });
               }
               //new
@@ -299,22 +308,24 @@ export class ExpressP11TypeContainer {
           if (specification.resources.length < 1) {
             //import all from schema
             const imports: SubSuperTypeDefinition[] = [];
-            sink.localTypes.get(specification.schema.$refText).forEach((t) => {
-              imports.push({ name: t.name, schema: specification.schema.$refText });
+            sink.localTypes.get(interfacedSchemaName).forEach((t) => {
+              imports.push({ name: t.name, schema: interfacedSchemaName });
             });
             sink.imports.addAll(schema.name, imports);
-            this.localFullUseFrom.add(schema.name, specification.schema.$refText);
+            this.localFullUseFrom.add(schema.name, interfacedSchemaName);
             //new
             if (interfacedSchema) expressSchema.fullyInterfaceWith(interfacedSchema, InterfaceType.UseFrom);
           }
           if (specification.resources.length >= 1) {
             for (const resource of specification.resources) {
-              const imp0rt = sink.localTypes.get(specification.schema.$refText).find((t) => t.name === resource.resource.$refText);
+              const imp0rt = sink.localTypes.get(interfacedSchemaName).find(
+                (type) => type.name.toLowerCase() === resource.resource.$refText.toLowerCase(),
+              );
               if (imp0rt) {
-                sink.imports.add(schema.name, { name: imp0rt.name, schema: specification.schema.$refText });
+                sink.imports.add(schema.name, { name: imp0rt.name, schema: interfacedSchemaName });
                 this.localPartialUseFrom.add(schema.name, {
                   name: imp0rt.name,
-                  schema: specification.schema.$refText,
+                  schema: interfacedSchemaName,
                 });
               }
               //new

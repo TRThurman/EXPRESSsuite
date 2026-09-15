@@ -1,4 +1,15 @@
-import { AstNode, AstNodeDescriptionProvider, AstUtils, DefaultScopeProvider, EMPTY_SCOPE, ReferenceInfo, Scope } from "langium";
+import {
+  AstNode,
+  AstNodeDescription,
+  AstNodeDescriptionProvider,
+  AstUtils,
+  DefaultScopeProvider,
+  EMPTY_SCOPE,
+  MultiMapScope,
+  ReferenceInfo,
+  Scope,
+  ScopeOptions,
+} from "langium";
 import {
   Attribute_decl,
   Attribute_id,
@@ -66,6 +77,33 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     super(services);
     this.astNodeDescriptionProvider = services.workspace.AstNodeDescriptionProvider;
     this.typeContainer = services.validation.TypeContainer;
+  }
+
+  protected override createScope(
+    elements: Iterable<AstNodeDescription>,
+    outerScope?: Scope,
+    options?: ScopeOptions,
+  ): Scope {
+    return super.createScope(elements, outerScope, { ...options, caseInsensitive: true });
+  }
+
+  protected override createScopeForNodes(
+    elements: Iterable<AstNode>,
+    outerScope?: Scope,
+    options?: ScopeOptions,
+  ): Scope {
+    return super.createScopeForNodes(elements, outerScope, { ...options, caseInsensitive: true });
+  }
+
+  protected override getGlobalScope(referenceType: string, _context: ReferenceInfo): Scope {
+    return this.globalScopeCache.get(
+      referenceType,
+      () => new MultiMapScope(
+        this.indexManager.allElements(referenceType),
+        undefined,
+        { caseInsensitive: true },
+      ),
+    );
   }
 
   override getScope(context: ReferenceInfo): Scope {

@@ -159,13 +159,19 @@ export class ExpressP11Schema {
     return this.hasResolvedGraph;
   }
   public getEntity(name: string): ExpressP11Entity | undefined {
-    return this.entities.get(name);
+    return this.entities.get(name) ?? [...this.entities.values()].find(
+      (entity) => entity.getName().toLowerCase() === name.toLowerCase(),
+    );
   }
   public getType(name: string): ExpressP11Type | undefined {
-    return this.types.get(name);
+    return this.types.get(name) ?? [...this.types.values()].find(
+      (type) => type.getName().toLowerCase() === name.toLowerCase(),
+    );
   }
   public getLocalDefinition(name: string): Definition | undefined {
-    return this.localResourceRegistry.get(name);
+    return this.localResourceRegistry.get(name) ?? [...this.localResourceRegistry.entries()].find(
+      ([candidate]) => candidate.toLowerCase() === name.toLowerCase(),
+    )?.[1];
   }
 
   public getEntities(): Map<string, ExpressP11Entity> {
@@ -287,7 +293,9 @@ export class ExpressP11Entity extends ExpressResource<EntityDefinition> {
     const memoQuery: MemoQuery = { name: this.graphKey.toString(), type: MemoType.SubSuper };
     if (memo.exist(memoQuery) && this.graphKey != NIL) {
       const memoized = memo.query(memoQuery) as MultiMap<string, EntityDefinition>;
-      return userFilter.length > 0 ? memoized.get(userFilter) : memoized.values().toArray();
+      return userFilter.length > 0
+        ? this.getCaseInsensitiveGraphEntries(memoized, userFilter)
+        : memoized.values().toArray();
     }
     const graph = new MultiMap<string, EntityDefinition>();
     this.graphKey = uuidv4();
@@ -296,7 +304,19 @@ export class ExpressP11Entity extends ExpressResource<EntityDefinition> {
 
     memo.memoize({ type: MemoType.SubSuper, name: this.graphKey.toString(), payload: graph });
 
-    return userFilter.length > 0 ? graph.get(filter) : graph.values().toArray();
+    return userFilter.length > 0
+      ? this.getCaseInsensitiveGraphEntries(graph, userFilter)
+      : graph.values().toArray();
+  }
+
+  private getCaseInsensitiveGraphEntries(
+    graph: MultiMap<string, EntityDefinition>,
+    name: string,
+  ): readonly EntityDefinition[] {
+    const key = [...graph.keys()].find(
+      (candidate) => candidate.toLowerCase() === name.toLowerCase(),
+    );
+    return key ? graph.get(key) : [];
   }
   private computeSubSuper(exclude: string[] = [], graphKey: string): ExpressP11Entity[] {
     if (exclude.includes(this.getQualifiedName())) {
@@ -615,7 +635,9 @@ export class ExpressP11OptimizedResourceList {
   public findByName(name: string): Definition | undefined {
     let result: Definition | undefined;
     this.resource.forEach((v) => {
-      if (v.has(name)) result = v.get(name);
+      result ??= v.get(name) ?? [...v.entries()].find(
+        ([candidate]) => candidate.toLowerCase() === name.toLowerCase(),
+      )?.[1];
     });
     return result;
   }
