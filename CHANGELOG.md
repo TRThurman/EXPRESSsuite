@@ -29,6 +29,8 @@
   is complete, and report loading completion only when references are ready.
 - Read the renamed `expresssuite.*` optimization settings through Langium's
   configuration service instead of silently falling back to an empty section.
+- Allow quick-fix requests once references are indexed, avoiding a startup
+  failure for workspace documents that are not eagerly validated.
 - Enforce SC4 declaration-name casing: initial-uppercase entity names in ARM
   schemas, lowercase entity names outside ARM schemas, and lowercase type
   names everywhere. Casing diagnostics provide a rename quick fix.
