@@ -3,6 +3,14 @@ import { describe, expect, test } from "vitest";
 import { createExpressP11Services } from "../language/express-module.js";
 
 describe("workspace readiness", () => {
+  test("ignores extensionless file-watcher updates", async () => {
+    const { shared } = createExpressP11Services(EmptyFileSystem);
+    await expect(
+      shared.workspace.DocumentBuilder.update([URI.parse("file:///workspace")], [])
+    ).resolves.toBeUndefined();
+    expect(shared.workspace.LangiumDocuments.hasDocument(URI.parse("file:///workspace"))).toBe(false);
+  });
+
   test("does not allow language requests before the initial build completes", async () => {
     const { shared } = createExpressP11Services(EmptyFileSystem);
     const manager = shared.workspace.WorkspaceManager;
