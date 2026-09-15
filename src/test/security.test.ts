@@ -130,40 +130,39 @@ const HTML_PURIFY_CONFIG = {
 };
 
 describe("Asciidoctor → DOMPurify pipeline", async () => {
-  const Asciidoctor = (await import("@asciidoctor/core")).default;
-  const ad = Asciidoctor();
-  const sanitize = (text: string): string =>
-    DOMPurify.sanitize(String(ad.convert(text, { safe: "secure" })), HTML_PURIFY_CONFIG);
+  const { convert } = await import("@asciidoctor/core");
+  const sanitize = async (text: string): Promise<string> =>
+    DOMPurify.sanitize(String(await convert(text, { safe: "secure" })), HTML_PURIFY_CONFIG);
 
-  test("strips +++<script>+++ block passthrough", () => {
+  test("strips +++<script>+++ block passthrough", async () => {
     const evil = `Some prose.
 
 +++<script>alert(document.cookie)</script>+++
 
 More prose.`;
-    const html = sanitize(evil);
+    const html = await sanitize(evil);
     expect(html).not.toMatch(/<script/i);
     expect(html).not.toMatch(/alert\(/);
   });
 
-  test("strips pass:[…] inline raw HTML", () => {
-    const html = sanitize(`inline pass:[<script>alert(1)</script>] payload`);
+  test("strips pass:[…] inline raw HTML", async () => {
+    const html = await sanitize(`inline pass:[<script>alert(1)</script>] payload`);
     expect(html).not.toMatch(/<script/i);
   });
 
-  test("strips on* event handlers from Asciidoctor passthrough", () => {
-    const html = sanitize(`pass:[<a href="x" onclick="evil()">click</a>]`);
+  test("strips on* event handlers from Asciidoctor passthrough", async () => {
+    const html = await sanitize(`pass:[<a href="x" onclick="evil()">click</a>]`);
     expect(html).not.toMatch(/onclick/i);
     expect(html).not.toMatch(/evil/);
   });
 
-  test("disables include:: in secure mode (inert in source layer)", () => {
-    const html = sanitize(`include::/etc/passwd[]`);
+  test("disables include:: in secure mode (inert in source layer)", async () => {
+    const html = await sanitize(`include::/etc/passwd[]`);
     expect(html).not.toMatch(/root:x:0:0/);
   });
 
-  test("preserves benign markup", () => {
-    const html = sanitize(`**bold** and _italic_ and \`code\`.`);
+  test("preserves benign markup", async () => {
+    const html = await sanitize(`**bold** and _italic_ and \`code\`.`);
     expect(html).toMatch(/<strong>bold<\/strong>/);
     expect(html).toMatch(/<em>italic<\/em>/);
     expect(html).toMatch(/<code>code<\/code>/);
@@ -176,8 +175,8 @@ More prose.`;
     expect(clean).toMatch(/<mi>x<\/mi>/);
   });
 
-  test("strips javascript: URLs from xrefs", () => {
-    const html = sanitize(`link:javascript:alert(1)[bad]`);
+  test("strips javascript: URLs from xrefs", async () => {
+    const html = await sanitize(`link:javascript:alert(1)[bad]`);
     expect(html).not.toMatch(/javascript:/);
   });
 

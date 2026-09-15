@@ -11,6 +11,16 @@
 - Add a distinct EXPRESSsuite application icon and coordinated Marketplace
   gallery banner, visually separate from NIST branding.
 
+### Security
+
+- Upgrade vulnerable development and release tooling, including ESLint,
+  Vitest, Vite, release-it, jsdom, and their transitive dependencies.
+- Upgrade Asciidoctor.js to 4.0 and migrate the description viewer to its
+  asynchronous API, removing the vulnerable legacy glob dependency while
+  preserving the secure render-and-sanitize pipeline.
+- Make the complete dependency audit a required CI step instead of allowing
+  production-only audit failures to pass.
+
 ### Validation
 
 - Enforce SC4 declaration-name casing: initial-uppercase entity names in ARM
