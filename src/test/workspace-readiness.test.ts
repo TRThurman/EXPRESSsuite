@@ -1,4 +1,5 @@
-import { EmptyFileSystem } from "langium";
+import { EmptyFileSystem, URI } from "langium";
+import type { BuildOptions, LangiumDocument } from "langium";
 import { describe, expect, test } from "vitest";
 import { createExpressP11Services } from "../language/express-module.js";
 
@@ -31,5 +32,34 @@ describe("workspace readiness", () => {
     expect(ready).toBe(true);
 
     builder.build = originalBuild;
+  });
+
+  test("validates open documents before reporting the workspace ready", async () => {
+    const { shared } = createExpressP11Services(EmptyFileSystem);
+    await shared.workspace.ConfigurationProvider.initialized({});
+    const uri = URI.parse("file:///open.exp");
+    const document = shared.workspace.LangiumDocumentFactory.fromString(
+      "SCHEMA open_schema; END_SCHEMA;",
+      uri
+    );
+    shared.workspace.LangiumDocuments.addDocument(document);
+
+    const textDocuments = shared.workspace.TextDocuments;
+    const originalKeys = textDocuments.keys.bind(textDocuments);
+    textDocuments.keys = () => [uri.toString()];
+    const builder = shared.workspace.DocumentBuilder;
+    const originalBuild = builder.build.bind(builder);
+    const builds: Array<{ documents: LangiumDocument[]; options?: BuildOptions }> = [];
+    builder.build = async (documents, options) => {
+      builds.push({ documents, options });
+    };
+
+    await shared.workspace.WorkspaceManager.initializeWorkspace([]);
+
+    expect(builds).toHaveLength(2);
+    expect(builds[1].documents).toEqual([document]);
+    expect(builds[1].options).toBe(builder.updateBuildOptions);
+    builder.build = originalBuild;
+    textDocuments.keys = originalKeys;
   });
 });
