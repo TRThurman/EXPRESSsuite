@@ -8,6 +8,8 @@
   Visual Studio Marketplace identity `TRThurman.expresssuite` and repository
   location `TRThurman/EXPRESSsuite`. Preserve NIST easyEXPRESS attribution and
   stable `express.*` command, setting, and language identifiers.
+- Add a distinct EXPRESSsuite application icon and coordinated Marketplace
+  gallery banner, visually separate from NIST branding.
 
 ### Validation
 
