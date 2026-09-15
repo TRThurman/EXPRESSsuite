@@ -11,7 +11,7 @@ import {
 import type { LangiumSharedServices } from "langium/lsp";
 import { CancellationToken, Connection, WorkDoneProgress } from "vscode-languageserver";
 import { allowedDocuments } from "../utils/file-filter.js";
-import { EASYEXPRESS_TOKEN } from "../shared/notifications.js";
+import { EXPRESSSUITE_TOKEN } from "../shared/notifications.js";
 import { Configuration } from "./express-p11-workspace-manager.js";
 import { ExpressP11BuildStrategy } from "./express-p11-build-strategy.js";
 export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
@@ -145,9 +145,9 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
     await this.runCancelable(validDocs, DocumentState.Linked, cancelToken, async (doc) => {
       linked += 1;
       if (this.isFirstLoad || buildStrategy != ExpressP11BuildStrategy.PartialBuildDuringEdition)
-        this.connection?.sendProgress(WorkDoneProgress.type, EASYEXPRESS_TOKEN, {
+        this.connection?.sendProgress(WorkDoneProgress.type, EXPRESSSUITE_TOKEN, {
           kind: "report",
-          message: `easyEXPRESS processing file ${linked} of ${documentsToLink}`,
+          message: `EXPRESSsuite processing file ${linked} of ${documentsToLink}`,
         });
 
       const linker = this.serviceRegistry.getServices(doc.uri).references.Linker; //.link(doc, cancelToken);
@@ -197,7 +197,7 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
     try {
       await this.refreshConfiguration();
       if ((this.isFirstLoad && !this.firstIndexingInitiated) || buildStrategy != ExpressP11BuildStrategy.PartialBuildDuringEdition) {
-        this.connection?.sendProgress(WorkDoneProgress.type, EASYEXPRESS_TOKEN, {
+        this.connection?.sendProgress(WorkDoneProgress.type, EXPRESSSUITE_TOKEN, {
           kind: "begin",
           title: "initiated",
         });
@@ -214,7 +214,7 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
 
       await interruptAndCheck(cancelToken);
       if ((this.isFirstLoad && this.firstIndexingInitiated) || buildStrategy != ExpressP11BuildStrategy.PartialBuildDuringEdition) {
-        this.connection?.sendProgress(WorkDoneProgress.type, EASYEXPRESS_TOKEN, { kind: "end" });
+        this.connection?.sendProgress(WorkDoneProgress.type, EXPRESSSUITE_TOKEN, { kind: "end" });
 
         this.isFirstLoad = false;
         this.firstIndexingInitiated = false;

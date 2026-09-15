@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: easyEXPRESS Viewers (Mirror)
+title: EXPRESSsuite
 message: >-
   If you use this software, please cite both this fork and the
   NIST-developed original it is based on.  See NOTICE.md for the
@@ -14,15 +14,15 @@ authors:
     affiliation: TRThurman Consulting
     email: thomas@trthurman.consulting
 license: MIT
-license-url: https://github.com/TRThurman/easy-express-mirror/blob/main/LICENSE
-repository-code: https://github.com/TRThurman/easy-express-mirror
-url: https://github.com/TRThurman/easy-express-mirror
+license-url: https://github.com/TRThurman/EXPRESSsuite/blob/main/LICENSE
+repository-code: https://github.com/TRThurman/EXPRESSsuite
+url: https://github.com/TRThurman/EXPRESSsuite
 abstract: >-
   A Visual Studio Code extension that provides language support and
   rich-content viewers (annotated AsciiDoc descriptions, EXPRESS-G
   diagram navigation, AsciiMath/LaTeX math rendering) for the
-  EXPRESS (ISO 10303-11) information modeling language.  Forked
-  from and substantially extending the NIST-developed easyEXPRESS.
+  EXPRESS (ISO 10303-11) information modeling language. EXPRESSsuite is
+  derived from and substantially extends the NIST-developed easyEXPRESS.
 keywords:
   - EXPRESS
   - "ISO 10303-11"

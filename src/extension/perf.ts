@@ -2,7 +2,7 @@
  * Lightweight performance instrumentation for DESIGN §4.2.2.
  *
  * `time(label)` returns a stop function. The stop function records the
- * elapsed milliseconds, logs to OutputChannel "easyEXPRESS Viewers", and
+ * elapsed milliseconds, logs to OutputChannel "EXPRESSsuite Viewers", and
  * — if a threshold is provided and exceeded — also surfaces a warning so
  * regressions show up immediately in the smoke-test runs.
  *
@@ -15,7 +15,7 @@ import * as vscode from "vscode";
 let logChannel: vscode.OutputChannel | undefined;
 function getLog(): vscode.OutputChannel {
   if (!logChannel) {
-    logChannel = vscode.window.createOutputChannel("easyEXPRESS Viewers");
+    logChannel = vscode.window.createOutputChannel("EXPRESSsuite Viewers");
   }
   return logChannel;
 }

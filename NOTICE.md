@@ -11,6 +11,10 @@ with the NIST Software Licensing Statement preserved in [LICENSE.md](LICENSE.md)
 
 This file is that notice.
 
+The derivative application is now named **EXPRESSsuite**. The distinct name
+avoids suggesting that this independently maintained product is the NIST-owned
+easyEXPRESS application or Marketplace listing.
+
 ## Acknowledgement of source
 
 The original easyEXPRESS was developed at the U.S. National Institute of
@@ -104,6 +108,15 @@ software in this fork.  Detailed history is available in `git log` and
 - Added automated regression coverage for each validation class across direct,
   transitive, cyclic, renamed-resource, and malformed-comment cases.
 
+### 2026-09 — EXPRESSsuite product identity
+
+- **Date**: 2026-09-15.
+- **Nature**: renamed the derivative application and repository to
+  **EXPRESSsuite** and assigned it the independent Visual Studio Marketplace
+  identity `TRThurman.expresssuite`. The EXPRESS language, command, and setting
+  identifiers remain stable for compatibility. NIST easyEXPRESS attribution is
+  preserved throughout the project.
+
 The complete list of source-level changes since the fork point can be
 obtained via:
 
@@ -127,8 +140,8 @@ regulatory work, please cite:
 
 - **This fork's modifications** (when the modifications are material to
   the work cited):
-  > Thurman, T.  *easyEXPRESS Viewers Mirror.*  TRThurman Consulting,
-  > 2025–.  https://github.com/TRThurman/easy-express-mirror.
+  > Thurman, T.  *EXPRESSsuite.*  TRThurman Consulting,
+  > 2025–.  https://github.com/TRThurman/EXPRESSsuite.
   > MIT-licensed for code originating in this fork; NIST-developed
   > portions remain subject to the NIST Software Licensing Statement.
 

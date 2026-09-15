@@ -6,7 +6,7 @@ import type { LangiumSharedServices } from "langium/lsp";
 import type { FileSystemNode } from "langium";
 import { CancellationToken, Connection, WorkDoneProgress, WorkspaceFolder } from "vscode-languageserver";
 import { isAllowedFile } from "../utils/file-filter.js";
-import { EASYEXPRESS_TOKEN } from "../shared/notifications.js";
+import { EXPRESSSUITE_TOKEN } from "../shared/notifications.js";
 
 export type Configuration = {
   useOptimizedConfiguration: boolean;
@@ -27,9 +27,9 @@ export class ExpressP11WorkspaceManager extends DefaultWorkspaceManager {
     this.configurationProvider = services.workspace.ConfigurationProvider;
   }
   override async initializeWorkspace(folders: WorkspaceFolder[], cancelToken = CancellationToken.None): Promise<void> {
-    this.connection?.sendProgress(WorkDoneProgress.type, EASYEXPRESS_TOKEN, {
+    this.connection?.sendProgress(WorkDoneProgress.type, EXPRESSSUITE_TOKEN, {
       kind: "report",
-      message: "$(sync~spin) easyEXPRESS loading workspace",
+      message: "$(sync~spin) EXPRESSsuite loading workspace",
     });
     const useOptimizedConfiguration = await this.configurationProvider?.getConfiguration("express", "useOptimizedConfiguration");
     const excludedFolders = await this.configurationProvider?.getConfiguration("express", "excludedFolders");

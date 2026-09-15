@@ -1,8 +1,17 @@
-# easyEXPRESS (Mirror)
+# EXPRESSsuite
 
 A Visual Studio Code extension that provides language support and rich-content viewers for the [EXPRESS (ISO 10303-11)](https://www.iso.org/standard/38047.html) information modeling language used by ISO TC 184/SC 4 STEP standards.
 
-This software is **based on** the NIST-developed [easyEXPRESS](https://github.com/usnistgov/easy-express) (Sylvere Krima, Allison Barnard Feeney, Rosemary Astheimer; U.S. National Institute of Standards and Technology). Pursuant to NIST's [Software Licensing Statement](LICENSE.md), this fork carries a notice of modifications in [`NOTICE.md`](NOTICE.md) and acknowledges NIST as the source of the original software. NIST-developed software is not subject to copyright protection within the United States under 17 U.S.C. § 105.
+EXPRESSsuite is an independently maintained derivative of the NIST-developed
+[easyEXPRESS](https://github.com/usnistgov/easy-express) (Sylvere Krima,
+Allison Barnard Feeney, Rosemary Astheimer; U.S. National Institute of
+Standards and Technology). EXPRESSsuite has its own product and Visual Studio
+Marketplace identity, `TRThurman.expresssuite`; it is not the NIST-owned
+easyEXPRESS application or listing. Pursuant to NIST's
+[Software Licensing Statement](LICENSE.md), this project carries a notice of
+modifications in [`NOTICE.md`](NOTICE.md) and acknowledges NIST as the source
+of the original software. NIST-developed software is not subject to copyright
+protection within the United States under 17 U.S.C. § 105.
 
 If you reference, cite, or build on this work, see [§ Citation](#citation) below or the machine-readable [`CITATION.cff`](CITATION.cff).
 
@@ -18,7 +27,7 @@ If you reference, cite, or build on this work, see [§ Citation](#citation) belo
 
 ### SC4 validation
 
-easyEXPRESS reports additional ISO TC 184/SC 4 authoring problems in the
+EXPRESSsuite reports additional ISO TC 184/SC 4 authoring problems in the
 standard VS Code **Problems** view:
 
 - **Declaration-name casing** — entities in schemas whose names end in
@@ -33,7 +42,7 @@ standard VS Code **Problems** view:
   malformed, misplaced, and unmatched signatures are reported, as are
   malformed `.IPn` and `.ipn` annotation keys.
 
-For workspace-level ambiguity checks, run **easyEXPRESS: Detect Duplicate
+For workspace-level ambiguity checks, run **EXPRESSsuite: Detect Duplicate
 Declarations in Schema Closure** from the Command Palette or an EXPRESS
 editor's context menu. The command follows transitive `USE FROM` and
 `REFERENCE FROM` relationships from the schema at the cursor, handles cycles
@@ -56,16 +65,19 @@ Four surfaces that render the [annotated EXPRESS](https://github.com/metanorma/a
 ### From a packaged `.vsix`
 
 ```
-code --install-extension easyexpress-0.4.0.vsix
+code --install-extension expresssuite-0.4.0.vsix
 ```
+
+The package installs as `TRThurman.expresssuite`. It does not replace or
+publish a new version under the NIST easyEXPRESS Marketplace identity.
 
 (Use `code-insiders --install-extension …` for VS Code Insiders.) Reload the window after install. The extension activates on the first `.exp` file encountered in the workspace.
 
 ### From source (development)
 
 ```
-git clone https://github.com/TRThurman/easy-express-mirror.git
-cd easy-express-mirror
+git clone https://github.com/TRThurman/EXPRESSsuite.git
+cd EXPRESSsuite
 npm ci
 npm run build
 ```
@@ -92,15 +104,15 @@ Open any `.exp` file with named-remark annotations (e.g. those in [wg12-step](ht
 | Hover description | hover the cursor on any entity name |
 | Show Description | right-click → **Show Description** (or command palette) |
 | Show EXPRESS-G Diagram | right-click → **Show EXPRESS-G Diagram** |
-| AsciiMath Playground | command palette → **easyEXPRESS: Open AsciiMath Playground** |
+| AsciiMath Playground | command palette → **EXPRESSsuite: Open AsciiMath Playground** |
 | Send Selection to Playground | select text in editor → right-click → **Send Selection to AsciiMath Playground** |
 | Detect duplicate declarations | place the cursor in a schema → command palette or right-click → **Detect Duplicate Declarations in Schema Closure** |
 
-Performance and diagnostic logs land in the **Output** panel under **easyEXPRESS Viewers**.
+Performance and diagnostic logs land in the **Output** panel under **EXPRESSsuite**.
 
 ## Privacy and confidentiality
 
-easyEXPRESS itself makes **zero outbound network calls**. Every webview is configured with CSP `connect-src 'none'`; the extension host source contains no `fetch`, no `http(s)` import, no telemetry. Math rendering happens entirely on your machine via Plurimath (in a `node:worker_threads` worker) and MathJax (lazy-loaded for hover SVGs).
+EXPRESSsuite itself makes **zero outbound network calls**. Every webview is configured with CSP `connect-src 'none'`; the extension host source contains no `fetch`, no `http(s)` import, no telemetry. Math rendering happens entirely on your machine via Plurimath (in a `node:worker_threads` worker) and MathJax (lazy-loaded for hover SVGs).
 
 > ⚠ However, modern VS Code (and especially VS Code Insiders) bundles **GitHub Copilot Chat** as a built-in feature. Its right-click context-menu entries (**Explain**, **Add File to Chat**, **Open Inline Chat**, **Review**) DO send the cursor word, enclosing scope, surrounding source lines, and snippets from other open editors to GitHub/Microsoft endpoints. `--disable-extensions` does NOT remove these.
 
@@ -192,7 +204,7 @@ If you use this software in academic, standards, or regulatory work, please cite
 
 **This fork** (when the modifications are material to the work cited):
 
-> Thurman, T. *easyEXPRESS Viewers Mirror.* TRThurman Consulting, 2025–. https://github.com/TRThurman/easy-express-mirror. MIT-licensed for code originating in this fork.
+> Thurman, T. *EXPRESSsuite.* TRThurman Consulting, 2025–. https://github.com/TRThurman/EXPRESSsuite. MIT-licensed for code originating in this derivative.
 
 A machine-readable [Citation File Format](https://citation-file-format.github.io/) entry is provided as [`CITATION.cff`](CITATION.cff). GitHub renders this as a "Cite this repository" button on the repository home page; tools such as Zenodo and CFF-aware reference managers consume it directly.
 
@@ -200,7 +212,7 @@ A machine-readable [Citation File Format](https://citation-file-format.github.io
 
 ## Contributing
 
-For bug reports and feature requests, please [open an issue](https://github.com/TRThurman/easy-express-mirror/issues).
+For bug reports and feature requests, please [open an issue](https://github.com/TRThurman/EXPRESSsuite/issues).
 
 For code contributions, the development workflow is:
 

@@ -1,4 +1,4 @@
-= easyEXPRESS Viewers: Annotated EXPRESS, EXPRESS-G, and Math Rendering in VS Code
+= EXPRESSsuite Viewers: Annotated EXPRESS, EXPRESS-G, and Math Rendering in VS Code
 Thomas Thurman <thomas@trthurman.consulting>
 :revdate: 2026-05-02
 :revnumber: 0.4.0
@@ -16,14 +16,14 @@ Thomas Thurman <thomas@trthurman.consulting>
 [abstract]
 == Abstract
 
-The easyEXPRESS extension for Visual Studio Code provides language-server support for ISO 10303-11 (EXPRESS) schemas. Version 0.4.0 is a fork of Version 0.4.0 adds four viewer surfaces that read the *annotated EXPRESS* convention used by ISO TC 184/SC 4 schema authors: rich-text descriptions in named-remark comments, EXPRESS-G diagrams as interactive SVG, AsciiMath and LaTeX math rendered via the Plurimath converter Metanorma uses, and a popup math playground. The extension makes zero outbound network calls; rendering happens entirely on the user's machine. This paper documents the architecture, security model, and operational characteristics of the new surfaces, and explains how to keep pre-publication standards content confidential against unrelated AI-assistant features that ship in the surrounding VS Code editor shell.
+EXPRESSsuite is an independently maintained Visual Studio Code extension derived from NIST easyEXPRESS. It provides language-server support for ISO 10303-11 (EXPRESS) schemas and four viewer surfaces that read the *annotated EXPRESS* convention used by ISO TC 184/SC 4 schema authors: rich-text descriptions in named-remark comments, EXPRESS-G diagrams as interactive SVG, AsciiMath and LaTeX math rendered via the Plurimath converter Metanorma uses, and a popup math playground. The extension makes zero outbound network calls; rendering happens entirely on the user's machine. This paper documents the architecture, security model, and operational characteristics of the new surfaces, and explains how to keep pre-publication standards content confidential against unrelated AI-assistant features that ship in the surrounding VS Code editor shell.
 
 
 == Background
 
 ISO 10303-11 (EXPRESS) is the schema language underlying every Standard for Exchange of Product model data published under ISO TC 184/SC 4 (STEP). Schema authors annotate their schemas with prose descriptions, examples, and EXPRESS-G diagrams using the *annotated EXPRESS* convention specified at https://github.com/metanorma/annotated-express[github.com/metanorma/annotated-express]: named-remark comments of the form `+(*"tag" body *)+` where `+tag+` is a dotted path (`+schema_name.entity_name.__note+`) and `+body+` is Metanorma AsciiDoc.
 
-Authors edit schemas as plain `.exp` files, run a separate Metanorma toolchain to render the resulting documents to HTML/PDF/Word, and then return to the editor for the next round. The editing experience itself was minimal: VS Code with the easyEXPRESS extension provided syntax highlighting, definition jumps, references, and validation, but no rendering. A schema author hovering on `point` saw the bare ENTITY declaration with no description; embedded math (`+stem:[RR^m]+`) appeared as raw source text; cross-references rendered as `+<<express:geometry_schema.cartesian_point>>+` rather than navigable links; and EXPRESS-G diagrams stored alongside the `.exp` file appeared as XML when opened.
+Authors edit schemas as plain `.exp` files, run a separate Metanorma toolchain to render the resulting documents to HTML/PDF/Word, and then return to the editor for the next round. The editing experience itself was minimal: the original NIST easyEXPRESS extension provided syntax highlighting, definition jumps, references, and validation, but no rendering. A schema author hovering on `point` saw the bare ENTITY declaration with no description; embedded math (`+stem:[RR^m]+`) appeared as raw source text; cross-references rendered as `+<<express:geometry_schema.cartesian_point>>+` rather than navigable links; and EXPRESS-G diagrams stored alongside the `.exp` file appeared as XML when opened.
 
 The 0.4.0 release adds four viewer surfaces inside the editor while preserving the existing language-server features. The surfaces read the same annotated content the Metanorma toolchain consumes, so author-time review matches the eventual published rendering with no separate build step.
 
@@ -32,7 +32,7 @@ The 0.4.0 release adds four viewer surfaces inside the editor while preserving t
 
 === Process layout
 
-easyEXPRESS runs as a standard VS Code extension with three cooperating pieces:
+EXPRESSsuite runs as a standard VS Code extension with three cooperating pieces:
 
 - *Extension host* (Node.js process owned by VS Code). Hosts the language-client, the hover provider, command handlers, and the webview orchestration. Bundle size after esbuild + tree-shake: 780 KB.
 - *Language server* (separate Node.js process spawned by the extension host over IPC). A Langium-based server with custom services for scope, references, validation, and (new in 0.4.0) the annotation index. Bundle size: 1.7 MB.
@@ -144,7 +144,7 @@ The Plurimath synchronous JS API cannot be cancelled mid-evaluation. Wrapping it
 [#privacy]
 == Data privacy and confidentiality
 
-=== easyEXPRESS makes zero outbound network calls
+=== EXPRESSsuite makes zero outbound network calls
 
 This is verifiable in three independent ways:
 
@@ -162,12 +162,12 @@ The Plurimath and MathJax workers operate on AsciiMath strings in node and produ
 
 === The surrounding editor is not silent
 
-VS Code Insiders ships *GitHub Copilot Chat* as a built-in feature. It is not removed by `+--disable-extensions+` because it is integrated into the editor shell rather than installed as an extension. Its right-click context-menu entries — *Add File to Chat*, *Open Inline Chat*, *Explain*, *Review* — appear above the easyEXPRESS entries on every `.exp` file.
+VS Code Insiders ships *GitHub Copilot Chat* as a built-in feature. It is not removed by `+--disable-extensions+` because it is integrated into the editor shell rather than installed as an extension. Its right-click context-menu entries — *Add File to Chat*, *Open Inline Chat*, *Explain*, *Review* — appear above the EXPRESSsuite entries on every `.exp` file.
 
 When a user clicks *Explain* with the cursor on `+point+`:
 
 . Copilot Chat takes the selection if any, or the cursor word otherwise.
-. It asks VS Code's `+DocumentSymbolProvider+` for the enclosing scope. easyEXPRESS implements this provider, so for `+point+` the enclosing scope is the entire `+ENTITY point ... END_ENTITY;+` block.
+. It asks VS Code's `+DocumentSymbolProvider+` for the enclosing scope. EXPRESSsuite implements this provider, so for `+point+` the enclosing scope is the entire `+ENTITY point ... END_ENTITY;+` block.
 . It includes a window of surrounding source lines (the exact byte budget is not publicly documented; observed values are in the 20–50-line range).
 . With `+github.copilot.chat.useProjectContext+` enabled (its default in recent VS Code releases), Copilot may attach snippets from *other open editors* in the workspace.
 . The combined prompt is sent to GitHub/Microsoft endpoints (typically `+api.githubcopilot.com+`).
@@ -181,7 +181,7 @@ Two complementary mitigations:
 * *Sign out of GitHub in the affected VS Code window.* Click the account icon (silhouette) in the bottom-left, choose Sign Out. Without authentication Copilot Chat cannot reach its API. The menu entries remain visible but clicking them errors locally; no outbound traffic.
 * *Set `+chat.disableAIFeatures: true+`* in the workspace settings (`+.vscode/settings.json+`) for the schema repository. Recent VS Code releases honour this as a hard switch. Combine with sign-out for redundancy.
 
-The published recommendation in the project README is: *use a separate, signed-out VS Code window for any pre-publication standards work*. This is independent of easyEXPRESS itself, but is the most consequential single piece of advice the project has for its audience.
+The published recommendation in the project README is: *use a separate, signed-out VS Code window for any pre-publication standards work*. This is independent of EXPRESSsuite itself, but is the most consequential single piece of advice the project has for its audience.
 
 
 == Hot-spot navigation
@@ -296,7 +296,7 @@ The extension host bundle is the relevant working-set figure for VS Code activat
 
 === Performance instrumentation
 
-Every user-facing path is wrapped in a `+perf.time(label)+` call that emits to the *easyEXPRESS Viewers* OutputChannel. Targets and warning thresholds (the threshold flags an "⚠ over budget" entry):
+Every user-facing path is wrapped in a `+perf.time(label)+` call that emits to the *EXPRESSsuite Viewers* OutputChannel. Targets and warning thresholds (the threshold flags an "⚠ over budget" entry):
 
 [cols="2,1,1", options="header"]
 |===
@@ -316,9 +316,9 @@ Cold-start activation does not load Plurimath, MathJax, or any webview. The firs
 == Limitations and future work
 
 * *Block-form math*. Inline `+stem:[…]+` and `+latexmath:[…]+` are supported; the block forms `+[stem]+` … `+++++…+++++` and `+[asciimath]+`/`+[latexmath]+` open-blocks are not yet recognised. The extractor and renderer do not pick them up. Not currently a corpus issue (the wg12-step schemas use only the inline form), but worth tracking.
-* *EXPRESS-G `+customEditor+` registration*. VS Code 1.97+ renders `.svg` files natively in the built-in image preview, which is fine for simple inspection. Registering the easyEXPRESS-G viewer as a `+customEditor+` with `+priority: option+` would give the user "Reopen with EXPRESS-G Viewer" in the right-click menu of any `.svg` file in their workspace. Currently the viewer is only reachable via the `+express.showExpressG+` command from a `.exp` file.
+* *EXPRESS-G `+customEditor+` registration*. VS Code 1.97+ renders `.svg` files natively in the built-in image preview, which is fine for simple inspection. Registering the EXPRESSsuite EXPRESS-G viewer as a `+customEditor+` with `+priority: option+` would give the user "Reopen with EXPRESS-G Viewer" in the right-click menu of any `.svg` file in their workspace. Currently the viewer is only reachable via the `+express.showExpressG+` command from a `.exp` file.
 * *Performance under very large schemas*. The annotation index walks the CST on every parse. For schemas with thousands of named-remarks (none observed in the wg12-step corpus, but plausibly in domain-specific extensions), the per-parse cost may need to drop to incremental updates.
-* *Cross-extension API*. The upstream `+asciidoctor.asciidoctor-vscode+` extension exposes no public API. If it ever publishes one, easyEXPRESS could delegate AsciiDoc rendering to it and avoid maintaining its own Asciidoctor.js bundle.
+* *Cross-extension API*. The upstream `+asciidoctor.asciidoctor-vscode+` extension exposes no public API. If it ever publishes one, EXPRESSsuite could delegate AsciiDoc rendering to it and avoid maintaining its own Asciidoctor.js bundle.
 * *Hover math fidelity*. MathJax in hover does not match Plurimath in description preview. The two engines render the wg12-step fixture set equivalently, but Metanorma-specific extensions (`+|:+`, `+:|+`, `+bii+`) may diverge for some inputs. The "Show full description" link in every hover gives the user one-click access to the canonical render.
 
 == Acknowledgements
