@@ -20,6 +20,7 @@ import { ExpressP11WorkspaceManager } from "./express-p11-workspace-manager.js";
 import { ExpressP11ExecuteComandHandler } from "./express-p11-execute-command-handler.js";
 import { ExpressP11ServiceRegistry } from "./express-p11-service-registry.js";
 import { ExpressP11AnnotationIndex } from "./express-p11-annotation-index.js";
+import { registerValidationChecks } from "./express-p11-validator.js";
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -114,5 +115,6 @@ export function createExpressP11Services(context: ExpressP11SharedModuleContext)
   const shared = inject(createDefaultSharedModule(context), ExpressGeneratedSharedModule, ExpressP11SharedModule, context.sharedModule);
   const ExpressP11 = inject(createDefaultModule({ shared }), ExpressP11GeneratedModule, ExpressP11Module, context.module);
   shared.ServiceRegistry.register(ExpressP11);
+  registerValidationChecks(ExpressP11);
   return { shared, ExpressP11 };
 }

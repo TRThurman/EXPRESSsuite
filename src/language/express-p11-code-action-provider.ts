@@ -9,6 +9,7 @@ import {
   Position,
 } from "vscode-languageserver";
 import {
+  DeclarationNameCaseData,
   ExpressP11Issues,
   ReferenceStatementData,
   WrongReferenceLabelData,
@@ -46,8 +47,31 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
         return this.fixReferenceStatementIncomplete(diagnostic, document);
       case ExpressP11Issues.ReferenceStatementMissing:
         return this.fixReferenceStatementMissing(diagnostic, document);
+      case ExpressP11Issues.DeclarationNameCase:
+        return this.fixDeclarationNameCase(diagnostic, document);
     }
     return undefined;
+  }
+
+  private fixDeclarationNameCase(
+    diagnostic: Diagnostic,
+    document: LangiumDocument<ExpressFile>
+  ): CodeAction | undefined {
+    const data = diagnostic.data as DeclarationNameCaseData;
+    if (!data?.expectedName) return undefined;
+    return {
+      title: `Rename to ${data.expectedName}`,
+      kind: CodeActionKind.QuickFix,
+      diagnostics: [diagnostic],
+      edit: {
+        changes: {
+          [document.textDocument.uri]: [{
+            range: diagnostic.range,
+            newText: data.expectedName,
+          }],
+        },
+      },
+    };
   }
 
   private fixWrongReferenceLabel(
