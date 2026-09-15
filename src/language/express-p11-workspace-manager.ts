@@ -46,7 +46,7 @@ export class ExpressP11WorkspaceManager extends DefaultWorkspaceManager {
       const excludedFiles = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFiles");
       this.workspaceConfiguration = { useOptimizedConfiguration, excludedFiles, excludedFolders };
       await super.initializeWorkspace(folders, cancelToken);
-      await this.validateOpenDocuments(cancelToken);
+      await this.refreshOpenDocuments(cancelToken);
       this.fullyReady.resolve();
     } catch (error) {
       this.fullyReady.reject(error);
@@ -55,16 +55,14 @@ export class ExpressP11WorkspaceManager extends DefaultWorkspaceManager {
       this.connection?.sendProgress(WorkDoneProgress.type, EXPRESSSUITE_TOKEN, { kind: "end" });
     }
   }
-  private async validateOpenDocuments(cancelToken: CancellationToken): Promise<void> {
-    const openDocuments = await Promise.all(
-      this.textDocuments.keys().map((uri) => this.langiumDocuments.getOrCreateDocument(URI.parse(uri)))
-    );
-    if (openDocuments.length > 0) {
-      // The initial workspace pass intentionally indexes without validating every
-      // file. Validate open editors now so the client receives a fresh diagnostic
-      // set as soon as indexing completes, without waiting for a later request
-      // such as Peek Definition to touch the document.
-      await this.documentBuilder.build(openDocuments, this.documentBuilder.updateBuildOptions, cancelToken);
+  private async refreshOpenDocuments(cancelToken: CancellationToken): Promise<void> {
+    const openUris = this.textDocuments.keys().map((uri) => URI.parse(uri));
+    if (openUris.length > 0) {
+      // Open editors can be parsed before the rest of the workspace is indexed.
+      // Rebuild them from Changed so early linking errors are discarded and
+      // references are resolved against the completed index before diagnostics
+      // are published. A validation-only pass leaves those cached errors intact.
+      await this.documentBuilder.update(openUris, [], cancelToken);
     }
   }
   override shouldIncludeEntry(entry: FileSystemNode): boolean {

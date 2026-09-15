@@ -1,5 +1,4 @@
 import { EmptyFileSystem, URI } from "langium";
-import type { BuildOptions, LangiumDocument } from "langium";
 import { describe, expect, test } from "vitest";
 import { createExpressP11Services } from "../language/express-module.js";
 
@@ -34,7 +33,7 @@ describe("workspace readiness", () => {
     builder.build = originalBuild;
   });
 
-  test("validates open documents before reporting the workspace ready", async () => {
+  test("relinks and validates open documents before reporting the workspace ready", async () => {
     const { shared } = createExpressP11Services(EmptyFileSystem);
     await shared.workspace.ConfigurationProvider.initialized({});
     const uri = URI.parse("file:///open.exp");
@@ -49,17 +48,18 @@ describe("workspace readiness", () => {
     textDocuments.keys = () => [uri.toString()];
     const builder = shared.workspace.DocumentBuilder;
     const originalBuild = builder.build.bind(builder);
-    const builds: Array<{ documents: LangiumDocument[]; options?: BuildOptions }> = [];
-    builder.build = async (documents, options) => {
-      builds.push({ documents, options });
+    const originalUpdate = builder.update.bind(builder);
+    builder.build = async () => {};
+    const updates: string[][] = [];
+    builder.update = async (changed) => {
+      updates.push(changed.map((changedUri) => changedUri.toString()));
     };
 
     await shared.workspace.WorkspaceManager.initializeWorkspace([]);
 
-    expect(builds).toHaveLength(2);
-    expect(builds[1].documents).toEqual([document]);
-    expect(builds[1].options).toBe(builder.updateBuildOptions);
+    expect(updates).toEqual([[uri.toString()]]);
     builder.build = originalBuild;
+    builder.update = originalUpdate;
     textDocuments.keys = originalKeys;
   });
 });
