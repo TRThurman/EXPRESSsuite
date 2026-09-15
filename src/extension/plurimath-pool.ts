@@ -52,10 +52,11 @@ function spawnWorker(): Worker {
     slot.resolve({ mathml: msg.mathml, error: msg.error });
   });
   w.on("error", (err) => {
+    const message = err instanceof Error ? err.message : String(err);
     // Drain pending: any in-flight request gets an error response.
     for (const [, slot] of pending) {
       clearTimeout(slot.timer);
-      slot.resolve({ error: `worker error: ${err.message}` });
+      slot.resolve({ error: `worker error: ${message}` });
     }
     pending.clear();
     if (worker === w) worker = undefined;

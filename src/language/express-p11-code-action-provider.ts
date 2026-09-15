@@ -2,11 +2,12 @@ import { LangiumDocument, MaybePromise } from "langium";
 import type { CodeActionProvider } from "langium/lsp";
 import {
   CancellationToken,
+  CodeAction,
   CodeActionKind,
+  CodeActionParams,
+  Command,
   Position,
 } from "vscode-languageserver";
-import { CodeActionParams } from "vscode-languageserver-protocol";
-import { CodeAction, Command } from "vscode-languageserver-types";
 import {
   ExpressP11Issues,
   ReferenceStatementData,
