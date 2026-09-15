@@ -2,6 +2,13 @@
 
 ## [Unreleased] (2026-09-15)
 
+### Product identity
+
+- Rename the independently maintained derivative to **EXPRESSsuite**, with
+  Visual Studio Marketplace identity `TRThurman.expresssuite` and repository
+  location `TRThurman/EXPRESSsuite`. Preserve NIST easyEXPRESS attribution and
+  stable `express.*` command, setting, and language identifiers.
+
 ### Validation
 
 - Enforce SC4 declaration-name casing: initial-uppercase entity names in ARM
@@ -10,7 +17,7 @@
 - Detect explicit `LOCAL` declarations that duplicate the index implicitly
   declared by a `REPEAT` increment control. Identifier matching is
   case-insensitive.
-- Add **easyEXPRESS: Detect Duplicate Declarations in Schema Closure** to the
+- Add **EXPRESSsuite: Detect Duplicate Declarations in Schema Closure** to the
   Command Palette and EXPRESS editor context menu. The cancellable check walks
   transitive `USE FROM` and `REFERENCE FROM` relationships and publishes
   cross-linked Problems diagnostics for conflicting schema-level declarations.
@@ -46,9 +53,9 @@
   SVG (via MathJax v4). Cross-schema lookup falls back to a workspace-wide
   annotation index.
 - Three new commands and two context-menu entries:
-  - `easyEXPRESS: Show Description`
-  - `easyEXPRESS: Show EXPRESS-G Diagram`
-  - `easyEXPRESS: Open AsciiMath Playground`
+  - `EXPRESSsuite: Show Description`
+  - `EXPRESSsuite: Show EXPRESS-G Diagram`
+  - `EXPRESSsuite: Open AsciiMath Playground`
 
 ### Architecture
 

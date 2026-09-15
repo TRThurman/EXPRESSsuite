@@ -44,7 +44,7 @@ async function prerenderMath(body: string): Promise<Record<string, string>> {
 let logChannel: vscode.OutputChannel | undefined;
 function getLog(): vscode.OutputChannel {
   if (!logChannel) {
-    logChannel = vscode.window.createOutputChannel("easyEXPRESS Viewers");
+    logChannel = vscode.window.createOutputChannel("EXPRESSsuite Viewers");
   }
   return logChannel;
 }
@@ -57,7 +57,7 @@ function logMessage(surface: string, level: string, message: string): void {
     // §3.2.5d: surface user-actionable errors in a toast, not just the
     // OutputChannel. Keep the toast text short.
     void vscode.window.showErrorMessage(
-      `easyEXPRESS ${surface}: ${message.length > 200 ? message.slice(0, 200) + "…" : message}`,
+      `EXPRESSsuite ${surface}: ${message.length > 200 ? message.slice(0, 200) + "…" : message}`,
       "Show Output",
     ).then((picked) => { if (picked === "Show Output") ch.show(); });
   }

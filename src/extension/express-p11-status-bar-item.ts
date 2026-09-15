@@ -1,7 +1,7 @@
 import { LanguageClient, WorkDoneProgress } from "vscode-languageclient/node";
 import * as vscode from "vscode";
 
-import { EASYEXPRESS_TOKEN } from "../shared/notifications.js";
+import { EXPRESSSUITE_TOKEN } from "../shared/notifications.js";
 
 export class ExpressP11StatusBarItem {
   private statusBarItem: vscode.StatusBarItem;
@@ -21,21 +21,21 @@ export class ExpressP11StatusBarItem {
   }
 
   private setProgressHandler() {
-    this.client.onProgress(WorkDoneProgress.type, EASYEXPRESS_TOKEN, (params) => {
+    this.client.onProgress(WorkDoneProgress.type, EXPRESSSUITE_TOKEN, (params) => {
       switch (params.kind) {
         case "begin":
           this.statusBarItem.show();
-          this.statusBarItem.text = `$(sync~spin) easyEXPRESS loading`;
+          this.statusBarItem.text = `$(sync~spin) EXPRESSsuite loading`;
           break;
         case "report":
           this.statusBarItem.show();
-          this.statusBarItem.text = `$(sync~spin) easyEXPRESS building`;
+          this.statusBarItem.text = `$(sync~spin) EXPRESSsuite building`;
 
           this.statusBarItem.tooltip = `${params.message}`;
 
           break;
         case "end":
-          vscode.window.showInformationMessage("easyEXPRESS has finished loading your workspace.");
+          vscode.window.showInformationMessage("EXPRESSsuite has finished loading your workspace.");
           this.setFullBuildHander();
           break;
       }

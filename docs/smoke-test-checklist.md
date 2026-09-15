@@ -1,7 +1,7 @@
 # Cross-platform smoke-test checklist (DESIGN §4.2.1)
 
 Manual verification steps for a fresh install on each target OS.
-Run after `vsce package` produces `easyexpress-<version>.vsix`.
+Run after `vsce package` produces `expresssuite-<version>.vsix`.
 
 The CI workflow (`.github/workflows/ci.yaml`) covers `npm test` + `vsce package`
 on macOS, Ubuntu, and Windows automatically. **This document covers the
@@ -18,7 +18,7 @@ visible-UI parts that CI cannot exercise.**
 ## Install
 
 ```
-code --install-extension easyexpress-0.4.0.vsix
+code --install-extension expresssuite-0.4.0.vsix
 ```
 
 Reload VS Code.  Open `wg12-step/schemas/resources/geometry_schema/geometry_schema.exp`.
@@ -131,7 +131,7 @@ on line 3294 → expg4).
 ### Schema-walk regression (one-time per smoke run)
 
 For each schema above, scroll through the file once with Page Down.  No
-errors should appear in the OutputChannel `easyEXPRESS Viewers` or in
+errors should appear in the OutputChannel `EXPRESSsuite Viewers` or in
 the dev-tools console.  Any "⚠ over budget" `[perf]` line is a finding
 to record (not necessarily a failure).
 
@@ -159,7 +159,7 @@ to record (not necessarily a failure).
 ## Performance targets (DESIGN §4.2.2)
 
 The extension instruments key paths with `perf.time()`.  Numbers land in
-the **easyEXPRESS Viewers** OutputChannel as `[perf] <label>: <Nms>`.
+the **EXPRESSsuite Viewers** OutputChannel as `[perf] <label>: <Nms>`.
 During the smoke test, capture the values and compare to these targets:
 
 | Label | Target | Triggers warning if over |

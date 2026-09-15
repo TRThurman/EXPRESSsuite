@@ -21,7 +21,7 @@ let schemaClosureDiagnostics: vscode.DiagnosticCollection;
 export function activate(context: vscode.ExtensionContext): void {
   const stop = time("activate");
   client = startLanguageClient(context);
-  schemaClosureDiagnostics = vscode.languages.createDiagnosticCollection("easyEXPRESS schema closure");
+  schemaClosureDiagnostics = vscode.languages.createDiagnosticCollection("EXPRESSsuite schema closure");
   context.subscriptions.push(schemaClosureDiagnostics);
   initPlurimathPool(context);
   registerHoverProvider(context, client);
@@ -246,7 +246,7 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
       await vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: "easyEXPRESS: Detecting duplicate declarations",
+          title: "EXPRESSsuite: Detecting duplicate declarations",
           cancellable: true,
         },
         async (_progress, token) => {
@@ -281,7 +281,7 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
                   message,
                   vscode.DiagnosticSeverity.Error,
                 );
-                diagnostic.source = "easyEXPRESS";
+                diagnostic.source = "EXPRESSsuite";
                 diagnostic.code = "duplicate-schema-closure-declaration";
                 diagnostic.relatedInformation = conflict.locations
                   .filter((candidate) => candidate !== location)

@@ -71,7 +71,7 @@ export function renderAsciiMathSvg(expr: string): string | undefined {
  */
 export async function renderAsciiMathSvgAsync(expr: string): Promise<string | undefined> {
   if (expr.length > MAX_EXPR_CHARS) {
-    console.warn(`[easyEXPRESS hover-math] expr exceeds ${MAX_EXPR_CHARS} chars; skipping`);
+    console.warn(`[EXPRESSsuite hover-math] expr exceeds ${MAX_EXPR_CHARS} chars; skipping`);
     return undefined;
   }
   const cached = cache.get(expr);
@@ -87,14 +87,14 @@ export async function renderAsciiMathSvgAsync(expr: string): Promise<string | un
     const outer: string = MathJax.startup.adaptor.outerHTML(node);
     const svg = extractSvg(outer);
     if (!svg) {
-      console.warn(`[easyEXPRESS hover-math] no <svg> in MathJax output for "${expr}"`);
+      console.warn(`[EXPRESSsuite hover-math] no <svg> in MathJax output for "${expr}"`);
       return undefined;
     }
     const themed = svg.replace(/<svg\b/, '<svg fill="currentColor"');
     touchCache(expr, themed);
     return themed;
   } catch (e) {
-    console.error(`[easyEXPRESS hover-math] render failed for "${expr.slice(0, 60)}":`, e);
+    console.error(`[EXPRESSsuite hover-math] render failed for "${expr.slice(0, 60)}":`, e);
     return undefined;
   }
 }

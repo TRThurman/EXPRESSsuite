@@ -1,14 +1,14 @@
 {
-  "name": "easyexpress",
-  "displayName": "easyEXPRESS",
+  "name": "expresssuite",
+  "displayName": "EXPRESSsuite",
   "description": "EXPRESS language support for Visual Studio Code",
-  "homepage": "https://github.com/TRThurman/easy-express-mirror",
+  "homepage": "https://github.com/TRThurman/EXPRESSsuite",
   "bugs": {
-    "url": "https://github.com/TRThurman/easy-express-mirror/issues"
+    "url": "https://github.com/TRThurman/EXPRESSsuite/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TRThurman/easy-express-mirror.git"
+    "url": "git+https://github.com/TRThurman/EXPRESSsuite.git"
   },
   "preview": true,
   "publisher": "TRThurman",
@@ -75,38 +75,38 @@
       {
         "command": "express.buildWorkspace",
         "title": "Build EXPRESS workspace",
-        "category": "easyEXPRESS"
+        "category": "EXPRESSsuite"
       },
       {
         "command": "express.buildGraph",
         "title": "Generate type graphs",
-        "category": "easyEXPRESS"
+        "category": "EXPRESSsuite"
       },
       {
         "command": "express.detectDuplicateDeclarationsInClosure",
         "title": "Detect Duplicate Declarations in Schema Closure",
-        "category": "easyEXPRESS",
+        "category": "EXPRESSsuite",
         "enablement": "editorLangId == express"
       },
       {
         "command": "express.showDescription",
         "title": "Show Description",
-        "category": "easyEXPRESS"
+        "category": "EXPRESSsuite"
       },
       {
         "command": "express.showExpressG",
         "title": "Show EXPRESS-G Diagram",
-        "category": "easyEXPRESS"
+        "category": "EXPRESSsuite"
       },
       {
         "command": "express.openMathPlayground",
         "title": "Open AsciiMath Playground",
-        "category": "easyEXPRESS"
+        "category": "EXPRESSsuite"
       },
       {
         "command": "express.sendSelectionToMathPlayground",
         "title": "Send Selection to AsciiMath Playground",
-        "category": "easyEXPRESS"
+        "category": "EXPRESSsuite"
       }
     ],
     "menus": {
@@ -134,7 +134,7 @@
       ]
     },
     "configuration": {
-      "title": "easyEXPRESS language server",
+      "title": "EXPRESSsuite language server",
       "properties": {
         "express.useOptimizedConfiguration": {
           "type": "boolean",

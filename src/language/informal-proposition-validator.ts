@@ -239,6 +239,6 @@ function createDiagnostic(
     severity,
     message,
     code,
-    source: "easyEXPRESS",
+    source: "EXPRESSsuite",
   };
 }

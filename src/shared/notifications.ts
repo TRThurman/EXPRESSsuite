@@ -1,4 +1,4 @@
-export const EASYEXPRESS_TOKEN = "usnistgov/easyEXPRESS";
-export const EASYEXPRESS_FIRST_DONE = "easyexpressFirstDone";
+export const EXPRESSSUITE_TOKEN = "TRThurman/EXPRESSsuite";
+export const EXPRESSSUITE_FIRST_DONE = "expresssuiteFirstDone";
 
-export const EASYEXPRESS_FULL_BUILD_REQUIRED = "easyexpressFullBuildREQUIRED";
+export const EXPRESSSUITE_FULL_BUILD_REQUIRED = "expresssuiteFullBuildREQUIRED";
