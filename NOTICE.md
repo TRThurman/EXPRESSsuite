@@ -89,6 +89,21 @@ software in this fork.  Detailed history is available in `git log` and
   design-protocol document
   (`DESIGN-viewers-integration.md`).
 
+### 2026-09 — SC4 validation improvements
+
+- **Date**: 2026-09-15.
+- **Nature**: expanded EXPRESS validation for ISO TC 184/SC 4 schema
+  maintenance:
+  - Enforced ARM and non-ARM entity/type naming conventions with quick fixes.
+  - Detected explicit local declarations that duplicate implicit `REPEAT`
+    loop indices.
+  - Added an on-demand, cancellable schema-closure duplicate declaration
+    check with native Problems diagnostics and source navigation.
+  - Validated informal proposition signatures and `.wr:IPn` annotation keys,
+    including missing, malformed, misplaced, non-final, and unmatched forms.
+- Added automated regression coverage for each validation class across direct,
+  transitive, cyclic, renamed-resource, and malformed-comment cases.
+
 The complete list of source-level changes since the fork point can be
 obtained via:
 
