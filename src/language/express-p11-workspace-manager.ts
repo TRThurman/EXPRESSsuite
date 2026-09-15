@@ -18,6 +18,8 @@ export type Configuration = {
 };
 export class ExpressP11WorkspaceManager extends DefaultWorkspaceManager {
   private readonly fullyReady = new Deferred<void>();
+  private acceptingStartupDocumentChanges = true;
+  private readonly startupDocumentChanges = new Set<string>();
   private connection: Connection | undefined;
   private readonly textDocuments: LangiumSharedServices["workspace"]["TextDocuments"];
   private workspaceConfiguration: Configuration = {
@@ -47,23 +49,41 @@ export class ExpressP11WorkspaceManager extends DefaultWorkspaceManager {
       this.workspaceConfiguration = { useOptimizedConfiguration, excludedFiles, excludedFolders };
       await super.initializeWorkspace(folders, cancelToken);
       await this.refreshOpenDocuments(cancelToken);
+      this.acceptingStartupDocumentChanges = false;
       this.fullyReady.resolve();
     } catch (error) {
+      this.acceptingStartupDocumentChanges = false;
       this.fullyReady.reject(error);
       throw error;
     } finally {
       this.connection?.sendProgress(WorkDoneProgress.type, EXPRESSSUITE_TOKEN, { kind: "end" });
     }
   }
+  public queueStartupDocumentChange(uri: string): boolean {
+    if (!this.acceptingStartupDocumentChanges) {
+      return false;
+    }
+    this.startupDocumentChanges.add(uri);
+    return true;
+  }
   private async refreshOpenDocuments(cancelToken: CancellationToken): Promise<void> {
-    const openUris = this.textDocuments.keys().map((uri) => URI.parse(uri));
-    if (openUris.length > 0) {
+    do {
+      const openUris = new Set(this.textDocuments.keys());
+      for (const uri of this.startupDocumentChanges) {
+        openUris.add(uri);
+      }
+      this.startupDocumentChanges.clear();
+      if (openUris.size === 0) {
+        return;
+      }
       // Open editors can be parsed before the rest of the workspace is indexed.
       // Rebuild them from Changed so early linking errors are discarded and
       // references are resolved against the completed index before diagnostics
       // are published. A validation-only pass leaves those cached errors intact.
-      await this.documentBuilder.update(openUris, [], cancelToken);
-    }
+      await this.documentBuilder.update([...openUris].map((uri) => URI.parse(uri)), [], cancelToken);
+      // Document notifications received while the refresh was running are
+      // folded into another pass before the workspace becomes ready.
+    } while (this.startupDocumentChanges.size > 0);
   }
   override shouldIncludeEntry(entry: FileSystemNode): boolean {
     if (!super.shouldIncludeEntry(entry)) {
