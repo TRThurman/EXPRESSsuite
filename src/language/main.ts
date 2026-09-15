@@ -7,6 +7,7 @@ import {
   DETECT_SCHEMA_CLOSURE_DUPLICATES_REQUEST,
   DetectSchemaClosureDuplicatesParams,
 } from "../shared/schema-closure-duplicates.js";
+import { EXPRESS_SERVICE_REQUIREMENTS } from "./service-requirements.js";
 
 // Create a connection to the client
 const connection = createConnection(ProposedFeatures.all);
@@ -72,4 +73,4 @@ connection.onRequest(
 );
 
 // Start the language server with the shared services
-startLanguageServer(shared);
+startLanguageServer(shared, EXPRESS_SERVICE_REQUIREMENTS);
