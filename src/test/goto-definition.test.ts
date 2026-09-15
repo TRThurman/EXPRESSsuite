@@ -39,6 +39,52 @@ describe("Basic Definition provider", async () => {
   });
 });
 
+describe("Plain type Definition provider", async () => {
+  const text = `SCHEMA Maths;
+
+    TYPE maths_atom = SELECT(ma<|>ths_boolean, maths_complex, maths_integer, maths_real);
+    END_TYPE;
+
+    TYPE <|maths_boolean|> = BOOLEAN;
+    END_TYPE;
+
+    TYPE maths_integer = INTEGER;
+    END_TYPE;
+
+    TYPE maths_complex = LIST[2:2] OF REAL;
+    END_TYPE;
+
+    TYPE maths_real = REAL;
+    END_TYPE;
+
+    END_SCHEMA;`;
+
+  const services = createExpressP11Services(EmptyFileSystem).ExpressP11;
+  const goto = expectGoToDefinition(services);
+  test("Can navigate to a plain type in the same schema", async () => {
+    await goto({ text, index: 0, rangeIndex: 0 });
+  });
+});
+
+describe("Imported plain type Definition provider", async () => {
+  const text = `SCHEMA Base;
+    TYPE <|measurement_value|> = REAL;
+    END_TYPE;
+    END_SCHEMA;
+
+    SCHEMA Consumer;
+    USE FROM Base;
+    TYPE converted_value = SELECT(mea<|>surement_value);
+    END_TYPE;
+    END_SCHEMA;`;
+
+  const services = createExpressP11Services(EmptyFileSystem).ExpressP11;
+  const goto = expectGoToDefinition(services);
+  test("Can navigate to a plain type imported through the schema closure", async () => {
+    await goto({ text, index: 0, rangeIndex: 0 });
+  });
+});
+
 describe("Advanced Definition provider", async () => {
   const text = `
     SCHEMA <|Nist|>;
