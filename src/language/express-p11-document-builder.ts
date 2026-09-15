@@ -12,6 +12,7 @@ import type { LangiumSharedServices } from "langium/lsp";
 import { CancellationToken, Connection, WorkDoneProgress } from "vscode-languageserver";
 import { allowedDocuments } from "../utils/file-filter.js";
 import { EXPRESSSUITE_TOKEN } from "../shared/notifications.js";
+import { EXPRESSSUITE_CONFIGURATION_SECTION } from "../shared/commands.js";
 import { Configuration } from "./express-p11-workspace-manager.js";
 import { ExpressP11BuildStrategy } from "./express-p11-build-strategy.js";
 export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
@@ -183,9 +184,9 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
       // No LSP connection (e.g. tests, CLI) -- use defaults
       return;
     }
-    const useOptimizedConfiguration = await this.configurationProvider?.getConfiguration("express", "useOptimizedConfiguration");
-    const excludedFolders = await this.configurationProvider?.getConfiguration("express", "excludedFolders");
-    const excludedFiles = await this.configurationProvider?.getConfiguration("express", "excludedFiles");
+    const useOptimizedConfiguration = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "useOptimizedConfiguration");
+    const excludedFolders = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFolders");
+    const excludedFiles = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFiles");
     this.workspaceConfiguration = { useOptimizedConfiguration, excludedFiles, excludedFolders };
   }
   protected override async buildDocuments(

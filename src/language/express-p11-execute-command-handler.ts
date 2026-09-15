@@ -5,6 +5,7 @@ import { ExpressP11DocumentBuilder } from "./express-p11-document-builder.js";
 import { CancellationToken } from "vscode-languageserver";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
 import { ExpressP11ServiceRegistry } from "./express-p11-service-registry.js";
+import { EXPRESSSUITE_COMMANDS } from "../shared/commands.js";
 
 export class ExpressP11ExecuteComandHandler extends AbstractExecuteCommandHandler {
   protected readonly documentBuilder: ExpressP11DocumentBuilder;
@@ -17,11 +18,11 @@ export class ExpressP11ExecuteComandHandler extends AbstractExecuteCommandHandle
     this.typeContainer = services.ServiceRegistry.getTypeContainer();
   }
   override registerCommands(acceptor: ExecuteCommandAcceptor): void {
-    acceptor("express.buildWorkspace", async (_, token) => {
+    acceptor(EXPRESSSUITE_COMMANDS.buildWorkspace, async (_, token) => {
       await this.buildWorkspace(token);
     });
 
-    acceptor("express.buildGraph", async (_, token) => {
+    acceptor(EXPRESSSUITE_COMMANDS.buildGraph, async (_, token) => {
       await this.buildGraph(token);
     });
   }

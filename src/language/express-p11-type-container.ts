@@ -10,6 +10,7 @@ import {
   interruptAndCheck,
 } from "langium";
 import { ExpressP11Services } from "./express-module.js";
+import { EXPRESSSUITE_CONFIGURATION_SECTION } from "../shared/commands.js";
 import {
   Attribute_decl,
   Derived_attr,
@@ -147,9 +148,9 @@ export class ExpressP11TypeContainer {
   }
 
   private async configureWorkspace() {
-    const useOptimizedConfiguration = await this.configurationProvider?.getConfiguration("express", "useOptimizedConfiguration");
-    const excludedFolders = await this.configurationProvider?.getConfiguration("express", "excludedFolders");
-    const excludedFiles = await this.configurationProvider?.getConfiguration("express", "excludedFiles");
+    const useOptimizedConfiguration = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "useOptimizedConfiguration");
+    const excludedFolders = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFolders");
+    const excludedFiles = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFiles");
     this.workspaceConfiguration = { useOptimizedConfiguration, excludedFiles, excludedFolders };
   }
 

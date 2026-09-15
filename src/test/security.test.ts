@@ -121,7 +121,7 @@ const HTML_PURIFY_CONFIG = {
     "accent", "accentunder", "frame", "framespacing", "rowalign", "columnalign",
     "xmlns",
   ],
-  ALLOWED_URI_REGEXP: /^(https?:|mailto:|#|command:vscode\.open|command:express\.)/,
+  ALLOWED_URI_REGEXP: /^(https?:|mailto:|#|command:vscode\.open|command:expresssuite\.)/,
   FORBID_TAGS: ["script", "style", "iframe", "object", "embed", "form", "input", "button"],
   FORBID_ATTR: [
     "onload", "onclick", "onerror", "onmouseover", "onmouseout", "onfocus",
@@ -180,10 +180,14 @@ More prose.`;
     expect(html).not.toMatch(/javascript:/);
   });
 
-  test("preserves command: URLs only for vscode.open and express.* (not arbitrary commands)", () => {
+  test("preserves command: URLs only for vscode.open and expresssuite.* (not arbitrary commands)", () => {
     const ok = `<a href="command:vscode.open?%5B%22file.exp%22%5D">link</a>`;
     const cleanOk = DOMPurify.sanitize(ok, HTML_PURIFY_CONFIG);
     expect(cleanOk).toMatch(/command:vscode\.open/);
+
+    const extensionCommand = `<a href="command:expresssuite.showDescription?abc">description</a>`;
+    const cleanExtensionCommand = DOMPurify.sanitize(extensionCommand, HTML_PURIFY_CONFIG);
+    expect(cleanExtensionCommand).toMatch(/command:expresssuite\.showDescription/);
 
     const evil = `<a href="command:workbench.action.terminal.sendSequence?abc">x</a>`;
     const cleanEvil = DOMPurify.sanitize(evil, HTML_PURIFY_CONFIG);

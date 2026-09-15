@@ -4,6 +4,7 @@ import { type RemarkAnnotation } from "./annotation-index.js";
 import { getAnnotationIndex, invalidateAnnotationIndex } from "./annotation-client.js";
 import { renderAsciiMathSvgAsync, svgToDataUri } from "./hover-math.js";
 import { time } from "./perf.js";
+import { EXPRESSSUITE_COMMANDS } from "../shared/commands.js";
 
 const HOVER_PREVIEW_CHAR_LIMIT = 360;
 
@@ -35,7 +36,7 @@ function transformInline(body: string, opts: InlineTransformOptions): string {
   // 2) <<express:tag,label>> → markdown command link
   out = out.replace(XREF_RE, (_m, tag: string, label?: string) => {
     const text = (label ?? tag).trim();
-    const cmd = `command:express.showDescription?${encodeURIComponent(JSON.stringify({ path: tag.trim() }))}`;
+    const cmd = `command:${EXPRESSSUITE_COMMANDS.showDescription}?${encodeURIComponent(JSON.stringify({ path: tag.trim() }))}`;
     return `[${text}](${cmd})`;
   });
 
@@ -139,8 +140,8 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
     md.isTrusted = {
       enabledCommands: [
         "vscode.open",
-        "express.showDescription",
-        "express.showExpressG",
+        EXPRESSSUITE_COMMANDS.showDescription,
+        EXPRESSSUITE_COMMANDS.showExpressG,
       ],
     };
 
@@ -158,7 +159,7 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
     }
 
     const showCmd = vscode.Uri.parse(
-      `command:express.showDescription?${encodeURIComponent(JSON.stringify({ path }))}`,
+      `command:${EXPRESSSUITE_COMMANDS.showDescription}?${encodeURIComponent(JSON.stringify({ path }))}`,
     );
     md.appendMarkdown(`\n\n[Show full description](${showCmd})`);
 

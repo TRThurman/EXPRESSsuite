@@ -2,6 +2,7 @@ import { LanguageClient, WorkDoneProgress } from "vscode-languageclient/node";
 import * as vscode from "vscode";
 
 import { EXPRESSSUITE_TOKEN } from "../shared/notifications.js";
+import { EXPRESSSUITE_COMMANDS } from "../shared/commands.js";
 
 export class ExpressP11StatusBarItem {
   private statusBarItem: vscode.StatusBarItem;
@@ -13,7 +14,7 @@ export class ExpressP11StatusBarItem {
   private setFullBuildHander() {
     this.statusBarItem.text = "$(play) Build";
     this.statusBarItem.tooltip = "Build your EXPRESS workspace";
-    this.statusBarItem.command = "express.buildWorkspace";
+    this.statusBarItem.command = EXPRESSSUITE_COMMANDS.buildWorkspace;
   }
 
   private removeFullFuildHandler() {

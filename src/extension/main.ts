@@ -13,6 +13,7 @@ import {
   DETECT_SCHEMA_CLOSURE_DUPLICATES_REQUEST,
   DetectSchemaClosureDuplicatesResult,
 } from "../shared/schema-closure-duplicates.js";
+import { EXPRESSSUITE_COMMANDS } from "../shared/commands.js";
 
 let client: LanguageClient;
 let schemaClosureDiagnostics: vscode.DiagnosticCollection;
@@ -31,7 +32,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
 function registerViewerCommands(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
-    vscode.commands.registerCommand("express.showDescription", async (arg?: { path?: string }) => {
+    vscode.commands.registerCommand(EXPRESSSUITE_COMMANDS.showDescription, async (arg?: { path?: string }) => {
       const stop = time("command.showDescription");
       const editor = vscode.window.activeTextEditor;
       if (!editor || editor.document.languageId !== "express") {
@@ -67,7 +68,7 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
       stop(/* threshold */ 1000);
     }),
 
-    vscode.commands.registerCommand("express.showExpressG", async () => {
+    vscode.commands.registerCommand(EXPRESSSUITE_COMMANDS.showExpressG, async () => {
       const stop = time("command.showExpressG");
       const editor = vscode.window.activeTextEditor;
       if (!editor || editor.document.languageId !== "express") {
@@ -214,13 +215,13 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
       stop(/* threshold */ 800);
     }),
 
-    vscode.commands.registerCommand("express.openMathPlayground", () => {
+    vscode.commands.registerCommand(EXPRESSSUITE_COMMANDS.openMathPlayground, () => {
       const stop = time("command.openMathPlayground");
       openMathPlayground(context);
       stop(/* threshold */ 500);
     }),
 
-    vscode.commands.registerCommand("express.sendSelectionToMathPlayground", () => {
+    vscode.commands.registerCommand(EXPRESSSUITE_COMMANDS.sendSelectionToMathPlayground, () => {
       const stop = time("command.sendSelectionToMathPlayground");
       const editor = vscode.window.activeTextEditor;
       if (!editor || editor.document.languageId !== "express") {
@@ -236,7 +237,7 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
       stop(/* threshold */ 500);
     }),
 
-    vscode.commands.registerCommand("express.detectDuplicateDeclarationsInClosure", async () => {
+    vscode.commands.registerCommand(EXPRESSSUITE_COMMANDS.detectDuplicateDeclarationsInClosure, async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor || editor.document.languageId !== "express") {
         vscode.window.showInformationMessage("Place the cursor in an EXPRESS schema first.");

@@ -78,38 +78,38 @@
   "contributes": {
     "commands": [
       {
-        "command": "express.buildWorkspace",
+        "command": "expresssuite.buildWorkspace",
         "title": "Build EXPRESS workspace",
         "category": "EXPRESSsuite"
       },
       {
-        "command": "express.buildGraph",
+        "command": "expresssuite.buildGraph",
         "title": "Generate type graphs",
         "category": "EXPRESSsuite"
       },
       {
-        "command": "express.detectDuplicateDeclarationsInClosure",
+        "command": "expresssuite.detectDuplicateDeclarationsInClosure",
         "title": "Detect Duplicate Declarations in Schema Closure",
         "category": "EXPRESSsuite",
         "enablement": "editorLangId == express"
       },
       {
-        "command": "express.showDescription",
+        "command": "expresssuite.showDescription",
         "title": "Show Description",
         "category": "EXPRESSsuite"
       },
       {
-        "command": "express.showExpressG",
+        "command": "expresssuite.showExpressG",
         "title": "Show EXPRESS-G Diagram",
         "category": "EXPRESSsuite"
       },
       {
-        "command": "express.openMathPlayground",
+        "command": "expresssuite.openMathPlayground",
         "title": "Open AsciiMath Playground",
         "category": "EXPRESSsuite"
       },
       {
-        "command": "express.sendSelectionToMathPlayground",
+        "command": "expresssuite.sendSelectionToMathPlayground",
         "title": "Send Selection to AsciiMath Playground",
         "category": "EXPRESSsuite"
       }
@@ -117,22 +117,22 @@
     "menus": {
       "editor/context": [
         {
-          "command": "express.showDescription",
+          "command": "expresssuite.showDescription",
           "when": "editorLangId == express",
           "group": "navigation@1"
         },
         {
-          "command": "express.showExpressG",
+          "command": "expresssuite.showExpressG",
           "when": "editorLangId == express",
           "group": "navigation@2"
         },
         {
-          "command": "express.sendSelectionToMathPlayground",
+          "command": "expresssuite.sendSelectionToMathPlayground",
           "when": "editorLangId == express && editorHasSelection",
           "group": "navigation@3"
         },
         {
-          "command": "express.detectDuplicateDeclarationsInClosure",
+          "command": "expresssuite.detectDuplicateDeclarationsInClosure",
           "when": "editorLangId == express",
           "group": "navigation@4"
         }
@@ -141,12 +141,12 @@
     "configuration": {
       "title": "EXPRESSsuite language server",
       "properties": {
-        "express.useOptimizedConfiguration": {
+        "expresssuite.useOptimizedConfiguration": {
           "type": "boolean",
           "default": true,
           "description": "Use STEP optimized configuration and ignore files and folders not required for development."
         },
-        "express.excludedFolders": {
+        "expresssuite.excludedFolders": {
           "type": "array",
           "items": {
             "type": "string"
@@ -171,7 +171,7 @@
           ],
           "description": "Exclude folders that contain one of these keywords in their name."
         },
-        "express.excludedFiles": {
+        "expresssuite.excludedFiles": {
           "type": "array",
           "items": {
             "type": "string"
