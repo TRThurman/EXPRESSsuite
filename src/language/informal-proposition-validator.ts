@@ -5,6 +5,7 @@ import {
   ExpressFile,
   SchemaDefinition,
   isEntityDefinition,
+  isExpressFile,
   isTypeDefinition,
 } from "./generated/ast.js";
 
@@ -52,7 +53,11 @@ const VALID_SIGNATURE_RE = /^(IP[0-9]+):[\t ]*$/;
 
 export function validateInformalPropositions(document: LangiumDocument<ExpressFile>): Diagnostic[] {
   const text = document.textDocument.getText();
-  const declarations = getDeclarations(document.parseResult.value.schemas);
+  const root = document.parseResult.value;
+  if (!isExpressFile(root)) {
+    return [];
+  }
+  const declarations = getDeclarations(root.schemas);
   const annotations = getAnnotations(text);
   const signatures = getSignatures(text, declarations);
   const diagnostics: Diagnostic[] = [];

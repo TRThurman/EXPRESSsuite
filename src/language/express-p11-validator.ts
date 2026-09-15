@@ -221,6 +221,11 @@ export class ExpressP11Validator {
       if (!schema.name) return;
       const importedResourcesIndex = this.buildImportedResourcesIndex(referenceSpecifications);
       this.buildUsedResourcesIndex(useSpecifications).forEach((value, key) => importedResourcesIndex.add(key, value));
+      const fullyImportedSchemas = new Set(
+        [...referenceSpecifications, ...useSpecifications]
+          .filter((specification) => specification.resources.length === 0)
+          .map((specification) => specification.schema.$refText)
+      );
       const currentSchemaName = schema.name;
 
       for (const node of AstUtils.streamAst(schema)) {
@@ -249,6 +254,7 @@ export class ExpressP11Validator {
           const schemaNeeded = AstUtils.getContainerOfType(ref.ref, isSchemaDefinition);
           if (!schemaNeeded || !schemaNeeded.name) return;
           if (schemaNeeded.name === currentSchemaName) return;
+          if (fullyImportedSchemas.has(schemaNeeded.name)) return;
 
           const resourceImported = importedResourcesIndex.get(schemaNeeded.name).find((r) => r.node === ref.ref);
 
