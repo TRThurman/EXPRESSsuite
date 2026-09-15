@@ -38,7 +38,14 @@ import { getReferenceSpecifications, getUseSpecifications } from "../utils/inter
 export function registerValidationChecks(services: ExpressP11Services) {
   const registry = services.validation.ValidationRegistry;
   const validator = services.validation.ExpressP11Validator;
-  const checks: ValidationChecks<ExpressAstType> = {};
+  const checks: ValidationChecks<ExpressAstType> = {
+    Attribute_decl: validator.checkAttributeNameStartsWithLowerCase,
+    SchemaDefinition: [
+      validator.checkUniqueEntityName,
+      validator.checkReferencesAreImported,
+      validator.checkDeclarationNameCasing,
+    ],
+  };
   registry.register(checks, validator);
 }
 
@@ -46,10 +53,15 @@ export enum ExpressP11Issues {
   ReferenceStatementIncomplete = "reference-statement-incomplete",
   ReferenceStatementMissing = "reference-statement-missing",
   WrongReferenceLabel = "wrong-reference-label",
+  DeclarationNameCase = "declaration-name-case",
 }
 
 export type WrongReferenceLabelData = {
   expectedReference: string;
+};
+
+export type DeclarationNameCaseData = {
+  expectedName: string;
 };
 
 export type ReferenceStatementData = {
@@ -73,7 +85,6 @@ export class ExpressP11Validator {
     this.documents = services.shared.workspace.LangiumDocuments;
     this.nameProvider = services.references.NameProvider;
     // this.resourceManager = services.resources.ResourceManager;
-    console.log("ExpressP11Validator loaded;");
   }
 
   checkAttributeNameStartsWithLowerCase(attribute: Attribute_decl, accept: ValidationAcceptor): void {
@@ -109,6 +120,35 @@ export class ExpressP11Validator {
       }
       reported.add(e.name);
     });
+  }
+
+  checkDeclarationNameCasing(schema: SchemaDefinition, accept: ValidationAcceptor): void {
+    if (!schemaHasDeclarations(schema)) return;
+    const isArmSchema = schema.name.toLowerCase().endsWith("_arm");
+
+    for (const declaration of schema.body.declarations) {
+      if (!isEntityDefinition(declaration) && !isTypeDefinition(declaration)) continue;
+      let expectedName: string;
+      let kind: "Entity" | "Type";
+      if (isEntityDefinition(declaration)) {
+        kind = "Entity";
+        expectedName = isArmSchema
+          ? declaration.name.charAt(0).toUpperCase() + declaration.name.slice(1)
+          : declaration.name.toLowerCase();
+      } else {
+        kind = "Type";
+        expectedName = declaration.name.toLowerCase();
+      }
+
+      if (declaration.name === expectedName) continue;
+      const data: DeclarationNameCaseData = { expectedName };
+      accept("info", `${kind} name should be '${expectedName}'.`, {
+        node: declaration,
+        property: "name",
+        code: ExpressP11Issues.DeclarationNameCase,
+        data,
+      });
+    }
   }
 
   private buildImportedResourcesIndex(listOfReferenceFromClauses: Reference_clause[]): MultiMap<SchemaName, NamedNode> {
