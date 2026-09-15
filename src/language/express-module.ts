@@ -21,6 +21,7 @@ import { ExpressP11ExecuteComandHandler } from "./express-p11-execute-command-ha
 import { ExpressP11ServiceRegistry } from "./express-p11-service-registry.js";
 import { ExpressP11AnnotationIndex } from "./express-p11-annotation-index.js";
 import { registerValidationChecks } from "./express-p11-validator.js";
+import { ExpressP11ConfigurationProvider } from "./express-p11-configuration-provider.js";
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -47,6 +48,7 @@ export type ExpressP11AddedSharedServices = {
 
 export const ExpressP11SharedModule: Module<ExpressP11SharedServices, DeepPartial<ExpressP11SharedServices>> = {
   workspace: {
+    ConfigurationProvider: (services) => new ExpressP11ConfigurationProvider(services),
     DocumentBuilder: (services) => new ExpressP11DocumentBuilder(services),
     IndexManager: (services) => new ExpressP11IndexManager(services),
     WorkspaceManager: (services) => new ExpressP11WorkspaceManager(services),

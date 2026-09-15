@@ -25,6 +25,10 @@
 
 ### Validation
 
+- Hold diagnostics and navigation requests until the initial workspace build
+  is complete, and report loading completion only when references are ready.
+- Read the renamed `expresssuite.*` optimization settings through Langium's
+  configuration service instead of silently falling back to an empty section.
 - Enforce SC4 declaration-name casing: initial-uppercase entity names in ARM
   schemas, lowercase entity names outside ARM schemas, and lowercase type
   names everywhere. Casing diagnostics provide a rename quick fix.
