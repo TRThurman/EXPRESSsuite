@@ -2,6 +2,11 @@
   "name": "expresssuite",
   "displayName": "EXPRESSsuite",
   "description": "EXPRESS language support for Visual Studio Code",
+  "icon": "assets/expresssuite-icon.png",
+  "galleryBanner": {
+    "color": "#071B44",
+    "theme": "dark"
+  },
   "homepage": "https://github.com/TRThurman/EXPRESSsuite",
   "bugs": {
     "url": "https://github.com/TRThurman/EXPRESSsuite/issues"

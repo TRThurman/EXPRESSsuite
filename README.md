@@ -1,5 +1,7 @@
 # EXPRESSsuite
 
+![EXPRESSsuite icon](assets/expresssuite-icon.png)
+
 A Visual Studio Code extension that provides language support and rich-content viewers for the [EXPRESS (ISO 10303-11)](https://www.iso.org/standard/38047.html) information modeling language used by ISO TC 184/SC 4 STEP standards.
 
 EXPRESSsuite is an independently maintained derivative of the NIST-developed

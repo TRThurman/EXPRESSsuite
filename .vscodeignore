@@ -11,7 +11,8 @@ src/**
 **/.eslintrc.json
 **/*.map
 **/*.ts
-assets/
+assets/**
+!assets/expresssuite-icon.png
 vitest.config.js
 esbuild.mjs
 CHANGELOG.md
