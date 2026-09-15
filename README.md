@@ -16,6 +16,30 @@ If you reference, cite, or build on this work, see [§ Citation](#citation) belo
 - [Refactoring](https://code.visualstudio.com/docs/editor/refactoring): Rename Symbol with cross-file scope tracking.
 - Code snippets for common EXPRESS patterns.
 
+### SC4 validation
+
+easyEXPRESS reports additional ISO TC 184/SC 4 authoring problems in the
+standard VS Code **Problems** view:
+
+- **Declaration-name casing** — entities in schemas whose names end in
+  `_arm` must begin with an uppercase letter. Entities in other schemas and
+  all type names must be lowercase. Casing diagnostics include a quick fix.
+- **Duplicate loop indices** — a `LOCAL` variable must not redeclare the
+  index implicitly declared by a `REPEAT` increment control. EXPRESS
+  identifiers are compared without regard to case.
+- **Informal proposition signatures** — annotations such as
+  `(*"schema.entity.wr:IP1" ... *)` must have a matching `--IP1:` signature
+  as the final entry inside the corresponding `ENTITY` or `TYPE`. Missing,
+  malformed, misplaced, and unmatched signatures are reported, as are
+  malformed `.IPn` and `.ipn` annotation keys.
+
+For workspace-level ambiguity checks, run **easyEXPRESS: Detect Duplicate
+Declarations in Schema Closure** from the Command Palette or an EXPRESS
+editor's context menu. The command follows transitive `USE FROM` and
+`REFERENCE FROM` relationships from the schema at the cursor, handles cycles
+and renamed resources, and publishes navigable diagnostics for declaration
+names supplied by more than one schema in that closure.
+
 ### Annotation viewers (new in 0.4.0)
 
 Four surfaces that render the [annotated EXPRESS](https://github.com/metanorma/annotated-express) convention used by SC 4 schema authors — Metanorma AsciiDoc inside `(*"tag" body *)` named-remark comments:
@@ -70,6 +94,7 @@ Open any `.exp` file with named-remark annotations (e.g. those in [wg12-step](ht
 | Show EXPRESS-G Diagram | right-click → **Show EXPRESS-G Diagram** |
 | AsciiMath Playground | command palette → **easyEXPRESS: Open AsciiMath Playground** |
 | Send Selection to Playground | select text in editor → right-click → **Send Selection to AsciiMath Playground** |
+| Detect duplicate declarations | place the cursor in a schema → command palette or right-click → **Detect Duplicate Declarations in Schema Closure** |
 
 Performance and diagnostic logs land in the **Output** panel under **easyEXPRESS Viewers**.
 
@@ -143,7 +168,7 @@ This path uses Plurimath to render embedded math, exactly matching the rendering
 ```
 npm run build      # langium-generate + tsc + esbuild
 npm run lint       # eslint
-npm test           # vitest (73 tests)
+npm test           # vitest (98 tests)
 npm run rebuild    # clean build from scratch
 ```
 

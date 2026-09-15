@@ -1,5 +1,30 @@
 # Changelog
 
+## [Unreleased] (2026-09-15)
+
+### Validation
+
+- Enforce SC4 declaration-name casing: initial-uppercase entity names in ARM
+  schemas, lowercase entity names outside ARM schemas, and lowercase type
+  names everywhere. Casing diagnostics provide a rename quick fix.
+- Detect explicit `LOCAL` declarations that duplicate the index implicitly
+  declared by a `REPEAT` increment control. Identifier matching is
+  case-insensitive.
+- Add **easyEXPRESS: Detect Duplicate Declarations in Schema Closure** to the
+  Command Palette and EXPRESS editor context menu. The cancellable check walks
+  transitive `USE FROM` and `REFERENCE FROM` relationships and publishes
+  cross-linked Problems diagnostics for conflicting schema-level declarations.
+- Validate informal proposition (`IPn`) signatures and annotation keys.
+  Diagnostics cover missing, malformed, misplaced, non-final, and unmatched
+  signatures as well as malformed `.IPn` / `.ipn` annotation keys.
+
+### Tests
+
+- Add coverage for ARM/non-ARM naming, duplicate loop indices, direct and
+  transitive schema closures, cyclic interfaces, renamed resources, all
+  surveyed IP signature forms, and comment-scanning false positives.
+- 98 automated tests now pass.
+
 ## [0.4.0] (2026-05-02)
 
 ### Features
