@@ -15,12 +15,14 @@ import {
   Attribute_decl,
   EntityDefinition,
   ExpressAstType,
+  Local_decl,
   Reference_clause,
   SchemaDefinition,
   Use_clause,
   isConstant_body,
   isEntityDefinition,
   isFunction_head,
+  isIncrement_control,
   isProcedure_head,
   isReference_clause,
   isResource_or_rename,
@@ -40,6 +42,7 @@ export function registerValidationChecks(services: ExpressP11Services) {
   const validator = services.validation.ExpressP11Validator;
   const checks: ValidationChecks<ExpressAstType> = {
     Attribute_decl: validator.checkAttributeNameStartsWithLowerCase,
+    Local_decl: validator.checkLocalVariablesDoNotDuplicateLoopIndices,
     SchemaDefinition: [
       validator.checkUniqueEntityName,
       validator.checkReferencesAreImported,
@@ -54,6 +57,7 @@ export enum ExpressP11Issues {
   ReferenceStatementMissing = "reference-statement-missing",
   WrongReferenceLabel = "wrong-reference-label",
   DeclarationNameCase = "declaration-name-case",
+  DuplicateLoopIndex = "duplicate-loop-index",
 }
 
 export type WrongReferenceLabelData = {
@@ -148,6 +152,30 @@ export class ExpressP11Validator {
         code: ExpressP11Issues.DeclarationNameCase,
         data,
       });
+    }
+  }
+
+  checkLocalVariablesDoNotDuplicateLoopIndices(local: Local_decl, accept: ValidationAcceptor): void {
+    const algorithm = local.$container.$container;
+    const loopIndices = new Set<string>();
+
+    for (const statement of algorithm.stmts) {
+      for (const node of AstUtils.streamAst(statement)) {
+        if (isIncrement_control(node)) {
+          loopIndices.add(node.var.name.toLowerCase());
+        }
+      }
+    }
+
+    for (const declaration of local.variables) {
+      for (const variable of declaration.ids) {
+        if (!loopIndices.has(variable.name.toLowerCase())) continue;
+        accept("error", `Local variable '${variable.name}' duplicates an implicitly declared loop index.`, {
+          node: variable,
+          property: "name",
+          code: ExpressP11Issues.DuplicateLoopIndex,
+        });
+      }
     }
   }
 
