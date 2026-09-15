@@ -1,6 +1,6 @@
 import { startLanguageServer } from "langium/lsp";
 import { NodeFileSystem } from "langium/node";
-import { createConnection, ProposedFeatures } from "vscode-languageserver/node.js";
+import { createConnection, ProposedFeatures } from "vscode-languageserver/node";
 import { createExpressP11Services } from "./express-module.js";
 
 // Create a connection to the client

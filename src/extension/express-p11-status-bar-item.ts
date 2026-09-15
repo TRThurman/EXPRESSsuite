@@ -1,4 +1,4 @@
-import { LanguageClient, WorkDoneProgress } from "vscode-languageclient/node.js";
+import { LanguageClient, WorkDoneProgress } from "vscode-languageclient/node";
 import * as vscode from "vscode";
 
 import { EASYEXPRESS_TOKEN } from "../shared/notifications.js";

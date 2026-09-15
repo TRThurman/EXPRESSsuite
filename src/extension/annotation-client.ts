@@ -11,7 +11,7 @@
  */
 
 import * as vscode from "vscode";
-import type { LanguageClient } from "vscode-languageclient/node.js";
+import type { LanguageClient } from "vscode-languageclient/node";
 import { AnnotationIndex, type RemarkAnnotation } from "./annotation-index.js";
 
 interface CachedIndex {

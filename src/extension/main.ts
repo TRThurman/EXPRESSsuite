@@ -1,8 +1,8 @@
-import type { LanguageClientOptions, ServerOptions } from "vscode-languageclient/node.js";
+import type { LanguageClientOptions, ServerOptions } from "vscode-languageclient/node";
 import * as vscode from "vscode";
 import * as path from "node:path";
 import * as fs from "node:fs/promises";
-import { LanguageClient, TransportKind } from "vscode-languageclient/node.js";
+import { LanguageClient, TransportKind } from "vscode-languageclient/node";
 import { ExpressP11StatusBarItem } from "./express-p11-status-bar-item.js";
 import { registerHoverProvider } from "./hover-provider.js";
 import { getAnnotationIndex } from "./annotation-client.js";
