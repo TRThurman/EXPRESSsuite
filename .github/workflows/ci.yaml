@@ -40,10 +40,8 @@ jobs:
       - name: Unit tests
         run: npm test -- --run
 
-      - name: Audit (production deps)
-        run: npm audit --omit=dev
-        # Continue on advisories — fail only on findings the team must address.
-        continue-on-error: true
+      - name: Audit dependencies
+        run: npm audit
 
   package:
     name: Package .vsix (${{ matrix.os }})
@@ -76,7 +74,7 @@ jobs:
       - name: Upload .vsix
         uses: actions/upload-artifact@v7
         with:
-          name: easyexpress-${{ matrix.os }}.vsix
+          name: expresssuite-${{ matrix.os }}.vsix
           path: '*.vsix'
           if-no-files-found: error
           retention-days: 14

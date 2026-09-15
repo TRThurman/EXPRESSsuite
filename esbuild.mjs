@@ -41,8 +41,8 @@ async function copyVendorAssets() {
   // "r2 is not a function" inside Opal.modules.parser). Webview controllers
   // load these via dynamic import() against the copied vendor URIs at runtime.
   const assets = [
-    ["node_modules/@asciidoctor/core/dist/browser/asciidoctor.js", "out/webview/vendor/asciidoctor.js"],
-    ["node_modules/@asciidoctor/core/dist/css/asciidoctor.css", "out/webview/vendor/asciidoctor.css"],
+    ["node_modules/@asciidoctor/core/build/browser/index.js", "out/webview/vendor/asciidoctor.js"],
+    ["node_modules/@asciidoctor/core/data/asciidoctor-default.css", "out/webview/vendor/asciidoctor.css"],
     ["node_modules/@plurimath/plurimath/dist/index.js", "out/webview/vendor/plurimath/index.js"],
     ["node_modules/@plurimath/plurimath/dist/plurimath-opal.js", "out/webview/vendor/plurimath/plurimath-opal.js"],
     ["node_modules/dompurify/dist/purify.es.mjs", "out/webview/vendor/dompurify.mjs"],

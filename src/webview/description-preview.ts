@@ -71,7 +71,8 @@ async function main(): Promise<void> {
   const DOMPurify = (dompurifyMod as any).default;
   log("info", "loading asciidoctor");
   const asciidoctorMod = await import(/* @vite-ignore */ payload.asciidoctorUrl);
-  const Asciidoctor = (asciidoctorMod as any).default;
+  const convert = (asciidoctorMod as any).convert as
+    (input: string, options?: object) => Promise<unknown>;
   log("info", "vendor modules loaded; using host-prerendered math");
 
   // Use the host-prerendered MathML map (no Plurimath in webview).
@@ -91,8 +92,7 @@ async function main(): Promise<void> {
 
   let html: string;
   try {
-    const ad = Asciidoctor();
-    const doc = ad.convert(preprocessed, {
+    const doc = await convert(preprocessed, {
       safe: "secure",
       doctype: "article",
       attributes: { showtitle: false, noheader: true, "skip-front-matter": true },
