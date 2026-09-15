@@ -10,9 +10,10 @@ import {
   interruptAndCheck,
   isOperationCancelled,
 } from "langium";
-import type { Diagnostic } from "vscode-languageserver";
 import { CancellationToken } from "vscode-languageserver";
 import { isQuery_expression } from "./generated/ast.js";
+
+type Diagnostic = NonNullable<LangiumDocument["diagnostics"]>[number];
 
 export class ExpressDocumentValidator extends DefaultDocumentValidator {
   override async validateDocument(

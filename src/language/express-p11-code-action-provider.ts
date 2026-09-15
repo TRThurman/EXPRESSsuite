@@ -3,7 +3,6 @@ import type { CodeActionProvider } from "langium/lsp";
 import {
   CancellationToken,
   CodeActionKind,
-  Diagnostic,
   Position,
 } from "vscode-languageserver";
 import { CodeActionParams } from "vscode-languageserver-protocol";
@@ -16,6 +15,8 @@ import {
 import { ExpressFile } from "./generated/ast.js";
 import { getReferenceSpecifications } from "../utils/interface-helpers.js";
 import { getSchemaDeclarations } from "../utils/schema-helpers.js";
+
+type Diagnostic = NonNullable<LangiumDocument["diagnostics"]>[number];
 
 export class ExpressP11CodeActionProvider implements CodeActionProvider {
   getCodeActions(
