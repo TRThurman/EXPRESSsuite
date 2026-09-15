@@ -53,6 +53,7 @@ export abstract class ExpressResource<T extends AstNode> {
 }
 export enum DefinitionType {
   Entity,
+  Type,
   EnumType,
   SelectType,
 }
@@ -68,6 +69,10 @@ export type Definition =
   | {
       type: DefinitionType.Entity;
       resource: ExpressP11Entity;
+    }
+  | {
+      type: DefinitionType.Type;
+      resource: ExpressP11PlainType;
     }
   | {
       type: DefinitionType.EnumType;
@@ -361,6 +366,21 @@ export abstract class ExpressP11Type extends ExpressResource<TypeDefinition> {
   abstract resolve(memoPool: ExpressP11MemoPool): void;
 }
 
+/** A named EXPRESS type that is neither an enumeration nor a select. */
+export class ExpressP11PlainType extends ExpressP11Type {
+  constructor(name: string, node: TypeDefinition) {
+    super(name, false, false, DefinitionType.Type, node);
+  }
+
+  override getDefinition(): Definition {
+    return { resource: this, type: DefinitionType.Type };
+  }
+
+  override resolve(_memoPool: ExpressP11MemoPool): void {
+    // Plain types have no inheritance graph to resolve here.
+  }
+}
+
 export class ExpressP11EnumType extends ExpressP11Type {
   protected values: EnumValue[] = [];
   protected base: ExpressP11EnumType | undefined;
@@ -516,7 +536,7 @@ export class ExpressP11TypeFactory {
         def
       );
     }
-    return;
+    return new ExpressP11PlainType(def.name, def);
   }
 }
 

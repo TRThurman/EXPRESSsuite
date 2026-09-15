@@ -80,6 +80,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         const visibleResources = this.typeContainer.getAllRessourcesFrom(schema, true);
         const visibleTypes = [
           ...visibleResources.resources.get(DefinitionType.Entity)?.values() ?? [],
+          ...visibleResources.resources.get(DefinitionType.Type)?.values() ?? [],
           ...visibleResources.resources.get(DefinitionType.EnumType)?.values() ?? [],
           ...visibleResources.resources.get(DefinitionType.SelectType)?.values() ?? [],
         ].map((definition) => definition.resource.getNode());
