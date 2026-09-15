@@ -83,6 +83,12 @@
         "category": "easyEXPRESS"
       },
       {
+        "command": "express.detectDuplicateDeclarationsInClosure",
+        "title": "Detect Duplicate Declarations in Schema Closure",
+        "category": "easyEXPRESS",
+        "enablement": "editorLangId == express"
+      },
+      {
         "command": "express.showDescription",
         "title": "Show Description",
         "category": "easyEXPRESS"
@@ -119,6 +125,11 @@
           "command": "express.sendSelectionToMathPlayground",
           "when": "editorLangId == express && editorHasSelection",
           "group": "navigation@3"
+        },
+        {
+          "command": "express.detectDuplicateDeclarationsInClosure",
+          "when": "editorLangId == express",
+          "group": "navigation@4"
         }
       ]
     },

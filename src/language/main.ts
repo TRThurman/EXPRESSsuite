@@ -2,12 +2,18 @@ import { startLanguageServer } from "langium/lsp";
 import { NodeFileSystem } from "langium/node";
 import { createConnection, ProposedFeatures } from "vscode-languageserver/node";
 import { createExpressP11Services } from "./express-module.js";
+import { SchemaClosureDuplicateAnalyzer } from "./schema-closure-duplicates.js";
+import {
+  DETECT_SCHEMA_CLOSURE_DUPLICATES_REQUEST,
+  DetectSchemaClosureDuplicatesParams,
+} from "../shared/schema-closure-duplicates.js";
 
 // Create a connection to the client
 const connection = createConnection(ProposedFeatures.all);
 
 // Inject the shared services and language-specific services
-const { shared } = createExpressP11Services({ connection, ...NodeFileSystem });
+const { shared, ExpressP11 } = createExpressP11Services({ connection, ...NodeFileSystem });
+const schemaClosureDuplicateAnalyzer = new SchemaClosureDuplicateAnalyzer(ExpressP11);
 
 // Custom LSP requests (DESIGN §3.2.2, §3.2.3). Registered before
 // startLanguageServer so handlers are wired by the time the client begins
@@ -54,6 +60,14 @@ connection.onRequest(
       };
     }
     return null;
+  },
+);
+
+connection.onRequest(
+  DETECT_SCHEMA_CLOSURE_DUPLICATES_REQUEST,
+  (params: DetectSchemaClosureDuplicatesParams, cancelToken) => {
+    if (!params || typeof params.uri !== "string" || !params.position) return { conflicts: [] };
+    return schemaClosureDuplicateAnalyzer.analyze(params.uri, params.position, cancelToken);
   },
 );
 
