@@ -12,6 +12,8 @@ import {
 } from "langium";
 import { CancellationToken } from "vscode-languageserver";
 import { isQuery_expression } from "./generated/ast.js";
+import { ExpressFile } from "./generated/ast.js";
+import { validateInformalPropositions } from "./informal-proposition-validator.js";
 
 type Diagnostic = NonNullable<LangiumDocument["diagnostics"]>[number];
 
@@ -46,6 +48,7 @@ export class ExpressDocumentValidator extends DefaultDocumentValidator {
     // Process custom validations
     try {
       diagnostics.push(...(await this.validateAst(parseResult.value, options, cancelToken)));
+      diagnostics.push(...validateInformalPropositions(document as LangiumDocument<ExpressFile>));
     } catch (err) {
       if (isOperationCancelled(err)) {
         throw err;
