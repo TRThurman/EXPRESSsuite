@@ -42,7 +42,7 @@ const HTML_PURIFY_CONFIG = {
     "accent", "accentunder", "frame", "framespacing", "rowalign", "columnalign",
     "xmlns",
   ],
-  ALLOWED_URI_REGEXP: /^(https?:|mailto:|#|command:vscode\.open|command:express\.)/,
+  ALLOWED_URI_REGEXP: /^(https?:|mailto:|#|command:vscode\.open|command:expresssuite\.)/,
   FORBID_TAGS: ["script", "style", "iframe", "object", "embed", "form", "input", "button"],
   FORBID_ATTR: [
     "onload", "onclick", "onerror", "onmouseover", "onmouseout", "onfocus",

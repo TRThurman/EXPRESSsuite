@@ -62,7 +62,7 @@ PHASE 4: VALIDATION           → Acceptance tests on real annotated schemas
 - Document selector for client: `{ scheme: "file", language: "express" }` — `src/extension/main.ts:43`.
 - **No webviews / custom editors / hover providers / tree views currently** — confirmed by `grep` over `src/`.
 - Existing UI surface: only `ExpressP11StatusBarItem` (status bar with build button) — `src/extension/express-p11-status-bar-item.ts:6-49`.
-- Contributed commands: `express.buildWorkspace`, `express.buildGraph` — `package.json:65-76`.
+- Contributed commands: `expresssuite.buildWorkspace`, `expresssuite.buildGraph` — `package.json:65-76`.
 - Contributions present: commands, configuration, languages, grammars, snippets — `package.json:64-148`. **No** `customEditors`, `views`, or `viewsContainers`.
 - Bundle: esbuild produces two CJS bundles in single pass; `entryPoints: ["src/extension/main.ts", "src/extension/language/main.ts"]`, `outdir: out`, `external: ["vscode"]`, `platform: node`, `target: ES2017`, `format: cjs` — `esbuild.mjs:31-46`.
 - Bundle sizes (current minified): `out/extension/main.cjs` = 765,187 B (748 KB); `out/language/main.cjs` = 1,814,032 B (1.7 MB). Combined ≈ 2.45 MB.
@@ -393,17 +393,17 @@ named-remark (raw text)
   "contributes": {
     "commands": [
       // existing:
-      { "command": "express.buildWorkspace", ... },
-      { "command": "express.buildGraph", ... },
+      { "command": "expresssuite.buildWorkspace", ... },
+      { "command": "expresssuite.buildGraph", ... },
       // new:
-      { "command": "express.showDescription", "title": "Show Description", "category": "EXPRESS" },
-      { "command": "express.showExpressG",   "title": "Show EXPRESS-G Diagram", "category": "EXPRESS" },
-      { "command": "express.openMathPlayground", "title": "Open AsciiMath Playground", "category": "EXPRESS" }
+      { "command": "expresssuite.showDescription", "title": "Show Description", "category": "EXPRESS" },
+      { "command": "expresssuite.showExpressG",   "title": "Show EXPRESS-G Diagram", "category": "EXPRESS" },
+      { "command": "expresssuite.openMathPlayground", "title": "Open AsciiMath Playground", "category": "EXPRESS" }
     ],
     "menus": {
       "editor/context": [
-        { "command": "express.showDescription", "when": "editorLangId == express", "group": "navigation" },
-        { "command": "express.showExpressG",    "when": "editorLangId == express", "group": "navigation" }
+        { "command": "expresssuite.showDescription", "when": "editorLangId == express", "group": "navigation" },
+        { "command": "expresssuite.showExpressG",    "when": "editorLangId == express", "group": "navigation" }
       ]
     }
   }
@@ -506,7 +506,7 @@ The `ALLOWED_URI_REGEXP` is critical: it permits `#fragment`, base64-encoded ima
 
 **Empirical finding (Phase 2)**: Asciidoctor's `:safe-mode: secure` blocks `include::` and external attribute reads, but **does NOT strip `pass:[…]` or `+++…+++` passthroughs**. Tests in `src/test/security.test.ts` confirm both surface in the rendered HTML even at the strictest safe level.
 
-**Mitigation**: layered defense — Asciidoctor with `:safe-mode: secure` followed by DOMPurify HTML sanitization on the output before injection. The HTML allow-list permits MathML elements (for `stem:[]` rendering) and a restricted `command:` URI scheme (only `vscode.open` and `express.*`).
+**Mitigation**: layered defense — Asciidoctor with `:safe-mode: secure` followed by DOMPurify HTML sanitization on the output before injection. The HTML allow-list permits MathML elements (for `stem:[]` rendering) and a restricted `command:` URI scheme (only `vscode.open` and `expresssuite.*`).
 
 ```js
 const html = asciidoctor.convert(body, {
@@ -516,7 +516,7 @@ const html = asciidoctor.convert(body, {
 });
 const sanitized = DOMPurify.sanitize(String(html), HTML_PURIFY_CONFIG);
 // HTML_PURIFY_CONFIG: ALLOWED_TAGS includes MathML;
-// ALLOWED_URI_REGEXP: /^(https?:|mailto:|#|command:vscode\.open|command:express\.)/
+// ALLOWED_URI_REGEXP: /^(https?:|mailto:|#|command:vscode\.open|command:expresssuite\.)/
 // FORBID_TAGS: script, style, iframe, object, embed, form, input, button
 // FORBID_ATTR: onload/onclick/onerror/onmouseover/.../style
 ```
@@ -534,8 +534,8 @@ const md = new vscode.MarkdownString();
 md.supportHtml = true;
 md.isTrusted = { enabledCommands: [
   'vscode.open',
-  'express.showDescription',
-  'express.showExpressG',
+  'expresssuite.showDescription',
+  'expresssuite.showExpressG',
 ] };
 ```
 
@@ -635,10 +635,10 @@ Future hardening (out of POC scope but tracked here):
 
 The Phase 2 POC succeeds when, on `~/test_git/sd.iso.org/wg12-step/schemas/resources/geometry_schema/geometry_schema.exp`:
 
-1. `express.showDescription` over a cursor on `point` (line 3294) opens a webview rendering the `__note` AsciiDoc body with bold/links/cross-refs visible.
+1. `expresssuite.showDescription` over a cursor on `point` (line 3294) opens a webview rendering the `__note` AsciiDoc body with bold/links/cross-refs visible.
 2. The same description's `stem:[RR^m]` renders as typeset math (vector "ℝᵐ" form), produced via Plurimath → MathML → Chromium.
-3. `express.showExpressG` opens a co-located `geometry_schemaexpg<N>.svg`; clicking a hot-spot opens the target schema location.
-4. `express.openMathPlayground` shows two panes; typing `sum_(i=1)^n i^3=((n(n+1))/2)^2` in the input pane renders typeset math in the output pane within 200ms of stop-typing.
+3. `expresssuite.showExpressG` opens a co-located `geometry_schemaexpg<N>.svg`; clicking a hot-spot opens the target schema location.
+4. `expresssuite.openMathPlayground` shows two panes; typing `sum_(i=1)^n i^3=((n(n+1))/2)^2` in the input pane renders typeset math in the output pane within 200ms of stop-typing.
 5. Hover over the same `point` entity name in the editor shows a `MarkdownString` with the first ~200 chars of the description.
 6. `npm run build` succeeds; combined extension-host bundle remains ≤ 800 KB; webview-vendor assets total ≤ 4 MB on disk.
 7. All 42 existing tests still pass; new tests exercise (a) named-remark CST extraction and (b) tag-string regex parsing.

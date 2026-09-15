@@ -113,9 +113,10 @@ software in this fork.  Detailed history is available in `git log` and
 - **Date**: 2026-09-15.
 - **Nature**: renamed the derivative application and repository to
   **EXPRESSsuite** and assigned it the independent Visual Studio Marketplace
-  identity `TRThurman.expresssuite`. The EXPRESS language, command, and setting
-  identifiers remain stable for compatibility. NIST easyEXPRESS attribution is
-  preserved throughout the project.
+  identity `TRThurman.expresssuite`. The EXPRESS language identifier remains
+  `express`, while commands and settings use the independent `expresssuite.*`
+  namespace so both products can be installed together. NIST easyEXPRESS
+  attribution is preserved throughout the project.
 
 The complete list of source-level changes since the fork point can be
 obtained via:

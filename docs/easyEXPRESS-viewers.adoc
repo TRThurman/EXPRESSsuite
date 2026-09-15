@@ -103,7 +103,7 @@ Each viewer surface is its own `+WebviewPanel+` with its own CSP. A compromise o
 Two findings drove explicit sanitisation:
 
 . *SVG content is XSS-capable*. EXPRESS-G hot-spot interaction requires the SVG to be inlined (an `+<img src>+` element does not propagate `+<a href>+` clicks back to JavaScript). Inlined SVG can carry `+<script>+`, `+<foreignObject>+` with HTML, `+javascript:+` URLs, and `+on*+` event handlers. The viewer sanitises every SVG via DOMPurify before injection with an explicit ALLOWED_TAGS / ALLOWED_ATTR allow-list and a URI-scheme regex that permits `+#fragment+`, base64-encoded image data URIs, and bare integer hot-spot indices, but strips all other URI schemes.
-. *Asciidoctor `+:safe-mode: secure+` does not strip `+pass:[…]+` or `++++…+++++` passthroughs*. The empirical test against a `+pass:[<script>alert(1)</script>]+` payload showed the script element appearing verbatim in the output. The viewer therefore applies DOMPurify HTML sanitisation to Asciidoctor output as well, with an allow-list that includes MathML elements (so pre-rendered math survives) and a `+command:+` URI filter that permits only `+vscode.open+` and the extension's own `+express.*+` commands.
+. *Asciidoctor `+:safe-mode: secure+` does not strip `+pass:[…]+` or `++++…+++++` passthroughs*. The empirical test against a `+pass:[<script>alert(1)</script>]+` payload showed the script element appearing verbatim in the output. The viewer therefore applies DOMPurify HTML sanitisation to Asciidoctor output as well, with an allow-list that includes MathML elements (so pre-rendered math survives) and a `+command:+` URI filter that permits only `+vscode.open+` and the extension's own `+expresssuite.*+` commands.
 
 === Hover trust scope
 
@@ -114,13 +114,13 @@ Two findings drove explicit sanitisation:
 md.isTrusted = {
   enabledCommands: [
     "vscode.open",
-    "express.showDescription",
-    "express.showExpressG",
+    "expresssuite.showDescription",
+    "expresssuite.showExpressG",
   ],
 };
 ----
 
-so the hover's "Show full description" link can fire `+express.showDescription+` but no other commands.
+so the hover's "Show full description" link can fire `+expresssuite.showDescription+` but no other commands.
 
 === Resource limits
 
@@ -316,7 +316,7 @@ Cold-start activation does not load Plurimath, MathJax, or any webview. The firs
 == Limitations and future work
 
 * *Block-form math*. Inline `+stem:[…]+` and `+latexmath:[…]+` are supported; the block forms `+[stem]+` … `+++++…+++++` and `+[asciimath]+`/`+[latexmath]+` open-blocks are not yet recognised. The extractor and renderer do not pick them up. Not currently a corpus issue (the wg12-step schemas use only the inline form), but worth tracking.
-* *EXPRESS-G `+customEditor+` registration*. VS Code 1.97+ renders `.svg` files natively in the built-in image preview, which is fine for simple inspection. Registering the EXPRESSsuite EXPRESS-G viewer as a `+customEditor+` with `+priority: option+` would give the user "Reopen with EXPRESS-G Viewer" in the right-click menu of any `.svg` file in their workspace. Currently the viewer is only reachable via the `+express.showExpressG+` command from a `.exp` file.
+* *EXPRESS-G `+customEditor+` registration*. VS Code 1.97+ renders `.svg` files natively in the built-in image preview, which is fine for simple inspection. Registering the EXPRESSsuite EXPRESS-G viewer as a `+customEditor+` with `+priority: option+` would give the user "Reopen with EXPRESS-G Viewer" in the right-click menu of any `.svg` file in their workspace. Currently the viewer is only reachable via the `+expresssuite.showExpressG+` command from a `.exp` file.
 * *Performance under very large schemas*. The annotation index walks the CST on every parse. For schemas with thousands of named-remarks (none observed in the wg12-step corpus, but plausibly in domain-specific extensions), the per-parse cost may need to drop to incremental updates.
 * *Cross-extension API*. The upstream `+asciidoctor.asciidoctor-vscode+` extension exposes no public API. If it ever publishes one, EXPRESSsuite could delegate AsciiDoc rendering to it and avoid maintaining its own Asciidoctor.js bundle.
 * *Hover math fidelity*. MathJax in hover does not match Plurimath in description preview. The two engines render the wg12-step fixture set equivalently, but Metanorma-specific extensions (`+|:+`, `+:|+`, `+bii+`) may diverge for some inputs. The "Show full description" link in every hover gives the user one-click access to the canonical render.

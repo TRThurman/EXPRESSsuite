@@ -7,9 +7,11 @@
 - Rename the independently maintained derivative to **EXPRESSsuite**, with
   Visual Studio Marketplace identity `TRThurman.expresssuite` and repository
   location `TRThurman/EXPRESSsuite`. Preserve NIST easyEXPRESS attribution and
-  stable `express.*` command, setting, and language identifiers.
+  the stable `express` language identifier.
 - Add a distinct EXPRESSsuite application icon and coordinated Marketplace
   gallery banner, visually separate from NIST branding.
+- Move commands and settings to the independent `expresssuite.*` namespace so
+  EXPRESSsuite can run alongside NIST easyEXPRESS without global ID collisions.
 
 ### Security
 
@@ -97,7 +99,7 @@ integer-href hot-spot convention while stripping `javascript:`,
 `data:text/html`, etc. Asciidoctor runs with `:safe-mode: secure`; output
 is also DOMPurified because secure mode does not strip `pass:[]` /
 `+++…+++` passthroughs. `MarkdownString.isTrusted` uses the array form to
-whitelist only `vscode.open` and `express.*` commands. Webview→host
+whitelist only `vscode.open` and `expresssuite.*` commands. Webview→host
 messages are schema-validated; resource limits cap per-expression and
 per-document math work to prevent DoS via pathological input.
 
