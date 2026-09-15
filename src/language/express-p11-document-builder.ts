@@ -52,51 +52,60 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
     cancelToken = CancellationToken.None,
     strategy: ExpressP11BuildStrategy = ExpressP11BuildStrategy.PartialBuildDuringEdition
   ): Promise<void> {
-    // Remove all metadata of documents that are reported as deleted
+    this.currentState = DocumentState.Changed;
+    const deletedUris: URI[] = [];
     for (const deletedUri of deleted) {
-      this.langiumDocuments.deleteDocument(deletedUri);
-      this.buildState.delete(deletedUri.toString());
-      this.indexManager.remove(deletedUri);
-    }
-    // Set the state of all changed documents to `Changed` so they are completely rebuilt
-    for (const changedUri of changed) {
-      const invalidated = this.langiumDocuments.invalidateDocument(changedUri);
-      if (!invalidated) {
-        await this.langiumDocuments.getOrCreateDocument(changedUri);
+      // File watchers also report directory changes. Remove every tracked
+      // document below a deleted URI rather than treating the directory as a
+      // language document.
+      const deletedDocuments = this.langiumDocuments.deleteDocuments(deletedUri);
+      for (const document of deletedDocuments) {
+        deletedUris.push(document.uri);
+        this.cleanUpDeleted(document);
       }
-      this.buildState.delete(changedUri.toString());
+    }
+
+    // Resolve directory notifications to supported EXPRESS files and discard
+    // unrelated or extensionless paths before asking the language registry to
+    // create documents for them.
+    const changedUris = (await Promise.all(changed.map((uri) => this.findChangedUris(uri)))).flat();
+    for (const changedUri of changedUris) {
+      let document = this.langiumDocuments.getDocument(changedUri);
+      if (!document) {
+        document = this.langiumDocumentFactory.fromModel({ $type: "INVALID" }, changedUri);
+        document.state = DocumentState.Changed;
+        this.langiumDocuments.addDocument(document);
+      }
+      this.resetToState(document, DocumentState.Changed);
     }
     if (this.isFirstLoad || strategy !== ExpressP11BuildStrategy.PartialBuildDuringEdition) {
       // Set the state of all documents that should be relinked to `ComputedScopes` (if not already lower)
-      const allChangedUris = stream(changed)
-        .concat(deleted)
+      const allChangedUris = stream(changedUris)
+        .concat(deletedUris)
         .map((uri) => uri.toString())
         .toSet();
       this.langiumDocuments.all
         .filter((doc) => !allChangedUris.has(doc.uri.toString()) && this.shouldRelink(doc, allChangedUris))
-        .forEach((doc) => {
-          const linker = this.serviceRegistry.getServices(doc.uri).references.Linker;
-          linker.unlink(doc);
-          doc.state = Math.min(doc.state, DocumentState.ComputedScopes);
-          doc.diagnostics = undefined;
-        });
+        .forEach((doc) => this.resetToState(doc, DocumentState.ComputedScopes));
     }
     // Notify listeners of the update
-    await this.emitUpdate(changed, deleted);
+    await this.emitUpdate(changedUris, deletedUris);
     // Only allow interrupting the execution after all state changes are done
     await interruptAndCheck(cancelToken);
 
     // Collect all documents that we should rebuild
     const rebuildDocuments = this.langiumDocuments.all
-      .filter(
-        (doc) =>
+      .filter((doc) =>
           // This includes those that were reported as changed and those that we selected for relinking
-          doc.state < DocumentState.Linked ||
+          doc.state < DocumentState.Validated ||
           // This includes those for which a previous build has been cancelled
-          !this.buildState.get(doc.uri.toString())?.completed
+          !this.buildState.get(doc.uri.toString())?.completed ||
+          // This includes documents missing validation categories requested by
+          // the current incremental build.
+          this.resultsAreIncomplete(doc, this.updateBuildOptions)
       )
       .toArray();
-    await this.buildDocuments(rebuildDocuments, this.updateBuildOptions, cancelToken, strategy);
+    await this.buildDocuments(this.sortDocuments(rebuildDocuments), this.updateBuildOptions, cancelToken, strategy);
   }
 
   private async executeBuildDocuments(
