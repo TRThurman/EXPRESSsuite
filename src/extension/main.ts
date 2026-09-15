@@ -9,13 +9,20 @@ import { getAnnotationIndex } from "./annotation-client.js";
 import { showDescriptionPreview, showExpressGPreview, openMathPlayground } from "./webviews.js";
 import { initPlurimathPool, shutdownPlurimathPool } from "./plurimath-pool.js";
 import { time } from "./perf.js";
+import {
+  DETECT_SCHEMA_CLOSURE_DUPLICATES_REQUEST,
+  DetectSchemaClosureDuplicatesResult,
+} from "../shared/schema-closure-duplicates.js";
 
 let client: LanguageClient;
+let schemaClosureDiagnostics: vscode.DiagnosticCollection;
 
 // This function is called when the extension is activated.
 export function activate(context: vscode.ExtensionContext): void {
   const stop = time("activate");
   client = startLanguageClient(context);
+  schemaClosureDiagnostics = vscode.languages.createDiagnosticCollection("easyEXPRESS schema closure");
+  context.subscriptions.push(schemaClosureDiagnostics);
   initPlurimathPool(context);
   registerHoverProvider(context, client);
   registerViewerCommands(context);
@@ -227,6 +234,91 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
       }
       openMathPlayground(context, sel);
       stop(/* threshold */ 500);
+    }),
+
+    vscode.commands.registerCommand("express.detectDuplicateDeclarationsInClosure", async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor || editor.document.languageId !== "express") {
+        vscode.window.showInformationMessage("Place the cursor in an EXPRESS schema first.");
+        return;
+      }
+
+      await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: "easyEXPRESS: Detecting duplicate declarations",
+          cancellable: true,
+        },
+        async (_progress, token) => {
+          try {
+            const result = await client.sendRequest<DetectSchemaClosureDuplicatesResult>(
+              DETECT_SCHEMA_CLOSURE_DUPLICATES_REQUEST,
+              {
+                uri: editor.document.uri.toString(),
+                position: editor.selection.active,
+              },
+              token,
+            );
+            if (token.isCancellationRequested) return;
+            if (!result.schema) {
+              vscode.window.showInformationMessage("Place the cursor inside an EXPRESS schema first.");
+              return;
+            }
+
+            schemaClosureDiagnostics.clear();
+            const diagnosticsByUri = new Map<string, vscode.Diagnostic[]>();
+            for (const conflict of result.conflicts) {
+              const schemas = [...new Set(conflict.locations.map((location) => location.schema))].sort();
+              const message = `${conflict.category} '${conflict.name}' is declared in multiple schemas in the closure of '${result.schema}': ${schemas.join(", ")}.`;
+              for (const location of conflict.locations) {
+                const diagnostic = new vscode.Diagnostic(
+                  new vscode.Range(
+                    location.range.start.line,
+                    location.range.start.character,
+                    location.range.end.line,
+                    location.range.end.character,
+                  ),
+                  message,
+                  vscode.DiagnosticSeverity.Error,
+                );
+                diagnostic.source = "easyEXPRESS";
+                diagnostic.code = "duplicate-schema-closure-declaration";
+                diagnostic.relatedInformation = conflict.locations
+                  .filter((candidate) => candidate !== location)
+                  .map((candidate) => new vscode.DiagnosticRelatedInformation(
+                    new vscode.Location(
+                      vscode.Uri.parse(candidate.uri),
+                      new vscode.Range(
+                        candidate.range.start.line,
+                        candidate.range.start.character,
+                        candidate.range.end.line,
+                        candidate.range.end.character,
+                      ),
+                    ),
+                    `${conflict.category} '${conflict.name}' is also declared in schema '${candidate.schema}'.`,
+                  ));
+                const diagnostics = diagnosticsByUri.get(location.uri) ?? [];
+                diagnostics.push(diagnostic);
+                diagnosticsByUri.set(location.uri, diagnostics);
+              }
+            }
+            for (const [uri, diagnostics] of diagnosticsByUri) {
+              schemaClosureDiagnostics.set(vscode.Uri.parse(uri), diagnostics);
+            }
+
+            const count = result.conflicts.length;
+            vscode.window.showInformationMessage(
+              count === 0
+                ? `No duplicate declarations found in the closure of '${result.schema}'.`
+                : `Found ${count} duplicate declaration ${count === 1 ? "name" : "names"} in the closure of '${result.schema}'.`,
+            );
+          } catch (error) {
+            if (token.isCancellationRequested) return;
+            const message = error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage(`Could not detect duplicate declarations: ${message}`);
+          }
+        },
+      );
     }),
   );
 }
