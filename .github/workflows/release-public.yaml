@@ -1,5 +1,14 @@
 name: Create release version
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: >-
+          Explicit version, e.g. 0.4.2. Leave blank to infer the increment from
+          conventional commits. An explicit value is needed when promoting a
+          pre-release, because there are no new feat/fix commits to infer from.
+        required: false
+        type: string
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -24,7 +33,11 @@ jobs:
       - name: Generate language utilities
         run: npm run langium:generate
       - name: Release extension
-        run: npm run release
+        # `npm run release` alone infers the increment from conventional commits.
+        # Promoting a pre-release has no new feat/fix commits since the tag, so the
+        # recommendation is empty and release-it resolves the version to null. The
+        # optional input supplies it explicitly; blank preserves inference.
+        run: npm run release -- ${{ inputs.version }}
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: End message
