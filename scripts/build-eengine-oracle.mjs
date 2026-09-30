@@ -11,6 +11,13 @@
 //   node scripts/build-eengine-oracle.mjs \
 //     --corpus <stepmod>/schemas --stepmod <stepmod> \
 //     [--out test-fixtures/eengine-oracle.json] [--jobs 8] [--resume]
+//     [--timeout 60000]
+//
+// Some schemas hang eengine rather than failing (modules/via_component/arm.exp is
+// one), so --timeout bounds each invocation. A schema that times out is recorded
+// as timedOut instead of rejected: "eengine did not answer" is not the same claim
+// as "eengine says this is invalid", and consumers must be able to tell them
+// apart.
 //
 // The -mode argument depends on the kind of file, per the documented mode table:
 // resource schemas and module MIMs are mim_shortform, module ARMs arm_shortform,
@@ -23,6 +30,7 @@ import { execFile } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { availableParallelism } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { corpusProvenance } from "./corpus-provenance.mjs";
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`);
@@ -34,6 +42,7 @@ const corpus = resolve(arg("corpus", ""));
 const stepmod = resolve(arg("stepmod", ""));
 const out = resolve(arg("out", "test-fixtures/eengine-oracle.json"));
 const jobs = Math.max(1, Number(arg("jobs", Math.max(1, Math.min(8, availableParallelism() - 2)))));
+const timeout = Math.max(1000, Number(arg("timeout", 600000)));
 if (!arg("corpus", "") || !arg("stepmod", "")) {
   console.error("--corpus and --stepmod are required");
   process.exit(2);
@@ -67,6 +76,7 @@ const modeFor = (path) => {
   return undefined;
 };
 
+const provenance = corpusProvenance(corpus);
 const schemas = walk(corpus).sort();
 const verdicts = flag("resume") && existsSync(out) ? JSON.parse(readFileSync(out, "utf8")).verdicts ?? {} : {};
 const alreadyDone = Object.keys(verdicts).length;
@@ -74,17 +84,20 @@ const alreadyDone = Object.keys(verdicts).length;
 const save = () => {
   const valid = Object.values(verdicts).filter((v) => v.valid).length;
   const skipped = Object.values(verdicts).filter((v) => v.skipped).length;
+  const timedOut = Object.values(verdicts).filter((v) => v.timedOut).length;
   mkdirSync(dirname(out), { recursive: true });
   const tmp = `${out}.tmp`;
   // No absolute paths recorded: this fixture is committed to a public repository.
-  writeFileSync(tmp, `${JSON.stringify({ tool: p21eval.split("/").pop(), schemas: schemas.length, valid, skipped, verdicts }, null, 2)}\n`);
+  writeFileSync(tmp, `${JSON.stringify({ tool: p21eval.split("/").pop(), corpus: provenance, schemas: schemas.length, valid, skipped, timedOut, verdicts }, null, 2)}\n`);
   renameSync(tmp, out); // atomic, so a kill never leaves a truncated fixture
 };
 
+// SIGKILL, not the default SIGTERM: p21eval does not exit on SIGTERM, so a
+// SIGTERM-based timeout never fires its callback and the worker blocks forever.
 const flatten = (schema, mode) =>
   new Promise((done) => {
-    execFile(p21eval, ["--flat", "-mode", mode, "-schema", schema, "-stepmod", stepmod, "-typeof", "noschema"], { timeout: 600000 }, (err) =>
-      done(err ? (typeof err.code === "number" ? err.code : 1) : 0)
+    execFile(p21eval, ["--flat", "-mode", mode, "-schema", schema, "-stepmod", stepmod, "-typeof", "noschema"], { timeout, killSignal: "SIGKILL" }, (err) =>
+      done({ exit: err ? (typeof err.code === "number" ? err.code : 1) : 0, timedOut: Boolean(err?.killed) })
     );
   });
 
@@ -106,14 +119,16 @@ const worker = async () => {
       // A .flat may be a tracked artifact in the corpus repository. Preserve its
       // bytes so this script never mutates the tree it is measuring.
       const original = existsSync(flat) ? readFileSync(flat) : undefined;
-      const exit = await flatten(schema, mode);
+      const { exit, timedOut } = await flatten(schema, mode);
       let nil = null;
       if (existsSync(flat)) {
-        nil = (readFileSync(flat, "utf8").match(/nil/gi) ?? []).length;
+        // Word-boundary: a bare substring match also hits identifiers such as
+        // unilateral_upper, which wrongly rejected 8 schemas.
+        nil = (readFileSync(flat, "utf8").match(/\bnil\b/gi) ?? []).length;
         if (original) writeFileSync(flat, original);
         else rmSync(flat);
       }
-      verdicts[rel] = { mode, exit, nil, valid: exit === 0 && nil === 0 };
+      verdicts[rel] = { mode, exit, nil, timedOut, valid: !timedOut && exit === 0 && nil === 0 };
     }
     if (++done % 25 === 0) {
       save();
