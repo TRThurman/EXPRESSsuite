@@ -40,7 +40,31 @@ jobs:
       - name: Unit tests
         run: npm test -- --run
 
-      - name: Audit dependencies
+  audit:
+    name: Audit dependencies
+    # Its own job, not a step in `test`: an advisory is not a test failure, and
+    # while it lived in `test` it turned all three platforms red and skipped
+    # `package` entirely, so packaging was never exercised.
+    #
+    # One runner, because the dependency tree does not vary by OS, and no
+    # `npm ci`, because `npm audit` resolves from package-lock.json alone.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.x
+
+      - name: Production dependencies
+        # The gate. Anything the extension ships must be clean.
+        run: npm audit --omit=dev
+
+      - name: Development advisories
+        # Reported, not enforced. The current advisories are release tooling
+        # (undici, reached through release-it) which never ships in the .vsix and
+        # never runs in a user's editor. Visible as a warning without failing CI.
+        continue-on-error: true
         run: npm audit
 
   package:
