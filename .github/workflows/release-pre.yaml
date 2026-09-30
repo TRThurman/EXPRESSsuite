@@ -3,6 +3,11 @@ on: workflow_dispatch
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      # release-it pushes the release commit and tag and creates the GitHub
+      # Release. The repository default for GITHUB_TOKEN is read-only, so
+      # without this the push fails with 403 for github-actions[bot].
+      contents: write
     steps:
       - name: Checkout source code
         uses: actions/checkout@v7
@@ -12,8 +17,8 @@ jobs:
         run: npm ci
       - name: Init git user
         run: |
-          git config --global user.email "krimas@nist.gov"
-          git config --global user.name "Sylvere Krima"
+          git config --global user.email "thomas.r.thurman@imonmail.com"
+          git config --global user.name "TRThurman"
       - name: Install vsce
         run: npm i -g @vscode/vsce
       - name: Generate language utilities
