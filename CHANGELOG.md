@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.4.2-0](https://github.com/TRThurman/EXPRESSsuite/compare/0.4.0...0.4.2-0) (2026-09-30)
+
+### Bug Fixes
+
+* let the release workflows push, and attribute them correctly ([3176eb6](https://github.com/TRThurman/EXPRESSsuite/commit/3176eb62d2b2ad323f602ca44563bae423ce8d43))
+* lex EXPRESS numeric literals per ISO 10303-11 ([76f666f](https://github.com/TRThurman/EXPRESSsuite/commit/76f666ff27385ca998d9b5d8a024766cce53ddfb))
+* lex EXPRESS string literals per ISO 10303-11 ([4ec2684](https://github.com/TRThurman/EXPRESSsuite/commit/4ec26845ec3e3bfd7450bfa75a87df3f89a59cdc))
+* lex nested EXPRESS remarks ([052a9f0](https://github.com/TRThurman/EXPRESSsuite/commit/052a9f04eff1f4d6fea679de8c9275c4c045a3c3))
+* match @types/vscode to engines.vscode so the extension packages ([7529117](https://github.com/TRThurman/EXPRESSsuite/commit/75291172a0df28c6d147cf65b05b7de6f89c1d8c))
+* resolve SELF inside a TYPE declaration ([d8345ae](https://github.com/TRThurman/EXPRESSsuite/commit/d8345aea10ca63447fc7234972ea1aea543e6aec))
+
 ## [0.4.1] (2026-09-15)
 
 ### Product identity
