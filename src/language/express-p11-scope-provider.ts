@@ -44,6 +44,7 @@ import {
   isSimple_factor,
   isSubtype_declaration,
   isSupertype_factor,
+  isTypeDefinition,
   isVariable_id,
 } from "./generated/ast.js";
 import { getFunctionParameterType } from "../utils/function-helpers.js";
@@ -52,7 +53,7 @@ import { ExpressP11Services } from "./express-module.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
 import { DefinitionType, ExpressP11ParameterTypeResolutionType, ExpressP11Schema } from "./express-p11-type-utilities.js";
 import { getTypesFromParameterType } from "../utils/entity-helpers.js";
-import { isTypeExtension } from "./type-system/semantic-type.js";
+import { extractInstanceTypes, isTypeExtension } from "./type-system/semantic-type.js";
 
 export type CustomExpressDescription<T> = {
   nameInScope: string;
@@ -172,13 +173,14 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
           }
           if (isBuilt_in_constant_or_function(leftMember)) {
             switch (leftMember.toLowerCase()) {
-              case "self":
-                const entity = AstUtils.getContainerOfType(context.container, isEntityDefinition);
-                if (entity) {
-                  nodesInScope.push(entity);
-                  nodesInScopeType = ScopeType.Entities;
+              case "self": {
+                const self = this.resolveSelfType(context.container);
+                if (self.nodes.length > 0) {
+                  nodesInScope.push(...self.nodes);
+                  nodesInScopeType = self.type;
                 }
                 break;
+              }
             }
           }
           if (isQualifier(leftMember)) {
@@ -354,6 +356,17 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     return { nodes: [], type: ScopeType.Empty };
   }
 
+  private resolveSelfType(node: AstNode): { nodes: AstNode[]; type: ScopeType } {
+    const entity = AstUtils.getContainerOfType(node, isEntityDefinition);
+    if (entity) return { nodes: [entity], type: ScopeType.Entities };
+    const typeDefinition = AstUtils.getContainerOfType(node, isTypeDefinition);
+    if (typeDefinition) {
+      const nodes = extractInstanceTypes(typeDefinition.underlyingType);
+      if (nodes.length > 0) return { nodes, type: ScopeType.Entities };
+    }
+    return { nodes: [], type: ScopeType.Empty };
+  }
+
   private getPrimaryType(primary: Primary, schema: ExpressP11Schema): { nodes: AstNode[]; type: ScopeType } {
     if (isComplex_Primary(primary)) {
       if (!primary.body) {
@@ -377,6 +390,9 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         }
       }
 
+      if (isBuilt_in_constant_or_function(primary.head) && primary.head.toLowerCase() === "self" && (primary.body?.qualifiers?.length ?? 0) === 0) {
+        return this.resolveSelfType(primary);
+      }
       if (primary.body?.qualifiers) {
         const lastQualifier = primary.body?.qualifiers.at(primary.body?.qualifiers.length - 1);
         if (isAttribute_qualifier(lastQualifier))

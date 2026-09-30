@@ -60,10 +60,10 @@ Bound_spec: "[" lower=Bound_1 ":" upper=Bound_2 "]" ;
 Bound_1: Numeric_expression ;
 Bound_2: Numeric_expression ;
 
-Instantiable_type: Concrete_types | Entity_ref ;
+Instantiable_type: Concrete_types ;
 Underlying_type: Constructed_types | Concrete_types ; //FROM type_decl
 Constructed_types: Enumeration_type | Select_type ;
-Concrete_types: Aggregation_types | Simple_types | Type_ref ;
+Concrete_types: Aggregation_types | Simple_types | Named_types ;
 Aggregation_types: Array_type | Bag_type | List_type | Set_type ; // Instantiable versions
 Array_type  : "ARRAY" bound=Bound_spec "OF" isOptional?="OPTIONAL"? isUnique?="UNIQUE"? type=Instantiable_type ;
 Bag_type  : "BAG" bound=Bound_spec? "OF" type=Instantiable_type ;
