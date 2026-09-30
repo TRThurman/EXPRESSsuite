@@ -12,6 +12,7 @@ import { ExpressP11CodeActionProvider } from "./express-p11-code-action-provider
 import { ExpressP11CompletionProvider } from "./express-p11-completion-provider.js";
 import { ExpressP11ScopeComputation } from "./express-p11-scope-computation.js";
 import { ExpressP11ScopeProvider } from "./express-p11-scope-provider.js";
+import { ExpressP11TokenBuilder } from "./express-p11-token-builder.js";
 import { ExpressP11NameProvider } from "./express-p11-name-provider.js";
 import { ExpressP11Validator } from "./express-p11-validator.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
@@ -89,6 +90,9 @@ export const ExpressP11Module: Module<ExpressP11Services, DeepPartial<ExpressP11
     ScopeProvider: (services) => new ExpressP11ScopeProvider(services),
     NameProvider: () => new ExpressP11NameProvider(),
     Linker: (services) => new ExpressP11Linker(services),
+  },
+  parser: {
+    TokenBuilder: () => new ExpressP11TokenBuilder(),
   },
 };
 
