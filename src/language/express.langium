@@ -308,7 +308,13 @@ terminal Self returns string: "SELF";
 terminal Simple_id returns string: ID ;
 terminal Slash returns string:("\\");
 terminal NUM returns string: /(\d+(\.?[eE]?[-+]?\d+)?)/;
-terminal SIMPLE_STRING returns string: /\'(\\.|\\\\|[^'])*\'/;
+// ISO 10303-11:2004 clause 144:
+//   simple_string_literal = \q { ( \q \q ) | not_quote | \s | ... } \q
+// EXPRESS has no backslash escapes: an embedded quote is written by doubling
+// it, and '\' is an ordinary string character (clause 132). Accepting any
+// non-quote character is deliberately broader than not_quote, so that the
+// editor does not invent errors on text the lexer can still tokenise.
+terminal SIMPLE_STRING returns string: /'([^']|'')*'/;
 terminal BINARY_LITERAL returns string:/(%[0-1]+)/;
 hidden terminal WS: /\s+/;
 hidden terminal SL_COMMENT:/(\-\-)[^\n\r]*/;
