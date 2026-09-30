@@ -44,6 +44,8 @@
 - Validate informal proposition (`IPn`) signatures and annotation keys.
   Diagnostics cover missing, malformed, misplaced, non-final, and unmatched
   signatures as well as malformed `.IPn` / `.ipn` annotation keys.
+- Accept declarations visible through transitive schema imports without
+  publishing false diagnostics that request redundant direct imports.
 
 ### Tests
 
