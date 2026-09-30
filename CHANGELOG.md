@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.2](https://github.com/TRThurman/EXPRESSsuite/compare/0.4.2-0...0.4.2) (2026-09-30)
+
+### Bug Fixes
+
+* allow an explicit version when promoting a pre-release ([c7e251e](https://github.com/TRThurman/EXPRESSsuite/commit/c7e251e752ef00c34f61567e59efe5e0dcd98303))
+
 ## [0.4.2-0](https://github.com/TRThurman/EXPRESSsuite/compare/0.4.0...0.4.2-0) (2026-09-30)
 
 ### Bug Fixes
