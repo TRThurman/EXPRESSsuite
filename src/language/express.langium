@@ -307,7 +307,14 @@ While_control: "WHILE" expression=Logical_expression ;
 terminal Self returns string: "SELF";
 terminal Simple_id returns string: ID ;
 terminal Slash returns string:("\\");
-terminal NUM returns string: /(\d+(\.?[eE]?[-+]?\d+)?)/;
+// ISO 10303-11:2004 clauses 141-142:
+//   integer_literal = digits
+//   real_literal    = integer_literal | ( digits '.' [ digits ] [ 'e' [ sign ] digits ] )
+// The exponent sits inside the fraction branch, so a decimal point is required
+// before it: 0. and 1.5e-3 are literals, while 1e10 and .5 are not. Unlike
+// SIMPLE_STRING, this terminal follows the production strictly -- eengine also
+// rejects 1e10 and .5, and neither form occurs in the STEP schema collection.
+terminal NUM returns string: /\d+(\.\d*([eE][-+]?\d+)?)?/;
 // ISO 10303-11:2004 clause 144:
 //   simple_string_literal = \q { ( \q \q ) | not_quote | \s | ... } \q
 // EXPRESS has no backslash escapes: an embedded quote is written by doubling
