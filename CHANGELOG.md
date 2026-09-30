@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased] (2026-09-15)
+## [0.4.1] (2026-09-15)
 
 ### Product identity
 
