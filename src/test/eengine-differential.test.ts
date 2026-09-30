@@ -40,9 +40,6 @@ const runnable = Boolean(oracle && corpus && existsSync(corpus));
  * an equality, so a new failure and a silently-fixed entry both break the test.
  */
 const KNOWN_PARSE_FAILURES = new Set<string>([
-  // A string literal holding a backslash (`'\'`) is mis-lexed, so the rest of the
-  // file is tokenised as code. 23 parse errors.
-  "parameterization_schema/parameterization_schema.exp",
   // The NUM terminal rejects the real literal `0.` at line 673. 2 parse errors.
   "presentation_organization_schema/presentation_organization_schema.exp",
 ]);
