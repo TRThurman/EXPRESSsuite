@@ -2,6 +2,7 @@ import { URI } from "langium";
 import { NodeFileSystem } from "langium/node";
 import { describe, expect, test } from "vitest";
 import { createExpressP11Services } from "../language/express-module.js";
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -36,7 +37,23 @@ const ORACLE = join(process.cwd(), "test-fixtures/eengine-oracle.json");
 const BASELINE = join(process.cwd(), "test-fixtures/parse-failure-baseline.json");
 
 type Verdict = { mode?: string; exit?: number; nil?: number | null; valid: boolean; skipped?: boolean; reason?: string };
-type Oracle = { tool: string; verdicts: Record<string, Verdict> };
+type Provenance = { commit: string | null; dirty: boolean | null; describedAt?: string };
+type Oracle = { tool: string; corpus?: Provenance; verdicts: Record<string, Verdict> };
+type Baseline = { corpus?: Provenance; failures: string[] };
+
+/**
+ * The corpus is a live repository. Recording which commit a fixture was measured
+ * against means a later mismatch can be explained — the tool changed, or the
+ * schemas did — instead of being indistinguishable.
+ */
+const liveProvenance = (root: string): Provenance => {
+  const git = (...args: string[]) => execFileSync("git", ["-C", root, ...args], { encoding: "utf8" }).trim();
+  try {
+    return { commit: git("rev-parse", "HEAD"), dirty: git("status", "--porcelain").length > 0 };
+  } catch {
+    return { commit: null, dirty: null };
+  }
+};
 
 const oracle: Oracle | undefined = existsSync(ORACLE) ? JSON.parse(readFileSync(ORACLE, "utf8")) : undefined;
 // The corpus is ISO schema text that cannot be vendored here, so its location is
@@ -71,8 +88,9 @@ describe.skipIf(!runnable)("differential: eengine-valid schemas must parse", () 
     failures.sort();
 
     if (updating) {
-      writeFileSync(BASELINE, `${JSON.stringify(failures, null, 2)}\n`);
-      console.log(`baseline updated: ${failures.length} known parse failures of ${checked} eengine-valid schemas`);
+      const written: Baseline = { corpus: liveProvenance(corpus!), failures };
+      writeFileSync(BASELINE, `${JSON.stringify(written, null, 2)}\n`);
+      console.log(`baseline updated: ${failures.length} known parse failures of ${checked} eengine-valid schemas at corpus ${written.corpus?.commit?.slice(0, 9)}`);
       return;
     }
 
@@ -81,7 +99,18 @@ describe.skipIf(!runnable)("differential: eengine-valid schemas must parse", () 
     const expectedChecked = Object.values(oracle!.verdicts).filter((v) => v.valid).length;
     expect(checked).toBe(expectedChecked);
 
-    const baseline: string[] = existsSync(BASELINE) ? JSON.parse(readFileSync(BASELINE, "utf8")) : [];
-    expect(failures).toEqual(baseline);
+    const stored: Baseline = existsSync(BASELINE) ? JSON.parse(readFileSync(BASELINE, "utf8")) : { failures: [] };
+    const live = liveProvenance(corpus!);
+    // Reported rather than asserted: the corpus moving is normal, but if the
+    // comparison below fails it is the first thing worth knowing.
+    if (stored.corpus?.commit && stored.corpus.commit !== live.commit) {
+      console.log(
+        `note: corpus has moved since this baseline was measured ` +
+          `(fixture ${stored.corpus.commit.slice(0, 9)}${stored.corpus.dirty ? "+dirty" : ""} -> ` +
+          `live ${live.commit?.slice(0, 9)}${live.dirty ? "+dirty" : ""}). ` +
+          `Regenerate with UPDATE_PARSE_BASELINE=1 if the change is expected.`
+      );
+    }
+    expect(failures).toEqual(stored.failures);
   }, 1800000);
 });

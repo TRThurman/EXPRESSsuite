@@ -1,1 +1,7 @@
-[]
+{
+  "corpus": {
+    "commit": "c45a89c45b20178c1d69cd6233aa2e086ef738d1",
+    "dirty": true
+  },
+  "failures": []
+}
