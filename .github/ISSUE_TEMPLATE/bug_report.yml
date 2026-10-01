@@ -1,0 +1,119 @@
+name: Bug report
+description: Something in EXPRESSsuite is wrong — a missed or false diagnostic, a crash, a viewer that renders incorrectly.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this.
+
+        **Issues are public.** Do not paste schema text that is under non-disclosure or not yet published
+        (see [Privacy and confidentiality](https://github.com/TRThurman/EXPRESSsuite#privacy-and-confidentiality)).
+        A few lines that reproduce the problem in a made-up schema are the most useful thing you can give.
+
+        Long-form and concatenated schema files are not supported yet, so problems with them are already known.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What EXPRESSsuite did, and what you expected it to do instead.
+      placeholder: |
+        Indexing a non-aggregate attribute, `the_datum[1]` where `the_datum : datum`, gives no diagnostic.
+        I expected an error in the Problems view.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal schema that reproduces it
+      description: |
+        The smallest EXPRESS that shows the problem, in a ```` ```express ```` block, or attach a `.exp` file.
+        If it needs more than one schema (a `USE FROM` or `REFERENCE FROM` closure), include each one.
+      placeholder: |
+        ```express
+        SCHEMA s;
+        ENTITY e;
+          a : STRING;
+        END_ENTITY;
+        END_SCHEMA;
+        ```
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the extension is affected?
+      multiple: true
+      options:
+        - Diagnostics / validation (Problems view)
+        - SC4 validation (casing, loop indices, informal propositions)
+        - Syntax highlighting
+        - Completion (IntelliSense)
+        - Navigation (Go to Definition, Find All References, Go to Symbol)
+        - Rename Symbol
+        - Hover description
+        - Show Description
+        - Show EXPRESS-G Diagram
+        - AsciiMath Playground
+        - Detect Duplicate Declarations in Schema Closure
+        - Build EXPRESS workspace / Generate type graphs
+        - Installation or activation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: other-tools
+    attributes:
+      label: What other EXPRESS tools report (optional)
+      description: If another tool (for example eep, eengine or JSDAI) gives a different result on the same schema, paste its exact output and the command you ran.
+
+  - type: input
+    id: extension-version
+    attributes:
+      label: EXPRESSsuite version
+      description: Shown in the Extensions view, or run `code --list-extensions --show-versions`.
+      placeholder: "0.4.2"
+    validations:
+      required: true
+
+  - type: input
+    id: vscode-version
+    attributes:
+      label: VS Code version
+      description: Help → About (Code → About Visual Studio Code on macOS). Say if it is VS Code Insiders.
+      placeholder: "1.137.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Windows
+        - Linux
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log output (optional)
+      description: |
+        Output panel → **EXPRESSsuite**. Check it before pasting: it can contain file paths and schema names.
+      render: text
+
+  - type: checkboxes
+    id: confidentiality
+    attributes:
+      label: Confidentiality
+      options:
+        - label: This report contains no schema text or log output that is under non-disclosure or not yet published.
+          required: true

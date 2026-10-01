@@ -1,0 +1,57 @@
+name: Feature request
+description: Suggest a new check, viewer, command or other improvement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Issues are public.** Do not paste schema text that is under non-disclosure or not yet published
+        (see [Privacy and confidentiality](https://github.com/TRThurman/EXPRESSsuite#privacy-and-confidentiality)).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way today?
+      placeholder: |
+        Two schemas in the current schema's USE FROM closure both declare `ENTITY datum`, and nothing warns me
+        until a downstream tool reports the ambiguity.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+      description: What should EXPRESSsuite do? Name the command, diagnostic or viewer, and where it should appear.
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example schema (optional)
+      description: A small made-up schema that shows the case, in a ```` ```express ```` block.
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria (optional)
+      description: How would you tell that it works? Include the cases that must stay silent as well as the ones that must be reported.
+      placeholder: |
+        - Given schemas B and C in A's closure that both declare `ENTITY datum`, running the command from A reports the collision.
+        - A declaration outside A's closure is not reported.
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References (optional)
+      description: Relevant clauses of ISO 10303-11, SC 4 authoring rules, or other tools that already do this.
+
+  - type: checkboxes
+    id: confidentiality
+    attributes:
+      label: Confidentiality
+      options:
+        - label: This request contains no schema text that is under non-disclosure or not yet published.
+          required: true
