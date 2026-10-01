@@ -15,7 +15,6 @@ assets/**
 !assets/expresssuite-icon.png
 vitest.config.js
 esbuild.mjs
-CHANGELOG.md
 .github/**
 node_modules/
 .release-it.json

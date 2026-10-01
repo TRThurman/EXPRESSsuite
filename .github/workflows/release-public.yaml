@@ -12,6 +12,11 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      # Step `if` cannot read the `secrets` context, and a step's own `env` is not
+      # visible to its `if`. Deriving a boolean here is the documented workaround:
+      # the value is "true"/"false", so the token itself is not exposed job-wide.
+      HAS_VSCE_PAT: ${{ secrets.VSCE_PAT != '' }}
     permissions:
       # release-it pushes the release commit and tag and creates the GitHub
       # Release. The repository default for GITHUB_TOKEN is read-only, so
@@ -40,5 +45,25 @@ jobs:
         run: npm run release -- ${{ inputs.version }}
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Publish to the VS Code Marketplace
+        # Publishes the exact .vsix that release-it's `before:github:release` hook
+        # built and attached to the GitHub Release, so the Marketplace bits are
+        # byte-identical to the release asset. Skipped when no VSCE_PAT secret is
+        # configured, which keeps the workflow usable on forks. A Marketplace
+        # version number can never be reused -- only unpublished -- so this runs
+        # only after release-it has succeeded, and only on the public release
+        # workflow, never on release-pre.
+        if: env.HAS_VSCE_PAT == 'true'
+        run: |
+          shopt -s nullglob
+          pkgs=(*.vsix)
+          if [ ${#pkgs[@]} -ne 1 ]; then
+            echo "expected exactly one .vsix in the workspace, found ${#pkgs[@]}: ${pkgs[*]}" >&2
+            exit 1
+          fi
+          echo "publishing ${pkgs[0]}"
+          vsce publish --packagePath "${pkgs[0]}" --pat "$VSCE_PAT"
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
       - name: End message
         run: echo 'Done'
