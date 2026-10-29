@@ -1,6 +1,14 @@
 # Lean 4 proofs behind EXPRESSsuite's type checks
 
-Machine-checked ground truth for two SC4 validation diagnostics:
+Machine-checked ground truth for the attribute-reference scope and for three
+SC4 validation diagnostics:
+
+- attribute and group reference scope — ISO 10303-11:2004 12.7.3 (`x.a`: the
+  entity, a supertype or a subtype; after `x\E`: E's own declaration; two
+  declarations at the nearest depth: ambiguous, `ambiguous-attribute-reference`)
+  and 12.7.4 (`x\E`: any entity in the same subtype/supertype graph).
+  Definitions: `visible`, `component`, `resolve`, `resolveAfterGroup`
+  (Inheritance.lean); the TypeScript walk is `ExpressP11Entity.getVisibleLevels`.
 
 - `redeclaration-not-specialization` — ISO 10303-11:2004 9.2.3.4 a) with 9.2.7:
   the type of a redeclared attribute shall be the same as, or a specialization
@@ -31,6 +39,7 @@ failing guard fails the build.
 | `ExpressSuite/IndexOperand.lean` | `neverAgg`; `neverAgg_sound`: if `neverAgg t` then no value of `t` is an aggregate value | proved, no `sorry` |
 | `ExpressSuite/Cases.lean` | the five wg12-step redeclarations (PRs #233 to #237) encoded from the published SMRLv8 text, the negative controls, and the standard's 9.2.3.4 EXAMPLE 2 and EXAMPLE 3 | `#guard`, build-checked |
 | `ExpressSuite/FpReproGt.lean` | two further valid narrowings (geometric_tolerance ARM) that a relation resolving only the NEW operand rejects | `#guard`, build-checked |
+| `ExpressSuite/Inheritance.lean` | finite inheritance graph; `Visible` (12.7.3) and `SameGraph` (12.7.4) as reachability; `visible` (ancestors then descendants, breadth-first, duplicate-free) and `component`; `mem_visible_iff`, `component_is_group_scope`, `visible_sub_component`, `visible_mono`, `resolve_unique`, `resolve_ambiguous`, `resolveAfterGroup_unique`, `visible_head`; termination of the fuelled closure by a pigeonhole lemma | proved, no `sorry`; b_spline, 9.2.3.3 and 12.7.3 examples `#guard` |
 
 Axioms (`#print axioms`): `propext`, `Classical.choice`, `Quot.sound` only.
 

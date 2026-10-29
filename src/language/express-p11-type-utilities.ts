@@ -11,6 +11,7 @@ import {
   Parameter_type,
   Select_type,
   TypeDefinition,
+  isAttribute_decl,
   isDerived_attr,
   isEnumeration_type,
   isExplicit_attr,
@@ -22,6 +23,13 @@ import {
   isSelect_type,
 } from "./generated/ast.js";
 import { NIL, v4 as uuidv4 } from "uuid";
+
+/**
+ * Name equality for attribute lookup. EXPRESS identifiers are case-insensitive
+ * (ISO 10303-11:2004 7.1.1), so candidates are gathered case-insensitively; the
+ * linker's final match on the written `$refText` stays exact.
+ */
+export const normalizeAttributeName = (name: string): string => name.toLowerCase();
 
 export abstract class ExpressResource<T extends AstNode> {
   protected owner: ExpressP11Schema | undefined;
@@ -262,13 +270,101 @@ export class ExpressP11Entity extends ExpressResource<EntityDefinition> {
     return { type: DefinitionType.Entity, resource: this };
   }
 
-  public getFullSubSuperGraph(memo: ExpressP11MemoPool): EntityDefinition[] {
-    const memoQuery: MemoQuery = { name: this.getQualifiedName(), type: MemoType.Graph };
-    if (memo.exist(memoQuery)) return memo.query(memoQuery) as EntityDefinition[];
+  /** Names in `SUBTYPE OF (...)` that no entity in the declaring schema's visible resources matches. */
+  public unresolvedSupertypes: string[] = [];
 
-    const graph = [this, ...this.getSubTypes(memo), ...this.getSuperTypes(memo)].map((ent) => ent.getNode());
-    memo.memoize({ name: this.getQualifiedName(), type: MemoType.Graph, payload: graph });
-    return graph;
+  private visibleMemo?: {
+    levels: ExpressP11Entity[][];
+    ancestors: ExpressP11Entity[][];
+    descendants: ExpressP11Entity[][];
+    set: Set<ExpressP11Entity>;
+  };
+  private ownAttributesMemo?: Map<string, Attribute_decl[]>;
+
+  /**
+   * The ISO 10303-11:2004 12.7.3 set of this entity ("that entity data type, a
+   * supertype or subtype of that entity data type") as nearest-first levels:
+   * `[[self], supertypes at depth 1, depth 2, ..., subtypes at depth 1, depth 2, ...]`.
+   * Supertype levels follow `SUBTYPE OF` textual order; subtype levels are
+   * sorted by qualified name because `_subtypes` is wired in schema resolution
+   * order, which is not stable between runs. One visited set seeded with the
+   * entity terminates cycles and keeps the apex of a diamond once. Mirrors
+   * `ancestors`, `descendants` and `visible` in lean/ExpressSuite/Inheritance.lean;
+   * the whole connected component (12.7.4, group references) is `getSubSuper`.
+   * Computed after the graph is wired (first use is at linking) and kept for the
+   * life of this object, which ends with the next type-container build.
+   */
+  public getVisibleLevels(): readonly (readonly ExpressP11Entity[])[] {
+    return this.visible().levels;
+  }
+  public getAncestorLevels(): readonly (readonly ExpressP11Entity[])[] {
+    return this.visible().ancestors;
+  }
+  public getDescendantLevels(): readonly (readonly ExpressP11Entity[])[] {
+    return this.visible().descendants;
+  }
+  public getVisibleSet(): ReadonlySet<ExpressP11Entity> {
+    return this.visible().set;
+  }
+  /** True when this entity or one of its supertypes names a supertype that could not be resolved. */
+  public hasUnresolvedSupertypes(): boolean {
+    if (this.unresolvedSupertypes.length > 0) return true;
+    return this.visible().ancestors.some((level) => level.some((entity) => entity.unresolvedSupertypes.length > 0));
+  }
+
+  private visible() {
+    if (this.visibleMemo) return this.visibleMemo;
+    const visited = new Set<ExpressP11Entity>([this]);
+    const byQualifiedName = (a: ExpressP11Entity, b: ExpressP11Entity): number => {
+      const [x, y] = [a.getQualifiedName(), b.getQualifiedName()];
+      return x < y ? -1 : x > y ? 1 : 0;
+    };
+    const expand = (next: (entity: ExpressP11Entity) => ExpressP11Entity[], sorted: boolean): ExpressP11Entity[][] => {
+      const levels: ExpressP11Entity[][] = [];
+      let frontier: ExpressP11Entity[] = [this];
+      while (frontier.length > 0) {
+        const level: ExpressP11Entity[] = [];
+        for (const entity of frontier) {
+          for (const candidate of next(entity)) {
+            if (visited.has(candidate)) continue;
+            visited.add(candidate);
+            level.push(candidate);
+          }
+        }
+        if (sorted) level.sort(byQualifiedName);
+        if (level.length > 0) levels.push(level);
+        frontier = level;
+      }
+      return levels;
+    };
+    const ancestors = expand((entity) => entity._supertypes, false);
+    const descendants = expand((entity) => entity._subtypes, true);
+    this.visibleMemo = { levels: [[this], ...ancestors, ...descendants], ancestors, descendants, set: visited };
+    return this.visibleMemo;
+  }
+
+  /**
+   * This entity's own attribute declarations (explicit, DERIVE, INVERSE,
+   * redeclarations included) keyed by normalized name, each list in declaration
+   * order. `nameOf` is the name provider's reading of a declaration: the
+   * identifier, or for a redeclaration its RENAMED name, else the original's.
+   */
+  public ownAttributesByName(nameOf: (attribute: Attribute_decl) => string | undefined): ReadonlyMap<string, Attribute_decl[]> {
+    if (this.ownAttributesMemo) return this.ownAttributesMemo;
+    const map = new Map<string, Attribute_decl[]>();
+    if (this.node.body) {
+      for (const element of AstUtils.streamAllContents(this.node.body)) {
+        if (!isAttribute_decl(element)) continue;
+        const name = nameOf(element);
+        if (name === undefined) continue;
+        const key = normalizeAttributeName(name);
+        const list = map.get(key);
+        if (list) list.push(element);
+        else map.set(key, [element]);
+      }
+    }
+    this.ownAttributesMemo = map;
+    return map;
   }
   public getSuperTypes(memo: ExpressP11MemoPool, exclude: string[] = []): ExpressP11Entity[] {
     const memoQuery: MemoQuery = { name: this.getQualifiedName(), type: MemoType.Supertypes };
@@ -638,48 +734,5 @@ export class ExpressP11OptimizedResourceList {
       if (v.has(name)) result = v.get(name);
     });
     return result;
-  }
-}
-
-export class ExpressP11OptimizedAttributeList {
-  protected resource = new Map<string, Map<string, Attribute_decl[]>>();
-
-  public add(graphKey: string, attributeName: string, attribute: Attribute_decl): void {
-    if (this.resource.has(graphKey)) {
-      if (this.resource.get(graphKey)?.has(attributeName)) {
-        const attributes = this.resource.get(graphKey)?.get(attributeName);
-        this.resource.get(graphKey)?.set(attributeName, [...attributes!, attribute]);
-      } else {
-        this.resource.get(graphKey)?.set(attributeName, [attribute]);
-      }
-    } else {
-      this.resource.set(graphKey, new Map<string, Attribute_decl[]>());
-      this.resource.get(graphKey)?.set(attributeName, [attribute]);
-    }
-  }
-
-  get resources() {
-    return this.resource;
-  }
-
-  public findByName(graphKey: string, name: string): Attribute_decl[] {
-    // let result: Attribute_decl[] | undefined;
-    // this.resource.forEach((v, k) => {
-    //   if (v.has(name)) result = v.get(name);
-    // });
-    if (name.length > 0) {
-      return this.resource.get(graphKey)?.get(name) ?? [];
-    } else {
-      const result: Attribute_decl[] = [];
-      this.resource.get(graphKey)?.forEach((attributes) => {
-        result.push(...attributes);
-      });
-      return result;
-    }
-    // return result;
-  }
-
-  public clear() {
-    this.resource.clear();
   }
 }

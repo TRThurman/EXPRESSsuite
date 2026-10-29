@@ -52,6 +52,17 @@ standard VS Code **Problems** view:
   not. The relation is proved sound in `lean/`.
 - **Index qualifiers** — `x[1]` is reported when the declared type of `x` can
   never hold an aggregate value (ISO 10303-11:2004 12.6.1).
+- **Ambiguous attribute references** — `x.a` is reported when `a` is declared
+  by two or more entities at the same nearest depth of the declared type of
+  `x` (ISO 10303-11:2004 12.7.3, last sentence); qualify it with a group
+  reference such as `x\e.a`.
+
+Attribute references resolve as 12.7.3 prescribes: `x.a` is looked up in the
+declared type of `x`, its supertypes and its subtypes, nearest first, never in
+a sibling entity; `x\e` may name any entity in the same subtype/supertype
+graph (12.7.4) and `x\e.a` then means `e`'s own declaration. Hover,
+go-to-definition, completion and validation all follow this one rule, which
+is proved against the clause text in `lean/`.
 
 For workspace-level ambiguity checks, run **EXPRESSsuite: Detect Duplicate
 Declarations in Schema Closure** from the Command Palette or an EXPRESS

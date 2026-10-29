@@ -99,6 +99,25 @@ describe("Type container", async () => {
     const guestNode = typeContainer.getSchemas().get("Nist")?.getEntity("Guest")?.getNode();
     expect(typeContainer.getFullSubSuperGraph(guestNode!).length).toBe(4);
   });
+
+  test("12.7.3 visible levels: self, supertypes by depth, then subtypes by depth sorted by name", () => {
+    const levels = (name: string) =>
+      typeContainer
+        .getSchemas()
+        .get("Nist")
+        ?.getEntity(name)
+        ?.getVisibleLevels()
+        .map((level) => level.map((e) => e.getName()));
+    expect(levels("Fed")).toEqual([["Fed"], ["Employee"], ["Person"]]);
+    expect(levels("Guest")).toEqual([["Guest"], ["Employee"], ["Person"]]);
+    expect(levels("Employee")).toEqual([["Employee"], ["Person"], ["Fed", "Guest"]]);
+    expect(levels("Person")).toEqual([["Person"], ["Employee"], ["Fed", "Guest"]]);
+    // the sibling is in the 12.7.4 graph but not in the 12.7.3 set
+    const fed = typeContainer.getSchemas().get("Nist")?.getEntity("Fed");
+    const guest = typeContainer.getSchemas().get("Nist")?.getEntity("Guest");
+    expect(fed?.getVisibleSet().has(guest!)).toBe(false);
+    expect(typeContainer.getFullSubSuperGraph(fed!.getNode())).toContain(guest!.getNode());
+  });
 });
 
 describe("TYPE resolver", async () => {

@@ -14,6 +14,7 @@ import {
 import {
   Assignment_stmt_body,
   Attribute_decl,
+  Attribute_qualifier,
   Complex_Primary_body,
   EntityDefinition,
   ExpressAstType,
@@ -43,6 +44,7 @@ import type { ExpressP11Services } from "./express-module.js";
 import { schemaHasDeclarations } from "../utils/schema-helpers.js";
 import { getReferenceSpecifications, getUseSpecifications } from "../utils/interface-helpers.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
+import { ExpressP11ScopeProvider, ScopeType } from "./express-p11-scope-provider.js";
 import { ExpressTypeBuilder } from "./type-system/express-type-builder.js";
 import { mentionsExtensibleSelect, notIndexableClosed, renderType, spec } from "./type-system/express-type-model.js";
 
@@ -55,6 +57,7 @@ export function registerValidationChecks(services: ExpressP11Services) {
   const checks: ValidationChecks<ExpressAstType> = {
     Assignment_stmt_body: validator.checkIndexQualifierOperands,
     Attribute_decl: validator.checkAttributeNameStartsWithLowerCase,
+    Attribute_qualifier: validator.checkAmbiguousAttributeReference,
     Complex_Primary_body: validator.checkIndexQualifierOperands,
     EntityDefinition: validator.checkRedeclaredAttributeTypes,
     Local_decl: validator.checkLocalVariablesDoNotDuplicateLoopIndices,
@@ -75,6 +78,7 @@ export enum ExpressP11Issues {
   DuplicateLoopIndex = "duplicate-loop-index",
   RedeclarationNotSpecialization = "redeclaration-not-specialization",
   IndexOnNonAggregate = "index-on-non-aggregate",
+  AmbiguousAttributeReference = "ambiguous-attribute-reference",
 }
 
 export type RedeclarationData = {
@@ -85,6 +89,12 @@ export type RedeclarationData = {
 
 export type IndexOperandData = {
   operandType: string;
+};
+
+export type AmbiguousAttributeData = {
+  attribute: string;
+  operand: string;
+  declaredIn: string[];
 };
 
 export type WrongReferenceLabelData = {
@@ -111,7 +121,7 @@ export class ExpressP11Validator {
   protected readonly nameProvider: NameProvider;
   protected readonly typeContainer: ExpressP11TypeContainer;
   protected readonly typeBuilder: ExpressTypeBuilder;
-  // protected readonly resourceManager: ExpressP11ResourceManager;
+  protected readonly scopeProvider: ExpressP11ScopeProvider;
 
   constructor(services: ExpressP11Services) {
     this.references = services.references.References;
@@ -119,7 +129,44 @@ export class ExpressP11Validator {
     this.nameProvider = services.references.NameProvider;
     this.typeContainer = services.validation.TypeContainer;
     this.typeBuilder = new ExpressTypeBuilder(services.validation.TypeContainer, services.shared.workspace.SelectExtensionIndex);
-    // this.resourceManager = services.resources.ResourceManager;
+    this.scopeProvider = services.references.ScopeProvider as ExpressP11ScopeProvider;
+  }
+
+  /**
+   * ISO 10303-11:2004 12.7.3, last sentence: "If two or more attributes are
+   * found with the same name then the reference is ambiguous and indeterminate
+   * (?) is returned." Reported for an entity-typed operand when the nearest
+   * depth of the 12.7.3 walk that declares the name holds declarations in two
+   * or more entities (multiple inheritance); a diamond inheriting one
+   * declaration along two paths is not ambiguous. The linker still binds the
+   * first candidate so that hover and navigation keep working. The NOTE of
+   * 12.7.3 recommends a group reference to select one. Select-typed operands
+   * are not reported: a select of entities with same-named attributes is the
+   * common case in SMRL and the standard's own NOTE names it.
+   */
+  checkAmbiguousAttributeReference(qualifier: Attribute_qualifier, accept: ValidationAcceptor): void {
+    const operand = this.scopeProvider.getQualifierOperand(qualifier);
+    if (!operand || operand.type !== ScopeType.Entities) return;
+    const entities = operand.nodes.filter(isEntityDefinition);
+    if (entities.length !== 1) return;
+    const name = qualifier.target.$refText;
+    const nearest = this.typeContainer
+      .getVisibleAttributeCandidates(entities[0], name)
+      .map((level) => level.declarations.filter((declaration) => this.nameProvider.getName(declaration) === name))
+      .find((declarations) => declarations.length > 0);
+    if (!nearest) return;
+    const owners = new Map<EntityDefinition, string>();
+    for (const declaration of nearest) {
+      const owner = AstUtils.getContainerOfType(declaration, isEntityDefinition);
+      if (owner) owners.set(owner, owner.name);
+    }
+    if (owners.size < 2) return;
+    const data: AmbiguousAttributeData = { attribute: name, operand: entities[0].name, declaredIn: [...owners.values()] };
+    accept(
+      "warning",
+      `Attribute reference '${name}' is ambiguous for an operand of type ${data.operand}: it is declared in ${data.declaredIn.join(" and ")} at the same depth, so the reference evaluates to indeterminate (ISO 10303-11:2004 12.7.3). Qualify it with a group reference, as in x\\${data.declaredIn[0]}.${name}.`,
+      { node: qualifier, property: "target", code: ExpressP11Issues.AmbiguousAttributeReference, data }
+    );
   }
 
   /**

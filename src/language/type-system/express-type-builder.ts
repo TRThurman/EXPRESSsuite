@@ -152,38 +152,20 @@ export class ExpressTypeBuilder {
    * linker's target for an attribute qualifier.
    */
   attributeTypeIn(entity: EntityDefinition, name: string): Ty | undefined {
-    const wanted = name.toLowerCase();
-    const supers = this.supertypesOf(entity);
-    if (!supers) return undefined;
-    const levels: EntityDefinition[][] = [[entity]];
-    // supertypesOf is breadth-first; rebuild the depth levels for the "nearest first" rule
-    const depth = new Map<EntityDefinition, number>([[entity, 0]]);
-    for (const e of [entity, ...supers]) {
-      const d = depth.get(e) ?? 0;
-      for (const reference of e.types?.supertypes?.entities ?? []) {
-        const target = reference.entity.ref;
-        if (target && !depth.has(target)) {
-          depth.set(target, d + 1);
-          (levels[d + 1] ??= []).push(target);
-        }
-      }
+    if (this.typeContainer.hasUnresolvedSupertypes(entity)) return undefined;
+    const candidates = this.typeContainer.getVisibleAttributeCandidates(entity, name);
+    for (const level of candidates) {
+      if (level.direction === "descendant") break;
+      if (level.declarations.length === 1) return this.ofAttribute(level.declarations[0]);
+      if (level.declarations.length > 1) return undefined;
     }
-    for (const level of levels) {
-      const found = (level ?? []).flatMap((e) => this.attributesNamed(e, wanted));
-      if (found.length === 1) return this.ofAttribute(found[0]);
-      if (found.length > 1) return undefined;
-    }
-    const below = this.typeContainer.getSubTypesFromDefinition(entity).flatMap((e) => this.attributesNamed(e, wanted));
+    const below = candidates.filter((level) => level.direction === "descendant").flatMap((level) => level.declarations);
     if (below.length === 0) return undefined;
     const types = below.map((a) => this.ofAttribute(a));
     if (types.some((t) => !t)) return undefined;
     // compare structurally without the TypeScript-only AST bookkeeping, which is circular
     const rendered = new Set(types.map((t) => JSON.stringify(t, (key, value) => (key === "node" ? undefined : value))));
     return rendered.size === 1 ? types[0] : undefined;
-  }
-
-  private attributesNamed(entity: EntityDefinition, wanted: string): Attribute_decl[] {
-    return this.typeContainer.getAttributesV2(entity).filter((a) => this.effectiveName(a)?.toLowerCase() === wanted);
   }
 
   /** The identifier an attribute declaration introduces or redeclares. */

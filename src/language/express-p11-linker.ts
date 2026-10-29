@@ -1,6 +1,7 @@
 import { AstNodeDescription, AstUtils, DefaultLinker, DocumentState, LinkingError, ReferenceInfo } from "langium";
 import {
   Attribute_decl,
+  AttributeOrEnum,
   EntityDefinition,
   FunctionDefinition,
   SchemaDefinition,
@@ -55,6 +56,7 @@ export class ExpressP11Linker extends DefaultLinker {
         message = `The schema '${referenceName}' could not be found.`;
         break;
       case Attribute_decl.$type:
+      case AttributeOrEnum.$type:
         message = `The attribute '${referenceName}' could not be found.`;
         break;
       case TypeDefinition.$type:

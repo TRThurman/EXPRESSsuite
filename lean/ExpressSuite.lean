@@ -4,3 +4,4 @@ import ExpressSuite.Soundness
 import ExpressSuite.FpReproGt
 import ExpressSuite.Cases
 import ExpressSuite.IndexOperand
+import ExpressSuite.Inheritance

@@ -24,6 +24,7 @@ describe("Basic completion", async () => {
     END_ENTITY;
 
     ENTITY Guest SUBTYPE OF(Employee);
+    guestOnly:STRING;
     WHERE
     WR1: GetSupervisor(SELF)\\<|>;
     WR2: GetSupervisor(SELF).<|>;

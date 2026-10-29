@@ -9,7 +9,6 @@ import { EntityDefinition } from "./generated/ast.js";
 export enum MemoType {
   Supertypes,
   Subtypes,
-  Graph,
   Resources,
   Types,
   SubSuper,
@@ -23,10 +22,6 @@ export type MemoRecord = { name: string } & (
   | {
       type: MemoType.Supertypes;
       payload: ExpressP11Entity[];
-    }
-  | {
-      type: MemoType.Graph;
-      payload: EntityDefinition[];
     }
   | {
       type: MemoType.Resources;
@@ -52,13 +47,11 @@ export class ExpressP11MemoPool {
   protected readonly memoizedSubtypesCall = new Map<string, ExpressP11Entity[]>();
   protected readonly memoizedSubSuperCall = new Map<string, MultiMap<string, EntityDefinition>>();
 
-  protected readonly memoizedGraphCall = new Map<string, EntityDefinition[]>();
   protected readonly memoizedAllResourcesCall = new Map<string, ExpressP11OptimizedResourceList>();
 
   constructor() {}
 
   public reset() {
-    this.memoizedGraphCall.clear();
     this.memoizedSubtypesCall.clear();
     this.memoizedSupertypesCall.clear();
     this.memoizedAllResourcesCall.clear();
@@ -70,9 +63,6 @@ export class ExpressP11MemoPool {
   }
   public memoize(record: MemoRecord): void {
     switch (record.type) {
-      case MemoType.Graph:
-        this.memoizedGraphCall.set(record.name, record.payload);
-        break;
       case MemoType.Subtypes:
         this.memoizedSubtypesCall.set(record.name, record.payload);
         break;
@@ -90,8 +80,6 @@ export class ExpressP11MemoPool {
 
   public exist(query: MemoQuery): boolean {
     switch (query.type) {
-      case MemoType.Graph:
-        return this.memoizedGraphCall.has(query.name);
       case MemoType.Subtypes:
         return this.memoizedSubtypesCall.has(query.name);
       case MemoType.Supertypes:
@@ -109,8 +97,6 @@ export class ExpressP11MemoPool {
     query: MemoQuery
   ): ExpressP11Entity[] | EntityDefinition[] | ExpressP11OptimizedResourceList | MultiMap<string, EntityDefinition> {
     switch (query.type) {
-      case MemoType.Graph:
-        return this.memoizedGraphCall.get(query.name) ?? [];
       case MemoType.Subtypes:
         return this.memoizedSubtypesCall.get(query.name) ?? [];
       case MemoType.Supertypes:
