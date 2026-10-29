@@ -1,5 +1,28 @@
 # Changelog
 
+## Unreleased
+
+### Validation
+
+- Check attribute redeclarations for type compatibility
+  (`redeclaration-not-specialization`): the type of a redeclared attribute must
+  be the same as, or a specialization of, the original attribute's type
+  (ISO 10303-11:2004 9.2.3.4 a, 9.2.7). Defined types and selects are seen
+  through on both sides and `SELECT BASED_ON` extensions in the workspace are
+  folded in, so valid narrowings through a defined or select type on the
+  original side are accepted;
+  a failed check against an EXTENSIBLE original select is a warning.
+- Report an index qualifier applied to an operand whose declared type can never
+  hold an aggregate value (`index-on-non-aggregate`, ISO 10303-11:2004 12.6.1).
+- Both relations are transcribed from Lean 4 definitions whose soundness
+  against the EXPRESS value semantics is machine-checked (`lean/`).
+
+### Tests
+
+- Headless census of workspace diagnostics and of the schema-closure duplicate
+  command, for differential work (`src/test/workspace-*.test.ts`, env-gated).
+
+
 ## [0.4.2](https://github.com/TRThurman/EXPRESSsuite/compare/0.4.2-0...0.4.2) (2026-09-30)
 
 ### Bug Fixes

@@ -44,6 +44,15 @@ standard VS Code **Problems** view:
   malformed, misplaced, and unmatched signatures are reported, as are
   malformed `.IPn` and `.ipn` annotation keys.
 
+- **Attribute redeclaration types** — the type of `SELF\e.attr : T` must be
+  the same as, or a specialization of, the original attribute's type
+  (ISO 10303-11:2004 9.2.3.4, 9.2.7). Defined types and selects are seen
+  through on both sides, so narrowing `compound_item_definition` to a
+  `LIST [2:3] OF point_and_vector_member` is accepted, while `LIST OF REAL` is
+  not. The relation is proved sound in `lean/`.
+- **Index qualifiers** — `x[1]` is reported when the declared type of `x` can
+  never hold an aggregate value (ISO 10303-11:2004 12.6.1).
+
 For workspace-level ambiguity checks, run **EXPRESSsuite: Detect Duplicate
 Declarations in Schema Closure** from the Command Palette or an EXPRESS
 editor's context menu. The command follows transitive `USE FROM` and

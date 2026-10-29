@@ -24,6 +24,7 @@ import { ExpressP11AnnotationIndex } from "./express-p11-annotation-index.js";
 import { registerValidationChecks } from "./express-p11-validator.js";
 import { ExpressP11ConfigurationProvider } from "./express-p11-configuration-provider.js";
 import { ExpressP11DocumentUpdateHandler } from "./express-p11-document-update-handler.js";
+import { ExpressP11SelectExtensionIndex } from "./express-p11-select-extension-index.js";
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -41,6 +42,7 @@ export type ExpressP11AddedSharedServices = {
     DocumentBuilder: ExpressP11DocumentBuilder;
     IndexManager: ExpressP11IndexManager;
     AnnotationIndex: ExpressP11AnnotationIndex;
+    SelectExtensionIndex: ExpressP11SelectExtensionIndex;
   };
   lsp: {
     NodeKindProvider: ExpressP11NodeKindProvider;
@@ -55,6 +57,7 @@ export const ExpressP11SharedModule: Module<ExpressP11SharedServices, DeepPartia
     IndexManager: (services) => new ExpressP11IndexManager(services),
     WorkspaceManager: (services) => new ExpressP11WorkspaceManager(services),
     AnnotationIndex: (services) => new ExpressP11AnnotationIndex(services),
+    SelectExtensionIndex: (services) => new ExpressP11SelectExtensionIndex(services),
   },
   lsp: {
     NodeKindProvider: () => new ExpressP11NodeKindProvider(),

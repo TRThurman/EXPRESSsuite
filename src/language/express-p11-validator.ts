@@ -12,16 +12,25 @@ import {
   isNamed,
 } from "langium";
 import {
+  Assignment_stmt_body,
   Attribute_decl,
+  Complex_Primary_body,
   EntityDefinition,
   ExpressAstType,
   Local_decl,
   Reference_clause,
   SchemaDefinition,
   Use_clause,
+  isAttribute_decl,
   isConstant_body,
+  isDerived_attr,
   isEntityDefinition,
+  isExplicit_attr,
   isFunction_head,
+  isIndex_qualifier,
+  isInverse_attr,
+  isProcedure_call_Or_Assigment_stmt_reference,
+  isRedeclared_attribute,
   isIncrement_control,
   isProcedure_head,
   isReference_clause,
@@ -34,6 +43,8 @@ import type { ExpressP11Services } from "./express-module.js";
 import { schemaHasDeclarations } from "../utils/schema-helpers.js";
 import { getReferenceSpecifications, getUseSpecifications } from "../utils/interface-helpers.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
+import { ExpressTypeBuilder } from "./type-system/express-type-builder.js";
+import { mentionsExtensibleSelect, notIndexableClosed, renderType, spec } from "./type-system/express-type-model.js";
 
 /**
  * Register custom validation checks.
@@ -42,7 +53,10 @@ export function registerValidationChecks(services: ExpressP11Services) {
   const registry = services.validation.ValidationRegistry;
   const validator = services.validation.ExpressP11Validator;
   const checks: ValidationChecks<ExpressAstType> = {
+    Assignment_stmt_body: validator.checkIndexQualifierOperands,
     Attribute_decl: validator.checkAttributeNameStartsWithLowerCase,
+    Complex_Primary_body: validator.checkIndexQualifierOperands,
+    EntityDefinition: validator.checkRedeclaredAttributeTypes,
     Local_decl: validator.checkLocalVariablesDoNotDuplicateLoopIndices,
     SchemaDefinition: [
       validator.checkUniqueEntityName,
@@ -59,7 +73,19 @@ export enum ExpressP11Issues {
   WrongReferenceLabel = "wrong-reference-label",
   DeclarationNameCase = "declaration-name-case",
   DuplicateLoopIndex = "duplicate-loop-index",
+  RedeclarationNotSpecialization = "redeclaration-not-specialization",
+  IndexOnNonAggregate = "index-on-non-aggregate",
 }
+
+export type RedeclarationData = {
+  attribute: string;
+  newType: string;
+  originalType: string;
+};
+
+export type IndexOperandData = {
+  operandType: string;
+};
 
 export type WrongReferenceLabelData = {
   expectedReference: string;
@@ -84,6 +110,7 @@ export class ExpressP11Validator {
   protected readonly documents: LangiumDocuments;
   protected readonly nameProvider: NameProvider;
   protected readonly typeContainer: ExpressP11TypeContainer;
+  protected readonly typeBuilder: ExpressTypeBuilder;
   // protected readonly resourceManager: ExpressP11ResourceManager;
 
   constructor(services: ExpressP11Services) {
@@ -91,7 +118,78 @@ export class ExpressP11Validator {
     this.documents = services.shared.workspace.LangiumDocuments;
     this.nameProvider = services.references.NameProvider;
     this.typeContainer = services.validation.TypeContainer;
+    this.typeBuilder = new ExpressTypeBuilder(services.validation.TypeContainer, services.shared.workspace.SelectExtensionIndex);
     // this.resourceManager = services.resources.ResourceManager;
+  }
+
+  /**
+   * ISO 10303-11:2004 9.2.3.4 a): the type of a redeclared attribute shall be the
+   * same as, or a specialization (9.2.7) of, the original attribute's type. The
+   * relation is `spec` from the type model, proved sound in
+   * lean/ExpressSuite/Soundness.lean; defined types and selects are seen
+   * through on both sides, and select extensions in the workspace are folded in.
+   * Nothing is reported when either type lies outside the proved domain.
+   */
+  checkRedeclaredAttributeTypes(entity: EntityDefinition, accept: ValidationAcceptor): void {
+    if (!entity.body) return;
+    const owners: Array<{ node: AstNode; declarations: Attribute_decl[]; type: unknown }> = [];
+    for (const explicit of entity.body.attributes) owners.push({ node: explicit, declarations: explicit.attributes, type: explicit.type });
+    for (const derived of entity.body.derived?.attributes ?? []) owners.push({ node: derived, declarations: [derived.attribute], type: derived.type });
+    for (const owner of owners) {
+      for (const declaration of owner.declarations) {
+        if (!isRedeclared_attribute(declaration)) continue;
+        const original = declaration.qualifiedAttribute.attribute.target.ref;
+        if (!original || !isAttribute_decl(original)) continue;
+        const originalOwner = original.$container;
+        if (!isExplicit_attr(originalOwner) && !isDerived_attr(originalOwner) && !isInverse_attr(originalOwner)) continue;
+        const newType = this.typeBuilder.ofType(owner.type as Parameters<ExpressTypeBuilder["ofType"]>[0]);
+        const originalType = this.typeBuilder.ofAttribute(original);
+        if (!newType || !originalType) continue;
+        if (spec(newType, originalType)) continue;
+        const attributeName = declaration.name ?? declaration.qualifiedAttribute.attribute.target.$refText;
+        const data: RedeclarationData = { attribute: attributeName, newType: renderType(newType), originalType: renderType(originalType) };
+        // An EXTENSIBLE select may have extensions outside the workspace that
+        // would admit the new type, so the verdict is then only a warning.
+        const severity = mentionsExtensibleSelect(originalType) ? "warning" : "error";
+        accept(
+          severity,
+          `Redeclared attribute '${attributeName}' has type ${data.newType}, which is not a specialization of the original type ${data.originalType} (ISO 10303-11:2004 9.2.3.4, 9.2.7).`,
+          { node: owner.node, property: "type", code: ExpressP11Issues.RedeclarationNotSpecialization, data }
+        );
+      }
+    }
+  }
+
+  /**
+   * ISO 10303-11:2004 12.6.1 (aggregate), 12.5.1 (string) and 12.3.1 (binary)
+   * indexing: the indexed operand shall be an aggregate, string or binary
+   * value. Reported only when the declared type of the operand can hold none
+   * of these (`notIndexable` in lean/ExpressSuite/IndexOperand.lean) and no
+   * EXTENSIBLE select is involved; unknown types are not reported.
+   */
+  checkIndexQualifierOperands(body: Complex_Primary_body | Assignment_stmt_body, accept: ValidationAcceptor): void {
+    const qualifiers = body.qualifiers ?? [];
+    if (!qualifiers.some(isIndex_qualifier)) return;
+    const head = isProcedure_call_Or_Assigment_stmt_reference(body.$container.head) ? body.$container.head.to.ref : body.$container.head;
+    let current =
+      typeof head === "string" || head === undefined
+        ? this.typeBuilder.ofHead(head ?? "", "parameterList" in body && Boolean(body.parameterList), body)
+        : isProcedure_call_Or_Assigment_stmt_reference(body.$container.head)
+          ? this.typeBuilder.ofDeclaration(head)
+          : this.typeBuilder.ofHead(body.$container.head as Parameters<ExpressTypeBuilder["ofHead"]>[0], "parameterList" in body && Boolean(body.parameterList), body);
+    qualifiers.forEach((qualifier, index) => {
+      if (isIndex_qualifier(qualifier) && current && notIndexableClosed(current)) {
+        const data: IndexOperandData = { operandType: renderType(current) };
+        accept("error", `Index applied to an operand of type ${data.operandType}, which is neither an aggregate nor a string or binary value (ISO 10303-11:2004 12.6.1, 12.5.1, 12.3.1).`, {
+          node: body,
+          property: "qualifiers",
+          index,
+          code: ExpressP11Issues.IndexOnNonAggregate,
+          data,
+        });
+      }
+      current = this.typeBuilder.afterQualifier(current, qualifier);
+    });
   }
 
   checkAttributeNameStartsWithLowerCase(attribute: Attribute_decl, accept: ValidationAcceptor): void {
