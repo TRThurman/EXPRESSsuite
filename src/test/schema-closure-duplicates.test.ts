@@ -4,6 +4,11 @@ import { describe, expect, test } from "vitest";
 import { createExpressP11Services } from "../language/express-module.js";
 import { SchemaClosureDuplicateAnalyzer } from "../language/schema-closure-duplicates.js";
 
+/**
+ * The command is the on-demand form of `duplicate-interfaced-declaration` and
+ * shares its scope index, so these cases state scope semantics (ISO
+ * 10303-11:2004 10.1 b, clause 11), not closure semantics.
+ */
 async function analyze(source: string, schemaName = "current") {
   const services = createExpressP11Services(EmptyFileSystem).ExpressP11;
   const document: LangiumDocument<AstNode> = await parseDocument(services, source);
@@ -14,15 +19,14 @@ async function analyze(source: string, schemaName = "current") {
 }
 
 describe("schema closure duplicate declarations", () => {
-  test("detects case-insensitive duplicates through direct and transitive interfaces", async () => {
-    const result = await analyze(`
+  const useAndReference = `
       SCHEMA source_b;
       ENTITY datum;
       END_ENTITY;
       END_SCHEMA;
 
       SCHEMA source_c;
-      ENTITY Datum;
+      ENTITY datum;
       END_ENTITY;
       END_SCHEMA;
 
@@ -34,15 +38,28 @@ describe("schema closure duplicate declarations", () => {
       SCHEMA current;
       USE FROM intermediate;
       END_SCHEMA;
-    `);
+    `;
 
-    expect(result.schema).toBe("current");
+  test("reports the clash where both declarations are visible", async () => {
+    const result = await analyze(useAndReference, "intermediate");
+    expect(result.schema).toBe("intermediate");
     expect(result.conflicts).toHaveLength(1);
-    expect(result.conflicts[0]).toMatchObject({ category: "ENTITY", name: "Datum" });
+    expect(result.conflicts[0]).toMatchObject({ category: "ENTITY", name: "datum" });
     expect(result.conflicts[0].locations.map((location) => location.schema).sort()).toEqual(["source_b", "source_c"]);
   });
 
-  test("handles interface cycles and excludes schemas outside the closure", async () => {
+  test("does not report a REFERENCE'd item further along a USE chain (11.3)", async () => {
+    const result = await analyze(useAndReference, "current");
+    expect(result.schema).toBe("current");
+    expect(result.conflicts).toHaveLength(0);
+  });
+
+  test("keeps entity names case-significant in a short form", async () => {
+    const result = await analyze(useAndReference.replace("SCHEMA source_c;\n      ENTITY datum;", "SCHEMA source_c;\n      ENTITY Datum;"), "intermediate");
+    expect(result.conflicts).toHaveLength(0);
+  });
+
+  test("handles interface cycles and excludes schemas outside the scope", async () => {
     const result = await analyze(`
       SCHEMA first;
       USE FROM second;

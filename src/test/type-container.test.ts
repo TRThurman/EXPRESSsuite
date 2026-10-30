@@ -196,6 +196,12 @@ describe("Interfaces", async () => {
     "USE FROM Zero;" +
     "ENTITY EFour;" +
     "END_ENTITY;" +
+    "END_SCHEMA;" +
+    //Five: a full REFERENCE of a schema that only REFERENCEs (11.3: reference does not chain)
+    "SCHEMA Five;" +
+    "REFERENCE FROM Three;" +
+    "ENTITY EFive;" +
+    "END_ENTITY;" +
     "END_SCHEMA;";
 
   const expDocument: LangiumDocument<AstNode> = await parseDocument(services, expFile);
@@ -208,8 +214,11 @@ describe("Interfaces", async () => {
     expect(typeContainer.getSchemas().get("Four")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(3);
   });
 
-  test("REFERENCE FROM are imported", () => {
-    expect(typeContainer.getSchemas().get("Three")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(2);
+  test("a full REFERENCE FROM sees what is declared in or use'd by the foreign schema (11.2), not what it references (11.3)", () => {
+    // Three: EThree, ETwo (declared in Two), EOne and EZeroOne (use'd by Two through One)
+    expect(typeContainer.getSchemas().get("Three")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(4);
+    // Five: EFive and EThree only; Three's reference'd items do not chain
+    expect(typeContainer.getSchemas().get("Five")?.getAllResources().resources.get(DefinitionType.Entity)?.size).toBe(2);
   });
 });
 

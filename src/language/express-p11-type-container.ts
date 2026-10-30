@@ -28,6 +28,7 @@ import {
 } from "./generated/ast.js";
 import { CancellationToken } from "vscode-languageserver";
 import { allowedDocuments } from "../utils/file-filter.js";
+import { ExpressP11ScopeIndex } from "./express-p11-scope-index.js";
 import { Configuration } from "./express-p11-workspace-manager.js";
 import {
   DefinitionType,
@@ -74,6 +75,8 @@ type ExpressSink = {
 export class ExpressP11TypeContainer {
   protected conflictManager: ExpressP11ConflictManager = new ExpressP11ConflictManager();
   protected memoPool: ExpressP11MemoPool = new ExpressP11MemoPool();
+  /** Schema scopes (10.1 b, clause 11) for the duplicate-interfaced-declaration check and the closure command. */
+  protected readonly scopeIndex: ExpressP11ScopeIndex = new ExpressP11ScopeIndex();
   protected schemas: Map<string, ExpressP11Schema> = new Map();
   protected readonly langiumDocuments: LangiumDocuments;
   protected readonly nameProvider: NameProvider;
@@ -112,6 +115,10 @@ export class ExpressP11TypeContainer {
   public getConflicts(): ExpressConflict[] {
     return this.conflictManager.getConflicts();
   }
+
+  public getScopeIndex(): ExpressP11ScopeIndex {
+    return this.scopeIndex;
+  }
   protected async build(documents: LangiumDocument[], cancelToken: CancellationToken): Promise<void> {
     this.reset();
     await this.configureWorkspace();
@@ -120,6 +127,7 @@ export class ExpressP11TypeContainer {
       localTypes: new MultiMap<string, ConcreteType>(),
     };
     const validDocs = allowedDocuments(this.langiumDocuments.all.toArray(), this.workspaceConfiguration);
+    this.scopeIndex.build(validDocs);
 
     await this.loadSchemas(validDocs, cancelToken, sink);
 

@@ -44,6 +44,7 @@ import type { ExpressP11Services } from "./express-module.js";
 import { schemaHasDeclarations } from "../utils/schema-helpers.js";
 import { getReferenceSpecifications, getUseSpecifications } from "../utils/interface-helpers.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
+import { ScopeClash, declarationNameRange } from "./express-p11-scope-index.js";
 import { ExpressP11ScopeProvider, ScopeType } from "./express-p11-scope-provider.js";
 import { ExpressTypeBuilder } from "./type-system/express-type-builder.js";
 import { mentionsExtensibleSelect, notIndexableClosed, renderType, spec } from "./type-system/express-type-model.js";
@@ -62,7 +63,7 @@ export function registerValidationChecks(services: ExpressP11Services) {
     EntityDefinition: validator.checkRedeclaredAttributeTypes,
     Local_decl: validator.checkLocalVariablesDoNotDuplicateLoopIndices,
     SchemaDefinition: [
-      validator.checkUniqueEntityName,
+      validator.checkDuplicateInterfacedDeclarations,
       validator.checkReferencesAreImported,
       validator.checkDeclarationNameCasing,
     ],
@@ -79,7 +80,14 @@ export enum ExpressP11Issues {
   RedeclarationNotSpecialization = "redeclaration-not-specialization",
   IndexOnNonAggregate = "index-on-non-aggregate",
   AmbiguousAttributeReference = "ambiguous-attribute-reference",
+  DuplicateInterfacedDeclaration = "duplicate-interfaced-declaration",
+  RedundantDeclaration = "redundant-declaration",
 }
+
+export type DuplicateDeclarationData = {
+  identifier: string;
+  schemas: string[];
+};
 
 export type RedeclarationData = {
   attribute: string;
@@ -256,22 +264,62 @@ export class ExpressP11Validator {
     }
   }
 
-  checkUniqueEntityName(schema: SchemaDefinition, accept: ValidationAcceptor): void {
-    const reported = new Set();
-    if (!schemaHasDeclarations(schema)) return;
-    // var allDeclarations: Declaration[] = schema.body.declarations.filter(
-    //   (d) => d.$type == "Declaration"
-    // ) as Declaration[];
-    const entityDeclarations = schema.body.declarations.filter((d) => isEntityDefinition(d)) as EntityDefinition[];
-    entityDeclarations.forEach((e) => {
-      if (reported.has(e.name)) {
-        accept("error", `Entity has non-unique name '${e.name}'.`, {
-          node: e,
-          property: "name",
-        });
+  /**
+   * ISO 10303-11:2004 10.1 b: "Within a single scope an identifier may be
+   * declared, or explicitly interfaced (see clause 11), once only." Reported in
+   * every schema in whose scope one identifier denotes two or more different
+   * declarations, local or interfaced, of any kind (Table 9); one declaration
+   * reached by several routes counts once (10.1 b, second sentence). Anchored at
+   * the local declaration, or at the interface item or specification that
+   * brought the declaration in, once per declaration. In a long form (WG11 N239) identical repeated
+   * definitions are a warning. The scope relation is decided by
+   * `lean/ExpressSuite/Interfaces.lean` (`clash_iff`). Never throws: a failure
+   * to compute a scope reports nothing for that schema.
+   */
+  checkDuplicateInterfacedDeclarations(schema: SchemaDefinition, accept: ValidationAcceptor): void {
+    let clashes: ScopeClash[];
+    try {
+      clashes = this.typeContainer.getScopeIndex().clashesIn(schema);
+    } catch (error) {
+      console.warn(`duplicate-interfaced-declaration skipped for '${schema.name}': ${error instanceof Error ? error.message : String(error)}`);
+      return;
+    }
+    for (const clash of clashes) {
+      const kinds = [...new Set(clash.declarations.map((decl) => decl.kind))];
+      const schemas = [...new Set(clash.declarations.map((decl) => decl.schema))];
+      const what = kinds.length === 1 ? `${kinds[0]} '${clash.identifier}'` : `Identifier '${clash.identifier}' (${kinds.join(", ")})`;
+      let message: string;
+      if (clash.identical) {
+        message = `${what} is declared more than once in ${schemas[0]} with identical text; a tool may treat repeated identical definitions as one (WG11 N239).`;
+      } else if (clash.longForm) {
+        message = `${what} is declared more than once in ${schemas[0]} with different definitions (ISO 10303-11:2004 10.1 b).`;
+      } else if (schemas.length === 1) {
+        message = `${what} is declared more than once in ${schemas[0]} (ISO 10303-11:2004 10.1 b).`;
+      } else {
+        const all = clash.declarations.length === 2 ? "both" : "all";
+        message = `${what} is declared in ${schemas.join(" and in ")}; ${all} are visible in ${schema.name} (ISO 10303-11:2004 10.1 b).`;
       }
-      reported.add(e.name);
-    });
+      const relatedInformation = clash.declarations.flatMap((decl) => {
+        const range = declarationNameRange(decl);
+        return range ? [{ location: { uri: decl.uri, range }, message: `${decl.kind} '${decl.name}' is declared in ${decl.schema}.` }] : [];
+      });
+      const data: DuplicateDeclarationData = { identifier: clash.identifier, schemas };
+      const severity = clash.identical ? "warning" : "error";
+      const code = clash.identical ? ExpressP11Issues.RedundantDeclaration : ExpressP11Issues.DuplicateInterfacedDeclaration;
+      // One diagnostic per declaration, at its first arrival in this schema (a
+      // local declaration, or the first interface line that brings it in); a
+      // declaration re-exported along several chains is not reported again.
+      const anchored = new Set<AstNode>();
+      for (const decl of clash.declarations) {
+        const arrival = clash.arrivals.find((candidate) => candidate.decl.node === decl.node);
+        if (!arrival) continue;
+        const target = arrival.route.kind === "local" ? arrival.decl.anchor : (arrival.route.item ?? arrival.route.spec);
+        if (anchored.has(target)) continue;
+        anchored.add(target);
+        if (arrival.route.kind === "local") accept(severity, message, { node: target, property: "name", code, data, relatedInformation });
+        else accept(severity, message, { node: target, code, data, relatedInformation });
+      }
+    }
   }
 
   checkDeclarationNameCasing(schema: SchemaDefinition, accept: ValidationAcceptor): void {
