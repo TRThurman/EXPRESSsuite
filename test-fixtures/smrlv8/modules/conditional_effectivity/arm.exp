@@ -1,0 +1,36 @@
+(*
+ Part1000: $Id: $
+ STEPmod.CVS.Id: arm.exp,v 1.7 2019/01/10 22:26:07 brandon Exp
+ ISO TC184/SC4/WG12 N10289 - ISO/TS 10303-1397 Conditional effectivity - EXPRESS ARM
+*) 
+
+
+SCHEMA Conditional_effectivity_arm;
+
+USE FROM Condition_arm;    -- ISO/TS 10303-1253
+
+USE FROM Effectivity_arm;    -- ISO/TS 10303-1057
+
+
+ENTITY Conditional_effectivity
+  SUBTYPE OF (Effectivity);
+  condition : Condition;
+END_ENTITY;
+
+ENTITY Conditional_configuration	
+	SUBTYPE OF (Conditional_effectivity);	
+	configuration_type	: STRING;										
+	inheritance_type	: STRING;										
+END_ENTITY;
+
+SUBTYPE_CONSTRAINT cond_eff_restrict_effectivity_subtypes FOR Effectivity;
+  ONEOF (Conditional_effectivity,
+         Dated_effectivity,
+         Lot_effectivity,
+         Serial_effectivity,
+         Time_interval_effectivity);
+END_SUBTYPE_CONSTRAINT;
+
+END_SCHEMA;  -- Conditional_effectivity_arm
+
+

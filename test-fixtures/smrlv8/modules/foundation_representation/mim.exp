@@ -1,0 +1,38 @@
+(* 
+Part1000: $Id: $
+ STEPmod.CVS.Id: mim.exp,v 1.22 2019/04/18 13:20:59 verodub Exp 
+ISO TC184/SC4/WG12 N10390 - ISO/TS 10303-1006 Foundation representation - EXPRESS MIM
+Supersedes ISO TC184/SC4/WG12 N6903
+*) 
+
+
+SCHEMA Foundation_representation_mim;
+
+USE FROM basic_attribute_schema   -- ISO 10303-41
+  (description_attribute,
+   description_attribute_select,
+   id_attribute,
+   id_attribute_select); 
+
+USE FROM measure_schema   -- ISO 10303-41
+  (global_unit_assigned_context); 
+
+USE FROM qualified_measure_schema   -- ISO 10303-45
+  (descriptive_representation_item); 
+
+USE FROM representation_schema   -- ISO 10303-43
+  (global_uncertainty_assigned_context,
+   representation,
+   representation_context,
+   representation_context_reference,
+   representation_reference,
+   representation_item,
+   representation_relationship,
+   uncertainty_measure_with_unit); 
+
+USE FROM Support_resource_mim;   -- ISO/TS 10303-1800
+
+USE FROM Value_with_unit_mim;    -- ISO/TS 10303-1054
+
+
+END_SCHEMA;  -- Foundation_representation_mim

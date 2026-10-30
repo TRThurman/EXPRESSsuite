@@ -1,0 +1,278 @@
+(*
+Part1000: $Id: $
+ STEPmod.CVS.Id: mim.exp,v 1.67 2019/03/04 17:50:23 kevin Exp
+ISO TC184/SC4/WG12 N10190 - ISO/TS 10303-1051 Geometric tolerance - EXPRESS MIM
+Supersedes ISO TC184/SC4/WG12 N9677
+*)
+
+
+SCHEMA Geometric_tolerance_mim;
+
+USE FROM Derived_shape_element_mim;       -- ISO/TS 10303-1130
+USE FROM Dimension_tolerance_mim;         -- ISO/TS 10303-1050
+USE FROM Feature_and_connection_zone_mim; -- ISO/TS 10303-1671
+USE FROM Measure_representation_mim;      -- ISO/TS 10303-1118
+USE FROM Part_shape_mim; -- ISO/TS 10303-1807
+USE FROM product_property_definition_schema     -- ISO 10303-41
+  (property_definition,
+   product_definition_shape,
+   shape_aspect);
+USE FROM product_property_representation_schema   -- ISO 10303-41
+  (property_definition_representation,
+   shape_representation);
+USE FROM Shape_composition_mim;           -- ISO/TS 10303-1742
+USE FROM Support_resource_mim;            -- ISO/TS 10303-1800
+USE FROM shape_aspect_definition_schema -- ISO 10303-47
+  (all_around_shape_aspect,
+  apex,
+  between_shape_aspect,
+  centre_of_symmetry,
+  continuous_shape_aspect,
+  composite_shape_aspect,
+  composite_group_shape_aspect,
+  common_datum,
+  common_datum_list,
+  contacting_feature,
+  datum,
+  datum_feature,
+  datum_reference_modifier_with_value,
+  datum_reference,
+  datum_reference_compartment,
+  datum_reference_element,
+  datum_system,
+  datum_target,
+  derived_shape_aspect,
+  extension,
+  general_datum_reference,
+  geometric_alignment,
+  geometric_contact,
+  geometric_intersection,
+  parallel_offset,
+  perpendicular_to,
+  referenced_modified_datum,
+  simple_datum_reference_modifier,
+  shape_aspect_deriving_relationship,
+  shape_representation_with_parameters,
+  symmetric_shape_aspect,
+  tangent);
+USE FROM shape_tolerance_schema  -- ISO 10303-47
+  (dimension_related_tolerance_zone_element,
+  directed_tolerance_zone,
+  geometric_tolerance,
+  geometric_tolerance_auxiliary_classification,
+  geometric_tolerance_relationship,
+  geometric_tolerance_with_datum_reference,
+  geometric_tolerance_with_defined_unit,
+  geometric_tolerance_with_defined_area_unit,
+  geometric_tolerance_with_maximum_tolerance,
+  geometric_tolerance_with_modifiers,
+  gps_filtration_specification,
+  gps_filter,
+  modified_geometric_tolerance,
+  non_uniform_zone_definition,
+  oriented_tolerance_zone,
+  projected_zone_definition,
+  projected_zone_definition_with_offset,
+  runout_zone_definition,
+  runout_zone_orientation_reference_direction,
+  tolerance_zone,
+  tolerance_zone_definition,
+  tolerance_zone_form,
+  tolerance_zone_with_datum,
+  cylindricity_tolerance,
+  flatness_tolerance,
+  line_profile_tolerance,
+  position_tolerance,
+  roundness_tolerance,
+  straightness_tolerance,
+  surface_profile_tolerance,
+  angularity_tolerance,
+  circular_runout_tolerance,
+  coaxiality_tolerance,
+  concentricity_tolerance,
+  parallelism_tolerance,
+  perpendicularity_tolerance,
+  symmetry_tolerance,
+  total_runout_tolerance,
+  unequally_disposed_geometric_tolerance);
+USE FROM Value_with_unit_extension_mim;   -- ISO/TS 10303-1753
+REFERENCE FROM support_resource_schema   -- ISO 10303-41
+  (bag_to_set,
+   type_check_function);
+
+ENTITY feature_for_datum_target_relationship
+  SUBTYPE OF (shape_aspect_relationship);
+  SELF\shape_aspect_relationship.related_shape_aspect : datum_target;
+UNIQUE
+  UR1: related_shape_aspect;
+WHERE
+  WR1: relating_shape_aspect.of_shape :=: related_shape_aspect.of_shape;
+  WR2: relating_shape_aspect\shape_aspect.product_definitional = TRUE;
+END_ENTITY;
+
+ENTITY placed_datum_target_feature
+  SUBTYPE OF (datum_target);
+DERIVE
+  representation_associations : SET[0:?] OF property_definition_representation := get_shape_aspect_property_definition_representations(SELF);
+WHERE
+  WR1: SELF.description IN ['point','line','rectangle','circle','circular curve'];
+  WR2: SIZEOF (QUERY (pdr <* representation_associations | 'GEOMETRIC_TOLERANCE_MIM.SHAPE_REPRESENTATION_WITH_PARAMETERS' IN TYPEOF (pdr.used_representation) )) = 1;
+  WR3: valid_datum_target_parameters(SELF);
+END_ENTITY;
+
+RULE non_uniform_zone_definition_constraint FOR (tolerance_zone_definition, tolerance_zone, tolerance_zone_form);
+LOCAL
+   tzf_set  : SET OF tolerance_zone_form := QUERY( tzf <* tolerance_zone_form | tzf\tolerance_zone_form.name = 'non uniform');
+   nuzd_set : SET OF tolerance_zone_definition := QUERY( tzd <* tolerance_zone_definition | 'SHAPE_TOLERANCE_SCHEMA.NON_UNIFORM_ZONE_DEFINITION' IN TYPEOF(tzd));
+END_LOCAL;
+
+WHERE
+WR1: QUERY(tzd <* nuzd_set |
+           (tzd\tolerance_zone_definition.zone\tolerance_zone.form IN tzf_set)
+      ) = nuzd_set;
+END_RULE;
+
+FUNCTION get_shape_aspect_property_definition_representations
+ (s_a_instance : shape_aspect) : SET OF property_definition_representation;
+LOCAL
+pd_set : SET OF property_definition := [];
+pdr_set : SET OF property_definition_representation := [] ;
+END_LOCAL;
+pd_set := bag_to_set(USEDIN(s_a_instance, 'PRODUCT_PROPERTY_DEFINITION_SCHEMA.PROPERTY_DEFINITION.DEFINITION'));
+IF (SIZEOF(pd_set) < 1) THEN
+RETURN (pdr_set);
+END_IF;
+REPEAT i := 1 TO HIINDEX(pd_set);
+pdr_set := pdr_set + (QUERY(pdr <* USEDIN(pd_set[i], 'PRODUCT_PROPERTY_REPRESENTATION_SCHEMA.' + 'PROPERTY_DEFINITION_REPRESENTATION.' + 'DEFINITION') |
+'PRODUCT_PROPERTY_REPRESENTATION_SCHEMA.SHAPE_DEFINITION_REPRESENTATION' IN TYPEOF(pdr)));
+END_REPEAT;
+RETURN (pdr_set);
+END_FUNCTION;
+
+FUNCTION valid_datum_target_parameters (pdf : placed_datum_target_feature) : BOOLEAN;
+  LOCAL
+    rep_set : SET OF representation := [] ;
+    parameter_representations: SET OF representation;
+  END_LOCAL;
+
+  REPEAT i := 1 TO HIINDEX(pdf.representation_associations);
+    rep_set := rep_set + pdf.representation_associations[i].used_representation;
+  END_REPEAT;
+  parameter_representations := QUERY(rep <* rep_set | ('GEOMETRIC_TOLERANCE_MIM.SHAPE_REPRESENTATION_WITH_PARAMETERS' IN TYPEOF(rep)));
+
+  IF (SIZEOF( QUERY( srwp <* parameter_representations |
+          (SIZEOF( QUERY( i <* srwp.items |
+          (i.name='orientation') AND
+          ('GEOMETRY_SCHEMA.PLACEMENT' IN TYPEOF(i)))) = 1))) <> 1) THEN
+    RETURN(FALSE);
+  END_IF;
+  CASE pdf\shape_aspect.description OF
+    'point': RETURN(SIZEOF(QUERY( srwp <* parameter_representations |
+              (SIZEOF(srwp.items) = 1))) = 1);
+    'circle', 'circular curve': RETURN((SIZEOF( QUERY( srwp <* parameter_representations |
+              (SIZEOF(srwp.items) = 2))) = 1) AND
+             (SIZEOF( QUERY( srwp <* parameter_representations |
+              (SIZEOF( QUERY( i <* srwp.items |
+                (i.name='target diameter') AND
+                (SIZEOF(['GEOMETRIC_TOLERANCE_MIM.MEASURE_REPRESENTATION_ITEM',
+		   'GEOMETRIC_TOLERANCE_MIM.LENGTH_MEASURE_WITH_UNIT']*TYPEOF(i)
+                 ) = 2) )) = 1))) = 1));
+    'line': RETURN(SIZEOF( QUERY( srwp <* parameter_representations |
+              (SIZEOF( QUERY( i <* srwp.items |
+                (i.name='target length') AND
+                (SIZEOF(['GEOMETRIC_TOLERANCE_MIM.MEASURE_REPRESENTATION_ITEM',
+		'GEOMETRIC_TOLERANCE_MIM.LENGTH_MEASURE_WITH_UNIT']*TYPEOF(i)
+                 ) = 2) )) = 1))) = 1);
+    'rectangle': RETURN((SIZEOF( QUERY( srwp <* parameter_representations |
+              (SIZEOF(srwp.items)= 3))) = 1) AND
+             (SIZEOF( QUERY( srwp <* parameter_representations |
+              (SIZEOF( QUERY( i <* srwp.items |
+                (i.name='target length') AND
+                (SIZEOF(['GEOMETRIC_TOLERANCE_MIM.MEASURE_REPRESENTATION_ITEM',
+		'GEOMETRIC_TOLERANCE_MIM.LENGTH_MEASURE_WITH_UNIT']*TYPEOF(i)
+                 ) = 2))) = 1))) = 1) AND
+              (SIZEOF( QUERY( srwp <* parameter_representations |
+               (SIZEOF( QUERY( i <* srwp.items |
+                 (i.name='target width') AND
+                 (SIZEOF(['GEOMETRIC_TOLERANCE_MIM.MEASURE_REPRESENTATION_ITEM',
+ 		'GEOMETRIC_TOLERANCE_MIM.LENGTH_MEASURE_WITH_UNIT']*TYPEOF(i)
+                  ) = 2))) = 1) )) = 1));
+    OTHERWISE : RETURN(FALSE);
+  END_CASE;
+END_FUNCTION;
+
+RULE unique_gdt_element_id_constraint for (
+                                          product_definition_shape,
+                                          dimensional_location,
+                                          dimensional_size,
+                                          shape_aspect,
+                                          shape_aspect_relationship);
+LOCAL
+ bss  : BAG OF STRING := [];
+ ds   : SET OF dimensional_size := QUERY(ds <* dimensional_size | EXISTS(ds\dimensional_size.id));
+ sa   : SET OF shape_aspect := QUERY(sa <* shape_aspect | EXISTS(sa\shape_aspect.id));
+ sar  : SET OF shape_aspect_relationship := QUERY(sar <* shape_aspect_relationship | EXISTS(sar\shape_aspect_relationship.id));
+ ssa  : SET OF shape_aspect := [];
+ pass : BOOLEAN := TRUE;
+END_LOCAL;
+REPEAT ii := 1 TO SIZEOF (product_definition_shape) WHILE pass;
+ bss := [];
+ ssa := bag_to_set(USEDIN(product_definition_shape[ii], 'PRODUCT_PROPERTY_DEFINITION_SCHEMA.' + 'SHAPE_ASPECT.' + 'OF_SHAPE'));
+
+ REPEAT i := 1 to SIZEOF (ds);
+  IF (ds[i]\dimensional_size.applies_to IN ssa) THEN
+   bss := bss + ds[i]\dimensional_size.id;
+  END_IF;
+ END_REPEAT;
+
+ REPEAT i := 1 to SIZEOF (sa);
+  IF (sa[i] IN ssa) THEN
+   bss := bss + sa[i]\shape_aspect.id;
+  END_IF;
+ END_REPEAT;
+
+ REPEAT i := 1 to SIZEOF (sar);
+  IF (sar[i]\shape_aspect_relationship.relating_shape_aspect IN ssa) THEN
+   bss := bss + sar[i]\shape_aspect_relationship.id;
+  END_IF;
+ END_REPEAT;
+
+ IF (SIZEOF(bag_to_set(bss)) <> SIZEOF(bss)) THEN pass := FALSE;
+ END_IF;
+END_REPEAT;
+WHERE
+  WR1 : pass;
+END_RULE;
+
+RULE tolerance_zone_form_name_constraint for (tolerance_zone_form);
+LOCAL
+ names : SET OF STRING :=
+  [ 'within a circle',
+    'within a cylinder',
+    'within a cone',
+    'within a single complex surface',
+    'within a sphere',
+    'between two coaxial cylinders',
+    'between two concentric circles',
+    'between two equidistant curves',
+    'between two equidistant complex lines or two parallel straight lines',
+    'between two equidistant complex surfaces or two parallel planes',
+    'between two equidistant surfaces',
+    'between two non-equidistant complex lines or two non-parallel straight lines',
+    'between two non-equidistant complex surfaces or two non-parallel planes',
+    'between two parallel circles on a conical surface',
+    'between two parallel circles of the same diameter',
+    'non uniform',
+    'cylindrical or circular',
+    'spherical',
+    'unknown'];
+ pass : BOOLEAN := TRUE;
+END_LOCAL;
+REPEAT i := 1 to SIZEOF(tolerance_zone_form) WHILE pass;
+ pass := (tolerance_zone_form[i].name IN names);
+END_REPEAT;
+WHERE
+ WR1: pass;
+END_RULE;
+
+END_SCHEMA;  -- Geometric_tolerance_mim

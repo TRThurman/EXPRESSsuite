@@ -1,0 +1,167 @@
+(* Concatenated File produced by Express Engine
+     5.0.13 (GIT 4be7cfa)
+     Steel Bank CL 1.4.2 (64-bits)
+
+   In Directory: /Users/ri328c/workspace/stepmod/data/modules/condition/
+   Commandline:
+     eengine --concat_schema
+       -schema C:\Users\ri328c\workspace\stepmod\data\modules\condition\arm.exp
+       -mode arm_shortform
+       -stepmod C:\Users\ri328c\workspace\stepmod
+*)
+
+(* 3 Schemata for Concatenated File
+
+classification_assignment_arm
+   Filename: C:/Users/ri328c/workspace/stepmod/data/modules/classification_assignment/arm.exp
+   CVS Rev:   1.9
+   File Status: up-to-date
+   Timestamp: 2018-10-19 18:34:49 GMT
+   Version:   <<No Schema Version String>>
+
+class_arm
+   Filename: C:/Users/ri328c/workspace/stepmod/data/modules/class/arm.exp
+   CVS Rev:   1.8
+   File Status: up-to-date
+   Timestamp: 2004-11-19 21:37:34 GMT
+   Version:   <<No Schema Version String>>
+
+condition_arm
+   Filename: C:/Users/ri328c/workspace/stepmod/data/modules/condition/arm.exp
+   CVS Rev:   1.13
+   File Status: up-to-date
+   Timestamp: 2018-09-11 19:54:59 GMT
+   Version:   <<No Schema Version String>>
+
+ *)
+
+--
+-- CLASSIFICATION_ASSIGNMENT_ARM (C:/Users/ri328c/workspace/stepmod/data/modules/classification_assignment/arm.exp)
+--
+(*
+ Part1000: $Id: $
+ STEPmod.CVS.Id: arm.exp,v 1.9 2018/10/17 23:02:25 brandon Exp
+ ISO TC184/SC4/WG12 N3248 - ISO/TS 10303-1114 Classification assignment - EXPRESS ARM
+ Supersedes ISO TC184/SC4/WG12 N2229
+*)
+
+SCHEMA Classification_assignment_arm;
+
+USE FROM Class_arm;    -- ISO/TS 10303-1070
+
+
+TYPE classification_item = EXTENSIBLE GENERIC_ENTITY SELECT;
+END_TYPE; 
+
+ENTITY Classification_assignment;
+  assigned_class : Class;
+  items : SET[1:?] OF classification_item;
+  role : OPTIONAL STRING;
+END_ENTITY;
+
+ENTITY Classification_relationship;
+	description 	: OPTIONAL STRING; 					
+	id 				: OPTIONAL STRING;					
+	related 		: Classification_assignment;			
+	relating 		: Classification_assignment;			
+	relation_type	: STRING;							
+  WHERE
+	WR1 : relating :<>: related;
+END_ENTITY;
+
+END_SCHEMA;  -- Classification_assignment_arm
+
+
+--
+-- CLASS_ARM (C:/Users/ri328c/workspace/stepmod/data/modules/class/arm.exp)
+--
+(*
+ Part1000: $Id: $
+ STEPmod.CVS.Id: arm.exp,v 1.8 2004/11/19 21:37:34 robbod Exp
+ ISO TC184/SC4/WG12 N3022 - ISO/TS 10303-1070 Class - EXPRESS ARM
+ Supersedes ISO TC184/SC4/WG12 N2258
+*) 
+
+
+SCHEMA Class_arm;
+
+
+ENTITY Class
+  SUPERTYPE OF (ONEOF (Class_by_extension,
+                       Class_by_intension));
+  id : STRING;
+  name : STRING;
+  description : OPTIONAL STRING;
+END_ENTITY;
+
+ENTITY Class_by_extension
+  SUBTYPE OF (Class);
+END_ENTITY;
+
+ENTITY Class_by_intension
+  SUBTYPE OF (Class);
+END_ENTITY;
+
+END_SCHEMA;  -- Class_arm
+
+
+
+--
+-- CONDITION_ARM (C:/Users/ri328c/workspace/stepmod/data/modules/condition/arm.exp)
+--
+(*
+ Part1000: $Id: $
+ STEPmod.CVS.Id: arm.exp,v 1.13 2004/11/19 21:37:34 robbod Exp
+ ISO TC184/SC4/WG12 N3025 - ISO/TS 10303-1253 Condition - EXPRESS ARM
+ Supersedes ISO TC184/SC4/WG12 N2318
+*) 
+
+
+SCHEMA Condition_arm;
+
+USE FROM Classification_assignment_arm;    -- ISO/TS 10303-1114
+
+
+TYPE condition_classification_item = EXTENSIBLE GENERIC_ENTITY SELECT BASED_ON classification_item WITH 
+   (Condition, 
+    Condition_assignment, 
+    Condition_parameter, 
+    Condition_relationship);
+END_TYPE; 
+
+TYPE condition_item = EXTENSIBLE GENERIC_ENTITY SELECT;
+END_TYPE; 
+
+TYPE condition_parameter_item = EXTENSIBLE GENERIC_ENTITY SELECT
+   (Condition_relationship);
+END_TYPE; 
+
+ENTITY Condition;
+  name : STRING;
+  description : OPTIONAL STRING;
+END_ENTITY;
+
+ENTITY Condition_assignment;
+  assigned_condition : Condition;
+  item : condition_item;
+END_ENTITY;
+
+ENTITY Condition_parameter;
+  name : STRING;
+  description : OPTIONAL STRING;
+  condition : Condition;
+  parameter : OPTIONAL condition_parameter_item;
+END_ENTITY;
+
+ENTITY Condition_relationship;
+  name : STRING;
+  description : OPTIONAL STRING;
+  relating_condition : Condition;
+  related_condition : Condition;
+END_ENTITY;
+
+END_SCHEMA;  -- Condition_arm
+
+
+
+

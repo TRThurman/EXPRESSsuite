@@ -1,0 +1,58 @@
+(*
+Part1000: $Id: $
+ STEPmod.CVS.Id: mim.exp,v 1.31 2019/01/22 22:07:41 rick Exp
+ISO TC184/SC4/WG12 N10196 - ISO/TS 10303-1131 Construction geometry - EXPRESS MIM
+Supersedes ISO TC184/SC4/WG12 N9747
+*) 
+
+SCHEMA Construction_geometry_mim;
+
+USE FROM aic_topologically_bounded_surface;    -- ISO 10303-511
+
+USE FROM Basic_curve_mim;    -- ISO/TS 10303-1651;
+
+USE FROM geometry_schema;   -- ISO 10303-42
+
+USE FROM representation_schema   -- ISO 10303-43
+  (mapped_item,
+   representation,
+   representation_map,
+   representation_relationship); 
+
+USE FROM topology_schema;   -- ISO 10303-42
+
+  TYPE constructive_geometry_representation_or_shape_representation = SELECT
+    (constructive_geometry_representation,
+    shape_representation);
+  END_TYPE;
+
+  ENTITY constructive_geometry_representation
+    SUBTYPE OF (representation);
+    WHERE
+      WR1: ('GEOMETRY_SCHEMA.GEOMETRIC_REPRESENTATION_CONTEXT' IN TYPEOF(SELF\representation.context_of_items)) AND 
+           ({2 <= SELF\representation.context_of_items\geometric_representation_context.coordinate_space_dimension <= 3});
+      WR2: SIZEOF( QUERY( cgr_i <* SELF.items | SIZEOF([
+      'GEOMETRY_SCHEMA.PLACEMENT', 
+      'GEOMETRY_SCHEMA.CURVE', 
+      'GEOMETRY_SCHEMA.EDGE', 
+      'TOPOLOGY_SCHEMA.FACE', 
+      'GEOMETRY_SCHEMA.POINT', 
+      'GEOMETRY_SCHEMA.SURFACE',
+      'TOPOLOGY_SCHEMA.CONNECTED_FACE_SET',
+      'TOPOLOGY_SCHEMA.CONNECTED_EDGE_SET',
+      'TOPOLOGY_SCHEMA.VERTEX_POINT'
+      ] * TYPEOF(cgr_i)) <> 1 )) = 0;
+      WR3: SIZEOF( USEDIN( SELF, 'REPRESENTATION_SCHEMA.' + 'REPRESENTATION_RELATIONSHIP.REP_2') ) > 0;
+  END_ENTITY;
+
+  ENTITY constructive_geometry_representation_relationship
+    SUBTYPE OF (representation_relationship);
+      SELF\representation_relationship.rep_1 : constructive_geometry_representation_or_shape_representation;    
+      SELF\representation_relationship.rep_2 : constructive_geometry_representation;    
+    WHERE
+      WR1: (SELF.rep_1.context_of_items :=: SELF.rep_2.context_of_items) AND 
+      ('GEOMETRY_SCHEMA.GEOMETRIC_REPRESENTATION_CONTEXT' IN TYPEOF(SELF.rep_1.context_of_items));
+      WR2: NOT('REPRESENTATION_SCHEMA.' + 'REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION' IN TYPEOF(SELF));
+  END_ENTITY;
+
+END_SCHEMA;  

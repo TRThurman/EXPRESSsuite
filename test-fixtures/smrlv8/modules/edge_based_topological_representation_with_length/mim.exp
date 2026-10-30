@@ -1,0 +1,25 @@
+(*
+   Part1000: $Id: $
+ STEPmod.CVS.Id: mim.exp,v 1.9 2019/04/10 10:55:43 kevin Exp
+   ISO TC184/SC4/WG12 N9708 - ISO/TS 10303-1830 edge_based_topological_representation_with_length - EXPRESS MIM
+    Supersedes ISO TC184/SC4/WG12 N9199
+*)
+SCHEMA Edge_based_topological_representation_with_length_mim;
+
+USE FROM Elemental_topology_mim; -- ISO/TS 10303-1005
+USE FROM topology_schema(edge_with_length, subedge, vertex_on_edge); -- ISO 10303-42
+
+TYPE connected_edge_with_length_set_items = SELECT
+    (connected_edge_set, 
+    path, 
+    vertex_on_edge);
+ END_TYPE; 
+ 
+ENTITY connected_edge_with_length_set_representation
+   SUBTYPE OF (representation);
+   SELF\representation.items : SET[1:?] OF connected_edge_with_length_set_items;
+WHERE
+   WR1: SIZEOF(QUERY ( it <* SELF.items | 'TOPOLOGY_SCHEMA.CONNECTED_EDGE_SET' IN TYPEOF(it)) ) = 1;
+ END_ENTITY;
+
+END_SCHEMA;

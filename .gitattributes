@@ -1,0 +1,4 @@
+# Published ISO 10303 SMRL v8 EXPRESS schemas kept byte-identical to the
+# distribution (mostly CRLF): no end-of-line conversion on any platform, and
+# marked vendored so GitHub collapses their diffs and language statistics.
+test-fixtures/smrlv8/** -text linguist-vendored

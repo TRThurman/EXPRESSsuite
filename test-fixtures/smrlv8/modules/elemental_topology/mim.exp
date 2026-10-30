@@ -1,0 +1,26 @@
+(*
+Part1000: $Id: $
+ STEPmod.CVS.Id: mim.exp,v 1.7 2012/10/11 05:49:05 liutkuviene Exp
+ISO TC184/SC4/WG12 N8009 - ISO/TS 10303-1005 Elemental topology - EXPRESS MIM
+Supersedes ISO TC184/SC4/WG12 N6897
+*)
+   
+SCHEMA Elemental_topology_mim;
+  USE FROM Foundation_representation_mim; 
+  USE FROM topology_schema -- ISO 10303-42
+      (connected_edge_set,
+       connected_face_set,
+       edge,
+       edge_loop,
+       face,
+       face_bound,
+       face_outer_bound,
+       loop,
+       oriented_edge,
+       path,
+       topological_representation_item,
+       vertex,
+       vertex_loop);
+END_SCHEMA;
+
+(* Last update -  15 Aug 2001 *)

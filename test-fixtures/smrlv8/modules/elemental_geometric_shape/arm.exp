@@ -1,0 +1,157 @@
+(* 
+	Part1000: $Id: $
+ STEPmod.CVS.Id: arm.exp,v 1.39 2019/01/23 18:17:58 brandon Exp
+	ISO TC184/SC4/WG12 N10330 - ISO/TS 10303-1004 Elemental geometric shape - EXPRESS ARM
+	Supersedes ISO TC184/SC4/WG12 N9156
+*)
+   
+SCHEMA Elemental_geometric_shape_arm;
+ 
+USE FROM Elemental_topology_arm; -- ISO/TS 10303-1005
+USE FROM Foundation_representation_arm; -- ISO/TS 10303-1006
+
+
+
+  TYPE cartesian_transformation = SELECT (
+    Cartesian_transformation_2d, 
+	Cartesian_transformation_3d);
+  END_TYPE;
+
+  TYPE geometric_model_item = SELECT 
+    (Detailed_geometric_model_element,
+     Detailed_topological_model_element);
+  END_TYPE;
+
+  TYPE template_definition_select = EXTENSIBLE SELECT (Geometric_model);
+  END_TYPE; 
+
+  ENTITY Axis_placement
+    ABSTRACT SUPERTYPE OF (ONEOF (Axis_placement_2d,
+      Axis_placement_3d, Axis1_placement))
+    SUBTYPE OF (Detailed_geometric_model_element);
+      location      : Cartesian_point;
+    DERIVE
+      dim: INTEGER := SIZEOF(location\Cartesian_point.coordinates);
+  END_ENTITY;
+
+  ENTITY Axis_placement_2d
+    SUBTYPE OF ( Axis_placement );
+      ref_direction : OPTIONAL Direction;
+    WHERE
+      WR1: SELF\Axis_placement.dim = 2;
+      WR2: SIZEOF(ref_direction\Direction.direction_ratios) = 2;
+  END_ENTITY;
+
+  ENTITY Axis_placement_3d
+    SUBTYPE OF ( Axis_placement );
+      axis          : OPTIONAL Direction;
+      ref_direction : OPTIONAL Direction;
+    WHERE
+      WR1: SELF\Axis_placement.dim = 3;
+      WR2: SIZEOF(axis\Direction.direction_ratios) = 3;
+      WR3: SIZEOF(ref_direction\Direction.direction_ratios) = 3;
+  END_ENTITY;
+
+  ENTITY Axis1_placement
+    SUBTYPE OF ( Axis_placement );
+      axis : OPTIONAL Direction;
+    WHERE
+      WR1: SELF\Axis_placement.dim = 3;
+      WR2: SIZEOF(axis\Direction.direction_ratios) = 3;
+  END_ENTITY;
+
+  ENTITY Point
+    ABSTRACT SUPERTYPE
+    SUBTYPE OF (Detailed_geometric_model_element);
+  END_ENTITY;
+
+  ENTITY Cartesian_point
+    SUBTYPE OF (Point);
+      coordinates : LIST[1:3] OF length_measure;
+  END_ENTITY;
+
+  ENTITY Cartesian_transformation_2d
+    SUBTYPE OF (Detailed_geometric_model_element);
+      multiplication_matrix : ARRAY[1:2] OF Direction;
+      translation           : Cartesian_point;
+      scale : OPTIONAL REAL;
+    WHERE
+      WR1: SIZEOF(multiplication_matrix[1]\Direction.direction_ratios)=2;
+      WR2: SIZEOF(multiplication_matrix[2]\Direction.direction_ratios)=2;
+      WR3: SIZEOF(translation.coordinates)=2;
+  END_ENTITY;
+
+  ENTITY Cartesian_transformation_3d
+    SUBTYPE OF (Detailed_geometric_model_element);
+      multiplication_matrix : ARRAY[1:3] OF Direction;
+      translation           : Cartesian_point;
+      scale : OPTIONAL REAL;
+    WHERE
+      WR1: SIZEOF(multiplication_matrix[1]\Direction.direction_ratios)=3;
+      WR2: SIZEOF(multiplication_matrix[2]\Direction.direction_ratios)=3;
+      WR3: SIZEOF(multiplication_matrix[3]\Direction.direction_ratios)=3;
+      WR4: SIZEOF(translation.coordinates)=3;
+  END_ENTITY;
+
+  ENTITY Detailed_geometric_model_element
+    ABSTRACT SUPERTYPE OF (ONEOF(
+      Direction, 
+      Axis_placement, 
+      Cartesian_transformation_2d,
+	  Cartesian_transformation_3d,
+	  Geometric_placement_operation,
+	  Point))
+    SUBTYPE OF (Representation_item);
+  END_ENTITY;
+
+  ENTITY Direction
+    SUBTYPE OF (Detailed_geometric_model_element);
+      direction_ratios : LIST[2:3] OF REAL;  
+  END_ENTITY;
+
+  ENTITY Geometric_coordinate_space
+    SUBTYPE OF (Numerical_representation_context);
+      dimension_count : INTEGER;
+    WHERE
+      WR1: dimension_count >0;
+  END_ENTITY;
+
+  ENTITY Geometric_model
+    SUBTYPE OF (Representation);
+      version_id                           : OPTIONAL STRING;
+      model_extent                         : OPTIONAL length_measure;
+      SELF\Representation.context_of_items : Geometric_coordinate_space;
+      SELF\Representation.items            : SET[1:?] OF geometric_model_item;
+  END_ENTITY;
+  
+  ENTITY Geometric_placement
+    SUBTYPE OF (Geometric_placement_operation);
+      target : Axis_placement;
+  END_ENTITY; 
+
+  ENTITY Geometric_placement_operation
+    ABSTRACT SUPERTYPE OF ( ONEOF (Geometric_placement,
+      Geometric_operator_transformation))
+    SUBTYPE OF (Detailed_geometric_model_element);
+      source : Axis_placement;  
+      template_definition : template_definition_select;
+  END_ENTITY; 
+
+  ENTITY Geometric_operator_transformation
+    SUBTYPE OF (Geometric_placement_operation);
+      target : cartesian_transformation;
+  END_ENTITY; 
+
+END_SCHEMA;
+
+
+
+
+
+
+
+
+
+
+
+
