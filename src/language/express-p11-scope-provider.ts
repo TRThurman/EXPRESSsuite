@@ -1,4 +1,4 @@
-import { AstNode, AstNodeDescriptionProvider, AstUtils, DefaultScopeProvider, EMPTY_SCOPE, MultiMapScope, ReferenceInfo, Scope, WorkspaceCache } from "langium";
+import { AstNode, AstNodeDescription, AstNodeDescriptionProvider, AstUtils, DefaultScopeProvider, EMPTY_SCOPE, ReferenceInfo, Scope, Stream, WorkspaceCache } from "langium";
 import {
   Attribute_decl,
   Attribute_id,
@@ -51,7 +51,8 @@ import { getFunctionParameterType } from "../utils/function-helpers.js";
 import { isProcedure_call_Or_Assigment_stmt_reference } from "./generated/ast.js";
 import { ExpressP11Services } from "./express-module.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
-import { byDescriptionUri, InterfaceIndex, InterfaceScope } from "./express-p11-interface-scope.js";
+import { byDescriptionUri, CaseRuleNodeIndex, CaseRuleScope, IndexedCaseRuleScope, LazyCaseRuleScope } from "./express-p11-case-rule-scope.js";
+import { isLongFormSchemaName } from "./express-p11-scope-index.js";
 import { DefinitionType, ExpressP11ParameterTypeResolutionType, ExpressP11Schema } from "./express-p11-type-utilities.js";
 import { getTypesFromParameterType } from "../utils/entity-helpers.js";
 import { extractInstanceTypes, isTypeExtension } from "./type-system/semantic-type.js";
@@ -64,8 +65,8 @@ export type CustomExpressDescription<T> = {
 export class ExpressP11ScopeProvider extends DefaultScopeProvider {
   protected readonly astNodeDescriptionProvider: AstNodeDescriptionProvider;
   private readonly typeContainer: ExpressP11TypeContainer;
-  /** Per schema and build: the declarations it sees through its interfaces, keyed by name. */
-  private readonly interfaceIndexCache: WorkspaceCache<string, InterfaceIndex>;
+  /** Per schema and build: the declarations it sees through its interfaces, keyed for the case rule. */
+  private readonly interfaceIndexCache: WorkspaceCache<string, CaseRuleNodeIndex>;
 
   constructor(services: ExpressP11Services) {
     super(services);
@@ -80,6 +81,8 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
       if (!schemaNode || !schemaNode.name) return EMPTY_SCOPE;
       const schema = this.typeContainer.getSchemas().get(schemaNode.name);
       if (!schema) return EMPTY_SCOPE;
+      // Every scope below binds under the case rule (see express-p11-case-rule-scope.ts).
+      const longForm = isLongFormSchemaName(schemaNode.name);
 
       if (this.reflection.getReferenceType(context) === NamedType.$type) {
         const visibleResources = this.typeContainer.getAllRessourcesFrom(schema, true);
@@ -89,14 +92,14 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
           ...visibleResources.resources.get(DefinitionType.EnumType)?.values() ?? [],
           ...visibleResources.resources.get(DefinitionType.SelectType)?.values() ?? [],
         ].map((definition) => definition.resource.getNode());
-        return this.createScopeForNodes(visibleTypes);
+        return this.caseRuleScope(visibleTypes, longForm);
       }
 
       if (isReferenceToControlledEntity(context)) {
         const entities = this.typeContainer.getAllRessourcesFrom(schema, true);
         if (!entities.resources.get(DefinitionType.Entity)) return EMPTY_SCOPE;
         const entitiesInScope = [...entities.resources.get(DefinitionType.Entity)!.values()].map((e) => e.resource.getNode());
-        return this.createScopeForNodes(entitiesInScope);
+        return this.caseRuleScope(entitiesInScope, longForm);
       }
       //type extension
       if (isReferenceToControlledType(context)) {
@@ -104,7 +107,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         const resources = this.typeContainer.getAllRessourcesFrom(schema, true);
         if (!resources.resources.get(typeOfType)) return EMPTY_SCOPE;
         const types = [...resources.resources.get(typeOfType)!.values()].map((typeObject) => typeObject.resource.getNode());
-        return this.createScopeForNodes(types);
+        return this.caseRuleScope(types, longForm);
       }
 
       // INVERSE ... FOR [entity.]attribute (ISO 10303-11:2004 9.2.1.3): an explicit
@@ -117,7 +120,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         const candidates = inverseAttribute.forEntity
           ? this.typeContainer.getAttributesV2(ofType.ref)
           : this.typeContainer.getVisibleAttributes(ofType.ref, context.reference.$refText, false);
-        return this.createScopeForNodes(candidates.filter((attribute) => isExplicit_attr(attribute.$container)));
+        return this.caseRuleScope(candidates.filter((attribute) => isExplicit_attr(attribute.$container)), longForm);
       }
 
       if (isGroup_qualifier(context.container) || isAttribute_qualifier(context.container)) {
@@ -130,46 +133,78 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
           switch (nodesInScopeType) {
             case ScopeType.Entities:
             case ScopeType.Entity:
-              return this.resolveAttributeQualifierScope(nodesInScope, nodesInScopeType, context.reference.$refText);
+              return this.resolveAttributeQualifierScope(nodesInScope, nodesInScopeType, context.reference.$refText, longForm);
 
             case ScopeType.Enums:
-              return this.resolveEnumQualifierScope(nodesInScope);
+              return this.resolveEnumQualifierScope(nodesInScope, longForm);
             default:
               break;
           }
         }
 
         if (searchingFor === QualifierKind.Group) {
-          return this.resolveGroupQualifierScope(nodesInScope, context.reference.$refText);
+          return this.resolveGroupQualifierScope(nodesInScope, context.reference.$refText, longForm);
         }
       }
 
-      // Langium's lookup: the local symbols innermost first, then getGlobalScope below.
-      const scope = super.getScope(context);
-      return scope;
+      return this.defaultScopeWithCaseRule(context, longForm, schema);
     } catch {
       return EMPTY_SCOPE;
     }
   }
 
+  /** The given declarations as a scope under the case rule, scanned lazily per lookup. */
+  private caseRuleScope(nodes: Iterable<AstNode>, longForm: boolean, outer?: Scope): Scope {
+    return new LazyCaseRuleScope(nodes, this.nameProvider, this.descriptions, outer, longForm);
+  }
+
   /**
-   * The outermost layer of the default lookup: the declarations the schema
-   * sees through its interfaces (ISO 10303-11:2004 clause 11) in front of the
-   * workspace index in document-URI order. The index holds every schema of
-   * the workspace, so without the interface layer a same-named declaration in
-   * an unrelated schema could win over an interfaced one, and which one won
+   * The lookup for every other reference, each layer under the case rule: the
+   * local symbols innermost first, then the declarations the schema sees
+   * through its interfaces (ISO 10303-11:2004 clause 11), then the workspace
+   * index in document-URI order. The index holds every schema of the
+   * workspace, so without the interface layer a same-named declaration in an
+   * unrelated schema could win over an interfaced one, and which one won
    * depended on the order in which the file system listed the documents.
    */
-  protected override getGlobalScope(referenceType: string, context: ReferenceInfo): Scope {
-    const index = this.globalScopeCache.get(
-      referenceType,
-      () => new MultiMapScope(this.indexManager.allElements(referenceType).toArray().sort(byDescriptionUri))
+  private defaultScopeWithCaseRule(context: ReferenceInfo, longForm: boolean, schema: ExpressP11Schema): Scope {
+    const referenceType = this.reflection.getReferenceType(context);
+    const layers: Array<Stream<AstNodeDescription>> = [];
+    const localSymbols = AstUtils.getDocument(context.container).localSymbols;
+    if (localSymbols) {
+      let current: AstNode | undefined = context.container;
+      do {
+        if (localSymbols.has(current)) {
+          layers.push(localSymbols.getStream(current).filter((description) => this.reflection.isSubtype(description.type, referenceType)));
+        }
+        current = current.$container;
+      } while (current);
+    }
+    let result = this.getGlobalScope(referenceType, context);
+    const interfaced = this.interfaceIndexCache.get(
+      `${schema.getName()}\u0000${longForm ? "lf" : "sf"}`,
+      () => new CaseRuleNodeIndex(this.visibleDeclarations(schema), this.nameProvider, longForm)
     );
+    result = new IndexedCaseRuleScope(
+      interfaced,
+      (node) => this.reflection.isSubtype(node.$type, referenceType),
+      this.nameProvider,
+      this.descriptions,
+      result
+    );
+    for (let i = layers.length - 1; i >= 0; i--) {
+      result = new CaseRuleScope(layers[i], result, longForm);
+    }
+    return result;
+  }
+
+  /** The index as a scope under the case rule, in document-URI order, cached per reference type and form. */
+  protected override getGlobalScope(referenceType: string, context: ReferenceInfo): Scope {
     const schemaNode = AstUtils.getContainerOfType(context.container, isSchemaDefinition);
-    const schema = schemaNode?.name ? this.typeContainer.getSchemas().get(schemaNode.name) : undefined;
-    if (!schema) return index;
-    const interfaced = this.interfaceIndexCache.get(schema.getName(), () => new InterfaceIndex(this.visibleDeclarations(schema), this.nameProvider));
-    return new InterfaceScope(interfaced, (node) => this.reflection.isSubtype(node.$type, referenceType), this.nameProvider, this.descriptions, index);
+    const longForm = schemaNode?.name ? isLongFormSchemaName(schemaNode.name) : false;
+    return this.globalScopeCache.get(`${referenceType}\u0000${longForm ? "lf" : "sf"}`, () =>
+      new CaseRuleScope(this.indexManager.allElements(referenceType).toArray().sort(byDescriptionUri), undefined, longForm)
+    );
   }
 
   /** The entities and types a schema sees: its own and those its USE and REFERENCE statements bring in. */
@@ -293,24 +328,23 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     return { nodes: nodesInScope, type: nodesInScopeType };
   }
 
-  private resolveGroupQualifierScope(options: AstNode[], filter: string = ""): Scope {
+  private resolveGroupQualifierScope(options: AstNode[], filter: string = "", longForm: boolean = false): Scope {
     const graphProcessed: string[] = [];
     const entities: EntityDefinition[] = [];
     for (const entity of options) {
       if (!graphProcessed.includes(this.typeContainer.getGraphKey(entity as EntityDefinition))) {
-        for (const entityDef of this.typeContainer.getFullSubSuperGraph(entity as EntityDefinition, filter)) {
-          entities.push(entityDef);
-        }
+        let graph = this.typeContainer.getFullSubSuperGraph(entity as EntityDefinition, filter);
+        // The graph is keyed exact-case; in a long form the written name may differ in case from the declaration.
+        if (graph.length === 0 && longForm && filter.length > 0) graph = this.typeContainer.getFullSubSuperGraph(entity as EntityDefinition);
+        entities.push(...graph);
         graphProcessed.push(this.typeContainer.getGraphKey(entity as EntityDefinition));
       }
     }
-    const scopeToReturn = this.createScopeForNodes(entities);
-
-    return scopeToReturn;
+    return this.caseRuleScope(entities, longForm);
   }
 
-  private resolveEnumQualifierScope(options: AstNode[]): Scope {
-    return this.createScopeForNodes(options, undefined);
+  private resolveEnumQualifierScope(options: AstNode[], longForm: boolean): Scope {
+    return this.caseRuleScope(options, longForm);
   }
 
   /**
@@ -323,7 +357,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
    * count: "shall occur within the entity declaration for that partial complex
    * entity data type".
    */
-  private resolveAttributeQualifierScope(options: AstNode[], type: ScopeType, filter: string = ""): Scope {
+  private resolveAttributeQualifierScope(options: AstNode[], type: ScopeType, filter: string = "", longForm: boolean = false): Scope {
     const attributes: Attribute_decl[] = [];
     if (type === ScopeType.Entities) {
       const seen = new Set<Attribute_decl>();
@@ -335,13 +369,12 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
           attributes.push(attribute);
         }
       }
-      return this.createScopeForNodes(attributes);
+      return this.caseRuleScope(attributes, longForm);
     }
 
     if (type === ScopeType.Entity && options.length == 1) {
       attributes.push(...this.typeContainer.getAttributesV2(options[0] as EntityDefinition));
-      const scope = this.createScopeForNodes(attributes);
-      return scope;
+      return this.caseRuleScope(attributes, longForm);
     }
     return EMPTY_SCOPE;
   }

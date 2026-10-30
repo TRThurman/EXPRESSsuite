@@ -1,8 +1,8 @@
 {
   "documents": 1287,
-  "diagnostics": 6419,
+  "diagnostics": 6341,
   "bySeverity": {
-    "error": 3967,
+    "error": 3889,
     "information": 704,
     "warning": 1748
   },
@@ -15,10 +15,10 @@
     "informal-proposition-malformed-signature": 7,
     "informal-proposition-misplaced-signature": 3,
     "informal-proposition-missing-annotation": 6,
-    "linking-error": 3464,
+    "linking-error": 3392,
     "parsing-error": 2,
     "redeclaration-not-specialization": 9,
-    "reference-statement-missing": 182
+    "reference-statement-missing": 176
   },
   "parseErrors": {
     "modules/solid_with_local_modification/Revisedent.exp": {
@@ -2471,7 +2471,6 @@
         3144,
         3157,
         3702,
-        4773,
         5077,
         5111,
         5126,
@@ -3012,10 +3011,7 @@
     },
     "modules/cfd_conditions/arm.exp": {
       "linking-error": [
-        88,
         107,
-        113,
-        114,
         137,
         138
       ]
@@ -3048,8 +3044,7 @@
     },
     "modules/chemical_substance/arm.exp": {
       "linking-error": [
-        151,
-        185
+        151
       ]
     },
     "modules/class_of_involvement_in_activity/mim.exp": {
@@ -3356,23 +3351,12 @@
         195,
         244,
         416,
-        416,
-        471,
-        472,
-        546
+        416
       ]
     },
     "modules/fea_definition_relationships/arm.exp": {
       "linking-error": [
         66
-      ]
-    },
-    "modules/finite_element_analysis/arm.exp": {
-      "linking-error": [
-        98,
-        108,
-        134,
-        148
       ]
     },
     "modules/finite_elements/arm.exp": {
@@ -3490,12 +3474,6 @@
         205
       ]
     },
-    "modules/general_model_parameter/arm.exp": {
-      "linking-error": [
-        61,
-        61
-      ]
-    },
     "modules/geometric_constraints/arm.exp": {
       "linking-error": [
         192,
@@ -3531,8 +3509,7 @@
         372,
         375,
         378,
-        381,
-        385
+        381
       ]
     },
     "modules/geometric_tolerance/mim.exp": {
@@ -3637,12 +3614,6 @@
       "linking-error": [
         14,
         20
-      ]
-    },
-    "modules/kinematic_analysis_control_and_result/arm.exp": {
-      "linking-error": [
-        24,
-        34
       ]
     },
     "modules/kinematic_motion_representation/arm.exp": {
@@ -3755,10 +3726,6 @@
     },
     "modules/kinematic_structure/arm.exp": {
       "linking-error": [
-        70,
-        75,
-        77,
-        79,
         90,
         90,
         90,
@@ -3831,8 +3798,7 @@
         97,
         309,
         315,
-        315,
-        383
+        315
       ],
       "reference-statement-missing": [
         163,
@@ -4045,11 +4011,6 @@
         223
       ]
     },
-    "modules/machining_features/arm.exp": {
-      "linking-error": [
-        934
-      ]
-    },
     "modules/machining_features/mim.exp": {
       "linking-error": [
         13,
@@ -4124,11 +4085,7 @@
         31,
         32,
         33,
-        64,
-        65,
-        71,
-        96,
-        102
+        96
       ],
       "reference-statement-missing": [
         57
@@ -4151,13 +4108,11 @@
         140,
         141,
         147,
-        181,
         202,
         203,
         203,
         204,
         204,
-        205,
         237
       ]
     },
@@ -4210,12 +4165,6 @@
         426
       ],
       "linking-error": [
-        161,
-        163,
-        165,
-        168,
-        170,
-        172,
         291,
         307,
         307,
@@ -4246,8 +4195,7 @@
         399,
         399,
         400,
-        400,
-        409
+        400
       ]
     },
     "modules/package/arm.exp": {
@@ -4594,7 +4542,6 @@
         102,
         104,
         133,
-        133,
         134,
         177
       ],
@@ -4856,12 +4803,6 @@
         13
       ]
     },
-    "modules/product_data_quality_definition/arm.exp": {
-      "linking-error": [
-        25,
-        29
-      ]
-    },
     "modules/product_data_quality_definition/mim.exp": {
       "linking-error": [
         20,
@@ -4944,10 +4885,6 @@
       ],
       "linking-error": [
         52,
-        128,
-        314,
-        316,
-        317,
         328,
         331,
         331,
@@ -4976,19 +4913,6 @@
       ],
       "redeclaration-not-specialization": [
         99
-      ]
-    },
-    "modules/scan_data_3d_shape/arm.exp": {
-      "linking-error": [
-        67,
-        77,
-        104,
-        109
-      ],
-      "reference-statement-missing": [
-        105,
-        110,
-        112
       ]
     },
     "modules/scan_data_3d_shape/mim.exp": {
@@ -5296,7 +5220,6 @@
     },
     "modules/tessellated_geometry/arm.exp": {
       "linking-error": [
-        18,
         145,
         160,
         192,
@@ -5311,19 +5234,6 @@
         253,
         263,
         263
-      ]
-    },
-    "modules/value_with_unit_extension/arm.exp": {
-      "linking-error": [
-        27,
-        33,
-        73,
-        104,
-        124,
-        138,
-        152,
-        162,
-        172
       ]
     },
     "modules/vertex_colours_for_tessellated_geometry/arm.exp": {
@@ -5692,7 +5602,6 @@
         90,
         91,
         94,
-        95,
         292,
         293,
         294,
@@ -7124,11 +7033,6 @@
         273
       ]
     },
-    "resources/domain_schema/domain_schema.exp": {
-      "linking-error": [
-        44
-      ]
-    },
     "resources/explicit_constraint_schema/explicit_constraint_schema.exp": {
       "linking-error": [
         31,
@@ -7284,7 +7188,6 @@
         785,
         786,
         786,
-        805,
         869,
         869,
         871,
@@ -7314,12 +7217,6 @@
         89
       ]
     },
-    "resources/material_property_definition_schema/material_property_definition_schema.exp": {
-      "linking-error": [
-        154,
-        182
-      ]
-    },
     "resources/mathematical_context_schema/mathematical_context_schema.exp": {
       "linking-error": [
         38
@@ -7344,14 +7241,6 @@
         4616,
         4617,
         4618
-      ]
-    },
-    "resources/mechanical_design_schema/mechanical_design_schema.exp": {
-      "linking-error": [
-        301,
-        304,
-        307,
-        310
       ]
     },
     "resources/mesh_connectivity_schema/mesh_connectivity_schema.exp": {
@@ -7445,17 +7334,6 @@
       "linking-error": [
         192,
         194
-      ]
-    },
-    "resources/scan_data_3d_shape_model_schema/scan_data_3d_shape_model_schema.exp": {
-      "linking-error": [
-        133,
-        138
-      ],
-      "reference-statement-missing": [
-        134,
-        139,
-        141
       ]
     },
     "resources/set_theory_schema/set_theory_schema.exp": {
@@ -7676,12 +7554,6 @@
         342
       ]
     },
-    "resources/state_observed_schema/state_observed_schema.exp": {
-      "linking-error": [
-        127,
-        155
-      ]
-    },
     "resources/structural_response_representation_schema/structural_response_representation_schema.exp": {
       "duplicate-loop-index": [
         2124,
@@ -7715,9 +7587,7 @@
         271,
         271,
         272,
-        272,
-        503,
-        504
+        272
       ]
     },
     "resources/variational_representation_schema/variational_representation_schema.exp": {

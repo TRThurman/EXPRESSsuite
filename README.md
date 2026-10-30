@@ -36,13 +36,16 @@ standard VS Code **Problems** view:
   is tailored for ISO 10303 development, where the case of an entity name
   carries meaning: ARM entity names begin with an uppercase letter
   (`Product`), MIM and integrated-resource entity names are lowercase
-  (`product`), and the two are different entities. References bind only to
-  the exact spelling, so `SUBTYPE OF (mesh)` does not name `ENTITY Mesh`, and
-  an ARM reference written in lowercase is an error in the ARM. This is a
-  deliberate project departure from ISO 10303-11:2004 7.1.2, which makes
-  letter case insignificant outside string literals (project ruling,
-  2026-10-29). The published SMRLv8 follows the convention without exception
-  in its ARMs (3,460 of 3,460 entity names) and MIMs (1,359 of 1,359).
+  (`product`), and the two are different entities. In a short form,
+  references bind only to the exact spelling, so `SUBTYPE OF (mesh)` does not
+  name `ENTITY Mesh`, and an ARM reference written in lowercase is an error
+  in the ARM. This is a deliberate project departure from ISO 10303-11:2004
+  7.1.2, which makes letter case insignificant outside string literals
+  (project ruling, 2026-10-29). The published SMRLv8 follows the convention
+  without exception in its ARMs (3,460 of 3,460 entity names) and MIMs
+  (1,359 of 1,359). In a long form (a schema whose name ends in `_lf`),
+  which WG11 N239 makes unique regardless of case for tools that fold case,
+  every name binds regardless of case (project ruling, 2026-10-30).
 - **Schema-name case (project requirement)** — a schema whose name ends in
   `arm` or `mim` begins with an uppercase letter (`Mesh_topology_arm`,
   `Mesh_topology_mim`; project ruling, 2026-10-30). The published SMRLv8
@@ -58,10 +61,12 @@ standard VS Code **Problems** view:
   subtype-constraint names (project requirement)** — two spellings that
   differ only in case denote the same declaration, as ISO 10303-11:2004 7.1.2
   provides; only entity names and the schema-name rule above carry case
-  (project ruling, 2026-10-30). Known gap: the linker still binds type and
-  attribute references to the exact spelling (in SMRLv8, 3 type and 23
-  attribute references fail only by case). The casing diagnostics below are
-  style hints and remain.
+  (project ruling, 2026-10-30). The linker binds accordingly: an exact match
+  first, otherwise a match regardless of case among the kinds that do not
+  carry case, so `SELF\Value_with_unit.Unit` names the attribute `unit` and
+  `x : Unit_kind` names `TYPE unit_kind`, while `SUBTYPE OF (mesh)` still
+  does not name `ENTITY Mesh` in a short form. The casing diagnostics below
+  are style hints and remain.
 - **Declaration-name casing** — entities in schemas whose names end in
   `_arm` must begin with an uppercase letter. Entities in other schemas and
   all type names must be lowercase. Casing diagnostics include a quick fix.
