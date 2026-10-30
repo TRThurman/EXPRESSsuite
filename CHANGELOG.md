@@ -18,9 +18,26 @@
 - Step over any number of index qualifiers when finding the operand of an
   attribute reference, so `s.segments[i][j].parent_surface` resolves.
 - Name the attribute in the linking error for an unresolved `.a`.
+- A `REFERENCE FROM` with no item list now makes visible what the foreign
+  schema declares and what it use's (ISO 10303-11:2004 11.2), not only its
+  own declarations, for supertype and attribute-type resolution.
 
 ### Validation
 
+- Report an identifier that denotes two different declarations in one
+  schema's scope (`duplicate-interfaced-declaration`, ISO 10303-11:2004
+  10.1 b), in every schema whose scope has the clash, during every validation
+  pass; the former entity-only `Entity has non-unique name` check is folded
+  into it, and the Problems view now shows the clash without running a
+  command. The scope follows clause 11 (USE re-exports along chains and
+  renames, REFERENCE sees declared-in and use'd-by items but never chains,
+  item lists filter, one declaration by several routes counts once) and is
+  proved in `lean/ExpressSuite/Interfaces.lean`. Entity names are keyed
+  case-significantly in short forms; long forms fold case for every kind and
+  report identical repeats as the warning `redundant-declaration` (WG11
+  N239). The command **Detect Duplicate Declarations in Schema Closure** now
+  uses the same relation (it no longer re-exports `REFERENCE FROM` items along
+  `USE FROM` chains or ignores item lists) and publishes the same code.
 - Report an attribute reference that is ambiguous under 12.7.3
   (`ambiguous-attribute-reference`, warning): the nearest depth that declares
   the name holds declarations in two or more entities, as with `basis_curve`
