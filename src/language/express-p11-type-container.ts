@@ -27,7 +27,7 @@ import {
   isUse_clause,
 } from "./generated/ast.js";
 import { CancellationToken } from "vscode-languageserver";
-import { allowedDocuments } from "../utils/file-filter.js";
+import { allowedDocuments, byUri } from "../utils/file-filter.js";
 import { ExpressP11ScopeIndex } from "./express-p11-scope-index.js";
 import { Configuration } from "./express-p11-workspace-manager.js";
 import {
@@ -126,7 +126,7 @@ export class ExpressP11TypeContainer {
       imports: new MultiMap<string, SubSuperTypeDefinition>(),
       localTypes: new MultiMap<string, ConcreteType>(),
     };
-    const validDocs = allowedDocuments(this.langiumDocuments.all.toArray(), this.workspaceConfiguration);
+    const validDocs = allowedDocuments(this.langiumDocuments.all.toArray(), this.workspaceConfiguration).sort(byUri);
     this.scopeIndex.build(validDocs);
 
     await this.loadSchemas(validDocs, cancelToken, sink);

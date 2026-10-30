@@ -21,6 +21,16 @@
 - A `REFERENCE FROM` with no item list now makes visible what the foreign
   schema declares and what it use's (ISO 10303-11:2004 11.2), not only its
   own declarations, for supertype and attribute-type resolution.
+- The declaration-name-case check treats a schema named `<module>_arm_lf`
+  as an ARM schema. An ARM long form was held to the MIM convention, so every
+  initial-capital entity in it was noted.
+- The informal-proposition check no longer aborts a document's validation
+  with a TypeError when the document parsed without a schema body (a
+  fragment); it has nothing to check there.
+- The type container and the scope index process documents in URI order,
+  so supertype resolution, `reference-statement-missing` and duplicate
+  declaration results no longer depend on the order in which the file system
+  lists a workspace.
 
 ### Validation
 
@@ -38,38 +48,6 @@
   N239). The command **Detect Duplicate Declarations in Schema Closure** now
   uses the same relation (it no longer re-exports `REFERENCE FROM` items along
   `USE FROM` chains or ignores item lists) and publishes the same code.
-- Report an attribute reference that is ambiguous under 12.7.3
-  (`ambiguous-attribute-reference`, warning): the nearest depth that declares
-  the name holds declarations in two or more entities, as with `basis_curve`
-  on a `curve` operand (declared by `offset_curve_2d` and `offset_curve_3d`).
-  The linker still binds the first candidate; the NOTE of 12.7.3 recommends a
-  group reference.
-
-- Check attribute redeclarations for type compatibility
-  (`redeclaration-not-specialization`): the type of a redeclared attribute must
-  be the same as, or a specialization of, the original attribute's type
-  (ISO 10303-11:2004 9.2.3.4 a, 9.2.7). Defined types and selects are seen
-  through on both sides and `SELECT BASED_ON` extensions in the workspace are
-  folded in, so valid narrowings through a defined or select type on the
-  original side are accepted;
-  a failed check against an EXTENSIBLE original select is a warning.
-- Report an index qualifier applied to an operand whose declared type can never
-  hold an aggregate value (`index-on-non-aggregate`, ISO 10303-11:2004 12.6.1).
-- Both relations are transcribed from Lean 4 definitions whose soundness
-  against the EXPRESS value semantics is machine-checked (`lean/`). The 12.7.3
-  and 12.7.4 scopes are likewise transcribed from `lean/ExpressSuite/Inheritance.lean`,
-  which proves that the attribute walk computes exactly the 12.7.3 set and the
-  group walk exactly the 12.7.4 set.
-
-### Tests
-
-- Headless census of workspace diagnostics and of the schema-closure duplicate
-  command, for differential work (`src/test/workspace-*.test.ts`, env-gated).
-- Headless link-target census: where every attribute reference and INVERSE FOR
-  binds, classified against the 12.7.3 set (`src/test/workspace-link-targets.test.ts`).
-- Two-sided scope tests: group references must keep reaching siblings, attribute
-  references must never (`src/test/attribute-qualifier-scope.test.ts`).
-
 
 ## [0.4.2](https://github.com/TRThurman/EXPRESSsuite/compare/0.4.2-0...0.4.2) (2026-09-30)
 

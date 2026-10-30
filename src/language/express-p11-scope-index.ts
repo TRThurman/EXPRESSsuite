@@ -1,4 +1,5 @@
 import { AstNode, AstUtils, GrammarUtils, LangiumDocument } from "langium";
+import { byUri } from "../utils/file-filter.js";
 import type { Range } from "vscode-languageserver";
 import {
   Named_type_or_rename,
@@ -119,7 +120,7 @@ export class ExpressP11ScopeIndex {
     this.declIds = new WeakMap();
     this.nextDeclId = 0;
     this.clashCache = new Map();
-    for (const document of documents) {
+    for (const document of [...documents].sort(byUri)) {
       const file = document.parseResult.value;
       if (!isExpressFile(file)) continue;
       const uri = document.uri.toString();

@@ -324,7 +324,9 @@ export class ExpressP11Validator {
 
   checkDeclarationNameCasing(schema: SchemaDefinition, accept: ValidationAcceptor): void {
     if (!schemaHasDeclarations(schema)) return;
-    const isArmSchema = schema.name.toLowerCase().endsWith("_arm");
+    // An ARM long form (`<module>_arm_lf`) carries the ARM convention too.
+    const lowerName = schema.name.toLowerCase();
+    const isArmSchema = lowerName.endsWith("_arm") || lowerName.endsWith("_arm_lf");
 
     for (const declaration of schema.body.declarations) {
       if (!isEntityDefinition(declaration) && !isTypeDefinition(declaration)) continue;
