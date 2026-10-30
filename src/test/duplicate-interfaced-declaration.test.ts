@@ -339,4 +339,260 @@ describe("duplicate-interfaced-declaration", () => {
     `);
     expect(errors).toHaveLength(0);
   });
+
+  test("REFERENCE interfaces functions but not rules (clause 11)", async () => {
+    const source = `
+      SCHEMA A;
+      ENTITY e;
+      END_ENTITY;
+      FUNCTION f : INTEGER;
+        RETURN (1);
+      END_FUNCTION;
+      RULE r FOR (e);
+      WHERE
+        wr1 : TRUE;
+      END_RULE;
+      END_SCHEMA;
+
+      SCHEMA B;
+      REFERENCE FROM A;
+      FUNCTION f : INTEGER; -- in B
+        RETURN (2);
+      END_FUNCTION;
+      RULE r FOR (e); -- in B
+      WHERE
+        wr1 : TRUE;
+      END_RULE;
+      END_SCHEMA;
+    `;
+    const { errors } = await check(source);
+    expect(errors).toHaveLength(2);
+    expect(errors.every((e) => String(e.message).includes("FUNCTION 'f'"))).toBe(true);
+    expect(errors.map((e) => e.range.start.line).sort()).toEqual([lineOf(source, "REFERENCE FROM A"), lineOf(source, "FUNCTION f : INTEGER; -- in B")].sort());
+  });
+
+  test("local duplicates of PROCEDURE and SUBTYPE_CONSTRAINT kinds", async () => {
+    const procedures = await check(`
+      SCHEMA P;
+      PROCEDURE p;
+      END_PROCEDURE;
+      PROCEDURE p;
+      END_PROCEDURE;
+      END_SCHEMA;
+    `);
+    expect(procedures.errors).toHaveLength(2);
+    expect(String(procedures.errors[0].message)).toContain("PROCEDURE 'p'");
+
+    const constraints = await check(`
+      SCHEMA S;
+      ENTITY e;
+      END_ENTITY;
+      ENTITY a SUBTYPE OF (e);
+      END_ENTITY;
+      ENTITY b SUBTYPE OF (e);
+      END_ENTITY;
+      SUBTYPE_CONSTRAINT sc FOR e;
+        ONEOF (a, b);
+      END_SUBTYPE_CONSTRAINT;
+      SUBTYPE_CONSTRAINT sc FOR e;
+        ONEOF (a, b);
+      END_SUBTYPE_CONSTRAINT;
+      END_SCHEMA;
+    `);
+    expect(constraints.errors).toHaveLength(2);
+    expect(String(constraints.errors[0].message)).toContain("SUBTYPE_CONSTRAINT 'sc'");
+  });
+
+  test("a chained rename is the original rename (11.3 EXAMPLE 2)", async () => {
+    const clashing = `
+      SCHEMA S1;
+      ENTITY e1;
+      END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA S2;
+      USE FROM S1 (e1 AS e2);
+      END_SCHEMA;
+
+      SCHEMA S3;
+      USE FROM S2 (e2);
+      ENTITY e2;
+      END_ENTITY;
+      END_SCHEMA;
+    `;
+    const { errors } = await check(clashing);
+    expect(errors).toHaveLength(2);
+    expect(errors.map((e) => e.range.start.line).sort()).toEqual([lineOf(clashing, "USE FROM S2 (e2)"), lineOf(clashing, "ENTITY e2")].sort());
+
+    const free = await check(`
+      SCHEMA S1;
+      ENTITY e1;
+      END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA S2;
+      USE FROM S1 (e1 AS e2);
+      END_SCHEMA;
+
+      SCHEMA S3;
+      USE FROM S2 (e2);
+      ENTITY e1;
+      END_ENTITY;
+      END_SCHEMA;
+    `);
+    expect(free.errors).toHaveLength(0);
+  });
+
+  test("three declarations of one name: one diagnostic per declaration, each naming all three", async () => {
+    const source = `
+      SCHEMA A;
+      ENTITY x;
+      END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA B;
+      ENTITY x;
+      END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA C;
+      ENTITY x;
+      END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA D;
+      USE FROM A;
+      USE FROM B;
+      USE FROM C;
+      END_SCHEMA;
+    `;
+    const { errors } = await check(source);
+    expect(errors).toHaveLength(3);
+    expect(errors.map((e) => e.range.start.line).sort()).toEqual([lineOf(source, "USE FROM A"), lineOf(source, "USE FROM B"), lineOf(source, "USE FROM C")].sort());
+    expect(errors.every((e) => e.relatedInformation?.length === 3)).toBe(true);
+    expect(String(errors[0].message)).toContain("all are visible in D");
+  });
+
+  test("one declaration reached by USE and by REFERENCE counts once (11.3)", async () => {
+    const { errors } = await check(`
+      SCHEMA A;
+      ENTITY x;
+      END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA B;
+      USE FROM A;
+      REFERENCE FROM A;
+      END_SCHEMA;
+    `);
+    expect(errors).toHaveLength(0);
+  });
+
+  test("a clash propagates to every schema whose scope holds both declarations", async () => {
+    const source = `
+      SCHEMA A;
+      ENTITY x;
+      END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA B;
+      ENTITY x;
+      END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA C;
+      USE FROM A;
+      USE FROM B;
+      END_SCHEMA;
+
+      SCHEMA D;
+      USE FROM C;
+      END_SCHEMA;
+
+      SCHEMA R;
+      REFERENCE FROM C;
+      END_SCHEMA;
+
+      SCHEMA L;
+      USE FROM C (x);
+      END_SCHEMA;
+    `;
+    const { errors } = await check(source);
+    // C: one diagnostic per interface line. D, R and L: both declarations
+    // arrive through one specification (or one listed item), so one diagnostic
+    // there, with both declarations in its related information.
+    const at = (text: string) => errors.filter((e) => e.range.start.line === lineOf(source, text));
+    expect(at("USE FROM A")).toHaveLength(1);
+    expect(at("USE FROM B")).toHaveLength(1);
+    expect(at("USE FROM C;")).toHaveLength(1);
+    expect(at("REFERENCE FROM C")).toHaveLength(1);
+    expect(at("USE FROM C (x)")).toHaveLength(1);
+    expect(errors).toHaveLength(5);
+    expect(errors.every((e) => e.relatedInformation?.length === 2)).toBe(true);
+    expect(String(at("REFERENCE FROM C")[0].message)).toContain("both are visible in R");
+  });
+
+  test("a rename onto a listed name clashes on the item line", async () => {
+    const source = `
+      SCHEMA A;
+      ENTITY x;
+      END_ENTITY;
+      ENTITY y;
+      END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA B;
+      USE FROM A (x AS y, y);
+      END_SCHEMA;
+
+      SCHEMA R;
+      REFERENCE FROM A (x AS y);
+      ENTITY y; -- in R
+      END_ENTITY;
+      END_SCHEMA;
+    `;
+    const { errors } = await check(source);
+    const at = (text: string) => errors.filter((e) => e.range.start.line === lineOf(source, text));
+    expect(at("x AS y, y")).toHaveLength(2);
+    expect(at("REFERENCE FROM A (x AS y)")).toHaveLength(1);
+    expect(at("ENTITY y; -- in R")).toHaveLength(1);
+    expect(errors).toHaveLength(4);
+  });
+
+  test("an interface specification names the schema of its own document first", async () => {
+    const services = createExpressP11Services(EmptyFileSystem).ExpressP11;
+    const validate = validationHelper(services);
+    const duplicates = (result: Awaited<ReturnType<typeof validate>>) =>
+      result.diagnostics.filter((d) => d.code === ExpressP11Issues.DuplicateInterfacedDeclaration);
+    const first = await validate(`
+      SCHEMA A;
+      ENTITY x;
+      END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA B;
+      USE FROM A;
+      ENTITY x;
+      END_ENTITY;
+      END_SCHEMA;
+    `);
+    expect(duplicates(first)).toHaveLength(2);
+
+    // A second document with its own schema A: its USE FROM A must bind here, not to the first A.
+    const second = await validate(`
+      SCHEMA A;
+      ENTITY y;
+      END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA C;
+      USE FROM A;
+      ENTITY y;
+      END_ENTITY;
+      END_SCHEMA;
+    `);
+    const clashes = duplicates(second);
+    expect(clashes).toHaveLength(2);
+    expect(clashes.every((d) => String(d.message).includes("'y'"))).toBe(true);
+  });
 });

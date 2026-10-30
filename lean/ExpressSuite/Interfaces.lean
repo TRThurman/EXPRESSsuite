@@ -563,6 +563,56 @@ def wCycle : Workspace := ofList [
 #guard clashes wCycle false "C" = ["b"]
 #guard clashes wCycle false "A" = []
 
+-- Clause 11: REFERENCE interfaces functions but not rules.
+def F (id : Nat) (name : String) : Decl := ⟨id, .function, name⟩
+def R (id : Nat) (name : String) : Decl := ⟨id, .rule, name⟩
+def wKinds : Workspace := ofList [
+  ("A", ⟨[F 1 "f", R 2 "r"], []⟩),
+  ("B", ⟨[F 3 "f", R 4 "r"], [refAll "A"]⟩)]
+#guard clashes wKinds false "B" = ["f"]
+
+-- 11.3 EXAMPLE 2 with a local declaration: the chained rename clashes under e2 and leaves e1 free.
+def wChainRename : Workspace := ofList [
+  ("s1", ⟨[E 1 "e1"], []⟩),
+  ("s2", ⟨[], [useSome "s1" [("e1", some "e2")]]⟩),
+  ("t2", ⟨[E 2 "e2"], [useSome "s2" [("e2", none)]]⟩),
+  ("t1", ⟨[E 3 "e1"], [useSome "s2" [("e2", none)]]⟩)]
+#guard clashes wChainRename false "t2" = ["e2"]
+#guard clashes wChainRename false "t1" = []
+
+-- Three declarations of one name: one key, three visible items.
+def wThree : Workspace := ofList [
+  ("A", ⟨[E 1 "x"], []⟩), ("B", ⟨[E 2 "x"], []⟩), ("C", ⟨[E 3 "x"], []⟩),
+  ("D", ⟨[], [useAll "A", useAll "B", useAll "C"]⟩)]
+#guard clashes wThree false "D" = ["x"]
+#guard (visibleIn wThree (table wThree) "D").length = 3
+
+-- One declaration by USE and by REFERENCE counts once (11.3).
+def wMixed : Workspace := ofList [
+  ("A", ⟨[E 1 "x"], []⟩),
+  ("B", ⟨[], [useAll "A", refAll "A"]⟩)]
+#guard clashes wMixed false "B" = []
+
+-- A clash reaches every scope that holds both declarations: by USE, by REFERENCE, by a listed item.
+def wPropagate : Workspace := ofList [
+  ("A", ⟨[E 1 "x"], []⟩), ("B", ⟨[E 2 "x"], []⟩),
+  ("C", ⟨[], [useAll "A", useAll "B"]⟩),
+  ("D", ⟨[], [useAll "C"]⟩),
+  ("R", ⟨[], [refAll "C"]⟩),
+  ("L", ⟨[], [useSome "C" [("x", none)]]⟩)]
+#guard clashes wPropagate false "C" = ["x"]
+#guard clashes wPropagate false "D" = ["x"]
+#guard clashes wPropagate false "R" = ["x"]
+#guard clashes wPropagate false "L" = ["x"]
+
+-- A rename onto a listed or local name clashes.
+def wOnto : Workspace := ofList [
+  ("A", ⟨[E 1 "x", E 2 "y"], []⟩),
+  ("B", ⟨[], [useSome "A" [("x", some "y"), ("y", none)]]⟩),
+  ("R", ⟨[E 3 "y"], [refSome "A" [("x", some "y")]]⟩)]
+#guard clashes wOnto false "B" = ["y"]
+#guard clashes wOnto false "R" = ["y"]
+
 #print axioms iterate_sound
 #print axioms export_complete
 #print axioms export_of_stable
