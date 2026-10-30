@@ -17,8 +17,6 @@
   outside the 12.7.3 set to inside it and removes 35 false linking errors.
 - Step over any number of index qualifiers when finding the operand of an
   attribute reference, so `s.segments[i][j].parent_surface` resolves.
-- Resolve `SUBTYPE OF` names case-insensitively in the type container
-  (EXPRESS identifiers are case-insensitive, 7.1.1).
 - Name the attribute in the linking error for an unresolved `.a`.
 
 ### Validation

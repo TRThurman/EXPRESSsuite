@@ -207,19 +207,7 @@ export class ExpressP11TypeContainer {
           for (const supertype of entity.getNode().types.supertypes!.entities!) {
             const supertypeName = supertype.entity.$refText;
 
-            const entities = allAvailable.resources.get(DefinitionType.Entity);
-            let supertypeDefinition = entities?.get(supertypeName);
-            if (!supertypeDefinition && entities) {
-              // EXPRESS identifiers are case-insensitive (ISO 10303-11:2004 7.1.1):
-              // `SUBTYPE OF (mesh)` names `ENTITY Mesh`.
-              const lower = supertypeName.toLowerCase();
-              for (const [name, definition] of entities) {
-                if (name.toLowerCase() === lower) {
-                  supertypeDefinition = definition;
-                  break;
-                }
-              }
-            }
+            const supertypeDefinition = allAvailable.resources.get(DefinitionType.Entity)?.get(supertypeName);
             if (supertypeDefinition) entity.addSuperType(supertypeDefinition.resource as ExpressP11Entity);
             else entity.unresolvedSupertypes.push(supertypeName);
           }
