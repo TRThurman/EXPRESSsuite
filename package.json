@@ -33,6 +33,8 @@
     "coverage": "vitest --coverage",
     "prebuild": "langium generate",
     "pretest": "langium generate",
+    "pretest:smrlv8": "langium generate",
+    "test:smrlv8": "vitest run --config vitest.smrlv8.config.js",
     "rebuild": "npm run clean && npm ci && langium generate && npm run build && npm test",
     "_comment": "deep clean removes lockfile; must use `npm install` to regenerate it",
     "clean:deep": "rm -rf node_modules out dist src/language/generated package-lock.json && echo '🧹 Deep clean complete'",

@@ -49,6 +49,49 @@
   uses the same relation (it no longer re-exports `REFERENCE FROM` items along
   `USE FROM` chains or ignores item lists) and publishes the same code.
 
+### Testing
+
+- The EXPRESS schema files of the published ISO 10303 SMRL v8 are a
+  regression corpus: 1,410 `.exp` files under `test-fixtures/smrlv8`,
+  byte-identical to the distribution. `npm run test:smrlv8` loads the 1,287
+  files the default settings admit as one workspace and the 103 long forms
+  directly, and compares every diagnostic with the baselines under
+  `test-fixtures/smrlv8-baseline`; CI runs it on one Linux runner. The
+  baselines pin behaviour, not correctness; the known false-positive classes
+  are listed in the baseline README.
+- Report an attribute reference that is ambiguous under 12.7.3
+  (`ambiguous-attribute-reference`, warning): the nearest depth that declares
+  the name holds declarations in two or more entities, as with `basis_curve`
+  on a `curve` operand (declared by `offset_curve_2d` and `offset_curve_3d`).
+  The linker still binds the first candidate; the NOTE of 12.7.3 recommends a
+  group reference.
+
+- Check attribute redeclarations for type compatibility
+  (`redeclaration-not-specialization`): the type of a redeclared attribute must
+  be the same as, or a specialization of, the original attribute's type
+  (ISO 10303-11:2004 9.2.3.4 a, 9.2.7). Defined types and selects are seen
+  through on both sides and `SELECT BASED_ON` extensions in the workspace are
+  folded in, so valid narrowings through a defined or select type on the
+  original side are accepted;
+  a failed check against an EXTENSIBLE original select is a warning.
+- Report an index qualifier applied to an operand whose declared type can never
+  hold an aggregate value (`index-on-non-aggregate`, ISO 10303-11:2004 12.6.1).
+- Both relations are transcribed from Lean 4 definitions whose soundness
+  against the EXPRESS value semantics is machine-checked (`lean/`). The 12.7.3
+  and 12.7.4 scopes are likewise transcribed from `lean/ExpressSuite/Inheritance.lean`,
+  which proves that the attribute walk computes exactly the 12.7.3 set and the
+  group walk exactly the 12.7.4 set.
+
+### Tests
+
+- Headless census of workspace diagnostics and of the schema-closure duplicate
+  command, for differential work (`src/test/workspace-*.test.ts`, env-gated).
+- Headless link-target census: where every attribute reference and INVERSE FOR
+  binds, classified against the 12.7.3 set (`src/test/workspace-link-targets.test.ts`).
+- Two-sided scope tests: group references must keep reaching siblings, attribute
+  references must never (`src/test/attribute-qualifier-scope.test.ts`).
+
+
 ## [0.4.2](https://github.com/TRThurman/EXPRESSsuite/compare/0.4.2-0...0.4.2) (2026-09-30)
 
 ### Bug Fixes

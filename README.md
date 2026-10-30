@@ -248,13 +248,22 @@ This path uses Plurimath to render embedded math, exactly matching the rendering
 ## Build, lint, test
 
 ```
-npm run build      # langium-generate + tsc + esbuild
-npm run lint       # eslint
-npm test           # vitest (98 tests)
-npm run rebuild    # clean build from scratch
+npm run build        # langium-generate + tsc + esbuild
+npm run lint         # eslint
+npm test             # vitest, the unit suite
+npm run test:smrlv8  # the SMRL v8 corpus against its baselines (minutes, multi-GB heap)
+npm run rebuild      # clean build from scratch
 ```
 
-Continuous integration runs the build/lint/test matrix on macOS, Ubuntu, and Windows via [`.github/workflows/ci.yaml`](.github/workflows/ci.yaml). The workflow uploads platform-specific `.vsix` artifacts on each push.
+Continuous integration runs the build/lint/test matrix on macOS, Ubuntu, and Windows via [`.github/workflows/ci.yaml`](.github/workflows/ci.yaml), audits the production dependencies, runs the SMRL v8 corpus on one Linux runner, and uploads platform-specific `.vsix` artifacts.
+
+### The SMRL v8 corpus
+
+`test-fixtures/smrlv8` holds the EXPRESS schema files of the published ISO 10303 SMRL v8 (1,410 `.exp` files, byte-identical to the distribution, nothing else from it). `npm run test:smrlv8` loads the 1,287 files the default settings admit as one workspace, then the 103 long forms directly, and compares every diagnostic with the baselines in `test-fixtures/smrlv8-baseline`. The baselines pin behaviour on real schemas, not correctness; the known false-positive classes are listed in that folder's README. After an intended change, regenerate them and review the diff:
+
+```
+EXPRESS_UPDATE_SMRLV8_BASELINE=1 npm run test:smrlv8
+```
 
 ## Origin and licensing
 
