@@ -1,8 +1,8 @@
 {
   "documents": 1287,
-  "diagnostics": 6508,
+  "diagnostics": 6419,
   "bySeverity": {
-    "error": 4056,
+    "error": 3967,
     "information": 704,
     "warning": 1748
   },
@@ -15,10 +15,10 @@
     "informal-proposition-malformed-signature": 7,
     "informal-proposition-misplaced-signature": 3,
     "informal-proposition-missing-annotation": 6,
-    "linking-error": 3470,
+    "linking-error": 3464,
     "parsing-error": 2,
     "redeclaration-not-specialization": 9,
-    "reference-statement-missing": 265
+    "reference-statement-missing": 182
   },
   "parseErrors": {
     "modules/solid_with_local_modification/Revisedent.exp": {
@@ -2566,12 +2566,6 @@
         226,
         228,
         228
-      ],
-      "reference-statement-missing": [
-        214,
-        216,
-        220,
-        222
       ]
     },
     "modules/ap203_configuration_controlled_3d_design_of_mechanical_parts_and_assemblies/mim.exp": {
@@ -2656,9 +2650,6 @@
       "linking-error": [
         28,
         354
-      ],
-      "reference-statement-missing": [
-        588
       ]
     },
     "modules/ap239_part_definition_information/mim.exp": {
@@ -2674,9 +2665,6 @@
         105,
         261,
         274
-      ],
-      "reference-statement-missing": [
-        469
       ]
     },
     "modules/ap239_product_definition_information/mim.exp": {
@@ -2698,9 +2686,6 @@
         1051,
         1070,
         1275
-      ],
-      "reference-statement-missing": [
-        1457
       ]
     },
     "modules/ap239_product_life_cycle_support/mim.exp": {
@@ -2718,14 +2703,6 @@
         330
       ]
     },
-    "modules/ap242_managed_model_based_3d_engineering/arm.exp": {
-      "reference-statement-missing": [
-        2617,
-        2619,
-        2623,
-        2625
-      ]
-    },
     "modules/ap242_managed_model_based_3d_engineering/mim.exp": {
       "linking-error": [
         2808,
@@ -2740,8 +2717,6 @@
         2831
       ],
       "reference-statement-missing": [
-        2894,
-        2896,
         2920,
         2921,
         2922
@@ -2753,16 +2728,6 @@
         37
       ]
     },
-    "modules/assembly_component_placement_requirements/arm.exp": {
-      "linking-error": [
-        151,
-        151,
-        158,
-        181,
-        187,
-        187
-      ]
-    },
     "modules/assembly_component/arm.exp": {
       "linking-error": [
         23
@@ -2771,6 +2736,16 @@
         21,
         24,
         25
+      ]
+    },
+    "modules/assembly_component_placement_requirements/arm.exp": {
+      "linking-error": [
+        151,
+        151,
+        158,
+        181,
+        187,
+        187
       ]
     },
     "modules/assembly_constraints/arm.exp": {
@@ -2893,11 +2868,6 @@
     "modules/basic_geometric_topology/arm.exp": {
       "linking-error": [
         28
-      ]
-    },
-    "modules/basic_geometry/arm.exp": {
-      "reference-statement-missing": [
-        175
       ]
     },
     "modules/building_component/mim.exp": {
@@ -3036,50 +3006,8 @@
         1757
       ],
       "reference-statement-missing": [
-        587,
-        591,
-        600,
-        602,
-        605,
-        609,
-        627,
-        629,
-        635,
-        637,
-        641,
-        671,
-        673,
-        721,
-        723,
-        730,
-        732,
-        736,
-        755,
-        757,
-        822,
-        824,
-        827,
-        834,
-        836,
-        840,
         904,
-        906,
-        1192,
-        1194,
-        1198,
-        1202,
-        1206,
-        1213,
-        1215,
-        1312,
-        1314,
-        1317,
-        1474,
-        1476,
-        1481,
-        1483,
-        1495,
-        1497
+        906
       ]
     },
     "modules/cfd_conditions/arm.exp": {
@@ -3134,12 +3062,6 @@
         13
       ]
     },
-    "modules/classification_with_attributes/mim.exp": {
-      "reference-statement-missing": [
-        63,
-        65
-      ]
-    },
     "modules/component_grouping/arm.exp": {
       "linking-error": [
         24,
@@ -3161,11 +3083,6 @@
         15
       ]
     },
-    "modules/conditional_effectivity/arm.exp": {
-      "reference-statement-missing": [
-        26
-      ]
-    },
     "modules/conductivity_material_aspects/arm.exp": {
       "linking-error": [
         86,
@@ -3176,9 +3093,6 @@
         118,
         121,
         121
-      ],
-      "reference-statement-missing": [
-        23
       ]
     },
     "modules/connection_of_individual_product/mim.exp": {
@@ -3219,29 +3133,6 @@
     "modules/design_management/mim.exp": {
       "linking-error": [
         13
-      ]
-    },
-    "modules/design_product_data_management/arm.exp": {
-      "linking-error": [
-        311,
-        311,
-        318,
-        318,
-        325,
-        325
-      ],
-      "reference-statement-missing": [
-        308,
-        310,
-        310,
-        315,
-        317,
-        317,
-        322,
-        324,
-        324,
-        355,
-        357
       ]
     },
     "modules/device_marking/arm.exp": {
@@ -3378,9 +3269,7 @@
       "reference-statement-missing": [
         42,
         42,
-        43,
-        55,
-        57
+        43
       ]
     },
     "modules/externally_conditioned_data_quality_criteria/arm.exp": {
@@ -3548,15 +3437,15 @@
         129
       ]
     },
+    "modules/functional_data/mim.exp": {
+      "linking-error": [
+        49
+      ]
+    },
     "modules/functional_data_and_schematic_representation/mim.exp": {
       "linking-error": [
         34,
         108
-      ]
-    },
-    "modules/functional_data/mim.exp": {
-      "linking-error": [
-        49
       ]
     },
     "modules/functional_specification/arm.exp": {
@@ -3784,9 +3673,6 @@
         164,
         186,
         186
-      ],
-      "reference-statement-missing": [
-        206
       ]
     },
     "modules/kinematic_state/arm.exp": {
@@ -3886,9 +3772,6 @@
         283,
         502,
         747
-      ],
-      "reference-statement-missing": [
-        755
       ]
     },
     "modules/kinematic_topology/arm.exp": {
@@ -3912,9 +3795,6 @@
         104,
         104,
         104
-      ],
-      "reference-statement-missing": [
-        136
       ]
     },
     "modules/land/arm.exp": {
@@ -4481,6 +4361,11 @@
         36
       ]
     },
+    "modules/part_template/mim.exp": {
+      "linking-error": [
+        12
+      ]
+    },
     "modules/part_template_2d_shape/arm.exp": {
       "duplicate-interfaced-declaration": [
         9,
@@ -4738,11 +4623,6 @@
         107
       ]
     },
-    "modules/part_template/mim.exp": {
-      "linking-error": [
-        12
-      ]
-    },
     "modules/physical_connectivity_definition/arm.exp": {
       "duplicate-loop-index": [
         148,
@@ -4814,7 +4694,6 @@
     "modules/physical_unit_design_view/arm.exp": {
       "reference-statement-missing": [
         71,
-        75,
         75
       ]
     },
@@ -4824,19 +4703,9 @@
         36
       ]
     },
-    "modules/picture_representation/mim.exp": {
-      "reference-statement-missing": [
-        39
-      ]
-    },
     "modules/planned_characteristic/mim.exp": {
       "linking-error": [
         15
-      ]
-    },
-    "modules/pre_defined_product_data_management_specializations/arm.exp": {
-      "reference-statement-missing": [
-        282
       ]
     },
     "modules/printed_physical_layout_template/arm.exp": {
@@ -5310,6 +5179,12 @@
         119
       ]
     },
+    "modules/solid_with_local_modification/Revisedent.exp": {
+      "parsing-error": [
+        1,
+        1
+      ]
+    },
     "modules/solid_with_local_modification/arm.exp": {
       "duplicate-loop-index": [
         436
@@ -5322,12 +5197,6 @@
         401,
         401,
         425
-      ]
-    },
-    "modules/solid_with_local_modification/Revisedent.exp": {
-      "parsing-error": [
-        1,
-        1
       ]
     },
     "modules/stock_material/mim.exp": {
@@ -5474,8 +5343,7 @@
         27,
         28,
         73,
-        74,
-        92
+        74
       ]
     },
     "modules/wiring_harness_assembly_design/arm.exp": {
@@ -5605,11 +5473,6 @@
       "linking-error": [
         2712,
         2859
-      ],
-      "reference-statement-missing": [
-        5201,
-        5205,
-        5237
       ]
     },
     "resources/aic_manifold_subsurface/aic_manifold_subsurface.exp": {

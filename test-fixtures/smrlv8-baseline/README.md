@@ -18,20 +18,20 @@ correctness: several of the classes below are known false positives.
 The corpus folder loaded as one workspace with the extension's default
 settings: `useOptimizedConfiguration` on, so files whose name contains `lf`
 or `concatenated` and the `business_object_models` folder are not loaded.
-1,287 of the 1,410 files load; 6,508 diagnostics
-(4,056 error, 704 information, 1,748 warning) in
-285 files. `files` maps file to code to the 1-based start
+1,287 of the 1,410 files load; 6,419 diagnostics
+(3,967 error, 704 information, 1,748 warning) in
+278 files. `files` maps file to code to the 1-based start
 line of every diagnostic. `parseErrors` lists the files with lexer or parser
 errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 26-line fragment the distribution ships beside the module, not a schema.
 
 | code                                     |  count |
 |------------------------------------------|--------|
-| linking-error                            |  3,470 |
+| linking-error                            |  3,464 |
 | (none)                                   |  1,737 |
 | declaration-name-case                    |    704 |
-| reference-statement-missing              |    265 |
 | duplicate-interfaced-declaration         |    229 |
+| reference-statement-missing              |    182 |
 | duplicate-loop-index                     |     72 |
 | redeclaration-not-specialization         |      9 |
 | informal-proposition-malformed-signature |      7 |
@@ -84,31 +84,29 @@ counts are what a change moves). No long form has a parse error, a
 - `linking-error` "The attribute '…' could not be found" (also "The entity
   '…' could not be found" and "A reference could not be resolved"): an
   attribute or group reference the linker cannot bind. The largest class in
-  both baselines (3,470 of the default-settings sites, 1,489 of them
+  both baselines (3,464 of the default-settings sites, 1,489 of them
   in `resources/automotive_design/automotive_design.exp` and
   `domain_models/managed_model_based_3d_engineering_domain/DomainModel.exp`;
   34,263 in the long forms). Not classified
   site by site. The sampled long-form sites (AP203 ARM and MIM long forms,
-  2026-10-30) are valid EXPRESS of three shapes:
-  - the operand is a QUERY variable over a nested QUERY, a function result
-    or an attribute path, which the linker does not type
-    (`msb\manifold_solid_brep.outer`, `csh\oriented_closed_shell.orientation`,
-    `mi\mapped_item.mapping_source.mapped_representation`, `temp.role` over
-    `bag_to_set(USEDIN(...))`);
-  - the attribute is written in another case than its declaration
-    (`SELF\Value_with_unit.Unit` for `unit`, nine sites in that file):
-    attribute names are not case-significant (ruling 2026-10-30), the
-    linker binds them exact-case today;
-  - the group qualifier names an entity in another case than its
-    declaration (`SELF\representation_relationship.rep_2` for
-    `Representation_relationship`; three such group references in that
-    file). Entity names are case-significant in short forms; whether a long
-    form binds them regardless of case (WG11 N239) is an open ruling.
+  2026-10-30) are valid EXPRESS whose operand is a QUERY variable over a
+  nested QUERY, a function result or an attribute path, which the linker
+  does not type (`msb\manifold_solid_brep.outer`,
+  `csh\oriented_closed_shell.orientation`,
+  `mi\mapped_item.mapping_source.mapped_representation`, `temp.role` over
+  `bag_to_set(USEDIN(...))`). References that differ from their declaration
+  only in letter case bind since the case rule (attribute, type and function
+  names everywhere; every name in a long form), which removed 78 short-form
+  and 27,296 long-form sites; the references that then resolve are checked
+  like any other, which is where the long forms' additional
+  `ambiguous-attribute-reference` and `redeclaration-not-specialization`
+  sites come from (not classified).
 - `linking-error` at `resources/product_structure_schema/product_structure_schema.exp`
   lines 192 and 194: a UNIQUE rule naming an inherited attribute and an
   INVERSE declared in a supertype, both valid EXPRESS (verified 2026-10-30).
 - `(none)`, "Attribute name should start with a lower case.": a diagnostic
   without a code yet.
-- `reference-statement-missing` depends on which of two same-named
-  declarations the type container keeps (the last in document-URI order), so
-  its sites move when a duplicate declaration enters or leaves the corpus.
+- `reference-statement-missing` is raised where a reference binds to a
+  declaration outside the schema's interface closure. A name the closure
+  holds binds there first; a name outside it binds to the first declaration
+  in document-URI order, so the sites are the same on every file system.

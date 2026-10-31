@@ -1,4 +1,4 @@
-import { AstNode, AstNodeDescriptionProvider, AstUtils, DefaultScopeProvider, EMPTY_SCOPE, ReferenceInfo, Scope } from "langium";
+import { AstNode, AstNodeDescriptionProvider, AstUtils, DefaultScopeProvider, EMPTY_SCOPE, MultiMapScope, ReferenceInfo, Scope, WorkspaceCache } from "langium";
 import {
   Attribute_decl,
   Attribute_id,
@@ -51,6 +51,7 @@ import { getFunctionParameterType } from "../utils/function-helpers.js";
 import { isProcedure_call_Or_Assigment_stmt_reference } from "./generated/ast.js";
 import { ExpressP11Services } from "./express-module.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
+import { byDescriptionUri, InterfaceIndex, InterfaceScope } from "./express-p11-interface-scope.js";
 import { DefinitionType, ExpressP11ParameterTypeResolutionType, ExpressP11Schema } from "./express-p11-type-utilities.js";
 import { getTypesFromParameterType } from "../utils/entity-helpers.js";
 import { extractInstanceTypes, isTypeExtension } from "./type-system/semantic-type.js";
@@ -63,11 +64,14 @@ export type CustomExpressDescription<T> = {
 export class ExpressP11ScopeProvider extends DefaultScopeProvider {
   protected readonly astNodeDescriptionProvider: AstNodeDescriptionProvider;
   private readonly typeContainer: ExpressP11TypeContainer;
+  /** Per schema and build: the declarations it sees through its interfaces, keyed by name. */
+  private readonly interfaceIndexCache: WorkspaceCache<string, InterfaceIndex>;
 
   constructor(services: ExpressP11Services) {
     super(services);
     this.astNodeDescriptionProvider = services.workspace.AstNodeDescriptionProvider;
     this.typeContainer = services.validation.TypeContainer;
+    this.interfaceIndexCache = new WorkspaceCache(services.shared);
   }
 
   override getScope(context: ReferenceInfo): Scope {
@@ -140,11 +144,41 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         }
       }
 
+      // Langium's lookup: the local symbols innermost first, then getGlobalScope below.
       const scope = super.getScope(context);
       return scope;
     } catch {
       return EMPTY_SCOPE;
     }
+  }
+
+  /**
+   * The outermost layer of the default lookup: the declarations the schema
+   * sees through its interfaces (ISO 10303-11:2004 clause 11) in front of the
+   * workspace index in document-URI order. The index holds every schema of
+   * the workspace, so without the interface layer a same-named declaration in
+   * an unrelated schema could win over an interfaced one, and which one won
+   * depended on the order in which the file system listed the documents.
+   */
+  protected override getGlobalScope(referenceType: string, context: ReferenceInfo): Scope {
+    const index = this.globalScopeCache.get(
+      referenceType,
+      () => new MultiMapScope(this.indexManager.allElements(referenceType).toArray().sort(byDescriptionUri))
+    );
+    const schemaNode = AstUtils.getContainerOfType(context.container, isSchemaDefinition);
+    const schema = schemaNode?.name ? this.typeContainer.getSchemas().get(schemaNode.name) : undefined;
+    if (!schema) return index;
+    const interfaced = this.interfaceIndexCache.get(schema.getName(), () => new InterfaceIndex(this.visibleDeclarations(schema), this.nameProvider));
+    return new InterfaceScope(interfaced, (node) => this.reflection.isSubtype(node.$type, referenceType), this.nameProvider, this.descriptions, index);
+  }
+
+  /** The entities and types a schema sees: its own and those its USE and REFERENCE statements bring in. */
+  private visibleDeclarations(schema: ExpressP11Schema): AstNode[] {
+    const nodes: AstNode[] = [];
+    for (const definitions of this.typeContainer.getAllRessourcesFrom(schema, true).resources.values()) {
+      for (const definition of definitions.values()) nodes.push(definition.resource.getNode());
+    }
+    return nodes;
   }
 
   /**

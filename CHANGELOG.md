@@ -31,6 +31,14 @@
   so supertype resolution, `reference-statement-missing` and duplicate
   declaration results no longer depend on the order in which the file system
   lists a workspace.
+- An unqualified name in an expression or in a RULE's FOR list binds through
+  the schema's interfaces (ISO 10303-11:2004 clause 11) before the workspace
+  index, and the index is consulted in document-URI order. The index holds
+  every schema of the workspace, so a same-named declaration in an unrelated
+  schema could win, and which one won depended on the order in which the file
+  system listed the documents: on macOS, `class` in the published
+  `Catalog_data_information_mim` bound to another schema's `class`, raising
+  four `reference-statement-missing` errors that Linux did not raise.
 
 ### Validation
 
