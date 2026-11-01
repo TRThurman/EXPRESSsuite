@@ -134,3 +134,100 @@ export async function getAnnotationIndex(
 export function invalidateAnnotationIndex(uri: vscode.Uri): void {
   cache.delete(uri.toString());
 }
+
+/* ----- description resolution ------------------------------------------- */
+
+/** A remark and the document it came from, as the server reports it. */
+export interface RemarkHit {
+  uri: string;
+  annotation: RemarkAnnotation;
+}
+
+/** A description for the editor: the remarks under one tag path and the document they live in. */
+export interface ResolvedDescription {
+  path: string;
+  annotations: RemarkAnnotation[];
+  sourceUri: vscode.Uri;
+}
+
+const TAG_PATH_RE = /^[A-Za-z_][A-Za-z0-9_.]*$/;
+
+function fromHits(path: string, hits: RemarkHit[], fallback: vscode.Uri): ResolvedDescription | undefined {
+  const matching = hits.filter((h) => h.annotation.tag === path || h.annotation.tag.startsWith(`${path}.__`));
+  if (matching.length === 0) return undefined;
+  const uri = matching[0].uri;
+  return {
+    path,
+    annotations: matching.map((h) => h.annotation),
+    sourceUri: typeof uri === "string" && uri.length > 0 ? vscode.Uri.parse(uri) : fallback,
+  };
+}
+
+/**
+ * The description of the word at `position`: first the remarks of the
+ * declaration the language server bound the word to, through the schema's
+ * USE and REFERENCE statements (ISO 10303-11:2004 clause 11), wherever those
+ * remarks live; then the active document's remarks for that name; then any
+ * document's. The last two are name-only matches for words the linker does
+ * not bind.
+ */
+export async function resolveDescriptionAt(
+  doc: vscode.TextDocument,
+  position: vscode.Position,
+  word: string,
+  client?: LanguageClient,
+): Promise<ResolvedDescription | undefined> {
+  if (client) {
+    try {
+      const at = (await client.sendRequest("express/findAnnotationsAt", {
+        uri: doc.uri.toString(),
+        position: { line: position.line, character: position.character },
+      })) as { path: string; annotations: RemarkHit[] } | null;
+      if (at && typeof at.path === "string" && Array.isArray(at.annotations)) {
+        const resolved = fromHits(at.path, at.annotations, doc.uri);
+        if (resolved) return resolved;
+      }
+    } catch {
+      /* server not ready; fall through */
+    }
+  }
+  const idx = await getAnnotationIndex(doc, client);
+  const local = idx.byEntityName(word)[0];
+  if (local) {
+    const path = `${local.parts[0]}.${local.parts[1]}`;
+    return { path, annotations: idx.byPath(path), sourceUri: doc.uri };
+  }
+  if (client) {
+    try {
+      const remote = (await client.sendRequest("express/findAnnotationsForEntity", { entityName: word })) as RemarkHit[];
+      const hit = Array.isArray(remote) ? remote.find((h) => h.annotation.parts.length >= 2 && h.annotation.parts[1] === word) : undefined;
+      if (hit) return fromHits(`${hit.annotation.parts[0]}.${hit.annotation.parts[1]}`, remote, doc.uri);
+    } catch {
+      /* server not ready */
+    }
+  }
+  return undefined;
+}
+
+/**
+ * The description under a tag path (`schema.entity`), as a `<<express:...>>`
+ * cross-reference names it: the active document's remarks first, then any
+ * document's.
+ */
+export async function resolveDescriptionByPath(
+  doc: vscode.TextDocument,
+  path: string,
+  client?: LanguageClient,
+): Promise<ResolvedDescription | undefined> {
+  if (!TAG_PATH_RE.test(path)) return undefined;
+  const idx = await getAnnotationIndex(doc, client);
+  const local = idx.byPath(path);
+  if (local.length > 0) return { path, annotations: local, sourceUri: doc.uri };
+  if (!client) return undefined;
+  try {
+    const remote = (await client.sendRequest("express/findAnnotationsByPath", { path })) as RemarkHit[];
+    return Array.isArray(remote) ? fromHits(path, remote, doc.uri) : undefined;
+  } catch {
+    return undefined;
+  }
+}

@@ -5,7 +5,7 @@ import * as fs from "node:fs/promises";
 import { LanguageClient, TransportKind } from "vscode-languageclient/node";
 import { ExpressP11StatusBarItem } from "./express-p11-status-bar-item.js";
 import { registerHoverProvider } from "./hover-provider.js";
-import { getAnnotationIndex } from "./annotation-client.js";
+import { getAnnotationIndex, resolveDescriptionAt, resolveDescriptionByPath } from "./annotation-client.js";
 import { showDescriptionPreview, showExpressGPreview, openMathPlayground } from "./webviews.js";
 import { initPlurimathPool, shutdownPlurimathPool } from "./plurimath-pool.js";
 import { time } from "./perf.js";
@@ -39,23 +39,27 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
         vscode.window.showInformationMessage("Place the cursor in an EXPRESS file first.");
         return;
       }
-      const idx = await getAnnotationIndex(editor.document, client);
-      let pathArg = arg?.path;
-      if (!pathArg) {
+      // A cross-reference names a tag path; the cursor names a word, which
+      // the server resolves to its declaration through the schema's interfaces.
+      let resolved;
+      let asked: string;
+      if (arg?.path) {
+        asked = arg.path;
+        resolved = await resolveDescriptionByPath(editor.document, arg.path, client);
+      } else {
         const wordRange = editor.document.getWordRangeAtPosition(
           editor.selection.active,
           /[A-Za-z_][A-Za-z0-9_]*/,
         );
         if (!wordRange) return;
-        const word = editor.document.getText(wordRange);
-        const matches = idx.byEntityName(word);
-        if (matches.length === 0) {
-          vscode.window.showInformationMessage(`No description found for "${word}".`);
-          return;
-        }
-        pathArg = `${matches[0].parts[0]}.${matches[0].parts[1]}`;
+        asked = editor.document.getText(wordRange);
+        resolved = await resolveDescriptionAt(editor.document, editor.selection.active, asked, client);
       }
-      const anns = idx.byPath(pathArg);
+      if (!resolved) {
+        vscode.window.showInformationMessage(`No description found for "${asked}".`);
+        return;
+      }
+      const { path: pathArg, annotations: anns } = resolved;
       const primary =
         anns.find((a) => a.tag === pathArg) ??
         anns.find((a) => a.tag === `${pathArg}.__note`) ??
@@ -64,7 +68,7 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
         vscode.window.showInformationMessage(`No description found for "${pathArg}".`);
         return;
       }
-      await showDescriptionPreview(context, primary, editor.document.uri);
+      await showDescriptionPreview(context, primary, resolved.sourceUri);
       stop(/* threshold */ 1000);
     }),
 
