@@ -67,6 +67,31 @@ jobs:
         continue-on-error: true
         run: npm audit
 
+  corpus:
+    name: SMRL v8 corpus
+    # The EXPRESS schemas of the published ISO 10303 SMRL v8 (test-fixtures/
+    # smrlv8) as a regression corpus: the 1,287 files the default settings admit
+    # as one workspace, then the 103 long forms, each diagnostic compared with
+    # the baselines in test-fixtures/smrlv8-baseline. Minutes and a multi-GB
+    # heap, so one Linux runner rather than the test matrix.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Langium artifacts
+        run: npm run langium:generate
+
+      - name: Census against the baselines
+        run: npm run test:smrlv8
+
   package:
     name: Package .vsix (${{ matrix.os }})
     runs-on: ${{ matrix.os }}

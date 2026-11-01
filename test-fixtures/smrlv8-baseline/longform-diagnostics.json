@@ -1,0 +1,411 @@
+{
+  "documents": 103,
+  "diagnostics": 34833,
+  "bySeverity": {
+    "error": 34752,
+    "information": 11,
+    "warning": 70
+  },
+  "byCode": {
+    "ambiguous-attribute-reference": 70,
+    "declaration-name-case": 11,
+    "duplicate-loop-index": 457,
+    "linking-error": 34263,
+    "redeclaration-not-specialization": 32
+  },
+  "parseErrors": {},
+  "files": {
+    "modules/ap203_configuration_controlled_3d_design_of_mechanical_parts_and_assemblies/arm_lf.exp": {
+      "duplicate-loop-index": 5,
+      "linking-error": 56
+    },
+    "modules/ap203_configuration_controlled_3d_design_of_mechanical_parts_and_assemblies/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 22,
+      "linking-error": 247
+    },
+    "modules/ap209_multidisciplinary_analysis_and_design/arm_lf.exp": {
+      "duplicate-loop-index": 9,
+      "linking-error": 4496
+    },
+    "modules/ap209_multidisciplinary_analysis_and_design/mim_lf.exp": {
+      "duplicate-loop-index": 37,
+      "linking-error": 349
+    },
+    "modules/ap210_assembly_functional_interface_requirements/arm_lf.exp": {
+      "duplicate-loop-index": 5,
+      "linking-error": 501
+    },
+    "modules/ap210_assembly_functional_interface_requirements/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 1,
+      "linking-error": 308
+    },
+    "modules/ap210_assembly_functional_requirements/arm_lf.exp": {
+      "duplicate-loop-index": 9,
+      "linking-error": 720,
+      "redeclaration-not-specialization": 3
+    },
+    "modules/ap210_assembly_functional_requirements/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 2,
+      "linking-error": 370
+    },
+    "modules/ap210_assembly_physical_design/arm_lf.exp": {
+      "duplicate-loop-index": 12,
+      "linking-error": 1153
+    },
+    "modules/ap210_assembly_physical_design/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 2,
+      "linking-error": 548
+    },
+    "modules/ap210_assembly_physical_interface_requirements/arm_lf.exp": {
+      "duplicate-loop-index": 11,
+      "linking-error": 800,
+      "redeclaration-not-specialization": 1
+    },
+    "modules/ap210_assembly_physical_interface_requirements/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 2,
+      "linking-error": 447
+    },
+    "modules/ap210_assembly_physical_requirements/arm_lf.exp": {
+      "duplicate-loop-index": 5,
+      "linking-error": 506
+    },
+    "modules/ap210_assembly_physical_requirements/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 1,
+      "linking-error": 308
+    },
+    "modules/ap210_assembly_requirement_allocation/arm_lf.exp": {
+      "duplicate-loop-index": 11,
+      "linking-error": 827,
+      "redeclaration-not-specialization": 3
+    },
+    "modules/ap210_assembly_requirement_allocation/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 2,
+      "linking-error": 447
+    },
+    "modules/ap210_assembly_technology_constraints/arm_lf.exp": {
+      "duplicate-loop-index": 2,
+      "linking-error": 189
+    },
+    "modules/ap210_assembly_technology_constraints/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "linking-error": 83
+    },
+    "modules/ap210_connection_zone_based_model_extraction/arm_lf.exp": {
+      "duplicate-loop-index": 2,
+      "linking-error": 212
+    },
+    "modules/ap210_connection_zone_based_model_extraction/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "linking-error": 89
+    },
+    "modules/ap210_datum_difference_based_model_definition/arm_lf.exp": {
+      "duplicate-loop-index": 5,
+      "linking-error": 461
+    },
+    "modules/ap210_datum_difference_based_model_definition/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 1,
+      "linking-error": 299
+    },
+    "modules/ap210_device_functional_and_physical_characterization/arm_lf.exp": {
+      "duplicate-loop-index": 5,
+      "linking-error": 506
+    },
+    "modules/ap210_device_functional_and_physical_characterization/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 1,
+      "linking-error": 309
+    },
+    "modules/ap210_electronic_assembly_interconnect_and_packaging_design/arm_lf.exp": {
+      "duplicate-loop-index": 28,
+      "linking-error": 276,
+      "redeclaration-not-specialization": 8
+    },
+    "modules/ap210_electronic_assembly_interconnect_and_packaging_design/mim_lf.exp": {
+      "duplicate-loop-index": 30,
+      "linking-error": 337
+    },
+    "modules/ap210_functional_decomposition/arm_lf.exp": {
+      "duplicate-loop-index": 2,
+      "linking-error": 222
+    },
+    "modules/ap210_functional_decomposition/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "linking-error": 94
+    },
+    "modules/ap210_functional_requirement_allocation/arm_lf.exp": {
+      "duplicate-loop-index": 2,
+      "linking-error": 222
+    },
+    "modules/ap210_functional_requirement_allocation/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "linking-error": 94
+    },
+    "modules/ap210_functional_specification/arm_lf.exp": {
+      "duplicate-loop-index": 2,
+      "linking-error": 227
+    },
+    "modules/ap210_functional_specification/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "linking-error": 94
+    },
+    "modules/ap210_interconnect_design/arm_lf.exp": {
+      "duplicate-loop-index": 18,
+      "linking-error": 1120,
+      "redeclaration-not-specialization": 2
+    },
+    "modules/ap210_interconnect_design/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 2,
+      "linking-error": 550
+    },
+    "modules/ap210_interconnect_design_for_microwave/arm_lf.exp": {
+      "duplicate-loop-index": 18,
+      "linking-error": 1120,
+      "redeclaration-not-specialization": 2
+    },
+    "modules/ap210_interconnect_design_for_microwave/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 2,
+      "linking-error": 550
+    },
+    "modules/ap210_interconnect_functional_requirements/arm_lf.exp": {
+      "duplicate-loop-index": 12,
+      "linking-error": 1024,
+      "redeclaration-not-specialization": 2
+    },
+    "modules/ap210_interconnect_functional_requirements/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 2,
+      "linking-error": 529
+    },
+    "modules/ap210_interconnect_physical_requirements/arm_lf.exp": {
+      "duplicate-loop-index": 12,
+      "linking-error": 1044
+    },
+    "modules/ap210_interconnect_physical_requirements/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 2,
+      "linking-error": 544
+    },
+    "modules/ap210_interconnect_requirement_allocation/arm_lf.exp": {
+      "duplicate-loop-index": 12,
+      "linking-error": 1052,
+      "redeclaration-not-specialization": 2
+    },
+    "modules/ap210_interconnect_requirement_allocation/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 2,
+      "linking-error": 544
+    },
+    "modules/ap210_interconnect_technology_constraints/arm_lf.exp": {
+      "duplicate-loop-index": 6,
+      "linking-error": 532
+    },
+    "modules/ap210_interconnect_technology_constraints/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 1,
+      "linking-error": 330
+    },
+    "modules/ap210_laminate_assembly_design/arm_lf.exp": {
+      "duplicate-loop-index": 13,
+      "linking-error": 1029
+    },
+    "modules/ap210_laminate_assembly_design/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 2,
+      "linking-error": 529
+    },
+    "modules/ap210_package_functional_and_physical_characterization/arm_lf.exp": {
+      "duplicate-loop-index": 5,
+      "linking-error": 497
+    },
+    "modules/ap210_package_functional_and_physical_characterization/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 1,
+      "linking-error": 309
+    },
+    "modules/ap210_packaged_part_white_box_model/arm_lf.exp": {
+      "duplicate-loop-index": 5,
+      "linking-error": 526
+    },
+    "modules/ap210_packaged_part_white_box_model/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 1,
+      "linking-error": 328
+    },
+    "modules/ap210_physical_unit_physical_characterization/arm_lf.exp": {
+      "duplicate-loop-index": 2,
+      "linking-error": 265
+    },
+    "modules/ap210_physical_unit_physical_characterization/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 1,
+      "linking-error": 144
+    },
+    "modules/ap210_printed_part_functional_and_physical_characterization/arm_lf.exp": {
+      "duplicate-loop-index": 8,
+      "linking-error": 637
+    },
+    "modules/ap210_printed_part_functional_and_physical_characterization/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "duplicate-loop-index": 2,
+      "linking-error": 363
+    },
+    "modules/ap210_production_rule/arm_lf.exp": {
+      "duplicate-loop-index": 5,
+      "linking-error": 226
+    },
+    "modules/ap210_production_rule/mim_lf.exp": {
+      "ambiguous-attribute-reference": 2,
+      "linking-error": 83
+    },
+    "modules/ap233_systems_engineering/arm_lf.exp": {
+      "duplicate-loop-index": 3,
+      "linking-error": 20
+    },
+    "modules/ap233_systems_engineering/mim_lf.exp": {
+      "declaration-name-case": 1,
+      "duplicate-loop-index": 2,
+      "linking-error": 12
+    },
+    "modules/ap236_furniture_catalog_and_interior_design/arm_lf.exp": {
+      "duplicate-loop-index": 4,
+      "linking-error": 294
+    },
+    "modules/ap236_furniture_catalog_and_interior_design/mim_lf.exp": {
+      "ambiguous-attribute-reference": 3,
+      "declaration-name-case": 1,
+      "duplicate-loop-index": 3,
+      "linking-error": 470
+    },
+    "modules/ap239_product_life_cycle_support/arm_lf.exp": {
+      "duplicate-loop-index": 1,
+      "linking-error": 20
+    },
+    "modules/ap239_product_life_cycle_support/mim_lf.exp": {
+      "duplicate-loop-index": 1,
+      "linking-error": 13
+    },
+    "modules/ap242_managed_model_based_3d_engineering/arm_lf.exp": {
+      "duplicate-loop-index": 9,
+      "linking-error": 160,
+      "redeclaration-not-specialization": 8
+    },
+    "modules/ap242_managed_model_based_3d_engineering/mim_lf.exp": {
+      "duplicate-loop-index": 30,
+      "linking-error": 332
+    },
+    "modules/catalog_data_information/arm_lf.exp": {
+      "duplicate-loop-index": 2,
+      "linking-error": 138
+    },
+    "modules/catalog_data_information/mim_lf.exp": {
+      "ambiguous-attribute-reference": 3,
+      "duplicate-loop-index": 1,
+      "linking-error": 262
+    },
+    "modules/catalog_data_information_and_shape_representation/arm_lf.exp": {
+      "duplicate-loop-index": 2,
+      "linking-error": 171
+    },
+    "modules/catalog_data_information_and_shape_representation/mim_lf.exp": {
+      "ambiguous-attribute-reference": 3,
+      "duplicate-loop-index": 1,
+      "linking-error": 361
+    },
+    "modules/function_based_behaviour/arm_lf.exp": {
+      "duplicate-loop-index": 2
+    },
+    "modules/function_based_behaviour/mim_lf.exp": {
+      "declaration-name-case": 1,
+      "duplicate-loop-index": 2
+    },
+    "modules/functional_data/mim_lf.exp": {
+      "declaration-name-case": 1,
+      "duplicate-loop-index": 4,
+      "linking-error": 10
+    },
+    "modules/functional_data_and_schematic_representation/mim_lf.exp": {
+      "declaration-name-case": 1,
+      "duplicate-loop-index": 4,
+      "linking-error": 10
+    },
+    "modules/furniture_interior_decoration/arm_lf.exp": {
+      "duplicate-loop-index": 2,
+      "linking-error": 185
+    },
+    "modules/furniture_interior_decoration/mim_lf.exp": {
+      "ambiguous-attribute-reference": 3,
+      "duplicate-loop-index": 1,
+      "linking-error": 361
+    },
+    "modules/parameterized_catalog_data_and_shape_representation/arm_lf.exp": {
+      "duplicate-loop-index": 4,
+      "linking-error": 280
+    },
+    "modules/parameterized_catalog_data_and_shape_representation/mim_lf.exp": {
+      "ambiguous-attribute-reference": 3,
+      "declaration-name-case": 1,
+      "duplicate-loop-index": 3,
+      "linking-error": 470
+    },
+    "modules/parameterized_catalog_data_information/arm_lf.exp": {
+      "duplicate-loop-index": 4,
+      "linking-error": 247
+    },
+    "modules/parameterized_catalog_data_information/mim_lf.exp": {
+      "ambiguous-attribute-reference": 3,
+      "declaration-name-case": 1,
+      "duplicate-loop-index": 3,
+      "linking-error": 367
+    },
+    "modules/part_and_zone_laminate_tables/arm_lf.exp": {
+      "duplicate-loop-index": 1,
+      "linking-error": 334,
+      "redeclaration-not-specialization": 1
+    },
+    "modules/reference_data_library/mim_lf.exp": {
+      "declaration-name-case": 1,
+      "duplicate-loop-index": 4,
+      "linking-error": 10
+    },
+    "modules/state_based_behaviour/arm_lf.exp": {
+      "duplicate-loop-index": 2
+    },
+    "modules/state_based_behaviour/mim_lf.exp": {
+      "declaration-name-case": 1,
+      "duplicate-loop-index": 2
+    },
+    "modules/system_behaviour/arm_lf.exp": {
+      "duplicate-loop-index": 2
+    },
+    "modules/system_behaviour/mim_lf.exp": {
+      "declaration-name-case": 1,
+      "duplicate-loop-index": 2
+    },
+    "modules/system_modelling/arm_lf.exp": {
+      "duplicate-loop-index": 3,
+      "linking-error": 20
+    },
+    "modules/system_modelling/mim_lf.exp": {
+      "declaration-name-case": 1,
+      "duplicate-loop-index": 2,
+      "linking-error": 12
+    },
+    "modules/system_structure/arm_lf.exp": {
+      "duplicate-loop-index": 1,
+      "linking-error": 20
+    },
+    "modules/system_structure/mim_lf.exp": {
+      "linking-error": 12
+    }
+  }
+}

@@ -65,6 +65,24 @@ standard VS Code **Problems** view:
 - **Declaration-name casing** — entities in schemas whose names end in
   `_arm` must begin with an uppercase letter. Entities in other schemas and
   all type names must be lowercase. Casing diagnostics include a quick fix.
+- **Duplicate interfaced declarations** — within one schema's scope an
+  identifier may be declared or explicitly interfaced once only (ISO
+  10303-11:2004 10.1 b). `duplicate-interfaced-declaration` is reported in
+  every schema in whose scope one identifier denotes two different
+  declarations of any kind, whether both are local, one is interfaced, or
+  both arrive through `USE FROM` chains; it is anchored at the local
+  declaration or at the interface line that brought the declaration in, with
+  related information at every declaration. The scope follows clause 11: a
+  `USE FROM` re-exports along chains and under renames (11.1, 11.3), a
+  `REFERENCE FROM` sees what the foreign schema declares or use's but never
+  chains (11.2, 11.3), explicit item lists are honoured, one declaration
+  reached by several routes counts once, and implicit interfaces bring no
+  identifier (11.4). In a short form an entity name is case-significant and
+  every other kind is compared without regard to case (project rulings); in a
+  long form (`_lf`) every identifier is compared without regard to case and
+  identical repeated definitions are the warning `redundant-declaration`
+  (WG11 N239). The scope relation is proved in
+  `lean/ExpressSuite/Interfaces.lean`.
 - **Duplicate loop indices** — a `LOCAL` variable must not redeclare the
   index implicitly declared by a `REPEAT` increment control. Loop-index and
   variable names are compared without regard to case.
@@ -94,10 +112,10 @@ graph (12.7.4) and `x\e.a` then means `e`'s own declaration. Hover,
 go-to-definition, completion and validation all follow this one rule, which
 is proved against the clause text in `lean/`.
 
-For workspace-level ambiguity checks, run **EXPRESSsuite: Detect Duplicate
+The same check is available on demand as **EXPRESSsuite: Detect Duplicate
 Declarations in Schema Closure** from the Command Palette or an EXPRESS
-editor's context menu. The command follows transitive `USE FROM` and
-`REFERENCE FROM` relationships from the schema at the cursor, handles cycles
+editor's context menu: it lists the clashes in the scope of the schema at the
+cursor, computed by the same scope index as the live diagnostic, handles cycles
 and renamed resources, and publishes navigable diagnostics for declaration
 names supplied by more than one schema in that closure.
 
@@ -230,13 +248,22 @@ This path uses Plurimath to render embedded math, exactly matching the rendering
 ## Build, lint, test
 
 ```
-npm run build      # langium-generate + tsc + esbuild
-npm run lint       # eslint
-npm test           # vitest (98 tests)
-npm run rebuild    # clean build from scratch
+npm run build        # langium-generate + tsc + esbuild
+npm run lint         # eslint
+npm test             # vitest, the unit suite
+npm run test:smrlv8  # the SMRL v8 corpus against its baselines (minutes, multi-GB heap)
+npm run rebuild      # clean build from scratch
 ```
 
-Continuous integration runs the build/lint/test matrix on macOS, Ubuntu, and Windows via [`.github/workflows/ci.yaml`](.github/workflows/ci.yaml). The workflow uploads platform-specific `.vsix` artifacts on each push.
+Continuous integration runs the build/lint/test matrix on macOS, Ubuntu, and Windows via [`.github/workflows/ci.yaml`](.github/workflows/ci.yaml), audits the production dependencies, runs the SMRL v8 corpus on one Linux runner, and uploads platform-specific `.vsix` artifacts.
+
+### The SMRL v8 corpus
+
+`test-fixtures/smrlv8` holds the EXPRESS schema files of the published ISO 10303 SMRL v8 (1,410 `.exp` files, byte-identical to the distribution, nothing else from it). `npm run test:smrlv8` loads the 1,287 files the default settings admit as one workspace, then the 103 long forms directly, and compares every diagnostic with the baselines in `test-fixtures/smrlv8-baseline`. The baselines pin behaviour on real schemas, not correctness; the known false-positive classes are listed in that folder's README. After an intended change, regenerate them and review the diff:
+
+```
+EXPRESS_UPDATE_SMRLV8_BASELINE=1 npm run test:smrlv8
+```
 
 ## Origin and licensing
 

@@ -1,0 +1,3208 @@
+[
+  {
+    "file": "modules/ap203_configuration_controlled_3d_design_of_mechanical_parts_and_assemblies/arm.exp",
+    "line": 11,
+    "col": 1,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Representation_with_uncertainty",
+    "schemas": [
+      "Qualified_measure_arm",
+      "Representation_with_uncertainty_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Representation_with_uncertainty' is declared in Qualified_measure_arm and in Representation_with_uncertainty_arm; both are visible in Ap203_configuration_controlled_3d_design_of_mechanical_parts_and_assemblies_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/ap203_configuration_controlled_3d_design_of_mechanical_parts_and_assemblies/arm.exp",
+    "line": 33,
+    "col": 1,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Representation_with_uncertainty",
+    "schemas": [
+      "Qualified_measure_arm",
+      "Representation_with_uncertainty_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Representation_with_uncertainty' is declared in Qualified_measure_arm and in Representation_with_uncertainty_arm; both are visible in Ap203_configuration_controlled_3d_design_of_mechanical_parts_and_assemblies_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/ap210_printed_part_functional_and_physical_characterization/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Connection_zone_in_layout_template",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Connection_zone_in_layout_template' is declared in Physical_layout_template_arm and in Layered_interconnect_simple_template_arm; both are visible in Ap210_printed_part_functional_and_physical_characterization_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/ap210_printed_part_functional_and_physical_characterization/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Reference_part_template_for_analytical_model",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Analytical_model_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Reference_part_template_for_analytical_model' is declared in Physical_layout_template_arm and in Analytical_model_arm; both are visible in Ap210_printed_part_functional_and_physical_characterization_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/ap210_printed_part_functional_and_physical_characterization/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Part_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template' is declared in Physical_layout_template_arm and in Part_template_arm; both are visible in Ap210_printed_part_functional_and_physical_characterization_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/ap210_printed_part_functional_and_physical_characterization/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template_definition",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Part_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template_definition' is declared in Physical_layout_template_arm and in Part_template_arm; both are visible in Ap210_printed_part_functional_and_physical_characterization_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/ap210_printed_part_functional_and_physical_characterization/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template_version",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Part_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template_version' is declared in Physical_layout_template_arm and in Part_template_arm; both are visible in Ap210_printed_part_functional_and_physical_characterization_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/ap210_printed_part_functional_and_physical_characterization/arm.exp",
+    "line": 11,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Connection_zone_in_layout_template",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Connection_zone_in_layout_template' is declared in Physical_layout_template_arm and in Layered_interconnect_simple_template_arm; both are visible in Ap210_printed_part_functional_and_physical_characterization_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/ap210_printed_part_functional_and_physical_characterization/mim.exp",
+    "line": 11,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "part_template_definition",
+    "schemas": [
+      "Physical_layout_template_mim",
+      "Part_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'part_template_definition' is declared in Physical_layout_template_mim and in Part_template_mim; both are visible in Ap210_printed_part_functional_and_physical_characterization_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/ap210_printed_part_functional_and_physical_characterization/mim.exp",
+    "line": 11,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "plt_groupable_item",
+    "schemas": [
+      "Physical_layout_template_mim",
+      "Part_template_mim"
+    ],
+    "related": 2,
+    "message": "TYPE 'plt_groupable_item' is declared in Physical_layout_template_mim and in Part_template_mim; both are visible in Ap210_printed_part_functional_and_physical_characterization_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 9,
+    "col": 1,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Apex",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Apex' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 9,
+    "col": 1,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Centre_axis",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Centre_axis' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 9,
+    "col": 1,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Centre_of_symmetry",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Centre_of_symmetry' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 9,
+    "col": 1,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Centre_plane",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Centre_plane' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 9,
+    "col": 1,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Centre_point",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Centre_point' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 9,
+    "col": 1,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Geometric_alignment",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Geometric_alignment' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 9,
+    "col": 1,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Geometric_intersection",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Geometric_intersection' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 9,
+    "col": 1,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Tangent_plane",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Tangent_plane' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 12,
+    "col": 1,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Edge_segment_vertex",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Non_feature_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Edge_segment_vertex' is declared in Extended_geometric_tolerance_arm and in Non_feature_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 117,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Apex",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Apex' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 128,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Centre_axis",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Centre_axis' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 134,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Centre_of_symmetry",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Centre_of_symmetry' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 141,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Centre_plane",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Centre_plane' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 147,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Centre_point",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Centre_point' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 324,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Edge_segment_vertex",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Non_feature_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Edge_segment_vertex' is declared in Extended_geometric_tolerance_arm and in Non_feature_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 335,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Geometric_alignment",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Geometric_alignment' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 339,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Geometric_intersection",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Geometric_intersection' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/arm.exp",
+    "line": 560,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Tangent_plane",
+    "schemas": [
+      "Extended_geometric_tolerance_arm",
+      "Derived_shape_element_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Tangent_plane' is declared in Extended_geometric_tolerance_arm and in Derived_shape_element_arm; both are visible in Extended_geometric_tolerance_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/mim.exp",
+    "line": 13,
+    "col": 1,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "edge_segment_vertex",
+    "schemas": [
+      "Extended_geometric_tolerance_mim",
+      "Non_feature_shape_element_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'edge_segment_vertex' is declared in Extended_geometric_tolerance_mim and in Non_feature_shape_element_mim; both are visible in Extended_geometric_tolerance_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/extended_geometric_tolerance/mim.exp",
+    "line": 68,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "edge_segment_vertex",
+    "schemas": [
+      "Extended_geometric_tolerance_mim",
+      "Non_feature_shape_element_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'edge_segment_vertex' is declared in Extended_geometric_tolerance_mim and in Non_feature_shape_element_mim; both are visible in Extended_geometric_tolerance_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Closed_curve_style_parameters",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Closed_curve_style_parameters' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Curve_style_parameters",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Curve_style_parameters' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Curve_style_parameters_with_ends",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Curve_style_parameters_with_ends' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Default_trace_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Default_trace_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Design_stack_model",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Fabrication_technology_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Design_stack_model' is declared in Part_template_2d_shape_arm and in Fabrication_technology_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "extend_or_chord_2_extend_or_truncate_or_round",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'extend_or_chord_2_extend_or_truncate_or_round' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "extend_or_truncate",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'extend_or_truncate' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Fill_area_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Fill_area_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Inter_stratum_feature_edge_segment_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Inter_stratum_feature_edge_segment_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Inter_stratum_feature_edge_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Inter_stratum_feature_edge_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Parametric_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Parametric_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Part_string_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Part_string_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Part_text_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Part_text_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Passage_technology_allocation_to_stack_model",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Fabrication_technology_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Passage_technology_allocation_to_stack_model' is declared in Part_template_2d_shape_arm and in Fabrication_technology_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Planar_closed_path_shape_model_with_parameters",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Planar_closed_path_shape_model_with_parameters' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Planar_path_shape_model_with_parameters",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Planar_path_shape_model_with_parameters' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Snowball_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Snowball_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Solid_character_glyph_2d_symbol",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Solid_character_glyph_2d_symbol' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "square_or_round",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'square_or_round' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Teardrop_by_angle_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Teardrop_by_angle_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Teardrop_by_length_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Teardrop_by_length_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Teardrop_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Teardrop_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "text_alignment",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Text_appearance_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'text_alignment' is declared in Part_template_extension_arm and in Text_appearance_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Trace_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Trace_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Complex_passage_padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Complex_passage_padstack_definition' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Default_trace_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Default_trace_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Dependent_template_location_in_padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Dependent_template_location_in_padstack_definition' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Fill_area_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Fill_area_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Inter_stratum_feature_edge_segment_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Inter_stratum_feature_edge_segment_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Inter_stratum_feature_edge_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Inter_stratum_feature_edge_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Inter_stratum_feature_template_location",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Inter_stratum_feature_template_location' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Library_stack_model",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Library_stack_model' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "location_stratum_technology_occurrence_or_stratum_technology",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'location_stratum_technology_occurrence_or_stratum_technology' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Material_removal_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Material_removal_structured_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Multi_stratum_special_symbol_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Multi_stratum_special_symbol_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Multi_stratum_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Multi_stratum_structured_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Padstack_definition' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Parametric_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Parametric_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Part_string_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Part_string_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Part_template_keepout_shape_allocation_to_stratum_stack",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Part_template_keepout_shape_allocation_to_stratum_stack' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Part_template_planar_keepout_shape_model",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Part_template_planar_keepout_shape_model' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Part_template_planar_shape_model",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Part_template_planar_shape_model' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Part_text_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Part_text_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Passage_padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Passage_padstack_definition' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Physical_unit_keepout_shape_allocation_to_stratum_stack",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Physical_unit_keepout_shape_allocation_to_stratum_stack' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Planar_closed_path_shape_model_with_parameters",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Planar_closed_path_shape_model_with_parameters' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Planar_path_shape_model_with_parameters",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Planar_path_shape_model_with_parameters' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Single_stratum_special_symbol_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Single_stratum_special_symbol_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Single_stratum_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Single_stratum_structured_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Snowball_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Snowball_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Solid_character_glyph_2d_symbol",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Solid_character_glyph_2d_symbol' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Special_symbol_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Special_symbol_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Stratum_specific_template_location",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Stratum_specific_template_location' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Stratum_stack_dependent_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Stratum_stack_dependent_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "stratum_technology_occurrence_or_stratum_technology",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'stratum_technology_occurrence_or_stratum_technology' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Structured_inter_stratum_feature_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Structured_inter_stratum_feature_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Structured_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Structured_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Structured_template_planar_shape_model",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Structured_template_planar_shape_model' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Teardrop_by_angle_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Teardrop_by_angle_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Teardrop_by_length_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Teardrop_by_length_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Teardrop_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Teardrop_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "template_arrangement",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'template_arrangement' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template_location_in_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template_location_in_structured_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template_location_in_structured_template_transform",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template_location_in_structured_template_transform' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Trace_template",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Layered_interconnect_simple_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Trace_template' is declared in Part_template_extension_arm and in Layered_interconnect_simple_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 44,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "template_arrangement",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'template_arrangement' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 51,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "location_stratum_technology_occurrence_or_stratum_technology",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'location_stratum_technology_occurrence_or_stratum_technology' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 56,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "stratum_technology_occurrence_or_stratum_technology",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'stratum_technology_occurrence_or_stratum_technology' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 61,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Complex_passage_padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Complex_passage_padstack_definition' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 65,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Dependent_template_location_in_padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Dependent_template_location_in_padstack_definition' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 89,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Design_stack_model",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Fabrication_technology_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Design_stack_model' is declared in Part_template_2d_shape_arm and in Fabrication_technology_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 100,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Inter_stratum_feature_template_location",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Inter_stratum_feature_template_location' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 109,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Library_stack_model",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Library_stack_model' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 116,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Material_removal_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Material_removal_structured_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 124,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Multi_stratum_special_symbol_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Multi_stratum_special_symbol_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 128,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Multi_stratum_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Multi_stratum_structured_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 135,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Padstack_definition' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 149,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Part_template_keepout_shape_allocation_to_stratum_stack",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Part_template_keepout_shape_allocation_to_stratum_stack' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 171,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Part_template_planar_keepout_shape_model",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Part_template_planar_keepout_shape_model' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 184,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Part_template_planar_shape_model",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Part_template_planar_shape_model' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 190,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Passage_padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Passage_padstack_definition' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 199,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Passage_technology_allocation_to_stack_model",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Fabrication_technology_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Passage_technology_allocation_to_stack_model' is declared in Part_template_2d_shape_arm and in Fabrication_technology_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 214,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Physical_unit_keepout_shape_allocation_to_stratum_stack",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Physical_unit_keepout_shape_allocation_to_stratum_stack' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 230,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Single_stratum_special_symbol_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Single_stratum_special_symbol_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 234,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Single_stratum_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Single_stratum_structured_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 251,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Special_symbol_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Special_symbol_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 256,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Stratum_specific_template_location",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Stratum_specific_template_location' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 280,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Stratum_stack_dependent_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Stratum_stack_dependent_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 295,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Structured_inter_stratum_feature_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Structured_inter_stratum_feature_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 299,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Structured_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Structured_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 309,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Structured_template_planar_shape_model",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Structured_template_planar_shape_model' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 314,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template_location_in_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template_location_in_structured_template' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/arm.exp",
+    "line": 335,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template_location_in_structured_template_transform",
+    "schemas": [
+      "Part_template_2d_shape_arm",
+      "Layered_interconnect_complex_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template_location_in_structured_template_transform' is declared in Part_template_2d_shape_arm and in Layered_interconnect_complex_template_arm; both are visible in Part_template_2d_shape_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "closed_curve_style_parameters",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Constructive_solid_geometry_2d_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'closed_curve_style_parameters' is declared in Part_template_extension_mim and in Constructive_solid_geometry_2d_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "curve_style_parameters_representation",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Constructive_solid_geometry_2d_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'curve_style_parameters_representation' is declared in Part_template_extension_mim and in Constructive_solid_geometry_2d_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "curve_style_parameters_with_ends",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Constructive_solid_geometry_2d_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'curve_style_parameters_with_ends' is declared in Part_template_extension_mim and in Constructive_solid_geometry_2d_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "default_trace_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'default_trace_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "design_stack_model",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Fabrication_technology_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'design_stack_model' is declared in Part_template_2d_shape_mim and in Fabrication_technology_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "fill_area_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'fill_area_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "inter_stratum_feature_edge_segment_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'inter_stratum_feature_edge_segment_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "inter_stratum_feature_edge_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'inter_stratum_feature_edge_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "parametric_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'parametric_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "part_string_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'part_string_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "part_text_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'part_text_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "passage_technology_allocation_to_stack_model",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Fabrication_technology_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'passage_technology_allocation_to_stack_model' is declared in Part_template_2d_shape_mim and in Fabrication_technology_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "path_area_with_parameters",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Constructive_solid_geometry_2d_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'path_area_with_parameters' is declared in Part_template_extension_mim and in Constructive_solid_geometry_2d_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "planar_path_shape_representation_with_parameters",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'planar_path_shape_representation_with_parameters' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "snowball_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'snowball_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "solid_character_glyph_2d_symbol",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'solid_character_glyph_2d_symbol' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "teardrop_by_angle_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'teardrop_by_angle_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "teardrop_by_length_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'teardrop_by_length_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "teardrop_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'teardrop_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "trace_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'trace_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "complex_passage_padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'complex_passage_padstack_definition' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "default_trace_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'default_trace_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "fill_area_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'fill_area_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "inter_stratum_feature_edge_segment_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'inter_stratum_feature_edge_segment_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "inter_stratum_feature_edge_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'inter_stratum_feature_edge_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "library_stack_model",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'library_stack_model' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "material_removal_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'material_removal_structured_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "multi_stratum_special_symbol_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'multi_stratum_special_symbol_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "multi_stratum_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'multi_stratum_structured_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'padstack_definition' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "parametric_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'parametric_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "part_string_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'part_string_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "part_template_keepout_shape_allocation_to_stratum_stack",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'part_template_keepout_shape_allocation_to_stratum_stack' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "part_text_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'part_text_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "passage_padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'passage_padstack_definition' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "physical_unit_keepout_shape_allocation_to_stratum_stack",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'physical_unit_keepout_shape_allocation_to_stratum_stack' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "planar_path_shape_representation_with_parameters",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'planar_path_shape_representation_with_parameters' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "single_stratum_special_symbol_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'single_stratum_special_symbol_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "single_stratum_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'single_stratum_structured_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "snowball_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'snowball_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "solid_character_glyph_2d_symbol",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'solid_character_glyph_2d_symbol' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "special_symbol_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'special_symbol_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "stratum_specific_template_location",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'stratum_specific_template_location' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "stratum_stack_dependent_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'stratum_stack_dependent_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "structured_inter_stratum_feature_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'structured_inter_stratum_feature_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "structured_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'structured_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "teardrop_by_angle_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'teardrop_by_angle_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "teardrop_by_length_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'teardrop_by_length_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "teardrop_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'teardrop_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "trace_template",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Layered_interconnect_simple_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'trace_template' is declared in Part_template_extension_mim and in Layered_interconnect_simple_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 22,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "complex_passage_padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'complex_passage_padstack_definition' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 26,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "design_stack_model",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Fabrication_technology_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'design_stack_model' is declared in Part_template_2d_shape_mim and in Fabrication_technology_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 30,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "library_stack_model",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'library_stack_model' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 34,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "material_removal_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'material_removal_structured_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 38,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "multi_stratum_special_symbol_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'multi_stratum_special_symbol_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 42,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "multi_stratum_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'multi_stratum_structured_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 48,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'padstack_definition' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 53,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "part_template_keepout_shape_allocation_to_stratum_stack",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'part_template_keepout_shape_allocation_to_stratum_stack' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 59,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "passage_padstack_definition",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'passage_padstack_definition' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 63,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "passage_technology_allocation_to_stack_model",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Fabrication_technology_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'passage_technology_allocation_to_stack_model' is declared in Part_template_2d_shape_mim and in Fabrication_technology_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 67,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "physical_unit_keepout_shape_allocation_to_stratum_stack",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'physical_unit_keepout_shape_allocation_to_stratum_stack' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 71,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "single_stratum_special_symbol_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'single_stratum_special_symbol_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 75,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "single_stratum_structured_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'single_stratum_structured_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 80,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "special_symbol_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'special_symbol_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 85,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "stratum_specific_template_location",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'stratum_specific_template_location' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 89,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "stratum_stack_dependent_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'stratum_stack_dependent_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 93,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "structured_inter_stratum_feature_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'structured_inter_stratum_feature_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_2d_shape/mim.exp",
+    "line": 97,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "structured_template",
+    "schemas": [
+      "Part_template_2d_shape_mim",
+      "Layered_interconnect_complex_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'structured_template' is declared in Part_template_2d_shape_mim and in Layered_interconnect_complex_template_mim; both are visible in Part_template_2d_shape_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 9,
+    "col": 5,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Closed_curve_style_parameters",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Closed_curve_style_parameters' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 9,
+    "col": 5,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Curve_style_parameters",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Curve_style_parameters' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 9,
+    "col": 5,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Curve_style_parameters_with_ends",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Curve_style_parameters_with_ends' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 9,
+    "col": 5,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "extend_or_chord_2_extend_or_truncate_or_round",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'extend_or_chord_2_extend_or_truncate_or_round' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 9,
+    "col": 5,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "extend_or_truncate",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'extend_or_truncate' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 9,
+    "col": 5,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "square_or_round",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'square_or_round' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 12,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "text_alignment",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Text_appearance_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'text_alignment' is declared in Part_template_extension_arm and in Text_appearance_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 14,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "extend_or_chord_2_extend_or_truncate_or_round",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'extend_or_chord_2_extend_or_truncate_or_round' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 21,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "extend_or_truncate",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'extend_or_truncate' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 26,
+    "col": 6,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "text_alignment",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Text_appearance_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'text_alignment' is declared in Part_template_extension_arm and in Text_appearance_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 46,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "square_or_round",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'square_or_round' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 57,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Curve_style_parameters",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Curve_style_parameters' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 67,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Closed_curve_style_parameters",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Closed_curve_style_parameters' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/arm.exp",
+    "line": 71,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Curve_style_parameters_with_ends",
+    "schemas": [
+      "Part_template_extension_arm",
+      "Constructive_solid_geometry_2d_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Curve_style_parameters_with_ends' is declared in Part_template_extension_arm and in Constructive_solid_geometry_2d_arm; both are visible in Part_template_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/mim.exp",
+    "line": 9,
+    "col": 5,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "closed_curve_style_parameters",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Constructive_solid_geometry_2d_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'closed_curve_style_parameters' is declared in Part_template_extension_mim and in Constructive_solid_geometry_2d_mim; both are visible in Part_template_extension_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/mim.exp",
+    "line": 9,
+    "col": 5,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "curve_style_parameters_representation",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Constructive_solid_geometry_2d_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'curve_style_parameters_representation' is declared in Part_template_extension_mim and in Constructive_solid_geometry_2d_mim; both are visible in Part_template_extension_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/mim.exp",
+    "line": 9,
+    "col": 5,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "curve_style_parameters_with_ends",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Constructive_solid_geometry_2d_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'curve_style_parameters_with_ends' is declared in Part_template_extension_mim and in Constructive_solid_geometry_2d_mim; both are visible in Part_template_extension_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/mim.exp",
+    "line": 9,
+    "col": 5,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "path_area_with_parameters",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Constructive_solid_geometry_2d_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'path_area_with_parameters' is declared in Part_template_extension_mim and in Constructive_solid_geometry_2d_mim; both are visible in Part_template_extension_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/mim.exp",
+    "line": 22,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "closed_curve_style_parameters",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Constructive_solid_geometry_2d_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'closed_curve_style_parameters' is declared in Part_template_extension_mim and in Constructive_solid_geometry_2d_mim; both are visible in Part_template_extension_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/mim.exp",
+    "line": 26,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "curve_style_parameters_representation",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Constructive_solid_geometry_2d_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'curve_style_parameters_representation' is declared in Part_template_extension_mim and in Constructive_solid_geometry_2d_mim; both are visible in Part_template_extension_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/mim.exp",
+    "line": 30,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "curve_style_parameters_with_ends",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Constructive_solid_geometry_2d_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'curve_style_parameters_with_ends' is declared in Part_template_extension_mim and in Constructive_solid_geometry_2d_mim; both are visible in Part_template_extension_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/part_template_extension/mim.exp",
+    "line": 74,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "path_area_with_parameters",
+    "schemas": [
+      "Part_template_extension_mim",
+      "Constructive_solid_geometry_2d_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'path_area_with_parameters' is declared in Part_template_extension_mim and in Constructive_solid_geometry_2d_mim; both are visible in Part_template_extension_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/physical_layout_template/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Reference_part_template_for_analytical_model",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Analytical_model_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Reference_part_template_for_analytical_model' is declared in Physical_layout_template_arm and in Analytical_model_arm; both are visible in Physical_layout_template_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/physical_layout_template/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Part_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template' is declared in Physical_layout_template_arm and in Part_template_arm; both are visible in Physical_layout_template_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/physical_layout_template/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template_definition",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Part_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template_definition' is declared in Physical_layout_template_arm and in Part_template_arm; both are visible in Physical_layout_template_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/physical_layout_template/arm.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template_version",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Part_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template_version' is declared in Physical_layout_template_arm and in Part_template_arm; both are visible in Physical_layout_template_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/physical_layout_template/arm.exp",
+    "line": 32,
+    "col": 9,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Reference_part_template_for_analytical_model",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Analytical_model_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Reference_part_template_for_analytical_model' is declared in Physical_layout_template_arm and in Analytical_model_arm; both are visible in Physical_layout_template_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/physical_layout_template/arm.exp",
+    "line": 39,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Part_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template' is declared in Physical_layout_template_arm and in Part_template_arm; both are visible in Physical_layout_template_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/physical_layout_template/arm.exp",
+    "line": 47,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template_definition",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Part_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template_definition' is declared in Physical_layout_template_arm and in Part_template_arm; both are visible in Physical_layout_template_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/physical_layout_template/arm.exp",
+    "line": 58,
+    "col": 10,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "Template_version",
+    "schemas": [
+      "Physical_layout_template_arm",
+      "Part_template_arm"
+    ],
+    "related": 2,
+    "message": "ENTITY 'Template_version' is declared in Physical_layout_template_arm and in Part_template_arm; both are visible in Physical_layout_template_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/physical_layout_template/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "part_template_definition",
+    "schemas": [
+      "Physical_layout_template_mim",
+      "Part_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'part_template_definition' is declared in Physical_layout_template_mim and in Part_template_mim; both are visible in Physical_layout_template_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/physical_layout_template/mim.exp",
+    "line": 9,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "plt_groupable_item",
+    "schemas": [
+      "Physical_layout_template_mim",
+      "Part_template_mim"
+    ],
+    "related": 2,
+    "message": "TYPE 'plt_groupable_item' is declared in Physical_layout_template_mim and in Part_template_mim; both are visible in Physical_layout_template_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/physical_layout_template/mim.exp",
+    "line": 19,
+    "col": 7,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "plt_groupable_item",
+    "schemas": [
+      "Physical_layout_template_mim",
+      "Part_template_mim"
+    ],
+    "related": 2,
+    "message": "TYPE 'plt_groupable_item' is declared in Physical_layout_template_mim and in Part_template_mim; both are visible in Physical_layout_template_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/physical_layout_template/mim.exp",
+    "line": 24,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "part_template_definition",
+    "schemas": [
+      "Physical_layout_template_mim",
+      "Part_template_mim"
+    ],
+    "related": 2,
+    "message": "ENTITY 'part_template_definition' is declared in Physical_layout_template_mim and in Part_template_mim; both are visible in Physical_layout_template_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/product_identification_extension/arm.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "pie_external_identification_item",
+    "schemas": [
+      "Product_identification_extension_arm",
+      "Product_view_definition_reference_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'pie_external_identification_item' is declared in Product_identification_extension_arm and in Product_view_definition_reference_arm; both are visible in Product_identification_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/product_identification_extension/arm.exp",
+    "line": 12,
+    "col": 8,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "pie_external_identification_item",
+    "schemas": [
+      "Product_identification_extension_arm",
+      "Product_view_definition_reference_arm"
+    ],
+    "related": 2,
+    "message": "TYPE 'pie_external_identification_item' is declared in Product_identification_extension_arm and in Product_view_definition_reference_arm; both are visible in Product_identification_extension_arm (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/product_identification_extension/mim.exp",
+    "line": 10,
+    "col": 2,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "pie_external_identification_item",
+    "schemas": [
+      "Product_identification_extension_mim",
+      "Product_view_definition_reference_mim"
+    ],
+    "related": 2,
+    "message": "TYPE 'pie_external_identification_item' is declared in Product_identification_extension_mim and in Product_view_definition_reference_mim; both are visible in Product_identification_extension_mim (ISO 10303-11:2004 10.1 b)."
+  },
+  {
+    "file": "modules/product_identification_extension/mim.exp",
+    "line": 16,
+    "col": 6,
+    "severity": "error",
+    "code": "duplicate-interfaced-declaration",
+    "identifier": "pie_external_identification_item",
+    "schemas": [
+      "Product_identification_extension_mim",
+      "Product_view_definition_reference_mim"
+    ],
+    "related": 2,
+    "message": "TYPE 'pie_external_identification_item' is declared in Product_identification_extension_mim and in Product_view_definition_reference_mim; both are visible in Product_identification_extension_mim (ISO 10303-11:2004 10.1 b)."
+  }
+]

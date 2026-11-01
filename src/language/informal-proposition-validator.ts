@@ -145,7 +145,8 @@ export function validateInformalPropositions(document: LangiumDocument<ExpressFi
 function getDeclarations(schemas: SchemaDefinition[]): Declaration[] {
   const declarations: Declaration[] = [];
   for (const schema of schemas) {
-    for (const node of schema.body.declarations) {
+    // A fragment that parsed without a schema body has nothing to check.
+    for (const node of schema.body?.declarations ?? []) {
       if (!isEntityDefinition(node) && !isTypeDefinition(node)) continue;
       const cst = node.$cstNode;
       if (!cst) continue;

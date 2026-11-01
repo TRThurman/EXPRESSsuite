@@ -1,0 +1,6892 @@
+(*   $Id: DomainModel.exp,v 1.0 2019/06/07 19:00:00 StepLib Exp $
+	ISO TC184/SC4/WG12 N10476 - ISO/TS 10303-4442 managed model-based 3d engineering domain model - EXPRESS DOMAIN MODEL
+*)
+
+SCHEMA managed_model_based_3d_engineering_domain_model;
+
+
+CONSTANT
+	SCHEMA_NAME : STRING := 'MANAGED_MODEL_BASED_3D_ENGINEERING_DOMAIN_MODEL.';
+END_CONSTANT;
+
+
+TYPE ActivityAssignmentSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	ActivityRelationship,
+	AddressAssignment,
+	AlternatePartRelationship,
+	AlternativeSolution,
+	ApprovalAssignment,
+	AssemblyOccurrenceRelationshipSubstitution,
+	AssemblyViewRelationshipSubstitution,
+	AssignmentObjectRelationship,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementRealization,
+	BreakdownElementVersion,
+	BreakdownElementVersionRelationship,
+	BreakdownElementView,
+	BreakdownElementViewRelationship,
+	BreakdownVersion,
+	BreakdownVersionAssignment,
+	BreakdownVersionRelationship,
+	CertificationAssignment,
+	Class,
+	Condition,
+	ConditionAssignment,
+	ConditionalConfiguration,
+	ConfiguredAssemblyEffectivity,
+	Contract,
+	ContractAssignment,
+	DateAndPersonAssignment,
+	DateTimeAssignment,
+	Document,
+	DocumentAssignment,
+	DocumentDefinition,
+	DocumentDefinitionRelationship,
+	DocumentVersion,
+	DocumentVersionRelationship,
+	Effectivity,
+	EffectivityAssignment,
+	Envelope,
+	Event,
+	EventAssignment,
+	ExternalOwlClass,
+	File,
+	FrozenAssignment,
+	IndividualAssemblyRelationship,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartVersionRelationship,
+	IndividualPartView,
+	IndividualPartViewRelationship,
+	InformationUsageRightAssignment,
+	MaterialIdentification,
+	MaterialPropertyAssignment,
+	Message,
+	ModelPropertyAssignment,
+	Occurrence,
+	OccurrenceRelationship,
+	Organization,
+	OrganizationOrPersonInOrganizationAssignment,
+	Part,
+	PartVersion,
+	PartVersionRelationship,
+	PartView,
+	PartViewRelationship,
+	Person,
+	PersonInOrganization,
+	ProcessOperationDefinition,
+	ProcessOperationOccurrence,
+	ProcessOperationResourceAssignment,
+	ProcessPlan,
+	ProductClass,
+	ProductConfiguration,
+	Project,
+	ProjectAssignment,
+	ProjectRelationship,
+	PropertyDefinitionAssignment,
+	PropertyDefinitionRelationship,
+	PropertyValue,
+	PropertyValueAssignment,
+	PropertyValueRelationship,
+	Representation,
+	Requirement,
+	RequirementAssignment,
+	RequirementVersion,
+	RequirementVersionRelationship,
+	RequirementView,
+	RequirementViewRelationship,
+	SecurityClassificationAssignment,
+	Specification,
+	SpecificationAssignment,
+	SpecificationCategory,
+	SpecificationCategoryAssignment,
+	SpecificationConditionAssignment,
+	SpecificationInclusion,
+	SpecificationInclusionAssignment,
+	StyledModel,
+	TimeIntervalAssignment,
+	ViewOccurrenceRelationship,
+	WorkOrderAssignment,
+	WorkRequestAssignment
+);
+END_TYPE;
+
+TYPE ActivityMethodAssignmentSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	AddressAssignment,
+	AlternativeSolution,
+	ApprovalAssignment,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementVersion,
+	BreakdownElementVersionRelationship,
+	BreakdownElementView,
+	BreakdownElementViewRelationship,
+	BreakdownVersion,
+	BreakdownVersionAssignment,
+	BreakdownVersionRelationship,
+	CertificationAssignment,
+	ConditionAssignment,
+	Contract,
+	ContractAssignment,
+	DateAndPersonAssignment,
+	DateTimeAssignment,
+	Document,
+	DocumentAssignment,
+	DocumentDefinition,
+	DocumentDefinitionRelationship,
+	DocumentVersion,
+	DocumentVersionRelationship,
+	EffectivityAssignment,
+	Envelope,
+	EventAssignment,
+	File,
+	FrozenAssignment,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartVersionRelationship,
+	IndividualPartView,
+	IndividualPartViewRelationship,
+	InformationUsageRightAssignment,
+	MaterialPropertyAssignment,
+	Message,
+	ModelPropertyAssignment,
+	Organization,
+	OrganizationOrPersonInOrganizationAssignment,
+	Part,
+	PartVersion,
+	PartVersionRelationship,
+	PartView,
+	PartViewRelationship,
+	Person,
+	PersonInOrganization,
+	ProcessOperationResourceAssignment,
+	ProductClass,
+	ProductConfiguration,
+	Project,
+	ProjectAssignment,
+	PropertyDefinitionAssignment,
+	PropertyDefinitionRelationship,
+	PropertyValueAssignment,
+	PropertyValueAssignmentRelationship,
+	PropertyValueRelationship,
+	Requirement,
+	RequirementAssignment,
+	RequirementVersion,
+	RequirementVersionRelationship,
+	RequirementView,
+	RequirementViewRelationship,
+	SecurityClassificationAssignment,
+	SpecificationAssignment,
+	SpecificationCategoryAssignment,
+	SpecificationConditionAssignment,
+	SpecificationInclusionAssignment,
+	TimeIntervalAssignment,
+	WorkOrderAssignment,
+	WorkRequest,
+	WorkRequestAssignment
+);
+END_TYPE;
+
+TYPE ActuatedDirectionEnum = ENUMERATION OF(
+	bidirectional,
+	negative_only,
+	not_actuated,
+	positive_only
+);
+END_TYPE;
+
+TYPE AnalysisAssignmentSelect = SELECT(
+	Activity,
+	ActivityMethod,
+	ActivityMethodRelationship,
+	ActivityRelationship,
+	AssemblyViewRelationshipSubstitution,
+	Condition,
+	ConditionRelationship,
+	Evidence,
+	Organization,
+	OrganizationRelationship,
+	Part,
+	PartRelationship,
+	PartToIndividualPartAssociation,
+	PartVersion,
+	PartVersionRelationship,
+	PartVersionToIndividualPartVersionAssociation,
+	PartView,
+	PartViewRelationship,
+	ProductConcept,
+	ProductGroupRelationship,
+	ProductPlannedToRealized,
+	ProjectRelationship,
+	PropertyDefinitionAssignment,
+	PropertyValueAssignment,
+	RequirementAssignment,
+	State,
+	StateAssignment,
+	StateDefinition,
+	Validation,
+	Verification,
+	VerificationRelationship,
+	ViewContext
+);
+END_TYPE;
+
+TYPE AnalysisModelItemsSelect = SELECT(
+	DocumentVersion,
+	StateDefinition,
+	StateDefinitionTransition
+);
+END_TYPE;
+
+TYPE AngleSelect = SELECT(
+	AxisPlacement,
+	Curve,
+	Direction
+);
+END_TYPE;
+
+TYPE ApplicationDomainSelect = SELECT(
+	ApplicationDomain,
+	PredefinedApplicationDomainEnum,
+	ProxySelect
+);
+END_TYPE;
+
+TYPE ApprovalAssignmentSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	ActivityMethodRelationship,
+	AddressAssignment,
+	AlternatePartRelationship,
+	AlternativeSolution,
+	ApprovalAssignment,
+	AssemblyOccurrenceRelationshipSubstitution,
+	AssemblyViewRelationshipSubstitution,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementRealization,
+	BreakdownElementVersion,
+	BreakdownElementVersionRelationship,
+	BreakdownElementView,
+	BreakdownElementViewRelationship,
+	BreakdownVersion,
+	BreakdownVersionAssignment,
+	BreakdownVersionRelationship,
+	Certification,
+	CertificationAssignment,
+	Class,
+	Classification,
+	Condition,
+	ConditionAssignment,
+	ConditionalConfiguration,
+	ConfiguredAssemblyEffectivity,
+	Contract,
+	ContractAssignment,
+	DateAndPersonAssignment,
+	DateTimeAssignment,
+	Descriptor,
+	DescriptorRelationship,
+	Document,
+	DocumentAssignment,
+	DocumentDefinition,
+	DocumentDefinitionRelationship,
+	DocumentVersion,
+	DocumentVersionRelationship,
+	Effectivity,
+	EffectivityAssignment,
+	Envelope,
+	EventAssignment,
+	ExternalClassSystem,
+	ExternalOwlClass,
+	File,
+	FrozenAssignment,
+	Identifier,
+	IdentifierRelationship,
+	InZone,
+	IndividualAssemblyRelationship,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartVersionRelationship,
+	IndividualPartView,
+	IndividualPartViewRelationship,
+	InformationUsageRight,
+	InformationUsageRightAssignment,
+	MaterialIdentification,
+	MaterialPropertyAssignment,
+	Message,
+	ModelPropertyAssignment,
+	Occurrence,
+	OccurrenceRelationship,
+	OrganizationOrPersonInOrganizationAssignment,
+	Part,
+	PartRelationship,
+	PartVersion,
+	PartVersionRelationship,
+	PartView,
+	PartViewRelationship,
+	PersonInOrganization,
+	ProcessOperationResourceAssignment,
+	ProcessPlan,
+	ProductClass,
+	ProductConfiguration,
+	Project,
+	ProjectAssignment,
+	PropertyDefinition,
+	PropertyDefinitionAssignment,
+	PropertyDefinitionRelationship,
+	PropertyValue,
+	PropertyValueAssignment,
+	PropertyValueRelationship,
+	Proxy,
+	Representation,
+	Requirement,
+	RequirementAssignment,
+	RequirementSource,
+	RequirementVersion,
+	RequirementVersionRelationship,
+	RequirementView,
+	RequirementViewRelationship,
+	SecurityClassification,
+	SecurityClassificationAssignment,
+	Specification,
+	SpecificationAssignment,
+	SpecificationCategory,
+	SpecificationCategoryAssignment,
+	SpecificationConditionAssignment,
+	SpecificationInclusion,
+	SpecificationInclusionAssignment,
+	StyledModel,
+	TimeIntervalAssignment,
+	ViewContext,
+	ViewOccurrenceRelationship,
+	WorkOrder,
+	WorkOrderAssignment,
+	WorkRequest,
+	WorkRequestAssignment
+);
+END_TYPE;
+
+TYPE ApprovalScopeSelect = SELECT(
+	Activity,
+	Contract,
+	Organization,
+	PersonInOrganization,
+	ProductClass,
+	ProductConfiguration,
+	Project
+);
+END_TYPE;
+
+TYPE AssemblyConstraintTypeEnum = ENUMERATION OF(
+	coaxial_assembly_constraint,
+	complex,
+	dimensioned_angle_assembly_constraint,
+	dimensioned_parallel_assembly_constraint,
+	dimensioned_surface_distance_assembly_constraint,
+	fixed_constituent_assembly_constraint,
+	incidence_assembly_constraint,
+	parallel_assembly_constraint,
+	perpendicular_assembly_constraint,
+	tangent_assembly_constraint
+);
+END_TYPE;
+
+TYPE AssemblyDefinitionOrAssemblyShapeConstraintSelect = SELECT(
+	AssemblyDefinition,
+	AssemblyShapeConstraint
+);
+END_TYPE;
+
+TYPE AssemblyDefinitionOrAssemblyShapeJointSelect = SELECT(
+	AssemblyDefinition,
+	AssemblyShapeJoint
+);
+END_TYPE;
+
+TYPE AssemblyDesignSelect = SELECT(
+	AssemblyViewRelationship,
+	DefinitionalPartViewUsage,
+	Occurrence,
+	PartShapeElement
+);
+END_TYPE;
+
+TYPE AssemblyJointTypeEnum = ENUMERATION OF(
+	bolted_connection,
+	circular_compressed_crimped_connection,
+	crimped_connection,
+	deep_indented_crimped_connection,
+	glued_connection,
+	hexagonal_compressed_crimped_connection,
+	insulation_displacement_connection,
+	insulation_piercing_connection,
+	promissory_connection,
+	promissory_connection_for_higher_assembly,
+	promissory_connection_for_installation_constraints,
+	promissory_connection_for_missing_contributors,
+	push_connection,
+	screwed_connection,
+	snap_connection,
+	soldered_connection,
+	welded_connection,
+	wrapped_connection
+);
+END_TYPE;
+
+TYPE AssemblyShapeConstraintOrJointDefinitionSelect = SELECT(
+	PartShapeElement,
+	PartShapeElementRelationship,
+	ShapeFeatureDefinition,
+	ShapeFeatureDefinitionElement,
+	ShapeFeatureDefinitionElementRelationship,
+	ShapeFeatureDefinitionRelationship
+);
+END_TYPE;
+
+TYPE AssignedDocumentSelect = SELECT(
+	Document,
+	DocumentDefinition,
+	DocumentVersion,
+	File
+);
+END_TYPE;
+
+TYPE AssignedShapePropertySelect = SELECT(
+	PartView,
+	PartViewRelationship,
+	ShapeElement,
+	ShapeElementRelationship,
+	ViewOccurrenceRelationship
+);
+END_TYPE;
+
+TYPE AssignedShapedElementSelect = SELECT(
+	AssemblyViewRelationship,
+	BreakdownElementView,
+	IndividualPartView,
+	Occurrence,
+	PartView,
+	ShapeElement,
+	ShapeElementRelationship
+);
+END_TYPE;
+
+TYPE AssignmentObjectSelect = SELECT(
+	ActivityAssignment,
+	ActivityMethodAssignment,
+	AddressAssignment,
+	ApprovalAssignment,
+	BreakdownVersionAssignment,
+	CertificationAssignment,
+	ConditionAssignment,
+	ContractAssignment,
+	DateAndPersonAssignment,
+	DateTimeAssignment,
+	DocumentAssignment,
+	EffectivityAssignment,
+	EventAssignment,
+	FrozenAssignment,
+	InformationUsageRightAssignment,
+	MaterialPropertyAssignment,
+	ModelPropertyAssignment,
+	OrganizationOrPersonInOrganizationAssignment,
+	ProcessOperationResourceAssignment,
+	ProjectAssignment,
+	PropertyDefinitionAssignment,
+	PropertyValueAssignment,
+	RequirementAssignment,
+	SecurityClassificationAssignment,
+	SpecificationAssignment,
+	SpecificationCategoryAssignment,
+	SpecificationConditionAssignment,
+	SpecificationInclusionAssignment,
+	TimeIntervalAssignment,
+	WorkOrderAssignment,
+	WorkRequestAssignment
+);
+END_TYPE;
+
+TYPE BoundaryClassZoneSelect = SELECT(
+	BoundaryCurveSet,
+	Loop
+);
+END_TYPE;
+
+TYPE BreakdownElementOrAlternativeSolutionSelect = SELECT(
+	AlternativeSolution,
+	BreakdownElement
+);
+END_TYPE;
+
+TYPE BreakdownElementOrOccurrenceSelect = SELECT(
+	BreakdownElement,
+	Occurrence
+);
+END_TYPE;
+
+TYPE BreakdownVersionAssignmentSelect = SELECT(
+	DocumentDefinition,
+	IndividualPartView,
+	Occurrence,
+	PartView,
+	ProductClass,
+	ProductConfiguration,
+	RequirementView
+);
+END_TYPE;
+
+TYPE CertificationAssignmentSelect = SELECT(
+	Activity,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementVersion,
+	BreakdownElementVersionRelationship,
+	BreakdownElementViewRelationship,
+	BreakdownVersion,
+	BreakdownVersionRelationship,
+	Document,
+	DocumentDefinitionRelationship,
+	DocumentVersion,
+	DocumentVersionRelationship,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartVersionRelationship,
+	IndividualPartViewRelationship,
+	Occurrence,
+	Part,
+	PartRelationship,
+	PartVersion,
+	PartVersionRelationship,
+	PartViewRelationship,
+	ProductConfiguration,
+	Project,
+	Requirement,
+	RequirementVersion,
+	RequirementVersionRelationship,
+	RequirementViewRelationship,
+	SupplierSolution
+);
+END_TYPE;
+
+TYPE CharacterString = STRING;
+END_TYPE;
+
+TYPE ClassSelect = SELECT(
+	Class,
+	ClassString,
+	ExternalOwlClass
+);
+END_TYPE;
+
+TYPE ClassString = STRING;
+END_TYPE;
+
+TYPE ComponentClassForAssemblySelect = SELECT(
+	CompositeAssembly,
+	FilamentLaminate,
+	Ply,
+	PlyLaminate,
+	ProcessedCore
+);
+END_TYPE;
+
+TYPE ComposedOrExternalGeometricModelSelect = SELECT(
+	ComposedGeometricModel,
+	ExternalGeometricModel
+);
+END_TYPE;
+
+TYPE CompositeAssemblyShapeSelect = SELECT(
+	ExternalAdvancedBrepShapeRepresentation,
+	ExternalEdgeBasedWireframeShapeRepresentation,
+	ExternalFacetedBrepShapeRepresentation,
+	ExternalGeometricallyBoundedSurfaceShapeRepresentation,
+	ExternalGeometricallyBoundedWireframeShapeRepresentation,
+	ExternalManifoldSurfaceShapeRepresentation,
+	ExternalShellBasedWireframeShapeRepresentation,
+	ThreeDGeometrySet
+);
+END_TYPE;
+
+TYPE ConditionAssignmentSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	ActivityMethodRelationship,
+	AddressAssignment,
+	Approval,
+	ApprovalAssignment,
+	BreakdownElementViewRelationship,
+	BreakdownVersionAssignment,
+	CertificationAssignment,
+	ConditionAssignment,
+	ContractAssignment,
+	DateAndPersonAssignment,
+	DateTimeAssignment,
+	DocumentAssignment,
+	DocumentDefinitionRelationship,
+	Effectivity,
+	EffectivityAssignment,
+	EventAssignment,
+	FrozenAssignment,
+	IndividualPartViewRelationship,
+	InformationUsageRightAssignment,
+	MaterialPropertyAssignment,
+	ModelPropertyAssignment,
+	OrganizationOrPersonInOrganizationAssignment,
+	PartViewRelationship,
+	ProcessOperationResourceAssignment,
+	ProjectAssignment,
+	PropertyDefinitionAssignment,
+	PropertyValueAssignment,
+	RequirementAssignment,
+	RequirementViewRelationship,
+	SecurityClassificationAssignment,
+	SpecificationAssignment,
+	SpecificationCategoryAssignment,
+	SpecificationConditionAssignment,
+	SpecificationInclusionAssignment,
+	TimeIntervalAssignment,
+	WorkOrderAssignment,
+	WorkRequestAssignment
+);
+END_TYPE;
+
+TYPE ConditionParameterSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	AddressAssignment,
+	Approval,
+	ApprovalAssignment,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementVersion,
+	BreakdownElementView,
+	BreakdownElementViewRelationship,
+	BreakdownVersion,
+	BreakdownVersionAssignment,
+	CertificationAssignment,
+	Classification,
+	Condition,
+	ConditionAssignment,
+	ConditionRelationship,
+	ContractAssignment,
+	DateAndPersonAssignment,
+	DateTimeAssignment,
+	DateTimeString,
+	Descriptor,
+	Document,
+	DocumentAssignment,
+	DocumentDefinition,
+	DocumentDefinitionRelationship,
+	DocumentVersion,
+	Effectivity,
+	EffectivityAssignment,
+	EventAssignment,
+	FrozenAssignment,
+	Identifier,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartView,
+	IndividualPartViewRelationship,
+	InformationUsageRightAssignment,
+	MaterialPropertyAssignment,
+	ModelPropertyAssignment,
+	Organization,
+	OrganizationOrPersonInOrganizationAssignment,
+	Part,
+	PartVersion,
+	PartView,
+	PartViewRelationship,
+	ProcessOperationResourceAssignment,
+	ProductConcept,
+	ProductConfiguration,
+	ProjectAssignment,
+	PropertyDefinition,
+	PropertyDefinitionAssignment,
+	PropertyDefinitionRelationship,
+	PropertyValue,
+	PropertyValueAssignment,
+	PropertyValueRelationship,
+	Proxy,
+	Requirement,
+	RequirementAssignment,
+	RequirementVersion,
+	RequirementView,
+	RequirementViewRelationship,
+	SecurityClassificationAssignment,
+	Specification,
+	SpecificationAssignment,
+	SpecificationCategoryAssignment,
+	SpecificationConditionAssignment,
+	SpecificationInclusionAssignment,
+	TimeIntervalAssignment,
+	WorkOrderAssignment,
+	WorkRequest,
+	WorkRequestAssignment
+);
+END_TYPE;
+
+TYPE ConnectedEdgeWithLengthSetItemsSelect = SELECT(
+	ConnectedEdgeSet,
+	Path,
+	VertexOnEdge
+);
+END_TYPE;
+
+TYPE ConnectedTerminalSelect = SELECT(
+	OccurrenceTerminal,
+	PartTerminal
+);
+END_TYPE;
+
+TYPE ConnectionSelect = SELECT(
+	InterfaceConnectorOccurrence,
+	PartView,
+	PartViewRelationship
+);
+END_TYPE;
+
+TYPE ConnectorOnSelect = SELECT(
+	PartView,
+	PartViewRelationship
+);
+END_TYPE;
+
+TYPE ContractAssignmentSelect = SELECT(
+	Activity,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	ActivityMethodRelationship,
+	AlternativeSolution,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementVersion,
+	BreakdownVersion,
+	Classification,
+	Descriptor,
+	Document,
+	DocumentVersion,
+	ExchangeContext,
+	Identifier,
+	IndividualPart,
+	IndividualPartVersion,
+	InformationUsageRight,
+	Message,
+	Organization,
+	Part,
+	PartVersion,
+	PersonInOrganization,
+	ProductConfiguration,
+	Project,
+	Proxy,
+	Requirement,
+	RequirementAssignment,
+	RequirementCollectionRelationship,
+	RequirementSource,
+	RequirementVersion,
+	RequirementVersionRelationship,
+	RequirementView,
+	WorkOrder,
+	WorkRequest
+);
+END_TYPE;
+
+TYPE CoreShapeSelect = SELECT(
+	BeveledSheetRepresentation,
+	ExternalAdvancedBrepShapeRepresentation,
+	ExternalFacetedBrepShapeRepresentation,
+	ExternalTessellatedShapeRepresentation
+);
+END_TYPE;
+
+TYPE CrossSectionalConstituentElementSelect = SELECT(
+	CrossSectionalOccurrenceShapeElement,
+	CrossSectionalPartShapeElement
+);
+END_TYPE;
+
+TYPE CrossSectionalPartShapeElementElementOfSelect = SELECT(
+	CrossSectionalPartShapeElement,
+	PartViewOrProductConfigurationSelect
+);
+END_TYPE;
+
+TYPE CurveOrPointSelect = SELECT(
+	Curve,
+	Point
+);
+END_TYPE;
+
+TYPE DateTimeAssignmentSelect = SELECT(
+	Envelope,
+	Event,
+	GeneralOrganizationalDataSelect,
+	Message
+);
+END_TYPE;
+
+TYPE DateTimePersonOrganizationElementSelect = SELECT(
+	Envelope,
+	Event,
+	GeneralOrganizationalDataSelect,
+	Message
+);
+END_TYPE;
+
+TYPE DateTimeString = STRING;
+END_TYPE;
+
+TYPE DeltaChangeManagementObjectSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	ActivityRelationship,
+	AddressAssignment,
+	AlternatePartRelationship,
+	AlternativeSolution,
+	ApprovalAssignment,
+	AssemblyOccurrenceRelationshipSubstitution,
+	AssemblyViewRelationshipSubstitution,
+	AssignmentObjectRelationship,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementRealization,
+	BreakdownElementVersion,
+	BreakdownElementVersionRelationship,
+	BreakdownElementView,
+	BreakdownElementViewRelationship,
+	BreakdownVersion,
+	BreakdownVersionAssignment,
+	BreakdownVersionRelationship,
+	CertificationAssignment,
+	Class,
+	Condition,
+	ConditionAssignment,
+	ConditionalConfiguration,
+	ConfiguredAssemblyEffectivity,
+	Contract,
+	ContractAssignment,
+	DateAndPersonAssignment,
+	DateTimeAssignment,
+	Document,
+	DocumentAssignment,
+	DocumentDefinition,
+	DocumentDefinitionRelationship,
+	DocumentVersion,
+	DocumentVersionRelationship,
+	Effectivity,
+	EffectivityAssignment,
+	Event,
+	EventAssignment,
+	ExternalOwlClass,
+	File,
+	FrozenAssignment,
+	IndividualAssemblyRelationship,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartVersionRelationship,
+	IndividualPartView,
+	IndividualPartViewRelationship,
+	InformationUsageRightAssignment,
+	MaterialIdentification,
+	MaterialPropertyAssignment,
+	ModelPropertyAssignment,
+	Occurrence,
+	OccurrenceRelationship,
+	Organization,
+	OrganizationOrPersonInOrganizationAssignment,
+	Part,
+	PartVersion,
+	PartVersionRelationship,
+	PartView,
+	PartViewRelationship,
+	Person,
+	PersonInOrganization,
+	ProcessOperationDefinition,
+	ProcessOperationOccurrence,
+	ProcessOperationResourceAssignment,
+	ProcessPlan,
+	ProductClass,
+	ProductConfiguration,
+	Project,
+	ProjectAssignment,
+	ProjectRelationship,
+	PropertyDefinitionAssignment,
+	PropertyDefinitionRelationship,
+	PropertyValue,
+	PropertyValueAssignment,
+	PropertyValueRelationship,
+	Representation,
+	Requirement,
+	RequirementAssignment,
+	RequirementVersion,
+	RequirementVersionRelationship,
+	RequirementView,
+	RequirementViewRelationship,
+	SecurityClassificationAssignment,
+	Specification,
+	SpecificationAssignment,
+	SpecificationCategory,
+	SpecificationCategoryAssignment,
+	SpecificationConditionAssignment,
+	SpecificationInclusion,
+	SpecificationInclusionAssignment,
+	StyledModel,
+	TimeIntervalAssignment,
+	ViewOccurrenceRelationship,
+	WorkOrderAssignment,
+	WorkRequestAssignment
+);
+END_TYPE;
+
+TYPE DeltaChangeRelationshipSelect = SELECT(
+	AlternativeSolutionRelationship,
+	BreakdownElementVersionRelationship,
+	DocumentVersionRelationship,
+	PartVersionRelationship,
+	ProcessOperationOccurrenceRelationship,
+	ProcessPlanRelationship,
+	ReplacedPartViewRelationship,
+	ReplacedUsageRelationship,
+	RequirementVersionRelationship,
+	ShapeElementRelationship
+);
+END_TYPE;
+
+TYPE DescriptorSelect = SELECT(
+	Descriptor,
+	DescriptorSet,
+	MultiLingualStringSelect
+);
+END_TYPE;
+
+TYPE DescriptorSet = SET[2:?] OF Descriptor;
+END_TYPE;
+
+TYPE DirectionSelect = SELECT(
+	Cartesian11,
+	Curve11,
+	Cylindrical11,
+	Direction,
+	PointArray,
+	Polar11,
+	UserDefined11
+);
+END_TYPE;
+
+TYPE DocumentAssignmentSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	ActivityMethodRelationship,
+	ActivityRelationship,
+	AddressAssignment,
+	AlternativeSolution,
+	Approval,
+	ApprovalAssignment,
+	ApprovalRelationship,
+	ApprovingPersonOrganization,
+	AssemblyOccurrenceRelationshipSubstitution,
+	AssemblyViewRelationshipSubstitution,
+	Breakdown,
+	BreakdownContext,
+	BreakdownElement,
+	BreakdownElementRealization,
+	BreakdownElementVersion,
+	BreakdownElementVersionRelationship,
+	BreakdownElementView,
+	BreakdownElementViewRelationship,
+	BreakdownVersion,
+	BreakdownVersionAssignment,
+	BreakdownVersionRelationship,
+	Certification,
+	CertificationAssignment,
+	Class,
+	ClassAttribute,
+	Classification,
+	Condition,
+	ConditionAssignment,
+	ConditionRelationship,
+	Contract,
+	ContractAssignment,
+	DateAndPersonAssignment,
+	DateTimeAssignment,
+	DeltaChange,
+	Descriptor,
+	DescriptorRelationship,
+	Document,
+	DocumentAssignment,
+	DocumentDefinition,
+	DocumentDefinitionRelationship,
+	DocumentVersion,
+	DocumentVersionRelationship,
+	Effectivity,
+	EffectivityAssignment,
+	EffectivityRelationship,
+	EventAssignment,
+	ExternalItem,
+	ExternalOwlClass,
+	FileRelationship,
+	FrozenAssignment,
+	Identifier,
+	IdentifierRelationship,
+	InZone,
+	IndividualAssemblyRelationship,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartVersionRelationship,
+	IndividualPartView,
+	IndividualPartViewRelationship,
+	InformationRight,
+	InformationUsageRight,
+	InformationUsageRightAssignment,
+	InformationUsageRightRelationship,
+	MaterialIdentification,
+	MaterialPropertyAssignment,
+	Message,
+	ModelPropertyAssignment,
+	Occurrence,
+	OccurrenceRelationship,
+	Organization,
+	OrganizationOrPersonInOrganizationAssignment,
+	OrganizationRelationship,
+	Part,
+	PartRelationship,
+	PartToIndividualPartAssociation,
+	PartVersion,
+	PartVersionRelationship,
+	PartVersionToIndividualPartVersionAssociation,
+	PartView,
+	PartViewRelationship,
+	PartViewToIndividualPartViewAssociation,
+	Person,
+	PersonInOrganization,
+	ProcessOperationOccurrence,
+	ProcessOperationResourceAssignment,
+	ProcessPlan,
+	ProductConcept,
+	ProductConfiguration,
+	Project,
+	ProjectAssignment,
+	ProjectRelationship,
+	PropertyDefinition,
+	PropertyDefinitionAssignment,
+	PropertyDefinitionRelationship,
+	PropertyValue,
+	PropertyValueAssignment,
+	PropertyValueRelationship,
+	Proxy,
+	Requirement,
+	RequirementAssignment,
+	RequirementSource,
+	RequirementVersion,
+	RequirementVersionRelationship,
+	RequirementView,
+	RequirementViewRelationship,
+	RetentionPeriod,
+	SecurityClassification,
+	SecurityClassificationAssignment,
+	ShapeElement,
+	ShapeElementRelationship,
+	Specification,
+	SpecificationAssignment,
+	SpecificationCategory,
+	SpecificationCategoryAssignment,
+	SpecificationConditionAssignment,
+	SpecificationInclusionAssignment,
+	SurfaceCondition,
+	TimeInterval,
+	TimeIntervalAssignment,
+	TimeIntervalRelationship,
+	ViewContext,
+	ViewOccurrenceRelationship,
+	WorkOrder,
+	WorkOrderAssignment,
+	WorkRequest,
+	WorkRequestAssignment
+);
+END_TYPE;
+
+TYPE EffectivityAssignmentSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	ActivityMethodRelationship,
+	ActivityRelationship,
+	AddressAssignment,
+	AlternativeSolution,
+	AlternativeSolutionRelationship,
+	ApprovalAssignment,
+	ApprovalRelationship,
+	AssemblyOccurrenceRelationshipSubstitution,
+	AssemblyViewRelationshipSubstitution,
+	AssignmentObjectRelationship,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementRelationship,
+	BreakdownElementVersion,
+	BreakdownElementVersionRelationship,
+	BreakdownElementView,
+	BreakdownElementViewRelationship,
+	BreakdownRelationship,
+	BreakdownVersion,
+	BreakdownVersionAssignment,
+	BreakdownVersionRelationship,
+	CertificationAssignment,
+	Class,
+	ClassificationRelationship,
+	Condition,
+	ConditionAssignment,
+	ConditionRelationship,
+	ConditionalConfiguration,
+	ContractAssignment,
+	DateAndPersonAssignment,
+	DateTimeAssignment,
+	Descriptor,
+	DescriptorRelationship,
+	Document,
+	DocumentAssignment,
+	DocumentDefinition,
+	DocumentDefinitionRelationship,
+	DocumentRelationship,
+	DocumentVersion,
+	DocumentVersionRelationship,
+	EffectivityAssignment,
+	EffectivityRelationship,
+	EventAssignment,
+	EventRelationship,
+	ExternalClassSystem,
+	ExternalItem,
+	ExternalOwlClass,
+	ExternalOwlObject,
+	File,
+	FileRelationship,
+	FrozenAssignment,
+	Identifier,
+	IdentifierRelationship,
+	InZone,
+	IndividualAssemblyRelationship,
+	IndividualPart,
+	IndividualPartRelationship,
+	IndividualPartVersion,
+	IndividualPartVersionRelationship,
+	IndividualPartView,
+	IndividualPartViewRelationship,
+	InformationUsageRightAssignment,
+	InformationUsageRightRelationship,
+	LinkMotionRelationship,
+	MatedPartRelationship,
+	MaterialPropertyAssignment,
+	Message,
+	ModelPropertyAssignment,
+	Occurrence,
+	OccurrenceRelationship,
+	OrganizationOrPersonInOrganizationAssignment,
+	OrganizationRelationship,
+	Part,
+	PartRelationship,
+	PartToIndividualPartAssociation,
+	PartVersion,
+	PartVersionRelationship,
+	PartVersionToIndividualPartVersionAssociation,
+	PartView,
+	PartViewRelationship,
+	PartViewToIndividualPartViewAssociation,
+	PersonInOrganization,
+	PersonInOrganizationRelationship,
+	ProcessOperationDefinition,
+	ProcessOperationDefinitionRelationship,
+	ProcessOperationOccurrence,
+	ProcessOperationOccurrenceRelationship,
+	ProcessOperationResourceAssignment,
+	ProcessPlan,
+	ProcessPlanRelationship,
+	ProductClass,
+	ProductClassRelationship,
+	ProductConfiguration,
+	ProductConfigurationRelationship,
+	ProductDesignAssociation,
+	ProjectAssignment,
+	ProjectRelationship,
+	PropertyDefinition,
+	PropertyDefinitionAssignment,
+	PropertyDefinitionAssignmentRelationship,
+	PropertyDefinitionRelationship,
+	PropertyValue,
+	PropertyValueAssignment,
+	PropertyValueAssignmentRelationship,
+	PropertyValueRelationship,
+	Proxy,
+	ProxyRelationship,
+	Representation,
+	Requirement,
+	RequirementAssignment,
+	RequirementRelationship,
+	RequirementSource,
+	RequirementVersion,
+	RequirementVersionRelationship,
+	RequirementView,
+	RequirementViewRelationship,
+	SecurityClassification,
+	SecurityClassificationAssignment,
+	ShapeElementRelationship,
+	Specification,
+	SpecificationAssignment,
+	SpecificationCategory,
+	SpecificationConditionAssignment,
+	SpecificationInclusion,
+	SpecificationInclusionAssignment,
+	StyledModel,
+	SuppliedObjectRelationship,
+	TimeIntervalAssignment,
+	TimeIntervalRelationship,
+	ViewOccurrenceRelationship,
+	WorkOrder,
+	WorkOrderAssignment,
+	WorkOrderRelationship,
+	WorkRequestAssignment,
+	WorkRequestRelationship
+);
+END_TYPE;
+
+TYPE EffectivityContextSelect = SELECT(
+	Activity,
+	Contract,
+	Organization,
+	PersonInOrganization,
+	ProductClass,
+	ProductConfiguration,
+	Project
+);
+END_TYPE;
+
+TYPE EvaluationResultEnum = ENUMERATION OF(
+	fail,
+	pass,
+	undefined
+);
+END_TYPE;
+
+TYPE EvaluationStatusEnum = ENUMERATION OF(
+	invalid,
+	not_evaluatable,
+	to_be_evaluated,
+	valid
+);
+END_TYPE;
+
+TYPE EventOrDateSelect = SELECT(
+	DateTimeString,
+	Event
+);
+END_TYPE;
+
+TYPE EvidenceSelect = SELECT(
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityRelationship,
+	ActualActivity,
+	ApprovalAssignment,
+	CertificationAssignment,
+	Classification,
+	ContractAssignment,
+	DateTimeAssignment,
+	EffectivityAssignment,
+	EvaluatedRequirement,
+	InformationUsageRightAssignment,
+	OrganizationOrPersonInOrganizationAssignment,
+	Part,
+	PartVersion,
+	PartVersionRelationship,
+	PartView,
+	PartViewRelationship,
+	PersonInOrganization,
+	ProjectAssignment,
+	PropertyDefinitionAssignment,
+	PropertyValue,
+	PropertyValueAssignment,
+	Proxy,
+	SecurityClassificationAssignment,
+	StateDefinition,
+	Validation,
+	Verification
+);
+END_TYPE;
+
+TYPE EvidenceSupportSelect = SELECT(
+	Validation,
+	Verification
+);
+END_TYPE;
+
+TYPE ExternalCurveOrSurfaceSelect = SELECT(
+	Curve,
+	Surface
+);
+END_TYPE;
+
+TYPE ExternalSourceSelect = SELECT(
+	DigitalFile,
+	Document,
+	IdentifierSelect
+);
+END_TYPE;
+
+TYPE ExternalTrimmedCurveOrSurfaceSelect = SELECT(
+	RectangularTrimmedSurface,
+	TrimmedCurve
+);
+END_TYPE;
+
+TYPE FinalDefinitionSelect = SELECT(
+	IndividualPartView,
+	PartView,
+	RequirementView
+);
+END_TYPE;
+
+TYPE GeneralOrganizationalDataSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	ActivityMethodRelationship,
+	ActivityRelationship,
+	AddressAssignment,
+	AlternativeSolution,
+	AlternativeSolutionRelationship,
+	Approval,
+	ApprovalAssignment,
+	ApprovalRelationship,
+	ApprovingPersonOrganization,
+	AssemblyOccurrenceRelationshipSubstitution,
+	AssemblyViewRelationshipSubstitution,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementRealization,
+	BreakdownElementVersion,
+	BreakdownElementVersionRelationship,
+	BreakdownElementView,
+	BreakdownElementViewRelationship,
+	BreakdownVersion,
+	BreakdownVersionAssignment,
+	BreakdownVersionRelationship,
+	Certification,
+	CertificationAssignment,
+	Class,
+	Classification,
+	Condition,
+	ConditionAssignment,
+	ConditionalConfiguration,
+	ConfiguredAssemblyEffectivity,
+	Contract,
+	ContractAssignment,
+	DateAndPersonAssignment,
+	DateTimeAssignment,
+	Descriptor,
+	DescriptorRelationship,
+	Document,
+	DocumentAssignment,
+	DocumentDefinition,
+	DocumentDefinitionRelationship,
+	DocumentVersion,
+	DocumentVersionRelationship,
+	Effectivity,
+	EffectivityAssignment,
+	EventAssignment,
+	ExternalClassSystem,
+	ExternalOwlClass,
+	File,
+	FrozenAssignment,
+	Identifier,
+	IdentifierRelationship,
+	IndividualAssemblyRelationship,
+	IndividualPartVersion,
+	IndividualPartVersionRelationship,
+	IndividualPartView,
+	IndividualPartViewRelationship,
+	InformationUsageRight,
+	InformationUsageRightAssignment,
+	MaterialIdentification,
+	MaterialPropertyAssignment,
+	ModelPropertyAssignment,
+	Occurrence,
+	OccurrenceRelationship,
+	Organization,
+	OrganizationOrPersonInOrganizationAssignment,
+	OrganizationRelationship,
+	Part,
+	PartRelationship,
+	PartToIndividualPartAssociation,
+	PartVersion,
+	PartVersionRelationship,
+	PartVersionToIndividualPartVersionAssociation,
+	PartView,
+	PartViewRelationship,
+	PartViewToIndividualPartViewAssociation,
+	Person,
+	PersonInOrganization,
+	PersonInOrganizationRelationship,
+	ProcessOperationDefinition,
+	ProcessOperationOccurrence,
+	ProcessOperationResourceAssignment,
+	ProcessPlan,
+	ProductConcept,
+	ProductConfiguration,
+	Project,
+	ProjectAssignment,
+	PropertyDefinition,
+	PropertyDefinitionAssignment,
+	PropertyDefinitionRelationship,
+	PropertyValue,
+	PropertyValueAssignment,
+	PropertyValueRelationship,
+	Proxy,
+	Representation,
+	RequirementAssignment,
+	RequirementSource,
+	RequirementVersion,
+	RequirementVersionRelationship,
+	RequirementView,
+	RequirementViewRelationship,
+	SecurityClassification,
+	SecurityClassificationAssignment,
+	SetMembership,
+	Specification,
+	SpecificationAssignment,
+	SpecificationCategory,
+	SpecificationCategoryAssignment,
+	SpecificationConditionAssignment,
+	SpecificationInclusion,
+	SpecificationInclusionAssignment,
+	StyledModel,
+	SubsetMember,
+	TimeIntervalAssignment,
+	ViewOccurrenceRelationship,
+	WorkOrder,
+	WorkOrderAssignment,
+	WorkRequest,
+	WorkRequestAssignment
+);
+END_TYPE;
+
+TYPE GeometricRepresentationSelect = SELECT(
+	ConnectedEdgeWithLengthSetRepresentation,
+	GeometricRepresentation
+);
+END_TYPE;
+
+TYPE GeometricSetSelect = SELECT(
+	CurveOrPointSelect,
+	Surface
+);
+END_TYPE;
+
+TYPE HighOrderKinematicPairTypeEnum = ENUMERATION OF(
+	linear_flexible_and_planar_curve_pair,
+	planar_curve_pair,
+	point_on_planar_curve_pair,
+	point_on_surface_pair,
+	rolling_curve_pair,
+	rolling_surface_pair,
+	sliding_curve_pair,
+	sliding_surface_pair
+);
+END_TYPE;
+
+TYPE IdentificationContextSelect = SELECT(
+	Identifier,
+	Organization
+);
+END_TYPE;
+
+TYPE IdentifierSelect = SELECT(
+	IdentifierSet,
+	SingleIdentifierSelect
+);
+END_TYPE;
+
+TYPE IdentifierSet = SET[2:?] OF Identifier;
+END_TYPE;
+
+TYPE IdentifierString = STRING;
+END_TYPE;
+
+TYPE InZoneSelect = SELECT(
+	ActivityMethod,
+	ActivityMethodAssignment,
+	BreakdownElementView,
+	DocumentDefinition,
+	IndividualPartView,
+	PartView,
+	RequirementView
+);
+END_TYPE;
+
+TYPE IndividualOrPartViewSelect = SELECT(
+	IndividualPartView,
+	PartView
+);
+END_TYPE;
+
+TYPE InformationUsageRightAssignmentSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	AlternativeSolution,
+	AlternativeSolutionRelationship,
+	Approval,
+	AssemblyOccurrenceRelationship,
+	AssemblyOccurrenceRelationshipSubstitution,
+	AssemblyViewRelationship,
+	AssemblyViewRelationshipSubstitution,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementRealization,
+	BreakdownElementVersion,
+	BreakdownElementVersionRelationship,
+	BreakdownElementView,
+	BreakdownElementViewRelationship,
+	BreakdownVersion,
+	Certification,
+	Class,
+	Classification,
+	Condition,
+	ConditionalConfiguration,
+	ConfiguredAssemblyEffectivity,
+	Contract,
+	DeltaChange,
+	Descriptor,
+	DescriptorRelationship,
+	DigitalFile,
+	Document,
+	DocumentDefinition,
+	DocumentDefinitionRelationship,
+	DocumentVersion,
+	ExternalClassSystem,
+	ExternalItem,
+	ExternalOwlClass,
+	File,
+	FileRelationship,
+	Identifier,
+	IdentifierRelationship,
+	IndividualAssemblyRelationship,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartView,
+	InformationRight,
+	InformationUsageRight,
+	InformationUsageRightRelationship,
+	MaterialIdentification,
+	Message,
+	Occurrence,
+	OccurrenceRelationship,
+	Organization,
+	OrganizationRelationship,
+	Part,
+	PartRelationship,
+	PartVersion,
+	PartVersionRelationship,
+	PartView,
+	PartViewRelationship,
+	Person,
+	PersonInOrganization,
+	PersonInOrganizationRelationship,
+	ProcessOperationDefinition,
+	ProcessOperationOccurrence,
+	ProcessOperationResourceAssignment,
+	ProcessPlan,
+	ProductClass,
+	ProductConfiguration,
+	Project,
+	PropertyDefinition,
+	PropertyDefinitionAssignment,
+	PropertyValue,
+	PropertyValueAssignment,
+	Proxy,
+	Representation,
+	Requirement,
+	RequirementAssignment,
+	RequirementVersion,
+	RequirementView,
+	RetentionPeriod,
+	SecurityClassification,
+	SecurityClassificationAssignment,
+	ShapeElement,
+	ShapeElementRelationship,
+	Specification,
+	SpecificationAssignment,
+	SpecificationCategory,
+	SpecificationConditionAssignment,
+	SpecificationInclusion,
+	SpecificationInclusionAssignment,
+	StyledModel,
+	SuppliedObjectRelationship,
+	SurfaceCondition,
+	ViewOccurrenceRelationship,
+	WorkOrder,
+	WorkRequest
+);
+END_TYPE;
+
+TYPE InterfaceDefinitionConnectionSelect = SELECT(
+	InterfaceConnectorDefinition,
+	PartView
+);
+END_TYPE;
+
+TYPE InterfaceDefinitionForSelect = SELECT(
+	InterfaceConnection,
+	InterfaceConnectorOccurrence,
+	InterfaceDefinitionConnection,
+	PartView
+);
+END_TYPE;
+
+TYPE InterfaceOrJoinTerminalEnum = ENUMERATION OF(
+	interface_terminal,
+	join_terminal
+);
+END_TYPE;
+
+TYPE InterpolationTypeEnum = ENUMERATION OF(
+	discontinuous_interpolation_type,
+	linear_interpolation_type,
+	synchronous_interpolation_type,
+	undefined_interpolation_type
+);
+END_TYPE;
+
+TYPE Language = LIST[1:2] OF STRING;
+END_TYPE;
+
+TYPE LengthMeasure = REAL;
+END_TYPE;
+
+TYPE LifeCycleStageSelect = SELECT(
+	LifeCycleStage,
+	ProxySelect
+);
+END_TYPE;
+
+TYPE LowOrderKinematicPairTypeEnum = ENUMERATION OF(
+	cylindrical_pair,
+	fully_constrained_pair,
+	planar_pair,
+	prismatic_pair,
+	revolute_pair,
+	spherical_pair,
+	spherical_pair_with_pin,
+	unconstrained_pair,
+	universal_pair
+);
+END_TYPE;
+
+TYPE LowOrderKinematicPairWithMotionCouplingTypeEnum = ENUMERATION OF(
+	gear_pair,
+	linear_flexible_and_pinion_pair,
+	rack_and_pinion_pair,
+	screw_pair
+);
+END_TYPE;
+
+TYPE MaterialIdentificationAssignmentSelect = SELECT(
+	BreakdownElementView,
+	IndividualPartView,
+	Occurrence,
+	PartView,
+	PartViewRelationship,
+	RequirementView,
+	ShapeElement,
+	ShapeElementRelationship,
+	ViewOccurrenceRelationship
+);
+END_TYPE;
+
+TYPE MatingTypeEnum = ENUMERATION OF(
+	bolted_joint,
+	brazing,
+	clasping,
+	clinching,
+	clipping,
+	doweling,
+	flanging,
+	foam_injection,
+	friction_welding,
+	gluing,
+	laser_welding,
+	press_fit,
+	riveting,
+	sewing,
+	soldering,
+	spot_welding,
+	stapling,
+	welding
+);
+END_TYPE;
+
+TYPE MeasureActivitySelect = SELECT(
+	Activity,
+	ProcessOperationOccurrence
+);
+END_TYPE;
+
+TYPE MessageContentSelect = SELECT(
+	Activity,
+	ActivityMethod,
+	Approval,
+	Certification,
+	Contract,
+	DigitalFile,
+	Organization,
+	Part,
+	PartVersion,
+	PartView,
+	Person,
+	ProductConcept,
+	ProductConfiguration,
+	ProductGroup,
+	Project,
+	SecurityClassification,
+	State,
+	StateDefinition,
+	Validation,
+	Verification,
+	WorkOrder,
+	WorkRequest
+);
+END_TYPE;
+
+TYPE MessageDefinerSelect = SELECT(
+	Organization,
+	PersonInOrganization
+);
+END_TYPE;
+
+TYPE ModelPropertyValueSelect = SELECT(
+	GeometricModel,
+	StyledModel
+);
+END_TYPE;
+
+TYPE MotionModelSelect = SELECT(
+	InterpolatedConfigurationModel,
+	LinkMotionAlongPath
+);
+END_TYPE;
+
+TYPE MultiLingualStringSelect = SELECT(
+	CharacterString,
+	LocalizedString,
+	TranslatedStringSet
+);
+END_TYPE;
+
+TYPE NodeTypeEnum = ENUMERATION OF(
+	branch_node,
+	external_node,
+	extremity_node,
+	intermediate_node
+);
+END_TYPE;
+
+TYPE OccurrenceContactFeatureDefinitionSelect = SELECT(
+	ContactFeatureDefinition,
+	OccurrenceContactFeature,
+	PartContactFeature
+);
+END_TYPE;
+
+TYPE OccurrenceContactFeatureElementOfSelect = SELECT(
+	Occurrence,
+	OccurrenceContactFeature
+);
+END_TYPE;
+
+TYPE OccurrenceDefinitionSelect = SELECT(
+	PartView,
+	ProductConfiguration
+);
+END_TYPE;
+
+TYPE OccurrenceOrOccurrenceDefinitionSelect = SELECT(
+	Occurrence,
+	OccurrenceDefinitionSelect
+);
+END_TYPE;
+
+TYPE OccurrenceShapeElementDefinitionSelect = SELECT(
+	OccurrenceShapeElement,
+	PartShapeElement,
+	ShapeFeatureDefinition
+);
+END_TYPE;
+
+TYPE OccurrenceShapeElementElementOfSelect = SELECT(
+	Occurrence,
+	OccurrenceShapeElement
+);
+END_TYPE;
+
+TYPE OccurrenceShapeFeatureDefinitionSelect = SELECT(
+	OccurrenceShapeFeature,
+	PartFeature,
+	ShapeFeatureDefinition
+);
+END_TYPE;
+
+TYPE OccurrenceShapeFeatureElementOfSelect = SELECT(
+	Occurrence,
+	OccurrenceShapeFeature
+);
+END_TYPE;
+
+TYPE OccurrenceTerminalDefinitionSelect = SELECT(
+	ContactFeatureDefinition,
+	OccurrenceTerminal,
+	PartTerminal
+);
+END_TYPE;
+
+TYPE OccurrenceTerminalElementOfSelect = SELECT(
+	Occurrence,
+	OccurrenceTerminal
+);
+END_TYPE;
+
+TYPE OccurrenceTransportFeatureDefinitionSelect = SELECT(
+	OccurrenceTransportFeature,
+	PartTransportFeature
+);
+END_TYPE;
+
+TYPE OccurrenceTransportFeatureElementOfSelect = SELECT(
+	Occurrence,
+	OccurrenceTransportFeature
+);
+END_TYPE;
+
+TYPE OccurrenceUsageContextSelect = SELECT(
+	BreakdownElementRealization,
+	ProcessOperationInputOrOutput,
+	ViewOccurrenceRelationship
+);
+END_TYPE;
+
+TYPE OrganizationOrPersonInOrganizationSelect = SELECT(
+	Organization,
+	PersonInOrganization
+);
+END_TYPE;
+
+TYPE OuterOrInnerBoundaryEnum = ENUMERATION OF(
+	inner_boundary,
+	outer_boundary
+);
+END_TYPE;
+
+TYPE ParameterSelect = SELECT(
+	ConditionParameter,
+	ConditionParameterSelect
+);
+END_TYPE;
+
+TYPE ParameterValue = REAL;
+END_TYPE;
+
+TYPE PartCategoryEnum = ENUMERATION OF(
+	EMI_connector_housing,
+	application_control,
+	assembly,
+	backshell,
+	boxed,
+	braid,
+	busbar,
+	cable,
+	cable_ferrule,
+	cable_fixing_device,
+	cable_support_sleeve,
+	cavity_plug,
+	collection,
+	completely_knocked_down,
+	conduit,
+	connector,
+	connector_cavity,
+	connector_contact,
+	connector_housing,
+	connector_insert,
+	connector_kit,
+	contact_member,
+	continuous,
+	corrugated_conduit,
+	detail,
+	discrete,
+	electrified_backshell,
+	end_cap,
+	fishnet,
+	fixing_device,
+	flat_cable,
+	grommet,
+	in_process,
+	inseparable_assembly,
+	insulation_piercing_connector,
+	joint_ferrule,
+	label,
+	overbraid,
+	plug,
+	protective_covering,
+	prototype,
+	raw_material,
+	raw_material_by_area,
+	raw_material_by_length,
+	raw_material_by_volume,
+	regulated,
+	safety,
+	seal,
+	service,
+	shield,
+	shield_connector,
+	shielded_connector,
+	socket,
+	spacer,
+	splice,
+	strain_relief_accessory,
+	tape,
+	terminal_block,
+	terminal_lug,
+	tool,
+	wire,
+	wiring_harness
+);
+END_TYPE;
+
+TYPE PartClassSelect = SELECT(
+	Class,
+	ClassString,
+	ExternalOwlClass,
+	PartCategoryEnum
+);
+END_TYPE;
+
+TYPE PartContactFeatureDefinitionSelect = SELECT(
+	ContactFeatureDefinition,
+	ShapeFeatureDefinitionElement
+);
+END_TYPE;
+
+TYPE PartContactFeatureElementOfSelect = SELECT(
+	PartContactFeature,
+	PartViewOrProductConfigurationSelect
+);
+END_TYPE;
+
+TYPE PartContactFeatureFitRelationshipDefinitionSelect = SELECT(
+	ContactFeatureDefinitionFitRelationship,
+	ShapeFeatureDefinitionElementRelationship
+);
+END_TYPE;
+
+TYPE PartFeatureFitRelationshipDefinitionSelect = SELECT(
+	ShapeFeatureDefinitionElementRelationship,
+	ShapeFeatureDefinitionFitRelationship
+);
+END_TYPE;
+
+TYPE PartInformationSelect = SELECT(
+	AssemblyViewRelationship,
+	BreakdownElementView,
+	IndividualPartView,
+	Occurrence,
+	PartView,
+	ProductConfiguration,
+	ShapeFeatureDefinition
+);
+END_TYPE;
+
+TYPE PartShapeElementDefinitionSelect = SELECT(
+	PartShapeElement,
+	PartShapeElementRelationship,
+	ShapeFeatureDefinition,
+	ShapeFeatureDefinitionElement,
+	ShapeFeatureDefinitionElementRelationship,
+	ShapeFeatureDefinitionRelationship
+);
+END_TYPE;
+
+TYPE PartShapeElementElementOfSelect = SELECT(
+	PartShapeElement,
+	PartViewOrProductConfigurationSelect
+);
+END_TYPE;
+
+TYPE PartTerminalElementOfSelect = SELECT(
+	PartTerminal,
+	PartViewOrProductConfigurationSelect
+);
+END_TYPE;
+
+TYPE PartTransportFeatureElementOfSelect = SELECT(
+	PartTransportFeature,
+	PartViewOrProductConfigurationSelect
+);
+END_TYPE;
+
+TYPE PartVersionOrProductConfigurationSelect = SELECT(
+	PartVersion,
+	ProductConfiguration
+);
+END_TYPE;
+
+TYPE PartViewOrProductConfigurationSelect = SELECT(
+	PartView,
+	ProductConfiguration
+);
+END_TYPE;
+
+TYPE PeriodOrDateSelect = SELECT(
+	DateTimeString,
+	Duration,
+	Event
+);
+END_TYPE;
+
+TYPE PhysicalElementSelect = SELECT(
+	AlternativeSolution,
+	BreakdownElement,
+	PartView
+);
+END_TYPE;
+
+TYPE PlaneAngleMeasure = REAL;
+END_TYPE;
+
+TYPE PlyLaminateShapeSelect = SELECT(
+	CompositeSheetRepresentation,
+	ExternalAdvancedBrepShapeRepresentation,
+	ExternalCsgShapeRepresentation,
+	ExternalCurveSweptSolidShapeRepresentation,
+	ExternalElementaryBrepShapeRepresentation,
+	ExternalFacetedBrepShapeRepresentation,
+	ExternalTessellatedShapeRepresentation,
+	ThreeDGeometrySet
+);
+END_TYPE;
+
+TYPE PointSelect = SELECT(
+	CartesianPoint,
+	DegeneratePcurve,
+	PointOnCurve,
+	PointOnSurface
+);
+END_TYPE;
+
+TYPE PositiveLengthMeasure = REAL;
+END_TYPE;
+
+TYPE PredefinedApplicationDomainEnum = ENUMERATION OF(
+	complete_design,
+	composites,
+	electrical,
+	geometrical_dimensioning_and_tolerancing_representation,
+	kinematic_mechanism,
+	machining_feature,
+	material_specification,
+	model_based_3D_annotation_representation,
+	partial_design,
+	partial_design_interface,
+	process_state,
+	surface_finish,
+	thermal,
+	unspecified,
+	wire_and_part_list_with_connectivity,
+	wiring_harness_assembly_3D_design,
+	wiring_harness_assembly_design_stick_line,
+	wiring_harness_formboard_drawing,
+	wiring_harness_segment_topology
+);
+END_TYPE;
+
+TYPE ProcessOperationInputOrOutputSelect = SELECT(
+	AssemblyOccurrenceRelationship,
+	AssemblyViewRelationship,
+	Occurrence,
+	PartVersion
+);
+END_TYPE;
+
+TYPE ProcessOperationResourceAssignmentSelect = SELECT(
+	BreakdownElement,
+	IndividualPartView,
+	Occurrence,
+	PartVersion,
+	RequirementView
+);
+END_TYPE;
+
+TYPE ProductGroupMembershipSelect = SELECT(
+	IndividualPart,
+	IndividualPartVersion,
+	Part,
+	PartVersion,
+	ProductConcept,
+	ProductGroup
+);
+END_TYPE;
+
+TYPE ProjectAssignmentSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	ActivityMethodRelationship,
+	AlternativeSolution,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementVersion,
+	BreakdownVersion,
+	Document,
+	DocumentVersion,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartView,
+	Occurrence,
+	Part,
+	PartVersion,
+	ProductConcept,
+	ProductConfiguration,
+	PropertyValue,
+	Requirement,
+	RequirementVersion
+);
+END_TYPE;
+
+TYPE PropertyAssignmentSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	ActivityMethodRelationship,
+	ActivityRelationship,
+	Address,
+	AddressAssignment,
+	AlternativeSolution,
+	Approval,
+	ApprovalAssignment,
+	BreakdownElementRealization,
+	BreakdownElementRelationship,
+	BreakdownElementVersionRelationship,
+	BreakdownElementView,
+	BreakdownElementViewRelationship,
+	BreakdownRelationship,
+	BreakdownVersion,
+	BreakdownVersionAssignment,
+	BreakdownVersionRelationship,
+	CertificationAssignment,
+	Condition,
+	ConditionAssignment,
+	ConditionRelationship,
+	Contract,
+	ContractAssignment,
+	ContractRelationship,
+	DateAndPersonAssignment,
+	DateTimeAssignment,
+	Document,
+	DocumentAssignment,
+	DocumentDefinition,
+	DocumentDefinitionRelationship,
+	DocumentRelationship,
+	DocumentVersion,
+	DocumentVersionRelationship,
+	EffectivityAssignment,
+	Envelope,
+	EventAssignment,
+	File,
+	FileRelationship,
+	FrozenAssignment,
+	InZone,
+	IndividualPartRelationship,
+	IndividualPartVersionRelationship,
+	IndividualPartView,
+	IndividualPartViewRelationship,
+	InformationUsageRightAssignment,
+	MaterialPropertyAssignment,
+	ModelPropertyAssignment,
+	Occurrence,
+	OccurrenceRelationship,
+	OrganizationOrPersonInOrganizationAssignment,
+	OrganizationRelationship,
+	Part,
+	PartRelationship,
+	PartVersion,
+	PartVersionRelationship,
+	PartView,
+	PartViewRelationship,
+	Person,
+	PersonInOrganization,
+	ProcessOperationDefinition,
+	ProcessOperationOccurrence,
+	ProcessOperationResourceAssignment,
+	ProcessPlan,
+	ProductConcept,
+	ProductConfiguration,
+	ProductConfigurationRelationship,
+	Project,
+	ProjectAssignment,
+	ProjectRelationship,
+	PropertyDefinitionAssignment,
+	PropertyDefinitionRelationship,
+	PropertyValueAssignment,
+	PropertyValueRelationship,
+	Representation,
+	RepresentationItem,
+	RequirementAssignment,
+	RequirementRelationship,
+	RequirementSource,
+	RequirementVersionRelationship,
+	RequirementView,
+	RequirementViewRelationship,
+	SecurityClassificationAssignment,
+	ShapeElement,
+	ShapeElementRelationship,
+	ShapeFeatureDefinition,
+	Specification,
+	SpecificationAssignment,
+	SpecificationCategoryAssignment,
+	SpecificationConditionAssignment,
+	SpecificationInclusionAssignment,
+	TimeIntervalAssignment,
+	ViewOccurrenceRelationship,
+	WorkOrder,
+	WorkOrderAssignment,
+	WorkRequest,
+	WorkRequestAssignment,
+	WorkRequestRelationship
+);
+END_TYPE;
+
+TYPE PropertyDefinitionEnum = ENUMERATION OF(
+	minimum_bending_radius,
+	occurrence_marking_property
+);
+END_TYPE;
+
+TYPE PropertyDefinitionSelect = SELECT(
+	PropertyDefinition,
+	PropertyDefinitionEnum,
+	PropertyDefinitionString
+);
+END_TYPE;
+
+TYPE PropertyDefinitionString = STRING;
+END_TYPE;
+
+TYPE PropertyValueSelect = SELECT(
+	CartesianPoint,
+	NumericalValue
+);
+END_TYPE;
+
+TYPE ProxyItemSelect = SELECT(
+	ExternalItem,
+	ExternalOwlObject,
+	ProxyString
+);
+END_TYPE;
+
+TYPE ProxySelect = SELECT(
+	Proxy,
+	ProxyItemSelect
+);
+END_TYPE;
+
+TYPE ProxyString = STRING;
+END_TYPE;
+
+TYPE RequirementAssignmentSelect = SELECT(
+	ActivityMethod,
+	ActivityMethodAssignment,
+	AlternatePartRelationship,
+	AlternativeSolution,
+	AssemblyOccurrenceRelationship,
+	AssemblyOccurrenceRelationshipSubstitution,
+	AssemblyViewRelationship,
+	AssemblyViewRelationshipSubstitution,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementRealization,
+	BreakdownElementRelationship,
+	BreakdownElementVersion,
+	BreakdownElementView,
+	BreakdownVersion,
+	Document,
+	DocumentDefinition,
+	DocumentVersion,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartView,
+	Part,
+	PartVersion,
+	PartView,
+	ProductConfiguration,
+	Project,
+	Requirement,
+	RequirementVersion,
+	RequirementView,
+	WorkRequest
+);
+END_TYPE;
+
+TYPE RequirementSourceSelect = SELECT(
+	Activity,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	AlternativeSolution,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementVersion,
+	BreakdownElementView,
+	BreakdownVersion,
+	Contract,
+	Document,
+	DocumentDefinition,
+	DocumentVersion,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartView,
+	Organization,
+	Part,
+	PartVersion,
+	PartView,
+	PersonInOrganization,
+	Project,
+	Requirement,
+	RequirementVersion,
+	RequirementView
+);
+END_TYPE;
+
+TYPE RotationAboutAxes = LIST[1:3] OF PlaneAngleMeasure;
+END_TYPE;
+
+TYPE SecurityClassificationAssignmentSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	ActivityMethodRelationship,
+	AlternativeSolution,
+	AssemblyOccurrenceRelationship,
+	AssemblyOccurrenceRelationshipSubstitution,
+	AssemblyViewRelationship,
+	AssemblyViewRelationshipSubstitution,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementRealization,
+	BreakdownElementRelationship,
+	BreakdownElementVersion,
+	BreakdownElementView,
+	BreakdownVersion,
+	Classification,
+	ConditionalConfiguration,
+	ConfiguredAssemblyEffectivity,
+	Descriptor,
+	DescriptorRelationship,
+	DigitalFile,
+	Document,
+	DocumentAssignment,
+	DocumentDefinition,
+	DocumentVersion,
+	Envelope,
+	ExternalClassSystem,
+	File,
+	Hardcopy,
+	Identifier,
+	IdentifierRelationship,
+	IndividualAssemblyRelationship,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartView,
+	MaterialIdentification,
+	Message,
+	Part,
+	PartToIndividualPartAssociation,
+	PartVersion,
+	PartVersionToIndividualPartVersionAssociation,
+	PartView,
+	PartViewRelationship,
+	PartViewToIndividualPartViewAssociation,
+	ProcessPlan,
+	ProductClass,
+	ProductConfiguration,
+	Project,
+	PropertyDefinition,
+	PropertyDefinitionAssignment,
+	PropertyValueAssignment,
+	Proxy,
+	Representation,
+	Requirement,
+	RequirementAssignment,
+	RequirementCollectionRelationship,
+	RequirementSource,
+	RequirementVersion,
+	RequirementVersionRelationship,
+	RequirementView,
+	RequirementViewRelationship,
+	Specification,
+	SpecificationCategory,
+	StyledModel,
+	WorkOrder,
+	WorkRequest
+);
+END_TYPE;
+
+TYPE ShapeElementOrDefinitionSelect = SELECT(
+	ShapeElement,
+	ShapeFeatureDefinitionOrRelationshipSelect
+);
+END_TYPE;
+
+TYPE ShapeElementRepresentedGeometrySelect = SELECT(
+	DetailedGeometricModelItem,
+	TopologicalRepresentationItem
+);
+END_TYPE;
+
+TYPE ShapeFeatureDefinitionOrElementRelationshipSelect = SELECT(
+	ShapeFeatureDefinitionElementRelationship,
+	ShapeFeatureDefinitionRelationship
+);
+END_TYPE;
+
+TYPE ShapeFeatureDefinitionOrElementSelect = SELECT(
+	ShapeFeatureDefinition,
+	ShapeFeatureDefinitionElement
+);
+END_TYPE;
+
+TYPE ShapeFeatureDefinitionOrRelationshipSelect = SELECT(
+	ShapeFeatureDefinition,
+	ShapeFeatureDefinitionRelationship
+);
+END_TYPE;
+
+TYPE ShapeFeatureTypeEnum = ENUMERATION OF(
+	cavity_plug_or_contact_profile,
+	cavity_profile,
+	contact_barrel,
+	contact_profile,
+	insert_profile,
+	pin_profile,
+	plug_profile,
+	slot_profile,
+	socket_profile,
+	unspecified,
+	wire_profile
+);
+END_TYPE;
+
+TYPE ShapedElementSelect = SELECT(
+	PartInformationSelect,
+	ShapeElement
+);
+END_TYPE;
+
+TYPE SimpleOrSpatialRotationSelect = SELECT(
+	RotationAboutAxes,
+	RotationAboutDirection
+);
+END_TYPE;
+
+TYPE SingleIdentifierSelect = SELECT(
+	Identifier,
+	IdentifierString
+);
+END_TYPE;
+
+TYPE StateAssignmentSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	AlternatePartRelationship,
+	Approval,
+	AssemblyOccurrenceRelationshipSubstitution,
+	AssemblyViewRelationshipSubstitution,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementRealization,
+	Certification,
+	Contract,
+	Document,
+	Evidence,
+	File,
+	FinalSolution,
+	IndividualPart,
+	Message,
+	Organization,
+	Part,
+	PartVersion,
+	PartView,
+	PartViewRelationship,
+	PersonInOrganization,
+	ProductConcept,
+	ProductConfiguration,
+	Project,
+	Requirement,
+	SecurityClassification,
+	Validation,
+	Verification,
+	WorkOrder,
+	WorkRequest
+);
+END_TYPE;
+
+TYPE StateDefinitionAssignmentSelect = SELECT(
+	Activity,
+	ActivityAssignment,
+	ActivityMethod,
+	ActivityMethodAssignment,
+	AlternatePartRelationship,
+	Approval,
+	AssemblyOccurrenceRelationshipSubstitution,
+	AssemblyViewRelationshipSubstitution,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementRealization,
+	Certification,
+	Contract,
+	Document,
+	Evidence,
+	File,
+	FinalSolution,
+	IndividualPart,
+	Message,
+	Organization,
+	Part,
+	PartVersion,
+	PartView,
+	PartViewRelationship,
+	PersonInOrganization,
+	ProductConcept,
+	ProductConfiguration,
+	Project,
+	Requirement,
+	SecurityClassification,
+	Validation,
+	Verification,
+	WorkOrder,
+	WorkRequest
+);
+END_TYPE;
+
+TYPE StockCategoryEnum = ENUMERATION OF(
+	anisotropic_material,
+	braided_assembly,
+	discontinuous_fiber_assembly,
+	filament_assembly,
+	isotropic_material,
+	stock_core,
+	woven_assembly
+);
+END_TYPE;
+
+TYPE SuppliedObjectSelect = SELECT(
+	Activity,
+	ActivityMethod,
+	AlternativeSolution,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementVersion,
+	BreakdownElementView,
+	BreakdownVersion,
+	Class,
+	ClassAttribute,
+	Condition,
+	ConditionalConfiguration,
+	ConfiguredAssemblyEffectivity,
+	Contract,
+	Document,
+	DocumentDefinition,
+	DocumentVersion,
+	Effectivity,
+	Event,
+	ExternalClassSystem,
+	ExternalOwlClass,
+	File,
+	FormatProperty,
+	IndividualPartView,
+	InformationRight,
+	InformationUsageRight,
+	MaterialIdentification,
+	Occurrence,
+	Organization,
+	Part,
+	PartVersion,
+	PartView,
+	PersonInOrganization,
+	ProcessOperationDefinition,
+	ProcessPlan,
+	ProductClass,
+	ProductConfiguration,
+	Project,
+	Representation,
+	Requirement,
+	RequirementSatisfactionAssertion,
+	RequirementVersion,
+	RequirementView,
+	SecurityClassification,
+	Specification,
+	SpecificationCategory,
+	SpecificationInclusion,
+	WorkOrder,
+	WorkRequest
+);
+END_TYPE;
+
+TYPE TerminalAndTransportDomainTypeEnum = ENUMERATION OF(
+	electrical,
+	magnetic,
+	matter,
+	optical,
+	thermal
+);
+END_TYPE;
+
+TYPE TerminalJointTypeEnum = ENUMERATION OF(
+	crimp_terminal,
+	fusion_fibre_splice,
+	insulation_displacement_termination,
+	lug_terminal,
+	mantle_terminal,
+	mechanical_fibre_splice,
+	non_reusable_insulation_displacement_termination,
+	optical_fiber_splice,
+	pillar_terminal,
+	pin_terminal,
+	push_on_contact_terminal,
+	resilient_contact_terminal,
+	saddle_terminal,
+	screw_terminal,
+	snap_on_contact_terminal,
+	socket_terminal,
+	solder_terminal,
+	stud_terminal,
+	tuning_fork_contact_terminal
+);
+END_TYPE;
+
+TYPE ThicknessLaminateTableComponentSelect = SELECT(
+	FilamentLaminate,
+	Ply,
+	ProcessedCore
+);
+END_TYPE;
+
+TYPE TopologyGeometryAssociationGeometricItemsSelect = SELECT(
+	AxisPlacement,
+	CartesianPoint,
+	Curve
+);
+END_TYPE;
+
+TYPE TopologyGeometryAssociationTopologicalItemsSelect = SELECT(
+	Edge,
+	Path,
+	Vertex
+);
+END_TYPE;
+
+TYPE TransformationSelect = SELECT(
+	CartesianTransformation,
+	GeometricRepresentationRelationship,
+	GeometryToTopologyRepresentationAssociation
+);
+END_TYPE;
+
+TYPE TransitionCodeEnum = ENUMERATION OF(
+	cont_same_gradient,
+	cont_same_gradient_same_curvature,
+	continuous,
+	discontinuous
+);
+END_TYPE;
+
+TYPE TranslatedStringSet = SET[1:?] OF LocalizedString;
+END_TYPE;
+
+TYPE TwistDirectionEnum = ENUMERATION OF(
+	clockwise,
+	counter_clockwise
+);
+END_TYPE;
+
+TYPE TranslationAlongAxes = LIST[1:3] OF LengthMeasure;
+END_TYPE;
+
+TYPE TypeQualifierSelect = SELECT(
+	ExternalTypeQualifier,
+	PreDefinedTypeQualifier
+);
+END_TYPE;
+
+TYPE UnitSelect = SELECT(
+	ExternalUnit,
+	Unit
+);
+END_TYPE;
+
+TYPE Uri = IdentifierString;
+END_TYPE;
+
+TYPE ValidationSelect = SELECT(
+	ActivityMethod,
+	OrganizationOrPersonInOrganizationAssignment,
+	PartVersion,
+	StateDefinition
+);
+END_TYPE;
+
+TYPE ValidityContextSelect = SELECT(
+	Organization,
+	ProductClass,
+	ProductConfiguration
+);
+END_TYPE;
+
+TYPE ValueQualifierSelect = SELECT(
+	PrecisionQualifier,
+	TypeQualifierSelect,
+	UncertaintyQualifier
+);
+END_TYPE;
+
+TYPE WorkOrderAssignmentSelect = SELECT(
+	Activity,
+	ActivityMethod
+);
+END_TYPE;
+
+TYPE WorkRequestAssignmentSelect = SELECT(
+	Activity,
+	ActivityMethod,
+	Breakdown,
+	BreakdownElement,
+	BreakdownElementVersion,
+	BreakdownElementView,
+	BreakdownElementViewRelationship,
+	BreakdownVersion,
+	Contract,
+	Document,
+	DocumentDefinition,
+	DocumentDefinitionRelationship,
+	DocumentVersion,
+	File,
+	IndividualPart,
+	IndividualPartVersion,
+	IndividualPartView,
+	IndividualPartViewRelationship,
+	Organization,
+	Part,
+	PartVersion,
+	PartView,
+	PartViewRelationship,
+	Person,
+	PersonInOrganization,
+	ProductConfiguration,
+	Project,
+	Requirement,
+	RequirementVersion,
+	RequirementView,
+	RequirementViewRelationship
+);
+END_TYPE;
+
+ENTITY Activity
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(ActualActivity, PlannedActivity));
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ActivityType : ClassSelect;
+	ChosenMethod : OPTIONAL ActivityMethod;
+	ConcernedOrganizations : OPTIONAL SET[1:?] OF Organization;
+	PossibleMethods : OPTIONAL SET[1:?] OF ActivityMethod;
+	Requestor : OPTIONAL DateAndPersonOrganization;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Status : OPTIONAL ClassSelect;
+	SupplyingOrganizations : OPTIONAL SET[1:?] OF Organization;
+END_ENTITY;
+
+ENTITY ActivityAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedActivity : Activity;
+	AssignedTo : ActivityAssignmentSelect;
+END_ENTITY;
+
+ENTITY ActivityHappeningRelationship
+	SUBTYPE OF(ActivityRelationship);
+	SELF\ActivityRelationship.Relating : PlannedActivity;
+	SELF\ActivityRelationship.Related : ActualActivity;
+DERIVE
+	SELF\ActivityRelationship.RelationType : STRING := 'happening';
+END_ENTITY;
+
+ENTITY ActivityMethod;
+	Id : OPTIONAL IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Consequence : OPTIONAL MultiLingualStringSelect;
+	Purpose : MultiLingualStringSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY ActivityMethodAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedActivityMethod : ActivityMethod;
+	AssignedTo : ActivityMethodAssignmentSelect;
+END_ENTITY;
+
+ENTITY ActivityMethodRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : ActivityMethod;
+	Related : ActivityMethod;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY ActivityRelationship
+	SUPERTYPE OF (ActivityHappeningRelationship);
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Activity;
+	Related : Activity;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY ActualActivity
+	SUPERTYPE OF (DirectedActualActivity)
+	SUBTYPE OF(Activity);
+	ActualEndDate : OPTIONAL DateTimeString;
+	ActualStartDate : OPTIONAL DateTimeString;
+END_ENTITY;
+
+ENTITY ActuatedPair;
+	Rx : OPTIONAL ActuatedDirectionEnum;
+	Ry : OPTIONAL ActuatedDirectionEnum;
+	Rz : OPTIONAL ActuatedDirectionEnum;
+	Tx : OPTIONAL ActuatedDirectionEnum;
+	Ty : OPTIONAL ActuatedDirectionEnum;
+	Tz : OPTIONAL ActuatedDirectionEnum;
+END_ENTITY;
+
+ENTITY AddElement
+	SUBTYPE OF(DeltaChangeActivity);
+	CurrentDesignObject : SET[1:?] OF DeltaChangeManagementObjectSelect;
+END_ENTITY;
+
+ENTITY Address;
+	Id : OPTIONAL IdentifierSelect;
+	Name : OPTIONAL CharacterString;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Country : OPTIONAL CharacterString;
+	ElectronicMailAddress : OPTIONAL CharacterString;
+	FacsimileNumber : OPTIONAL CharacterString;
+	InternalLocation : OPTIONAL CharacterString;
+	PostalBox : OPTIONAL CharacterString;
+	PostalCode : OPTIONAL CharacterString;
+	Region : OPTIONAL CharacterString;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Street : OPTIONAL CharacterString;
+	StreetNumber : OPTIONAL CharacterString;
+	TelephoneNumber : OPTIONAL CharacterString;
+	TelexNumber : OPTIONAL CharacterString;
+	Town : OPTIONAL CharacterString;
+	Url : OPTIONAL CharacterString;
+END_ENTITY;
+
+ENTITY AddressAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedAddress : Address;
+	AssignedTo : OrganizationOrPersonInOrganizationSelect;
+END_ENTITY;
+
+ENTITY AdvancedFace
+	SUBTYPE OF(DetailedGeometricModelItem);
+	SELF\RepresentationItem.External : ExternalItem;
+END_ENTITY;
+
+ENTITY AlternatePartRelationship
+	SUBTYPE OF(PartRelationship);
+	Criteria : OPTIONAL MultiLingualStringSelect;
+DERIVE
+	SELF\PartRelationship.RelationType : STRING := 'alternate';
+UNIQUE
+UR1: Relating, Related;
+END_ENTITY;
+
+ENTITY AlternativeSolution
+	SUPERTYPE OF (ONEOF(FinalSolution, SupplierSolution, TechnicalSolution));
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	BaseElement : BreakdownElementOrAlternativeSolutionSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY AlternativeSolutionRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : AlternativeSolution;
+	Related : AlternativeSolution;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY Analysis;
+	Id : IdentifierSelect;
+	Name : DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Versions : SET[1:?] OF AnalysisVersion;
+END_ENTITY;
+
+ENTITY AnalysisAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedAnalysis : AnalysisVersion;
+	AssignedTo : AnalysisAssignmentSelect;
+END_ENTITY;
+
+ENTITY AnalysisDisciplineDefinition;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AdditionalContexts : OPTIONAL SET[1:?] OF ViewContext;
+	DefinitionalRepresentations : OPTIONAL SET[1:?] OF AnalysisModelObject;
+	InitialContext : ViewContext;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+INVERSE
+	ViewOf : AnalysisVersion FOR Views;
+END_ENTITY;
+
+ENTITY AnalysisModel
+	SUBTYPE OF(AnalysisModelObject);
+	Items : SET[1:?] OF AnalysisModelItemsSelect;
+END_ENTITY;
+
+ENTITY AnalysisModelObject
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(AnalysisModel, ExternalAnalysisModel));
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ContextOfItems : AnalysisRepresentationContext;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY AnalysisRepresentationContext;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY AnalysisVersion;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Views : OPTIONAL SET[1:?] OF AnalysisDisciplineDefinition;
+INVERSE
+	VersionOf : Analysis FOR Versions;
+END_ENTITY;
+
+ENTITY AnalysisVersionRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : AnalysisVersion;
+	Related : AnalysisVersion;
+END_ENTITY;
+
+ENTITY AndCondition
+	SUBTYPE OF(Condition);
+DERIVE
+	SELF\Condition.ConditionType : STRING := 'and';
+END_ENTITY;
+
+ENTITY ApplicationDomain;
+	SameAs : SET[1:?] OF Proxy;
+UNIQUE
+UR1: SameAs;
+END_ENTITY;
+
+ENTITY Approval;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ApprovalScope : OPTIONAL SET[1:?] OF ApprovalScopeSelect;
+	ApprovedBy : OPTIONAL SET[1:?] OF ApprovingPersonOrganization;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Status : ClassSelect;
+	ValidDate : OPTIONAL DateTimeString;
+END_ENTITY;
+
+ENTITY ApprovalAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL SET[1:?] OF DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssignedApproval : Approval;
+	AssignedTo : ApprovalAssignmentSelect;
+END_ENTITY;
+
+ENTITY ApprovalRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL SET[1:?] OF DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Approval;
+	Related : Approval;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY ApprovingPersonOrganization;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Approver : OrganizationOrPersonInOrganizationSelect;
+	DateApproved : OPTIONAL DateTimeString;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+INVERSE
+	AuthorizedApproval : Approval FOR ApprovedBy;
+END_ENTITY;
+
+ENTITY AssemblyDefinition
+	SUPERTYPE OF (ONEOF(MatingDefinition, WiringHarnessAssemblyDesign))
+	SUBTYPE OF(PartView);
+	AssemblyType : OPTIONAL ClassSelect;
+END_ENTITY;
+
+ENTITY AssemblyOccurrenceRelationship
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(NextAssemblyOccurrenceUsage, PromissoryAssemblyOccurrenceUsage))
+	SUBTYPE OF(ViewOccurrenceRelationship);
+	SELF\ViewOccurrenceRelationship.Relating : AssemblyDefinition;
+	Placement : OPTIONAL SET[1:?] OF TransformationSelect;
+WHERE
+WR1: NOT('GEOMETRICREPRESENTATIONRELATIONSHIPWITHPLACEMENTTRANSFORMATION' IN TYPEOF(Placement)) OR (SIZEOF(QUERY(ix <* Placement | ix\RepresentationRelationship.Definitional = TRUE)) = 0);
+END_ENTITY;
+
+ENTITY AssemblyOccurrenceRelationshipSubstitution;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Relating : AssemblyOccurrenceRelationship;
+	Related : AssemblyOccurrenceRelationship;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY AssemblyRealizationContext;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Relating : IndividualAssemblyRelationship;
+	Related : AssemblyDesignSelect;
+END_ENTITY;
+
+ENTITY AssemblyShapeConstraint
+	SUBTYPE OF(PartShapeElement);
+	ConstraintType : OPTIONAL AssemblyConstraintTypeEnum;
+	SELF\PartShapeElement.Definition : OPTIONAL AssemblyShapeConstraintOrJointDefinitionSelect;
+	SELF\PartShapeElement.ElementOf : AssemblyDefinitionOrAssemblyShapeConstraintSelect;
+END_ENTITY;
+
+ENTITY AssemblyShapeConstraintItemRelationship
+	SUBTYPE OF(ShapeElementRelationship);
+	SELF\ShapeElementRelationship.Relating : AssemblyShapeConstraint;
+	SELF\ShapeElementRelationship.Related : OccurrenceShapeFeature;
+END_ENTITY;
+
+ENTITY AssemblyShapeJoint
+	SUBTYPE OF(PartShapeElement);
+	JointType : OPTIONAL AssemblyJointTypeEnum;
+	SELF\PartShapeElement.Definition : OPTIONAL AssemblyShapeConstraintOrJointDefinitionSelect;
+	SELF\PartShapeElement.ElementOf : AssemblyDefinitionOrAssemblyShapeJointSelect;
+END_ENTITY;
+
+ENTITY AssemblyShapeJointItemRelationship
+	SUBTYPE OF(ShapeElementRelationship);
+	SELF\ShapeElementRelationship.Relating : AssemblyShapeJoint;
+	SELF\ShapeElementRelationship.Related : OccurrenceShapeFeature;
+END_ENTITY;
+
+ENTITY AssemblyViewRelationship
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(NextAssemblyViewUsage, PromissoryAssemblyViewUsage))
+	SUBTYPE OF(PartViewRelationship);
+	SELF\PartViewRelationship.Relating : AssemblyDefinition;
+	DefiningGeometry : OPTIONAL GeometricModel;
+	LocationIndicator : OPTIONAL IdentifierSelect;
+	Quantity : OPTIONAL ValueWithUnit;
+END_ENTITY;
+
+ENTITY AssemblyViewRelationshipSubstitution;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Relating : AssemblyViewRelationship;
+	Related : AssemblyViewRelationship;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY AssignmentObjectRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : AssignmentObjectSelect;
+	Related : AssignmentObjectSelect;
+WHERE
+WR1: TYPEOF(Relating) = TYPEOF(Related);
+END_ENTITY;
+
+ENTITY AxisPlacement
+	SUPERTYPE OF (ONEOF(ToolAttachmentPointFrame, ToolCentrePointFrame))
+	SUBTYPE OF(DetailedGeometricModelItem);
+	Axis : OPTIONAL LIST[2:3] OF LengthMeasure;
+	Position : LIST[2:3] OF LengthMeasure;
+	RefDirection : OPTIONAL LIST[2:3] OF LengthMeasure;
+WHERE
+WR1: SIZEOF(RefDirection) = SIZEOF(Position);
+WR2: NOT(EXISTS(Axis)) OR (SIZEOF(Axis) = SIZEOF(Position));
+END_ENTITY;
+
+ENTITY BeveledSheetRepresentation
+	SUBTYPE OF(ConstituentShapeRepresentation);
+	BevelAngle : NumericalValue;
+	BoundarySurface : CompositeSheetRepresentation;
+	VerticalProfileHeight : NumericalValue;
+WHERE
+WR1: (SELF.VerticalProfileHeight.Unit.Name='length') AND (SELF.BevelAngle.Unit.Name='angle');
+END_ENTITY;
+
+ENTITY BoundaryCurveSet
+	SUBTYPE OF(GeometricCurveSet);
+	SELF\GeometricCurveSet.Elements : SET[1:?] OF Curve;
+DERIVE
+	Bounds : SET[1:?] OF Curve := SELF\GeometricCurveSet.Elements;
+END_ENTITY;
+
+ENTITY Breakdown
+	SUPERTYPE OF (ONEOF(FunctionalBreakdown, PhysicalBreakdown, SystemBreakdown, ZonalBreakdown));
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	BreakdownType : ClassSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Versions : SET[1:?] OF BreakdownVersion;
+WHERE
+WR1: NOT(TYPEOF(SELF) = [SCHEMA_NAME + 'BREAKDOWN']) OR ((SELF.BreakdownType <> 'physical') AND (SELF.BreakdownType <> 'functional') AND (SELF.BreakdownType <> 'zonal') AND (SELF.BreakdownType <> 'system'));
+END_ENTITY;
+
+ENTITY BreakdownContext;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	BreakdownContext : BreakdownVersion;
+	BreakdownElement : BreakdownElement;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY BreakdownElement;
+	Id : IdentifierSelect;
+	Name : DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Versions : OPTIONAL SET[1:?] OF BreakdownElementVersion;
+END_ENTITY;
+
+ENTITY BreakdownElementRealization;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : BreakdownElementOrAlternativeSolutionSelect;
+	Related : BreakdownElementOrOccurrenceSelect;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY BreakdownElementRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : BreakdownElement;
+	Related : BreakdownElement;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY BreakdownElementVersion;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Views : OPTIONAL SET[1:?] OF BreakdownElementView;
+INVERSE
+	VersionOf : BreakdownElement FOR Versions;
+END_ENTITY;
+
+ENTITY BreakdownElementVersionRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : BreakdownElementVersion;
+	Related : BreakdownElementVersion;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY BreakdownElementView;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AdditionalContexts : OPTIONAL SET[1:?] OF ViewContext;
+	DefiningGeometry : OPTIONAL GeometricModel;
+	InitialContext : ViewContext;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+INVERSE
+	ViewOf : BreakdownElementVersion FOR Views;
+END_ENTITY;
+
+ENTITY BreakdownElementViewRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : BreakdownElementView;
+	Related : BreakdownElementView;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY BreakdownRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Breakdown;
+	Related : Breakdown;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY BreakdownVersion;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+INVERSE
+	VersionOf : Breakdown FOR Versions;
+END_ENTITY;
+
+ENTITY BreakdownVersionAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedBreakdownVersion : BreakdownVersion;
+	AssignedTo : BreakdownVersionAssignmentSelect;
+END_ENTITY;
+
+ENTITY BreakdownVersionRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : BreakdownVersion;
+	Related : BreakdownVersion;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY CableOccurrence
+	SUBTYPE OF(QuantifiedOccurrence);
+END_ENTITY;
+
+ENTITY CableOccurrenceTerminal
+	SUBTYPE OF(OccurrenceTerminal);
+	SELF\OccurrenceTerminal.AssociatedTransportFeature : WireIdentification;
+	SELF\ShapeElement.ElementOf : CableOccurrenceTerminalLocationGroup;
+END_ENTITY;
+
+ENTITY CableOccurrenceTerminalLocationGroup
+	SUBTYPE OF(OccurrenceTerminal);
+	SELF\OccurrenceShapeFeature.ElementOf : CableOccurrence;
+END_ENTITY;
+
+ENTITY Cartesian11
+	SUBTYPE OF(DetailedGeometricModelItem);
+	Placement : AxisPlacement;
+END_ENTITY;
+
+ENTITY CartesianPoint
+	SUBTYPE OF(Point);
+	Coordinates : LIST[2:3] OF LengthMeasure;
+END_ENTITY;
+
+ENTITY CartesianTransformation;
+	RotationMatrix : LIST[2:3] OF LIST[2:3] OF REAL;
+	Scale : OPTIONAL REAL;
+	TranslationVector : LIST[2:3] OF REAL;
+WHERE
+WR1: SIZEOF( QUERY(xi <* RotationMatrix |  SIZEOF( QUERY(xj <* xi | (-1.0 > xj) OR (xj > 1.0))) > 0)) = 0;
+WR2: Scale > 0.0;
+WR3: SIZEOF(TranslationVector) = SIZEOF(RotationMatrix);
+END_ENTITY;
+
+ENTITY CentreOfMass
+	SUBTYPE OF(ShapeDependentProperty);
+	CentrePoint : CartesianPoint;
+	SELF\ShapeDependentProperty.DefinedIn : GeometricCoordinateSpace;
+END_ENTITY;
+
+ENTITY Certification;
+	Id : OPTIONAL IdentifierSelect;
+	Name : DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	CertificationType : ClassSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY CertificationAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssignedCertification : Certification;
+	AssignedTo : CertificationAssignmentSelect;
+END_ENTITY;
+
+ENTITY ChangeElementSequence;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Relating : DeltaChangeActivity;
+	Related : DeltaChangeActivity;
+END_ENTITY;
+
+ENTITY CircularPath
+	SUBTYPE OF(PathSegment);
+	ViaPoint : CartesianPoint;
+END_ENTITY;
+
+ENTITY Class;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	DefinedIn : OPTIONAL ExternalClassSystem;
+	Source : OPTIONAL ExternalSourceSelect;
+INVERSE
+	ClassAttributes : SET[0:?] OF ClassAttribute FOR DefinedFor;
+UNIQUE
+UR1: Id;
+END_ENTITY;
+
+ENTITY ClassAttribute;
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	AllowedValues : OPTIONAL SET[1:?] OF PropertyValue;
+	AttributeDefinition : PropertyDefinition;
+	DefinedFor : Class;
+END_ENTITY;
+
+ENTITY Classification;
+	Role : OPTIONAL ClassString;
+	Class : ClassSelect;
+END_ENTITY;
+
+ENTITY ClassificationRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Classification;
+	Related : Classification;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY CoatingLayer
+	SUBTYPE OF(ShapeElement);
+INVERSE
+	Thickness : SET[0:1] OF ThicknessSizeDimension FOR AppliedTo;
+END_ENTITY;
+
+ENTITY CollectedPartRelationship
+	SUBTYPE OF(ViewOccurrenceRelationship);
+	SELF\ViewOccurrenceRelationship.Relating : CollectionDefinition;
+DERIVE
+	SELF\ViewOccurrenceRelationship.RelationType : STRING := 'collected part view';
+END_ENTITY;
+
+ENTITY CollectionDefinition
+	SUBTYPE OF(PartView);
+	Purpose : OPTIONAL MultiLingualStringSelect;
+INVERSE
+	CollectedParts : SET[2:?] OF CollectedPartRelationship FOR Relating;
+END_ENTITY;
+
+ENTITY ComponentPlacement;
+	PlacedComponent : BreakdownElementView;
+	Placement : TransformationSelect;
+	ReferenceComponent : BreakdownElementView;
+WHERE
+WR1: NOT ('GEOMETRICREPRESENTATIONRELATIONSHIPWITHPLACEMENTTRANSFORMATION' IN TYPEOF(Placement)) OR (Placement.Definitional = TRUE);
+END_ENTITY;
+
+ENTITY ComposedGeometricModel
+	SUBTYPE OF(GeometricModel);
+	SELF\Representation.Items : SET[1:?] OF AxisPlacement;
+INVERSE
+	ComposedModels : SET[1:?] OF GeometricRepresentationRelationship FOR Relating;
+END_ENTITY;
+
+ENTITY CompositeAssembly
+	SUBTYPE OF(ConstituentPart);
+	LayupPart : CompositeAssemblyTable;
+	CompositeAssemblyShape : OPTIONAL CompositeAssemblyShapeSelect;
+END_ENTITY;
+
+ENTITY CompositeAssemblySequenceDefinition;
+	ComponentsInSequence : BAG[1:?] OF ComponentClassForAssemblySelect;
+END_ENTITY;
+
+ENTITY CompositeAssemblyTable
+	SUBTYPE OF(LaminateTable);
+	SequenceGroups : LIST[2:?] OF CompositeAssemblySequenceDefinition;
+END_ENTITY;
+
+ENTITY CompositeCurveOnSurface
+	SUBTYPE OF(Curve);
+END_ENTITY;
+
+ENTITY CompositeSheetRepresentation
+	SUPERTYPE OF (ONEOF(FaceBasedSheetRepresentation, GeometricSheetRepresentation))
+	SUBTYPE OF(ConstituentShapeRepresentation);
+	ThreeDGeometry : ExternalGeometricModel;
+END_ENTITY;
+
+ENTITY Condition
+	SUPERTYPE OF (ONEOF(AndCondition, EqualsCondition, NotCondition, NotEqualsCondition, OneOfCondition, OrCondition));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ConditionType : ClassSelect;
+	Parameters : SET[1:?] OF ParameterSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY ConditionAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedCondition : Condition;
+	AssignedTo : ConditionAssignmentSelect;
+END_ENTITY;
+
+ENTITY ConditionParameter;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Parameter : OPTIONAL ConditionParameterSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY ConditionRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Condition;
+	Related : Condition;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY ConditionalConfiguration
+	SUBTYPE OF(ConditionalEffectivity);
+	ConfigurationType : ClassSelect;
+	InheritanceType : ClassSelect;
+END_ENTITY;
+
+ENTITY ConditionalEffectivity
+	SUPERTYPE OF (ConditionalConfiguration)
+	SUBTYPE OF(Effectivity);
+	Condition : Condition;
+END_ENTITY;
+
+ENTITY ConfiguredAssemblyEffectivity;
+	Id : OPTIONAL IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ConfiguredElements : SET[1:?] OF AssemblyDesignSelect;
+	EffectivityDomain : OPTIONAL Effectivity;
+	ResolvedConfiguration : ProductDesignAssociation;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY ConnectedEdgeSet
+	SUPERTYPE OF (ConnectedEdgeSubSet)
+	SUBTYPE OF(TopologicalRepresentationItem);
+	ConnectedEdges : SET[1:?] OF Edge;
+END_ENTITY;
+
+ENTITY ConnectedEdgeSubSet
+	SUBTYPE OF(ConnectedEdgeSet);
+	ParentEdgeSet : ConnectedEdgeSet;
+END_ENTITY;
+
+ENTITY ConnectedEdgeWithLengthSetRepresentation
+	SUBTYPE OF(Representation);
+	SELF\Representation.Items : SET[1:?] OF ConnectedEdgeWithLengthSetItemsSelect;
+END_ENTITY;
+
+ENTITY ConstituentPart
+	SUPERTYPE OF (ONEOF(CompositeAssembly, FilamentLaminate, Ply, PlyLaminate, PlyLaminateSequenceDefinition, PlyPiece, ProcessedCore))
+	SUBTYPE OF(PartView);
+	Weight : OPTIONAL NumericalValue;
+WHERE
+WR1: ((NOT(EXISTS(SELF.Weight))) OR ((EXISTS(SELF.Weight)) AND (SELF.Weight.Unit.Name='mass')));
+END_ENTITY;
+
+ENTITY ConstituentShapeRepresentation
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(BeveledSheetRepresentation, CompositeSheetRepresentation, ThreeDGeometrySet))
+	SUBTYPE OF(GeometricRepresentation);
+END_ENTITY;
+
+ENTITY ContactFeatureDefinition
+	SUBTYPE OF(ShapeFeatureDefinition);
+END_ENTITY;
+
+ENTITY ContactFeatureDefinitionFitRelationship
+	SUBTYPE OF(ShapeFeatureDefinitionFitRelationship);
+	JointType : OPTIONAL AssemblyJointTypeEnum;
+	SELF\ShapeFeatureDefinitionRelationship.Relating : ContactFeatureDefinition;
+	SELF\ShapeFeatureDefinitionRelationship.Related : ContactFeatureDefinition;
+END_ENTITY;
+
+ENTITY ContentProperty;
+	Description : OPTIONAL DescriptorSelect;
+	DetailLevel : OPTIONAL DescriptorSelect;
+	GeometryTypes : OPTIONAL SET[1:?] OF Classification;
+	Languages : OPTIONAL SET[1:?] OF Language;
+	RealWorldScale : OPTIONAL NumericalValue;
+END_ENTITY;
+
+ENTITY Contract;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ContractType : ClassSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+INVERSE
+	Releases : SET[0:?] OF OrganizationInContract FOR SignedContracts;
+END_ENTITY;
+
+ENTITY ContractAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssignedContract : Contract;
+	AssignedTo : ContractAssignmentSelect;
+END_ENTITY;
+
+ENTITY ContractRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL SET[1:?] OF DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Contract;
+	Related : Contract;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY Copyright
+	SUBTYPE OF(InformationRight);
+END_ENTITY;
+
+ENTITY CreationProperty;
+	Description : OPTIONAL DescriptorSelect;
+	CreatingInterface : OPTIONAL CharacterString;
+	CreatingSystem : CharacterString;
+	OperatingSystem : OPTIONAL CharacterString;
+END_ENTITY;
+
+ENTITY CrossSectionalAlternativePartShapeElement
+	SUBTYPE OF(CrossSectionalPartShapeElement);
+	Items : SET[1:?] OF CrossSectionalConstituentElementSelect;
+END_ENTITY;
+
+ENTITY CrossSectionalGroupShapeElement
+	SUPERTYPE OF (ONEOF(CrossSectionalGroupShapeElementWithLacing, CrossSectionalGroupShapeElementWithTubularCover, TwistedCrossSectionalGroupShapeElement))
+	SUBTYPE OF(CrossSectionalPartShapeElement);
+	Items : SET[1:?] OF CrossSectionalConstituentElementSelect;
+END_ENTITY;
+
+ENTITY CrossSectionalGroupShapeElementWithLacing
+	SUBTYPE OF(CrossSectionalGroupShapeElement);
+	LacingMaterial : OPTIONAL Occurrence;
+END_ENTITY;
+
+ENTITY CrossSectionalGroupShapeElementWithTubularCover
+	SUBTYPE OF(CrossSectionalGroupShapeElement);
+	Cover : CrossSectionalConstituentElementSelect;
+END_ENTITY;
+
+ENTITY CrossSectionalOccurrenceShapeElement
+	SUBTYPE OF(OccurrenceShapeFeature);
+	SELF\OccurrenceShapeElement.Definition : CrossSectionalConstituentElementSelect;
+END_ENTITY;
+
+ENTITY CrossSectionalPartShapeElement
+	SUPERTYPE OF (ONEOF(CrossSectionalAlternativePartShapeElement, CrossSectionalGroupShapeElement))
+	SUBTYPE OF(PartShapeElement);
+	SELF\PartShapeElement.ElementOf : CrossSectionalPartShapeElementElementOfSelect;
+	MaxCrossSectionDiameter : OPTIONAL NumericalValue;
+	MinCrossSectionDiameter : OPTIONAL NumericalValue;
+	MinimumBendRadius : OPTIONAL NumericalValue;
+	OuterOrInnerBoundary : OPTIONAL OuterOrInnerBoundaryEnum;
+END_ENTITY;
+
+ENTITY Curve
+	SUPERTYPE OF (ONEOF(CompositeCurveOnSurface, Pcurve, SurfaceCurve, TrimmedCurve))
+	SUBTYPE OF(DetailedGeometricModelItem);
+	SELF\RepresentationItem.External : ExternalItem;
+END_ENTITY;
+
+ENTITY Curve11
+	SUBTYPE OF(DetailedGeometricModelItem);
+	Fiber11Offset : ValueWithUnit;
+	GuideCurves : SET[1:?] OF Curve;
+END_ENTITY;
+
+ENTITY Cylindrical11
+	SUBTYPE OF(DetailedGeometricModelItem);
+	GuideCurves : SET[1:?] OF Curve;
+END_ENTITY;
+
+ENTITY DataEnvironment;
+	Name : DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	Characterization : OPTIONAL SET[1:?] OF PropertyValue;
+END_ENTITY;
+
+ENTITY DateAndPersonAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedDateAndPerson : DateAndPersonOrganization;
+	AssignedTo : DateTimePersonOrganizationElementSelect;
+END_ENTITY;
+
+ENTITY DateAndPersonOrganization;
+	Date : DateTimeString;
+	PersonOrOrganization : OrganizationOrPersonInOrganizationSelect;
+END_ENTITY;
+
+ENTITY DateTimeAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedDate : DateTimeString;
+	AssignedTo : DateTimeAssignmentSelect;
+END_ENTITY;
+
+ENTITY DatedEffectivity
+	SUPERTYPE OF (TimeIntervalEffectivity)
+	SUBTYPE OF(Effectivity);
+	EndDefinition : OPTIONAL EventOrDateSelect;
+	StartDefinition : OPTIONAL EventOrDateSelect;
+END_ENTITY;
+
+ENTITY DefinitionBasedOccurrence
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(QuantifiedOccurrence, SingleOccurrence))
+	SUBTYPE OF(Occurrence);
+	SELF\Occurrence.Definition : OccurrenceDefinitionSelect;
+END_ENTITY;
+
+ENTITY DefinitionalPartViewUsage
+	SUBTYPE OF(PartViewRelationship);
+END_ENTITY;
+
+ENTITY DegeneratePcurve
+	SUBTYPE OF(Point);
+END_ENTITY;
+
+ENTITY DeleteElement
+	SUBTYPE OF(DeltaChangeActivity);
+	PreviousDesignObject : SET[1:?] OF DeltaChangeManagementObjectSelect;
+END_ENTITY;
+
+ENTITY DeltaChange;
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ChangeActivities : OPTIONAL SET[1:?] OF DeltaChangeActivity;
+	DescribedChange : OPTIONAL DeltaChangeRelationshipSelect;
+END_ENTITY;
+
+ENTITY DeltaChangeActivity
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(AddElement, DeleteElement, ModifyElement, ModifySingleElement));
+	AttributeName : OPTIONAL CharacterString;
+	ChangeLocationInAggregateAttribute : OPTIONAL LIST[1:?] OF INTEGER;
+INVERSE
+	ChangeSet : DeltaChange FOR ChangeActivities;
+END_ENTITY;
+
+ENTITY Descriptor;
+	Id : OPTIONAL IdentifierSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	DescriptionContext : OPTIONAL SET[1:?] OF IdentificationContextSelect;
+	Text : MultiLingualStringSelect;
+END_ENTITY;
+
+ENTITY DescriptorRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Descriptor;
+	Related : Descriptor;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY DetailedGeometricModelItem
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(AdvancedFace, AxisPlacement, Cartesian11, Curve, Curve11, Cylindrical11, Direction, EdgeCurve, GeometricSet, InterpolatedConfigurationSequence, KinematicPair, KinematicPairValue, KinematicPathDefinedByNodes, Loop, Point, PointAndVector, PointArray, Polar11, RotationAboutDirection, Surface, VertexPoint))
+	SUBTYPE OF(RepresentationItem);
+END_ENTITY;
+
+ENTITY DigitalDocumentDefinition
+	SUBTYPE OF(DocumentDefinition);
+	Files : OPTIONAL SET[1:?] OF DigitalFile;
+END_ENTITY;
+
+ENTITY DigitalFile
+	SUBTYPE OF(File);
+INVERSE
+	AssociatedModelSpace : SET[0:?] OF ExternalGeometricModel FOR ExternalFile;
+END_ENTITY;
+
+ENTITY DirectedActualActivity
+	SUBTYPE OF(ActualActivity);
+	Directive : WorkOrder;
+END_ENTITY;
+
+ENTITY DirectedPlannedActivity
+	SUBTYPE OF(PlannedActivity);
+	Directive : WorkOrder;
+END_ENTITY;
+
+ENTITY Direction
+	SUBTYPE OF(DetailedGeometricModelItem);
+	DirectionRatios : LIST[2:3] OF LengthMeasure;
+END_ENTITY;
+
+ENTITY Document;
+	Id : IdentifierSelect;
+	Name : DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	DocumentTypes : SET[1:?] OF ClassSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Versions : SET[1:?] OF DocumentVersion;
+END_ENTITY;
+
+ENTITY DocumentAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedDocument : AssignedDocumentSelect;
+	AssignedTo : DocumentAssignmentSelect;
+	DocumentPortion : OPTIONAL MultiLingualStringSelect;
+END_ENTITY;
+
+ENTITY DocumentDefinition
+	SUPERTYPE OF (ONEOF(DigitalDocumentDefinition, PhysicalDocumentDefinition));
+	Id : OPTIONAL IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	DocumentContent : OPTIONAL ContentProperty;
+	DocumentCreation : OPTIONAL CreationProperty;
+	DocumentFormat : OPTIONAL SET[1:?] OF FormatProperty;
+	DocumentSize : OPTIONAL SizeProperty;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+INVERSE
+	ViewOf : DocumentVersion FOR Views;
+END_ENTITY;
+
+ENTITY DocumentDefinitionRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : DocumentDefinition;
+	Related : DocumentDefinition;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY DocumentRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Document;
+	Related : Document;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY DocumentVersion;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Views : OPTIONAL SET[1:?] OF DocumentDefinition;
+INVERSE
+	VersionOf : Document FOR Versions;
+END_ENTITY;
+
+ENTITY DocumentVersionRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : DocumentVersion;
+	Related : DocumentVersion;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY DrapedOrientationAngle
+	SUBTYPE OF(PlyOrientationAngle);
+END_ENTITY;
+
+ENTITY Duration;
+	Time : STRING;
+	Unit : STRING;
+END_ENTITY;
+
+ENTITY Edge
+	SUPERTYPE OF (ONEOF(EdgeWithLength, SubEdge))
+	SUBTYPE OF(TopologicalRepresentationItem);
+	EdgeEnd : Vertex;
+	EdgeStart : Vertex;
+END_ENTITY;
+
+ENTITY EdgeCurve
+	SUBTYPE OF(DetailedGeometricModelItem);
+	SELF\RepresentationItem.External : ExternalItem;
+END_ENTITY;
+
+ENTITY EdgeWithLength
+	SUBTYPE OF(Edge);
+	EdgeLength : PositiveLengthMeasure;
+END_ENTITY;
+
+ENTITY EdgeZoneShape
+	SUBTYPE OF(ZoneStructuralMakeupShapeRepresentation);
+	Boundary : BoundaryClassZoneSelect;
+END_ENTITY;
+
+ENTITY Effectivity
+	SUPERTYPE OF (ONEOF(ConditionalEffectivity, DatedEffectivity, IndividualPartEffectivity, LotEffectivity, SerialEffectivity));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ConcernedOrganizations : OPTIONAL SET[1:?] OF Organization;
+	EffectivityContext : OPTIONAL EffectivityContextSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY EffectivityAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedEffectivity : Effectivity;
+	AssignedTo : EffectivityAssignmentSelect;
+	EffectivityIndication : BOOLEAN;
+END_ENTITY;
+
+ENTITY EffectivityRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Effectivity;
+	Related : Effectivity;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY ElementDelivery;
+	Role : ClassSelect;
+	AssociatedActivity : Activity;
+	DeliverableElements : SET[1:?] OF ActivityAssignmentSelect;
+	Destination : Organization;
+	Quantity : ValueWithUnit;
+END_ENTITY;
+
+ENTITY Envelope;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Acknowledge : OPTIONAL MultiLingualStringSelect;
+	Wrapping : OPTIONAL Message;
+END_ENTITY;
+
+ENTITY EnvelopeRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Relating : Envelope;
+	Related : Envelope;
+END_ENTITY;
+
+ENTITY EqualsCondition
+	SUBTYPE OF(Condition);
+DERIVE
+	SELF\Condition.ConditionType : STRING := 'equals';
+END_ENTITY;
+
+ENTITY EvaluatedCharacteristic;
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ActualCharacteristic : MeasuredCharacteristic;
+	EvaluationResult : EvaluationResultEnum;
+	EvaluationStatus : EvaluationStatusEnum;
+	PlannedCharacteristic : PlannedCharacteristic;
+END_ENTITY;
+
+ENTITY EvaluatedRequirement;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AnalysedCharacteristic : PropertyValue;
+	AnalysisModel : AnalysisModel;
+	EvaluationResults : StateObserved;
+	EvaluationStatus : StateObserved;
+	RequiredCharacteristic : PropertyValue;
+	RequiredFor : RequirementAssignment;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY Event;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	EventType : ClassSelect;
+	ActualStartDate : OPTIONAL DateTimeString;
+	Offset : OPTIONAL Duration;
+	PlannedStartDate : OPTIONAL DateTimeString;
+END_ENTITY;
+
+ENTITY EventAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedEvent : Event;
+	AssignedTo : GeneralOrganizationalDataSelect;
+END_ENTITY;
+
+ENTITY EventRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Event;
+	Related : Event;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY Evidence;
+	Id : IdentifierSelect;
+	Description : DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Items : SET[1:?] OF EvidenceSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Supports : EvidenceSupportSelect;
+END_ENTITY;
+
+ENTITY ExchangeContext;
+	Description : OPTIONAL DescriptorSelect;
+	ClassLibrary : OPTIONAL Uri;
+	DefaultLanguage : OPTIONAL Language;
+	DefaultUnit : OPTIONAL Unit;
+	IdentificationContext : OPTIONAL IdentificationContextSelect;
+WHERE
+WR1: EXISTS(DefaultLanguage) OR EXISTS (IdentificationContext);
+END_ENTITY;
+
+ENTITY ExpandedUncertainty
+	SUBTYPE OF(StandardUncertainty);
+	CoverageFactor : REAL;
+END_ENTITY;
+
+ENTITY ExternalAdvancedBrepShapeRepresentation
+	SUBTYPE OF(ExternalGeometricModel);
+END_ENTITY;
+
+ENTITY ExternalAnalysisModel
+	SUBTYPE OF(AnalysisModelObject);
+	ExternalFile : DigitalFile;
+END_ENTITY;
+
+ENTITY ExternalClassSystem;
+	Id : SingleIdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	Source : OPTIONAL ExternalSourceSelect;
+INVERSE
+	AllowedClasses : SET[1:?] OF Class FOR DefinedIn;
+UNIQUE
+UR1: Id, Source;
+END_ENTITY;
+
+ENTITY ExternalCsgShapeRepresentation
+	SUBTYPE OF(ExternalGeometricModel);
+END_ENTITY;
+
+ENTITY ExternalCurveSweptSolidShapeRepresentation
+	SUBTYPE OF(ExternalGeometricModel);
+END_ENTITY;
+
+ENTITY ExternalEdgeBasedWireframeShapeRepresentation
+	SUBTYPE OF(ExternalGeometricModel);
+END_ENTITY;
+
+ENTITY ExternalElementaryBrepShapeRepresentation
+	SUBTYPE OF(ExternalGeometricModel);
+END_ENTITY;
+
+ENTITY ExternalEntityInstance
+	SUPERTYPE OF (ONEOF(NextInstanceForward, NextInstanceInverse))
+	SUBTYPE OF(ExternalItem);
+	SELF\ExternalItem.Id : IdentifierString;
+END_ENTITY;
+
+ENTITY ExternalFacetedBrepShapeRepresentation
+	SUBTYPE OF(ExternalGeometricModel);
+END_ENTITY;
+
+ENTITY ExternalGeometricModel
+	SUPERTYPE OF (ONEOF(ExternalAdvancedBrepShapeRepresentation, ExternalCsgShapeRepresentation, ExternalCurveSweptSolidShapeRepresentation, ExternalEdgeBasedWireframeShapeRepresentation, ExternalElementaryBrepShapeRepresentation, ExternalFacetedBrepShapeRepresentation, ExternalGeometricallyBoundedSurfaceShapeRepresentation, ExternalGeometricallyBoundedWireframeShapeRepresentation, ExternalManifoldSurfaceShapeRepresentation, ExternalShellBasedWireframeShapeRepresentation, ExternalTessellatedShapeRepresentation))
+	SUBTYPE OF(GeometricModel);
+	ExternalFile : DigitalFile;
+	ExternalItem : OPTIONAL ExternalItem;
+	SELF\Representation.Items : SET[1:?] OF AxisPlacement;
+	ParameterValues : OPTIONAL SET[1:?] OF PropertyValue;
+END_ENTITY;
+
+ENTITY ExternalGeometricallyBoundedSurfaceShapeRepresentation
+	SUBTYPE OF(ExternalGeometricModel);
+END_ENTITY;
+
+ENTITY ExternalGeometricallyBoundedWireframeShapeRepresentation
+	SUBTYPE OF(ExternalGeometricModel);
+END_ENTITY;
+
+ENTITY ExternalItem
+	SUPERTYPE OF (ExternalEntityInstance);
+	Id : SingleIdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	Source : OPTIONAL ExternalSourceSelect;
+UNIQUE
+UR1: Id, Source;
+END_ENTITY;
+
+ENTITY ExternalManifoldSurfaceShapeRepresentation
+	SUBTYPE OF(ExternalGeometricModel);
+END_ENTITY;
+
+ENTITY ExternalOwlClass;
+	Class : Uri;
+UNIQUE
+UR1: Class;
+END_ENTITY;
+
+ENTITY ExternalOwlObject;
+	Individual : Uri;
+UNIQUE
+UR1: Individual;
+END_ENTITY;
+
+ENTITY ExternalRepresentationItem
+	SUBTYPE OF(RepresentationItem);
+	SELF\RepresentationItem.External : ExternalItem;
+END_ENTITY;
+
+ENTITY ExternalShellBasedWireframeShapeRepresentation
+	SUBTYPE OF(ExternalGeometricModel);
+END_ENTITY;
+
+ENTITY ExternalTessellatedShapeRepresentation
+	SUBTYPE OF(ExternalGeometricModel);
+END_ENTITY;
+
+ENTITY ExternalTypeQualifier;
+	SameAs : OPTIONAL Proxy;
+END_ENTITY;
+
+ENTITY ExternalUnit;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Definition : ProxyItemSelect;
+	SameAs : SET[1:?] OF Proxy;
+UNIQUE
+UR1: SameAs;
+END_ENTITY;
+
+ENTITY FaceBasedSheetRepresentation
+	SUBTYPE OF(CompositeSheetRepresentation);
+	FaceSurface : Surface;
+	InnerBounds : OPTIONAL SET[1:?] OF Loop;
+	OuterBound : Loop;
+END_ENTITY;
+
+ENTITY FilamentLaminate
+	SUBTYPE OF(ConstituentPart);
+	MadeFrom : StockMaterial;
+	ShapeCrossSection : OPTIONAL GeometricModel;
+WHERE
+WR1 : SELF.MadeFrom.StockMaterialType = filament_assembly;
+END_ENTITY;
+
+ENTITY File
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(DigitalFile, Hardcopy));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	FileType : OPTIONAL ClassSelect;
+	FileContent : OPTIONAL ContentProperty;
+	FileCreation : OPTIONAL CreationProperty;
+	FileFormat : OPTIONAL FormatProperty;
+	FileLocations : OPTIONAL SET[1:?] OF FileLocationIdentification;
+	FileSize : OPTIONAL SizeProperty;
+	Locations : OPTIONAL SET[1:?] OF ExternalItem;
+END_ENTITY;
+
+ENTITY FileLocationIdentification;
+	ExternalId : OPTIONAL IdentifierString;
+	SourceId : IdentifierString;
+	SourceType : IdentifierString;
+END_ENTITY;
+
+ENTITY FileRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : File;
+	Related : File;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY FinalSolution
+	SUBTYPE OF(AlternativeSolution);
+	Specifications : SET[1:?] OF FinalDefinitionSelect;
+	Status : ClassSelect;
+END_ENTITY;
+
+ENTITY FormatProperty;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	CharacterCode : OPTIONAL ClassSelect;
+	DataFormat : OPTIONAL ClassSelect;
+	SizeFormat : OPTIONAL RectangularSize;
+END_ENTITY;
+
+ENTITY FrozenAssignment;
+	FrozenObject : SET[1:?] OF DeltaChangeManagementObjectSelect;
+END_ENTITY;
+
+ENTITY FunctionalBreakdown
+	SUBTYPE OF(Breakdown);
+DERIVE
+	SELF\Breakdown.BreakdownType : STRING := 'functional';
+END_ENTITY;
+
+ENTITY FunctionalBreakdownElementViewAssociation;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssociatedFunctionalElement : BreakdownElementView;
+	AssociatedPhysicalElement : PhysicalElementSelect;
+END_ENTITY;
+
+ENTITY GeneralGeometricRepresentationRelationship
+	SUBTYPE OF(GeometricRepresentationRelationship);
+	RelationType : ClassSelect;
+END_ENTITY;
+
+ENTITY GeneralShapeDependentProperty
+	SUBTYPE OF(ShapeDependentProperty);
+	PropertyType : PropertyDefinitionSelect;
+	PropertyValue : PropertyValueSelect;
+	Unit : OPTIONAL Unit;
+END_ENTITY;
+
+ENTITY GeometricCoordinateSpace
+	SUBTYPE OF(RepresentationContext);
+	DimensionCount : INTEGER;
+	SELF\RepresentationContext.Representations : OPTIONAL SET[1:?] OF GeometricRepresentation;
+WHERE
+WR1: DimensionCount > 0;
+END_ENTITY;
+
+ENTITY GeometricCurveSet
+	SUPERTYPE OF (BoundaryCurveSet)
+	SUBTYPE OF(GeometricSet);
+	SELF\GeometricSet.Elements : SET[1:?] OF CurveOrPointSelect;
+END_ENTITY;
+
+ENTITY GeometricModel
+	SUPERTYPE OF (ONEOF(ComposedGeometricModel, ExternalGeometricModel, TransformedGeometricModel))
+	SUBTYPE OF(GeometricRepresentation);
+	ModelExtent : OPTIONAL LengthMeasure;
+END_ENTITY;
+
+ENTITY GeometricRepresentation
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(ConstituentShapeRepresentation, GeometricModel, InterpolatedConfigurationModel, KinematicLink, LinkMotionAlongPath, Mechanism, MechanismState, StyledModel))
+	SUBTYPE OF(Representation);
+INVERSE
+	SELF\Representation.ContextOfItems : GeometricCoordinateSpace FOR Representations;
+END_ENTITY;
+
+ENTITY GeometricRepresentationRelationship
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(GeneralGeometricRepresentationRelationship, GeometricRepresentationRelationshipWithCartesianTransformation, GeometricRepresentationRelationshipWithPlacementTransformation, GeometricRepresentationRelationshipWithSameCoordinateSpace))
+	SUBTYPE OF(RepresentationRelationship);
+	SELF\RepresentationRelationship.Relating : GeometricRepresentationSelect;
+	SELF\RepresentationRelationship.Related : GeometricRepresentationSelect;
+END_ENTITY;
+
+ENTITY GeometricRepresentationRelationshipWithCartesianTransformation
+	SUBTYPE OF(GeometricRepresentationRelationship);
+	Transformation : CartesianTransformation;
+WHERE
+WR1: SELF\GeometricRepresentationRelationship.Relating.ContextOfItems :<>: SELF\GeometricRepresentationRelationship.Related.ContextOfItems;
+END_ENTITY;
+
+ENTITY GeometricRepresentationRelationshipWithPlacementTransformation
+	SUBTYPE OF(GeometricRepresentationRelationship);
+	Origin : AxisPlacement;
+	Target : AxisPlacement;
+WHERE
+WR1: SELF\GeometricRepresentationRelationship.Relating.ContextOfItems :<>: SELF\GeometricRepresentationRelationship.Related.ContextOfItems;
+END_ENTITY;
+
+ENTITY GeometricRepresentationRelationshipWithSameCoordinateSpace
+	SUBTYPE OF(GeometricRepresentationRelationship);
+DERIVE
+	SELF\RepresentationRelationship.Definitional : BOOLEAN := TRUE;
+WHERE
+WR1: SELF\RepresentationRelationship.Relating.ContextOfItems :=: SELF\RepresentationRelationship.Related.ContextOfItems;
+END_ENTITY;
+
+ENTITY GeometricSet
+	SUPERTYPE OF (GeometricCurveSet)
+	SUBTYPE OF(DetailedGeometricModelItem);
+	Elements : SET[1:?] OF GeometricSetSelect;
+END_ENTITY;
+
+ENTITY GeometricSheetRepresentation
+	SUBTYPE OF(CompositeSheetRepresentation);
+	BasisSurface : Surface;
+	Cutouts : OPTIONAL SET[1:?] OF BoundaryCurveSet;
+	OuterEdge : BoundaryCurveSet;
+END_ENTITY;
+
+ENTITY GeometricalRelationship
+	SUBTYPE OF(PartViewRelationship);
+	Placement : GeometricRepresentationRelationshipWithPlacementTransformation;
+DERIVE
+	SELF\PartViewRelationship.RelationType : STRING := 'geometrically related part view';
+END_ENTITY;
+
+ENTITY GeometryToTopologyRepresentationAssociation
+	SUBTYPE OF(RepresentationRelationship);
+	Origin : TopologyGeometryAssociationGeometricItemsSelect;
+	Target : TopologyGeometryAssociationTopologicalItemsSelect;
+END_ENTITY;
+
+ENTITY Hardcopy
+	SUBTYPE OF(File);
+END_ENTITY;
+
+ENTITY HarnessNode
+	SUBTYPE OF(PartShapeElement);
+	AttachedFeature : OPTIONAL OccurrenceShapeFeature;
+	SELF\ShapeElement.ElementOf : WiringHarnessAssemblyDesign;
+	NodeType : OPTIONAL NodeTypeEnum;
+	SELF\ShapeElement.RepresentedGeometry : Vertex;
+END_ENTITY;
+
+ENTITY HarnessSegment
+	SUBTYPE OF(PartShapeElement);
+	CrossSection : OPTIONAL CrossSectionalConstituentElementSelect;
+	SELF\ShapeElement.ElementOf : WiringHarnessAssemblyDesign;
+	ForcedLength : OPTIONAL NumericalValue;
+	SELF\ShapeElement.RepresentedGeometry : Edge;
+END_ENTITY;
+
+ENTITY HierarchicalInterfaceConnection
+	SUBTYPE OF(InterfaceConnection);
+END_ENTITY;
+
+ENTITY HighOrderKinematicPair
+	SUBTYPE OF(KinematicPair);
+	CurveOrSurface1 : ExternalCurveOrSurfaceSelect;
+	CurveOrSurface2 : OPTIONAL ExternalCurveOrSurfaceSelect;
+	Kind : HighOrderKinematicPairTypeEnum;
+	LowerLimitPitch : OPTIONAL PlaneAngleMeasure;
+	LowerLimitRoll : OPTIONAL PlaneAngleMeasure;
+	LowerLimitYaw : OPTIONAL PlaneAngleMeasure;
+	Model1 : ExternalGeometricModel;
+	Model2 : OPTIONAL ExternalGeometricModel;
+	Orientation : OPTIONAL BOOLEAN;
+	Range1 : OPTIONAL ExternalTrimmedCurveOrSurfaceSelect;
+	Range2 : OPTIONAL ExternalTrimmedCurveOrSurfaceSelect;
+	UpperLimitPitch : OPTIONAL PlaneAngleMeasure;
+	UpperLimitRoll : OPTIONAL PlaneAngleMeasure;
+	UpperLimitYaw : OPTIONAL PlaneAngleMeasure;
+END_ENTITY;
+
+ENTITY Identifier;
+	Id : IdentifierString;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	IdentificationContext : OPTIONAL IdentificationContextSelect;
+UNIQUE
+UR1: Id, Role, IdentificationContext;
+WHERE
+ContextlessForOrganizationOnly: NOT (NOT EXISTS(IdentificationContext) AND (SIZEOF(USEDIN(SELF, SCHEMA_NAME + 'ORGANIZATION.ID'))=0));
+END_ENTITY;
+
+ENTITY IdentifierRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Identifier;
+	Related : Identifier;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY InZone;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	LocatedItem : InZoneSelect;
+	Zone : BreakdownElementView;
+END_ENTITY;
+
+ENTITY IndividualAssemblyRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Relating : IndividualPartView;
+	Related : IndividualOrPartViewSelect;
+DERIVE
+	RelationType : STRING := 'next assembly view';
+INVERSE
+	IsRealizationOf : AssemblyRealizationContext FOR Relating;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY IndividualPart;
+	Id : IdentifierSelect;
+	Name : DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Versions : SET[1:?] OF IndividualPartVersion;
+END_ENTITY;
+
+ENTITY IndividualPartEffectivity
+	SUBTYPE OF(Effectivity);
+	Items : SET[1:?] OF IndividualPart;
+END_ENTITY;
+
+ENTITY IndividualPartRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : IndividualPart;
+	Related : IndividualPart;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY IndividualPartTestResult
+	SUBTYPE OF(IndividualPartView);
+	TestedPart : IndividualPartView;
+END_ENTITY;
+
+ENTITY IndividualPartVersion
+	SUPERTYPE OF (ONEOF(PlannedIndividualPart, RealizedIndividualPart));
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Views : OPTIONAL SET[1:?] OF IndividualPartView;
+INVERSE
+	VersionOf : IndividualPart FOR Versions;
+END_ENTITY;
+
+ENTITY IndividualPartVersionRelationship
+	SUPERTYPE OF (ProductPlannedToRealized);
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : IndividualPartVersion;
+	Related : IndividualPartVersion;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY IndividualPartView
+	SUPERTYPE OF (IndividualPartTestResult);
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AdditionalContexts : OPTIONAL SET[1:?] OF ViewContext;
+	DefiningGeometry : OPTIONAL GeometricModel;
+	InitialContext : ViewContext;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+INVERSE
+	ViewOf : IndividualPartVersion FOR Views;
+END_ENTITY;
+
+ENTITY IndividualPartViewRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : IndividualPartView;
+	Related : IndividualPartView;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY InformationRight
+	SUPERTYPE OF (Copyright);
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Owners : SET[1:?] OF OrganizationOrPersonInOrganizationSelect;
+	Restriction : OPTIONAL MultiLingualStringSelect;
+END_ENTITY;
+
+ENTITY InformationUsageRight;
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	GrantsRight : SET[1:?] OF InformationRight;
+	Owners : SET[1:?] OF OrganizationOrPersonInOrganizationSelect;
+END_ENTITY;
+
+ENTITY InformationUsageRightAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssignedRight : InformationUsageRight;
+	AssignedTo : InformationUsageRightAssignmentSelect;
+END_ENTITY;
+
+ENTITY InformationUsageRightRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL SET[1:?] OF DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : InformationUsageRight;
+	Related : InformationUsageRight;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY InterfaceConnection
+	SUPERTYPE OF (HierarchicalInterfaceConnection);
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Connected : ConnectionSelect;
+	Connecting : ConnectionSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY InterfaceConnector;
+	Id : IdentifierSelect;
+	Name : DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Versions : SET[1:?] OF InterfaceConnectorVersion;
+END_ENTITY;
+
+ENTITY InterfaceConnectorDefinition;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AdditionalContexts : OPTIONAL SET[1:?] OF ViewContext;
+	ConnectorOn : InterfaceDefinitionConnectionSelect;
+	InitialContext : ViewContext;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+INVERSE
+	ViewOf : InterfaceConnectorVersion FOR Views;
+END_ENTITY;
+
+ENTITY InterfaceConnectorOccurrence;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ConnectorOn : ConnectorOnSelect;
+	OccurrenceOf : InterfaceConnectorDefinition;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY InterfaceConnectorVersion;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Views : SET[1:?] OF InterfaceConnectorDefinition;
+INVERSE
+	VersionOf : InterfaceConnector FOR Versions;
+END_ENTITY;
+
+ENTITY InterfaceDefinitionConnection;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Connected : InterfaceDefinitionConnectionSelect;
+	Connecting : InterfaceDefinitionConnectionSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY InterfaceDefinitionFor;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Interface : InterfaceSpecificationDefinition;
+	InterfaceComponent : InterfaceDefinitionForSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY InterfaceSpecification;
+	Id : IdentifierSelect;
+	Name : DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Versions : SET[1:?] OF InterfaceSpecificationVersion;
+END_ENTITY;
+
+ENTITY InterfaceSpecificationDefinition;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AdditionalContexts : OPTIONAL SET[1:?] OF ViewContext;
+	InitialContext : ViewContext;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+INVERSE
+	ViewOf : InterfaceSpecificationVersion FOR Views;
+END_ENTITY;
+
+ENTITY InterfaceSpecificationVersion;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Views : SET[1:?] OF InterfaceSpecificationDefinition;
+INVERSE
+	VersionOf : InterfaceSpecification FOR Versions;
+END_ENTITY;
+
+ENTITY InterpolatedConfigurationModel
+	SUBTYPE OF(GeometricRepresentation);
+	SELF\Representation.Items : SET[1:?] OF InterpolatedConfigurationSequence;
+	ParameterUnit : Unit;
+END_ENTITY;
+
+ENTITY InterpolatedConfigurationSegment;
+	Interpolation : InterpolationTypeEnum;
+	State : MechanismState;
+	TParameter : ParameterValue;
+END_ENTITY;
+
+ENTITY InterpolatedConfigurationSequence
+	SUBTYPE OF(DetailedGeometricModelItem);
+	Segments : LIST[2:?] OF InterpolatedConfigurationSegment;
+END_ENTITY;
+
+ENTITY KinematicLink
+	SUBTYPE OF(GeometricRepresentation);
+	SELF\Representation.Items : SET[1:?] OF AxisPlacement;
+	OfModel : OPTIONAL ExternalGeometricModel;
+END_ENTITY;
+
+ENTITY KinematicLinkToOccurrenceAssociation;
+	AssociatedLink : KinematicLink;
+	AssociatedTo : Occurrence;
+END_ENTITY;
+
+ENTITY KinematicMechanismAssociation;
+	AssociatedMechanism : Mechanism;
+	AssociatedTo : AssemblyDefinition;
+	BaseLink : KinematicLink;
+UNIQUE
+UR1 : AssociatedTo;
+END_ENTITY;
+
+ENTITY KinematicPair
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(HighOrderKinematicPair, LowOrderKinematicPair, LowOrderKinematicPairWithMotionCoupling))
+	SUBTYPE OF(DetailedGeometricModelItem);
+	Actuation : OPTIONAL ActuatedPair;
+	Link1 : KinematicLink;
+	Link2 : KinematicLink;
+	PairFrame1 : AxisPlacement;
+	PairFrame2 : AxisPlacement;
+END_ENTITY;
+
+ENTITY KinematicPairValue
+	SUBTYPE OF(DetailedGeometricModelItem);
+	ActualPointOnCurve1 : OPTIONAL PointOnCurve;
+	ActualPointOnCurve2 : OPTIONAL PointOnCurve;
+	ActualPointOnSurface1 : OPTIONAL PointOnSurface;
+	ActualPointOnSurface2 : OPTIONAL PointOnSurface;
+	ActualRotation : OPTIONAL SimpleOrSpatialRotationSelect;
+	ActualTranslation : OPTIONAL TranslationAlongAxes;
+	AppliesToPair : KinematicPair;
+END_ENTITY;
+
+ENTITY KinematicPathDefinedByNodes
+	SUBTYPE OF(DetailedGeometricModelItem);
+	PlacementStart : AxisPlacement;
+	Segments : LIST[1:?] OF PathSegment;
+	TStart : REAL;
+END_ENTITY;
+
+ENTITY LaidOrientationAngle
+	SUBTYPE OF(PlyOrientationAngle);
+END_ENTITY;
+
+ENTITY LaminateTable
+	SUPERTYPE OF (ONEOF(CompositeAssemblyTable, PlyLaminateTable, ZoneStructuralMakeup))
+	SUBTYPE OF(PartView);
+	BaseSurface : SurfaceWithDirection;
+	Basis : ReinforcementOrientationBasis;
+	Handedness : OPTIONAL STRING;
+	ResultingBoundary : PlyShape;
+	ResultingSurface : Surface;
+WHERE
+WR1: SELF.InitialContext.Applicationdomain = 'composites';
+END_ENTITY;
+
+ENTITY LifeCycleStage;
+	SameAs : SET[1:?] OF Proxy;
+UNIQUE
+UR1: SameAs;
+END_ENTITY;
+
+ENTITY LinearPath
+	SUBTYPE OF(PathSegment);
+END_ENTITY;
+
+ENTITY LinkMotionAlongPath
+	SUBTYPE OF(GeometricRepresentation);
+	SELF\Representation.Items : SET[1:?] OF KinematicPathDefinedByNodes;
+	TimeUnit : OPTIONAL Unit;
+END_ENTITY;
+
+ENTITY LinkMotionRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Relating : LinkMotionAlongPath;
+	Related : ComposedOrExternalGeometricModelSelect;
+	TranformationOperator : LinkMotionTransformation;
+END_ENTITY;
+
+ENTITY LinkMotionTransformation;
+	TransformItem1 : AxisPlacement;
+	TransformItem2 : KinematicPathDefinedByNodes;
+END_ENTITY;
+
+ENTITY LocalizedString;
+	Language : OPTIONAL Language;
+	Text : CharacterString;
+END_ENTITY;
+
+ENTITY Loop
+	SUBTYPE OF(DetailedGeometricModelItem);
+	SELF\RepresentationItem.External : ExternalItem;
+END_ENTITY;
+
+ENTITY LotEffectivity
+	SUBTYPE OF(Effectivity);
+	LotId : OPTIONAL IdentifierSelect;
+	LotSize : ValueWithUnit;
+END_ENTITY;
+
+ENTITY LowOrderKinematicPair
+	SUBTYPE OF(KinematicPair);
+	Kind : LowOrderKinematicPairTypeEnum;
+	LowerLimitActualRotationX : OPTIONAL PlaneAngleMeasure;
+	LowerLimitActualRotationY : OPTIONAL PlaneAngleMeasure;
+	LowerLimitActualRotationZ : OPTIONAL PlaneAngleMeasure;
+	LowerLimitActualTranslationX : OPTIONAL LengthMeasure;
+	LowerLimitActualTranslationY : OPTIONAL LengthMeasure;
+	LowerLimitActualTranslationZ : OPTIONAL LengthMeasure;
+	UpperLimitActualRotationX : OPTIONAL PlaneAngleMeasure;
+	UpperLimitActualRotationY : OPTIONAL PlaneAngleMeasure;
+	UpperLimitActualRotationZ : OPTIONAL PlaneAngleMeasure;
+	UpperLimitActualTranslationX : OPTIONAL LengthMeasure;
+	UpperLimitActualTranslationY : OPTIONAL LengthMeasure;
+	UpperLimitActualTranslationZ : OPTIONAL LengthMeasure;
+END_ENTITY;
+
+ENTITY LowOrderKinematicPairWithMotionCoupling
+	SUBTYPE OF(KinematicPair);
+	Bevel : OPTIONAL PlaneAngleMeasure;
+	GearRatio : OPTIONAL REAL;
+	HelicalAngle : OPTIONAL PlaneAngleMeasure;
+	Kind : LowOrderKinematicPairWithMotionCouplingTypeEnum;
+	LowerLimitActualRotation : OPTIONAL PlaneAngleMeasure;
+	LowerLimitRackDisplacement : OPTIONAL LengthMeasure;
+	Pitch : OPTIONAL LengthMeasure;
+	Radius1 : OPTIONAL LengthMeasure;
+	Radius2 : OPTIONAL LengthMeasure;
+	UpperLimitActualRotation : OPTIONAL PlaneAngleMeasure;
+	UpperLimitRackDisplacement : OPTIONAL LengthMeasure;
+END_ENTITY;
+
+ENTITY MakeFromRelationship
+	SUBTYPE OF(PartViewRelationship);
+	Priority : OPTIONAL INTEGER;
+	Quantity : OPTIONAL ValueWithUnit;
+DERIVE
+	SELF\PartViewRelationship.RelationType : STRING := 'make from';
+END_ENTITY;
+
+ENTITY Market;
+	Id : OPTIONAL IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	MarketSegmentType : OPTIONAL ClassSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY MatedPartAssociation
+	SUBTYPE OF(NextAssemblyOccurrenceUsage);
+	SELF\AssemblyOccurrenceRelationship.Relating : MatingDefinition;
+END_ENTITY;
+
+ENTITY MatedPartRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	MatingType : MatingTypeEnum;
+	Relating : MatedPartAssociation;
+	Related : MatedPartAssociation;
+	MatedShapes : OPTIONAL SET[1:?] OF AssemblyShapeJoint;
+	MatingMaterials : OPTIONAL SET[1:?] OF DefinitionBasedOccurrence;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY MaterialIdentification;
+	Id : IdentifierSelect;
+	AssignedTo : MaterialIdentificationAssignmentSelect;
+END_ENTITY;
+
+ENTITY MaterialPropertyAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedProperty : MaterialPropertyValue;
+	AssignedTo : MaterialIdentification;
+	Definitional : OPTIONAL BOOLEAN;
+END_ENTITY;
+
+ENTITY MaterialPropertyDefinition
+	SUBTYPE OF(PropertyDefinition);
+	Name : DescriptorSelect;
+END_ENTITY;
+
+ENTITY MaterialPropertyValue;
+	Definition : MaterialPropertyDefinition;
+	EnvironmentCondition : DataEnvironment;
+	MaterialValue : PropertyValue;
+END_ENTITY;
+
+ENTITY MatingDefinition
+	SUBTYPE OF(AssemblyDefinition);
+	MatingType : OPTIONAL ClassSelect;
+INVERSE
+	MatedParts : SET[2:?] OF MatedPartAssociation FOR Relating;
+END_ENTITY;
+
+ENTITY MeasureQualification;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Qualifiers : SET[1:?] OF ValueQualifierSelect;
+END_ENTITY;
+
+ENTITY MeasuredCharacteristic;
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	MeasureActivity : OPTIONAL MeasureActivitySelect;
+	MeasuredCharacteristics : OPTIONAL SET[1:?] OF PropertyValueAssignment;
+END_ENTITY;
+
+ENTITY Mechanism
+	SUBTYPE OF(GeometricRepresentation);
+	SELF\Representation.Items : SET[1:?] OF KinematicPair;
+END_ENTITY;
+
+ENTITY MechanismState
+	SUBTYPE OF(GeometricRepresentation);
+	SELF\Representation.Items : SET[1:?] OF KinematicPairValue;
+	RepresentedMechanism : Mechanism;
+END_ENTITY;
+
+ENTITY Message;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Contains : OPTIONAL SET[1:?] OF MessageContentSelect;
+	DefinedBy : OPTIONAL SET[1:?] OF MessageDefinerSelect;
+	ExchangeContext : OPTIONAL SET[1:?] OF ExchangeContext;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY MessageRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Relating : Message;
+	Related : Message;
+END_ENTITY;
+
+ENTITY ModelProperty;
+	Definition : PropertyDefinitionSelect;
+	SpecifiedValue : ModelPropertyValueSelect;
+END_ENTITY;
+
+ENTITY ModelPropertyAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssignedProperty : ModelProperty;
+	AssignedTo : PropertyAssignmentSelect;
+	ValidityContext : OPTIONAL ValidityContextSelect;
+END_ENTITY;
+
+ENTITY ModifyElement
+	SUBTYPE OF(DeltaChangeActivity);
+	CurrentDesignObject : SET[1:?] OF DeltaChangeManagementObjectSelect;
+END_ENTITY;
+
+ENTITY ModifySingleElement
+	SUBTYPE OF(DeltaChangeActivity);
+	CurrentDesignObject : DeltaChangeManagementObjectSelect;
+	PreviousDesignObject : DeltaChangeManagementObjectSelect;
+WHERE
+WR1: CurrentDesignObject :<>: PreviousDesignObject;
+END_ENTITY;
+
+ENTITY MomentsOfInertia
+	SUBTYPE OF(ShapeDependentProperty);
+	SELF\ShapeDependentProperty.DefinedIn : GeometricCoordinateSpace;
+	InertiaValue : ARRAY[1:3] OF ARRAY[1:3] OF NumericalValue;
+	ReferenceAxisPlacement : AxisPlacement;
+END_ENTITY;
+
+ENTITY MotionModelAssociation;
+	AssociatedModel : MotionModelSelect;
+	AssociatedTo : AssemblyDefinition;
+END_ENTITY;
+
+ENTITY NamedSize
+	SUBTYPE OF(RectangularSize);
+	Size : ClassSelect;
+END_ENTITY;
+
+ENTITY NextAssemblyOccurrenceUsage
+	SUPERTYPE OF (MatedPartAssociation)
+	SUBTYPE OF(AssemblyOccurrenceRelationship);
+DERIVE
+	SELF\ViewOccurrenceRelationship.RelationType : STRING := 'next assembly occurrence';
+END_ENTITY;
+
+ENTITY NextAssemblyViewUsage
+	SUBTYPE OF(AssemblyViewRelationship);
+DERIVE
+	SELF\PartViewRelationship.RelationType : STRING := 'next assembly view';
+END_ENTITY;
+
+ENTITY NextInstanceForward
+	SUBTYPE OF(ExternalEntityInstance);
+	AttributeName : STRING;
+	NextInstance : ExternalEntityInstance;
+END_ENTITY;
+
+ENTITY NextInstanceInverse
+	SUBTYPE OF(ExternalEntityInstance);
+	AttributeName : STRING;
+	NextInstance : ExternalEntityInstance;
+END_ENTITY;
+
+ENTITY NotCondition
+	SUBTYPE OF(Condition);
+DERIVE
+	SELF\Condition.ConditionType : STRING := 'not';
+END_ENTITY;
+
+ENTITY NotEqualsCondition
+	SUBTYPE OF(Condition);
+DERIVE
+	SELF\Condition.ConditionType : STRING := 'not equals';
+END_ENTITY;
+
+ENTITY NumericalContext;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Accuracy : REAL;
+	SignificantDigits : OPTIONAL INTEGER;
+END_ENTITY;
+
+ENTITY NumericalValue
+	SUPERTYPE OF (ValueLimit)
+	SUBTYPE OF(ValueWithUnit);
+	ValueComponent : REAL;
+	ValueContext : OPTIONAL NumericalContext;
+END_ENTITY;
+
+ENTITY Occurrence
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(DefinitionBasedOccurrence, SpecifiedOccurrence));
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	DefiningGeometry : OPTIONAL GeometricModel;
+	Definition : OccurrenceOrOccurrenceDefinitionSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY OccurrenceContactFeature
+	SUPERTYPE OF (OccurrenceTerminal)
+	SUBTYPE OF(OccurrenceShapeFeature);
+	SELF\OccurrenceShapeElement.Definition : OPTIONAL OccurrenceContactFeatureDefinitionSelect;
+	SELF\OccurrenceShapeFeature.ElementOf : OccurrenceContactFeatureElementOfSelect;
+END_ENTITY;
+
+ENTITY OccurrencePlacement;
+	PlacedInstance : SingleOccurrence;
+	Placement : TransformationSelect;
+	ReferenceComponent : BreakdownElementView;
+WHERE
+WR1: NOT ('GEOMETRICREPRESENTATIONRELATIONSHIPWITHPLACEMENTTRANSFORMATION' IN TYPEOF(Placement)) OR (Placement.Definitional = TRUE);
+END_ENTITY;
+
+ENTITY OccurrenceRelationship
+	SUPERTYPE OF (ONEOF(ReplacedUsageRelationship, SameTimeMachiningRelationship));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Occurrence;
+	Related : Occurrence;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY OccurrenceShapeElement
+	SUPERTYPE OF (OccurrenceShapeFeature)
+	SUBTYPE OF(ShapeElement);
+	DefinitionOSE : OPTIONAL OccurrenceShapeElementDefinitionSelect;
+	SELF\ShapeElement.ElementOf : OccurrenceShapeElementElementOfSelect;
+END_ENTITY;
+
+ENTITY OccurrenceShapeFeature
+	SUPERTYPE OF (ONEOF(CrossSectionalOccurrenceShapeElement, OccurrenceContactFeature, OccurrenceTransportFeature))
+	SUBTYPE OF(OccurrenceShapeElement);
+	SELF\OccurrenceShapeElement.Definition : OPTIONAL OccurrenceShapeFeatureDefinitionSelect;
+	SELF\OccurrenceShapeElement.ElementOf : OccurrenceShapeFeatureElementOfSelect;
+END_ENTITY;
+
+ENTITY OccurrenceTerminal
+	SUPERTYPE OF (ONEOF(CableOccurrenceTerminal, CableOccurrenceTerminalLocationGroup, WireOccurrenceTerminal))
+	SUBTYPE OF(OccurrenceContactFeature);
+	AssociatedTransportFeature : OPTIONAL OccurrenceTransportFeature;
+	SELF\OccurrenceContactFeature.Definition : OccurrenceTerminalDefinitionSelect;
+	SELF\OccurrenceContactFeature.ElementOf : OccurrenceTerminalElementOfSelect;
+END_ENTITY;
+
+ENTITY OccurrenceTransportFeature
+	SUPERTYPE OF (WireIdentification)
+	SUBTYPE OF(OccurrenceShapeFeature);
+	SELF\OccurrenceShapeElement.Definition : OPTIONAL OccurrenceTransportFeatureDefinitionSelect;
+	DomainType : OPTIONAL TerminalAndTransportDomainTypeEnum;
+	SELF\OccurrenceShapeFeature.ElementOf : OccurrenceTransportFeatureElementOfSelect;
+END_ENTITY;
+
+ENTITY OneOfCondition
+	SUBTYPE OF(Condition);
+DERIVE
+	SELF\Condition.ConditionType : STRING := 'one of';
+END_ENTITY;
+
+ENTITY OrCondition
+	SUBTYPE OF(Condition);
+DERIVE
+	SELF\Condition.ConditionType : STRING := 'or';
+END_ENTITY;
+
+ENTITY Organization;
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	OrganizationTypes : OPTIONAL SET[1:?] OF ClassSelect;
+END_ENTITY;
+
+ENTITY OrganizationInContract;
+	Description : OPTIONAL SET[1:?] OF DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ContractedOrganization : Organization;
+	OrganizationRole : ClassSelect;
+	SignedBy : OPTIONAL SET[1:?] OF DateAndPersonOrganization;
+	SignedContracts : SET[1:?] OF Contract;
+END_ENTITY;
+
+ENTITY OrganizationOrPersonInOrganizationAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedPersonOrOrganization : OrganizationOrPersonInOrganizationSelect;
+	AssignedTo : DateTimePersonOrganizationElementSelect;
+END_ENTITY;
+
+ENTITY OrganizationRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Organization;
+	Related : Organization;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY OrientedSurface
+	SUBTYPE OF(Surface);
+END_ENTITY;
+
+ENTITY Part;
+	Id : IdentifierSelect;
+	Name : DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	PartTypes : SET[1:?] OF PartClassSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Versions : SET[1:?] OF PartVersion;
+END_ENTITY;
+
+ENTITY PartConnectivityDefinition
+	SUBTYPE OF(PartShapeElement);
+	ConnectedTerminals : SET[2:?] OF ConnectedTerminalSelect;
+END_ENTITY;
+
+ENTITY PartContactFeature
+	SUPERTYPE OF (PartTerminal)
+	SUBTYPE OF(PartFeature);
+	SELF\PartShapeElement.Definition : OPTIONAL PartContactFeatureDefinitionSelect;
+	SELF\PartShapeElement.ElementOf : PartContactFeatureElementOfSelect;
+END_ENTITY;
+
+ENTITY PartContactFeatureFitRelationship
+	SUBTYPE OF(PartFeatureFitRelationship);
+	SELF\PartShapeElementRelationship.Relating : PartContactFeature;
+	SELF\PartShapeElementRelationship.Related : PartContactFeature;
+	SELF\PartFeatureFitRelationship.Definition : OPTIONAL PartContactFeatureFitRelationshipDefinitionSelect;
+	ParentRelationshipPCFFR : OPTIONAL PartContactFeatureFitRelationship;
+END_ENTITY;
+
+ENTITY PartFeature
+	SUPERTYPE OF (ONEOF(PartContactFeature, PartTransportFeature))
+	SUBTYPE OF(PartShapeElement);
+END_ENTITY;
+
+ENTITY PartFeatureFitRelationship
+	SUPERTYPE OF (PartContactFeatureFitRelationship)
+	SUBTYPE OF(PartShapeElementRelationship);
+	SELF\PartShapeElementRelationship.Relating : PartFeature;
+	SELF\PartShapeElementRelationship.Related : PartFeature;
+	DefinitionPFFR : OPTIONAL PartFeatureFitRelationshipDefinitionSelect;
+END_ENTITY;
+
+ENTITY PartRelationship
+	SUPERTYPE OF (AlternatePartRelationship);
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Part;
+	Related : Part;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY PartShapeElement
+	SUPERTYPE OF (ONEOF(AssemblyShapeConstraint, AssemblyShapeJoint, CrossSectionalPartShapeElement, HarnessNode, HarnessSegment, PartConnectivityDefinition, PartFeature))
+	SUBTYPE OF(ShapeElement);
+	DefinitionPSE : OPTIONAL PartShapeElementDefinitionSelect;
+	SELF\ShapeElement.ElementOf : PartShapeElementElementOfSelect;
+END_ENTITY;
+
+ENTITY PartShapeElementRelationship
+	SUPERTYPE OF (PartFeatureFitRelationship)
+	SUBTYPE OF(ShapeElementRelationship);
+	SELF\ShapeElementRelationship.Relating : PartShapeElement;
+	SELF\ShapeElementRelationship.Related : PartShapeElement;
+END_ENTITY;
+
+ENTITY PartTerminal
+	SUBTYPE OF(PartContactFeature);
+	AssociatedTransportFeature : OPTIONAL PartTransportFeature;
+	DomainType : OPTIONAL TerminalAndTransportDomainTypeEnum;
+	SELF\PartShapeElement.ElementOf : PartTerminalElementOfSelect;
+	IntendedJointType : OPTIONAL SET[1:?] OF TerminalJointTypeEnum;
+	InterfaceOrJoinTerminal : OPTIONAL InterfaceOrJoinTerminalEnum;
+END_ENTITY;
+
+ENTITY PartToIndividualPartAssociation;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssociatedIndividualPart : IndividualPart;
+	AssociatedPart : Part;
+END_ENTITY;
+
+ENTITY PartTransportFeature
+	SUBTYPE OF(PartFeature);
+	DomainType : OPTIONAL TerminalAndTransportDomainTypeEnum;
+	SELF\PartShapeElement.ElementOf : PartTransportFeatureElementOfSelect;
+END_ENTITY;
+
+ENTITY PartVersion;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Views : OPTIONAL SET[1:?] OF PartView;
+INVERSE
+	CorrespondingProductConfigurations : SET[0:?] OF ProductDesignAssociation FOR AssociatedDesign;
+	VersionOf : Part FOR Versions;
+END_ENTITY;
+
+ENTITY PartVersionRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : PartVersion;
+	Related : PartVersion;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY PartVersionToIndividualPartVersionAssociation;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssociatedIndividualPart : IndividualPartVersion;
+	AssociatedPart : PartVersionOrProductConfigurationSelect;
+END_ENTITY;
+
+ENTITY PartView
+	SUPERTYPE OF (ONEOF(AssemblyDefinition, CollectionDefinition, ConstituentPart, LaminateTable));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AdditionalContexts : OPTIONAL SET[1:?] OF ViewContext;
+	AuxiliaryGeometry : OPTIONAL SET[1:?] OF GeometricModel;
+	DefiningGeometry : OPTIONAL GeometricModel;
+	InitialContext : ViewContext;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+INVERSE
+	ViewOf : PartVersion FOR Views;
+WHERE
+WR1: NOT (EXISTS(AuxiliaryGeometry)) OR EXISTS(DefiningGeometry);
+END_ENTITY;
+
+ENTITY PartViewRelationship
+	SUPERTYPE OF (ONEOF(AssemblyViewRelationship, DefinitionalPartViewUsage, GeometricalRelationship, MakeFromRelationship, ProcessStateRelationship, ReplacedPartViewRelationship, ToolPartRelationship));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : PartView;
+	Related : PartView;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY PartViewToIndividualPartViewAssociation;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssociatedIndividualPart : IndividualPartView;
+	AssociatedPart : PartViewOrProductConfigurationSelect;
+END_ENTITY;
+
+ENTITY Path
+	SUBTYPE OF(TopologicalRepresentationItem);
+	EdgeList : SET[1:?] OF Edge;
+	OrientationList : SET[1:?] OF BOOLEAN;
+END_ENTITY;
+
+ENTITY PathSegment
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(CircularPath, LinearPath, PointToPointPath));
+	PlacementEnd : AxisPlacement;
+	TEnd : REAL;
+	Transition : TransitionCodeEnum;
+END_ENTITY;
+
+ENTITY Pcurve
+	SUBTYPE OF(Curve);
+END_ENTITY;
+
+ENTITY PercentageLaminateTable
+	SUBTYPE OF(ZoneStructuralMakeup);
+	TableComponents : SET[1:?] OF PercentagePly;
+	TotalThickness : NumericalValue;
+END_ENTITY;
+
+ENTITY PercentagePly;
+	MakeupAndProperties : OPTIONAL ZoneStructuralMakeup;
+	Material : StockMaterial;
+	StrengthOrientation : OPTIONAL PlyOrientationAngle;
+	VolumePercent : NumericalValue;
+END_ENTITY;
+
+ENTITY Person;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	FirstName : OPTIONAL STRING;
+	LastName : STRING;
+	MiddleNames : OPTIONAL LIST[1:?] OF STRING;
+	PrefixTitles : OPTIONAL LIST[1:?] OF STRING;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	SuffixTitles : OPTIONAL LIST[1:?] OF STRING;
+INVERSE
+	AssociatedOrganizations : SET[1:?] OF PersonInOrganization FOR AssociatedPerson;
+END_ENTITY;
+
+ENTITY PersonInOrganization;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AssociatedOrganization : Organization;
+	AssociatedPerson : Person;
+	PersonRole : ClassSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY PersonInOrganizationRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : PersonInOrganization;
+	Related : PersonInOrganization;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY PhysicalBreakdown
+	SUBTYPE OF(Breakdown);
+DERIVE
+	SELF\Breakdown.BreakdownType : STRING := 'physical';
+END_ENTITY;
+
+ENTITY PhysicalDocumentDefinition
+	SUBTYPE OF(DocumentDefinition);
+	Components : OPTIONAL SET[1:?] OF Hardcopy;
+END_ENTITY;
+
+ENTITY PlannedActivity
+	SUPERTYPE OF (DirectedPlannedActivity)
+	SUBTYPE OF(Activity);
+	VersionId : OPTIONAL IdentifierSelect;
+	PlannedEndDate : OPTIONAL PeriodOrDateSelect;
+	PlannedStartDate : OPTIONAL EventOrDateSelect;
+END_ENTITY;
+
+ENTITY PlannedCharacteristic;
+	Name : OPTIONAL DescriptorSelect;
+	DefinedFor : RequirementAssignment;
+	PlannedCharacteristics : OPTIONAL SET[1:?] OF PropertyValueAssignment;
+END_ENTITY;
+
+ENTITY PlannedIndividualPart
+	SUBTYPE OF(IndividualPartVersion);
+END_ENTITY;
+
+ENTITY Ply
+	SUBTYPE OF(ConstituentPart);
+	Constituents : OPTIONAL LIST[1:?] OF PlyPiece;
+	MaterialOrientation : PlyOrientationAngle;
+	MaterialType : StockMaterial;
+	PlyThickness : NumericalValue;
+	PlyShape : OPTIONAL PlyShape;
+WHERE
+WR1 : SELF.PlyThickness.ValueComponent >= 0.0;
+WR2 : SELF.PlyThickness.Unit.Name='length';
+END_ENTITY;
+
+ENTITY PlyAngleRepresentation
+	SUBTYPE OF(Representation);
+	SELF\Representation.Items : SET[1:1] OF RepresentationItem;
+END_ENTITY;
+
+ENTITY PlyLaminate
+	SUBTYPE OF(ConstituentPart);
+	PlyTable : PlyLaminateTable;
+	PlyLaminateShape : OPTIONAL PlyLaminateShapeSelect;
+END_ENTITY;
+
+ENTITY PlyLaminateSequenceDefinition
+	SUBTYPE OF(ConstituentPart);
+	PliesInSequence : SET[1:?] OF Ply;
+END_ENTITY;
+
+ENTITY PlyLaminateTable
+	SUBTYPE OF(LaminateTable);
+	Sequence : LIST[2:?] OF PlyLaminateSequenceDefinition;
+END_ENTITY;
+
+ENTITY PlyOrientationAngle
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(DrapedOrientationAngle, LaidOrientationAngle))
+	SUBTYPE OF(RepresentationRelationship);
+	SELF\RepresentationRelationship.Relating : PlyAngleRepresentation;
+	SELF\RepresentationRelationship.Related : ReinforcementOrientationBasis;
+DERIVE
+	FiberDirection : PlyAngleRepresentation := SELF\RepresentationRelationship.Relating;
+	ReinforcementDirection : ReinforcementOrientationBasis := SELF\RepresentationRelationship.Related;
+END_ENTITY;
+
+ENTITY PlyPiece
+	SUBTYPE OF(ConstituentPart);
+	PlyPieceShape : OPTIONAL PlyShape;
+	WarpSurface : LOGICAL;
+END_ENTITY;
+
+ENTITY PlyShape;
+	Basis : OPTIONAL PlyShape;
+	DefiningModel : PlyLaminateShapeSelect;
+END_ENTITY;
+
+ENTITY Point
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(CartesianPoint, DegeneratePcurve, PointOnCurve, PointOnSurface))
+	SUBTYPE OF(DetailedGeometricModelItem);
+END_ENTITY;
+
+ENTITY PointAndVector
+	SUBTYPE OF(DetailedGeometricModelItem);
+	Location : Point;
+	Vector : SET[1:2] OF Direction;
+END_ENTITY;
+
+ENTITY PointArray
+	SUBTYPE OF(DetailedGeometricModelItem);
+	Directions : SET[1:?] OF PointAndVector;
+END_ENTITY;
+
+ENTITY PointOnCurve
+	SUBTYPE OF(Point);
+	BasicCurve : Curve;
+	SELF\RepresentationItem.External : ExternalItem;
+	Parameter : ExternalRepresentationItem;
+END_ENTITY;
+
+ENTITY PointOnSurface
+	SUBTYPE OF(Point);
+	BasicSurface : Surface;
+	SELF\RepresentationItem.External : ExternalItem;
+	Parameter : ExternalRepresentationItem;
+END_ENTITY;
+
+ENTITY PointToPointPath
+	SUBTYPE OF(PathSegment);
+END_ENTITY;
+
+ENTITY PointZoneShape
+	SUBTYPE OF(ZoneStructuralMakeupShapeRepresentation);
+	Location : PointSelect;
+END_ENTITY;
+
+ENTITY Polar11
+	SUBTYPE OF(DetailedGeometricModelItem);
+	Placement : AxisPlacement;
+END_ENTITY;
+
+ENTITY PreDefinedTypeQualifier;
+	Name : ClassSelect;
+END_ENTITY;
+
+ENTITY PrecisionQualifier;
+	SameAs : OPTIONAL Proxy;
+	SignificantDigits : INTEGER;
+END_ENTITY;
+
+ENTITY ProcessOperationDefinition;
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ProcessType : ClassSelect;
+END_ENTITY;
+
+ENTITY ProcessOperationDefinitionRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : ProcessOperationDefinition;
+	Related : ProcessOperationDefinition;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY ProcessOperationInputOrOutput;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	ConcernedShapes : OPTIONAL SET[1:?] OF ShapeElement;
+	Element : ProcessOperationInputOrOutputSelect;
+	Operation : ProcessOperationOccurrence;
+	Placement : OPTIONAL GeometricRepresentationRelationshipWithPlacementTransformation;
+END_ENTITY;
+
+ENTITY ProcessOperationOccurrence;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	DefinedIn : OPTIONAL GeometricCoordinateSpace;
+	Definition : ProcessOperationDefinition;
+	Plan : ProcessPlan;
+END_ENTITY;
+
+ENTITY ProcessOperationOccurrenceRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : ProcessOperationOccurrence;
+	Related : ProcessOperationOccurrence;
+	CycleTime : OPTIONAL Duration;
+	WaitingTime : OPTIONAL PropertyValue;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY ProcessOperationResourceAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AssignedResource : ProcessOperationResourceAssignmentSelect;
+	AssignedTo : ProcessOperationOccurrence;
+	Placement : OPTIONAL GeometricRepresentationRelationshipWithPlacementTransformation;
+	Reason : OPTIONAL MultiLingualStringSelect;
+	ReferenceTool : BOOLEAN;
+END_ENTITY;
+
+ENTITY ProcessPlan;
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ProducedOutputs : OPTIONAL SET[1:?] OF PartVersion;
+END_ENTITY;
+
+ENTITY ProcessPlanRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : ProcessPlan;
+	Related : ProcessPlan;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY ProcessStateRelationship
+	SUBTYPE OF(PartViewRelationship);
+DERIVE
+	SELF\PartViewRelationship.RelationType : STRING := 'process state';
+END_ENTITY;
+
+ENTITY ProcessedCore
+	SUBTYPE OF(ConstituentPart);
+	AddedMaterial : OPTIONAL LIST[1:?] OF Ply;
+	CellDirection : PlyOrientationAngle;
+	MadeFromProcessedCore : OPTIONAL SET[1:?] OF ProcessedCore;
+	MadeFromStock : StockMaterial;
+	ProcessedCoreShape : OPTIONAL CoreShapeSelect;
+WHERE
+WR1: SELF.MadeFromStock.StockMaterialType = stock_core;
+END_ENTITY;
+
+ENTITY ProductClass
+	SUBTYPE OF(ProductConcept);
+	VersionId : OPTIONAL IdentifierSelect;
+	LevelType : OPTIONAL ClassSelect;
+END_ENTITY;
+
+ENTITY ProductClassRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : ProductClass;
+	Related : ProductClass;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY ProductConcept
+	SUPERTYPE OF (ProductClass);
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	TargetMarket : OPTIONAL Market;
+END_ENTITY;
+
+ENTITY ProductConfiguration;
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	DefiningGeometry : OPTIONAL GeometricModel;
+	DefiningSpecifications : OPTIONAL SET[1:?] OF Specification;
+	MemberOf : ProductConcept;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+INVERSE
+	CorrespondingPartVersion : SET[0:1] OF ProductDesignAssociation FOR AssociatedConfiguration;
+END_ENTITY;
+
+ENTITY ProductConfigurationRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : ProductConfiguration;
+	Related : ProductConfiguration;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY ProductDesignAssociation;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AssociatedConfiguration : ProductConfiguration;
+	AssociatedDesign : PartVersion;
+END_ENTITY;
+
+ENTITY ProductGroup;
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Context : OPTIONAL MultiLingualStringSelect;
+	MembershipRule : OPTIONAL MultiLingualStringSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY ProductGroupMembership;
+	Id : OPTIONAL IdentifierSelect;
+	Member : ProductGroupMembershipSelect;
+	OfGroup : ProductGroup;
+END_ENTITY;
+
+ENTITY ProductGroupRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Relating : ProductGroup;
+	Related : ProductGroup;
+END_ENTITY;
+
+ENTITY ProductPlannedToRealized
+	SUBTYPE OF(IndividualPartVersionRelationship);
+	SELF\IndividualPartVersionRelationship.Relating : PlannedIndividualPart;
+	SELF\IndividualPartVersionRelationship.Related : RealizedIndividualPart;
+END_ENTITY;
+
+ENTITY ProductStructureKinematicPathAssociation;
+	AssociatedMotionPath : KinematicPathDefinedByNodes;
+	AssociatedMotionRepresentation : LinkMotionAlongPath;
+	AssociatedTo : AssemblyOccurrenceRelationship;
+	Substructure : OPTIONAL SpecifiedOccurrence;
+END_ENTITY;
+
+ENTITY ProductStructureLinkMotionAssociation;
+	AssociatedMotion : LinkMotionRelationship;
+	AssociatedTo : AssemblyOccurrenceRelationship;
+	Substructure : OPTIONAL SpecifiedOccurrence;
+END_ENTITY;
+
+ENTITY Project;
+	Id : OPTIONAL IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ActualEndDate : OPTIONAL DateTimeString;
+	ActualStartDate : OPTIONAL DateTimeString;
+	PlannedEndDate : OPTIONAL PeriodOrDateSelect;
+	PlannedStartDate : OPTIONAL EventOrDateSelect;
+	ResponsibleOrganizations : OPTIONAL SET[1:?] OF Organization;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY ProjectAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedProject : Project;
+	AssignedTo : ProjectAssignmentSelect;
+END_ENTITY;
+
+ENTITY ProjectRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL SET[1:?] OF DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Project;
+	Related : Project;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY PromissoryAssemblyOccurrenceUsage
+	SUBTYPE OF(AssemblyOccurrenceRelationship);
+DERIVE
+	SELF\ViewOccurrenceRelationship.RelationType : STRING := 'promissory assembly occurrence';
+END_ENTITY;
+
+ENTITY PromissoryAssemblyViewUsage
+	SUBTYPE OF(AssemblyViewRelationship);
+DERIVE
+	SELF\PartViewRelationship.RelationType : STRING := 'promissory assembly view';
+END_ENTITY;
+
+ENTITY PropertyDefinition
+	SUPERTYPE OF (ONEOF(MaterialPropertyDefinition, WireColourBasedIdentificationCode));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	PropertyType : OPTIONAL ClassSelect;
+	AllowedUnits : OPTIONAL SET[1:?] OF UnitSelect;
+	DefinedIn : OPTIONAL ExternalClassSystem;
+	Definition : OPTIONAL ProxyItemSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY PropertyDefinitionAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AllowedUnits : OPTIONAL SET[1:?] OF UnitSelect;
+	AssignedPropertyDefinition : PropertyDefinitionSelect;
+	AssignedTo : PropertyAssignmentSelect;
+UNIQUE
+UR1: AssignedTo, AssignedPropertyDefinition;
+END_ENTITY;
+
+ENTITY PropertyDefinitionAssignmentRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : PropertyDefinitionAssignment;
+	Related : PropertyDefinitionAssignment;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY PropertyDefinitionRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : PropertyDefinitionSelect;
+	Related : PropertyDefinitionSelect;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY PropertyValue
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(StringValue, ValueList, ValueSet, ValueWithUnit));
+	Name : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Definition : OPTIONAL PropertyDefinitionSelect;
+	DeterminationMethod : OPTIONAL ClassSelect;
+	Qualifications : OPTIONAL SET[1:?] OF MeasureQualification;
+END_ENTITY;
+
+ENTITY PropertyValueAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssignedPropertyValues : SET[1:?] OF PropertyValue;
+	AssignedTo : PropertyAssignmentSelect;
+	ValueAssignmentContext : OPTIONAL PropertyDefinitionAssignment;
+END_ENTITY;
+
+ENTITY PropertyValueAssignmentRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : PropertyValueAssignment;
+	Related : PropertyValueAssignment;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY PropertyValueRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : PropertyValue;
+	Related : PropertyValue;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY Proxy;
+	Individual : ProxyItemSelect;
+END_ENTITY;
+
+ENTITY ProxyRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : Proxy;
+	Related : Proxy;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY QualitativeUncertainty
+	SUBTYPE OF(UncertaintyQualifier);
+	UncertaintyValue : MultiLingualStringSelect;
+END_ENTITY;
+
+ENTITY QuantifiedOccurrence
+	SUPERTYPE OF (ONEOF(CableOccurrence, WireOccurrence))
+	SUBTYPE OF(DefinitionBasedOccurrence);
+	Criterion : OPTIONAL MultiLingualStringSelect;
+	Quantity : OPTIONAL ValueWithUnit;
+WHERE
+WR1: EXISTS(Quantity) OR EXISTS(Criterion);
+END_ENTITY;
+
+ENTITY RealizedIndividualPart
+	SUBTYPE OF(IndividualPartVersion);
+END_ENTITY;
+
+ENTITY RectangularSize
+	SUPERTYPE OF (NamedSize);
+	Density : OPTIONAL ValueWithUnit;
+	Height : OPTIONAL ValueWithUnit;
+	Width : OPTIONAL ValueWithUnit;
+END_ENTITY;
+
+ENTITY RectangularTrimmedSurface
+	SUBTYPE OF(Surface);
+END_ENTITY;
+
+ENTITY ReinforcementOrientationBasis
+	SUBTYPE OF(Representation);
+	Basis11Direction : DirectionSelect;
+	CoordinateSpace : GeometricCoordinateSpace;
+	Placement : AxisPlacement;
+INVERSE
+	Table : LaminateTable FOR Basis;
+END_ENTITY;
+
+ENTITY ReplacedPartViewRelationship
+	SUBTYPE OF(PartViewRelationship);
+DERIVE
+	SELF\PartViewRelationship.RelationType : STRING := 'replaced part view';
+END_ENTITY;
+
+ENTITY ReplacedUsageRelationship
+	SUBTYPE OF(OccurrenceRelationship);
+	UsageContext : OccurrenceUsageContextSelect;
+DERIVE
+	SELF\OccurrenceRelationship.RelationType : STRING := 'replaced usage';
+END_ENTITY;
+
+ENTITY Representation
+	SUPERTYPE OF (ONEOF(ConnectedEdgeWithLengthSetRepresentation, GeometricRepresentation, PlyAngleRepresentation, ReinforcementOrientationBasis));
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Items : SET[1:?] OF RepresentationItem;
+	RepresentationTypes : OPTIONAL SET[1:?] OF ClassSelect;
+INVERSE
+	ContextOfItems : RepresentationContext FOR Representations;
+END_ENTITY;
+
+ENTITY RepresentationContext
+	SUPERTYPE OF (GeometricCoordinateSpace);
+	Id : IdentifierSelect;
+	Accuracies : OPTIONAL SET[1:?] OF MeasureQualification;
+	Items : OPTIONAL SET[1:?] OF RepresentationItem;
+	Representations : OPTIONAL SET[1:?] OF Representation;
+	Units : OPTIONAL SET[1:?] OF Unit;
+END_ENTITY;
+
+ENTITY RepresentationItem
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(DetailedGeometricModelItem, ExternalRepresentationItem, TopologicalRepresentationItem, UserDefined11));
+	Name : OPTIONAL DescriptorSelect;
+	External : OPTIONAL ExternalItem;
+END_ENTITY;
+
+ENTITY RepresentationRelationship
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(GeometricRepresentationRelationship, GeometryToTopologyRepresentationAssociation, PlyOrientationAngle, TopologyToGeometryAssociationByMultipleElementPairs));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Relating : Representation;
+	Related : Representation;
+	Definitional : BOOLEAN;
+END_ENTITY;
+
+ENTITY Requirement;
+	Id : IdentifierSelect;
+	Name : DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Versions : OPTIONAL SET[1:?] OF RequirementVersion;
+END_ENTITY;
+
+ENTITY RequirementAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssignedRequirement : RequirementView;
+	AssignedTo : RequirementAssignmentSelect;
+END_ENTITY;
+
+ENTITY RequirementCollectionRelationship
+	SUBTYPE OF(RequirementViewRelationship);
+DERIVE
+	SELF\RequirementViewRelationship.RelationType : STRING := 'collection';
+END_ENTITY;
+
+ENTITY RequirementDecompositionRelationship
+	SUBTYPE OF(RequirementViewRelationship);
+DERIVE
+	SELF\RequirementViewRelationship.RelationType : STRING := 'decomposition';
+END_ENTITY;
+
+ENTITY RequirementRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Relating : Requirement;
+	Related : Requirement;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY RequirementSatisfactionAssertion;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AssertedBy : OPTIONAL SET[1:?] OF DateAndPersonOrganization;
+	RelatedAssignment : OPTIONAL RequirementAssignment;
+	SatisfiedBy : RequirementAssignmentSelect;
+	SatisfiedRequirement : RequirementView;
+END_ENTITY;
+
+ENTITY RequirementSource;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Source : RequirementSourceSelect;
+	SourcedRequirement : RequirementView;
+END_ENTITY;
+
+ENTITY RequirementTracingRelationship
+	SUBTYPE OF(RequirementViewRelationship);
+DERIVE
+	SELF\RequirementViewRelationship.RelationType : STRING := 'tracing';
+END_ENTITY;
+
+ENTITY RequirementVersion;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Views : OPTIONAL SET[1:?] OF RequirementView;
+INVERSE
+	VersionOf : Requirement FOR Versions;
+END_ENTITY;
+
+ENTITY RequirementVersionRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Relating : RequirementVersion;
+	Related : RequirementVersion;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY RequirementView;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AdditionalContexts : OPTIONAL SET[1:?] OF ViewContext;
+	DefinitionalRepresentations : SET[1:?] OF PropertyValue;
+	InitialContext : ViewContext;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+INVERSE
+	ViewOf : RequirementVersion FOR Views;
+END_ENTITY;
+
+ENTITY RequirementViewRelationship
+	SUPERTYPE OF (ONEOF(RequirementCollectionRelationship, RequirementDecompositionRelationship, RequirementTracingRelationship));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Relating : RequirementView;
+	Related : RequirementView;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY RetentionPeriod;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AssignedTo : SET[1:?] OF GeneralOrganizationalDataSelect;
+	EarliestEnd : PeriodOrDateSelect;
+	LatestEnd : PeriodOrDateSelect;
+	Start : EventOrDateSelect;
+END_ENTITY;
+
+ENTITY RotationAboutDirection
+	SUBTYPE OF(DetailedGeometricModelItem);
+	DirectionOfAxis : Direction;
+	RotationAngle : PlaneAngleMeasure;
+END_ENTITY;
+
+ENTITY SameTimeMachiningRelationship
+	SUBTYPE OF(OccurrenceRelationship);
+	Placement : OPTIONAL TransformationSelect;
+DERIVE
+	SELF\OccurrenceRelationship.RelationType : STRING := 'same time machining';
+WHERE
+WR1: NOT ('GEOMETRICREPRESENTATIONRELATIONSHIPWITHPLACEMENTTRANSFORMATION' IN TYPEOF(Placement)) OR (Placement.Definitional = FALSE);
+END_ENTITY;
+
+ENTITY SecurityClassification;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Level : ClassSelect;
+END_ENTITY;
+
+ENTITY SecurityClassificationAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssignedSecurityClassification : SecurityClassification;
+	AssignedTo : SecurityClassificationAssignmentSelect;
+END_ENTITY;
+
+ENTITY SerialEffectivity
+	SUBTYPE OF(Effectivity);
+	EndId : OPTIONAL IdentifierSelect;
+	StartId : IdentifierSelect;
+END_ENTITY;
+
+ENTITY SetMembership;
+	Member : ProxyItemSelect;
+	OfSet : ClassSelect;
+END_ENTITY;
+
+ENTITY ShapeDependentProperty
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(CentreOfMass, GeneralShapeDependentProperty, MomentsOfInertia));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssignedTo : AssignedShapedElementSelect;
+	DefinedIn : OPTIONAL GeometricCoordinateSpace;
+	ValueDetermination : OPTIONAL ClassSelect;
+END_ENTITY;
+
+ENTITY ShapeElement
+	SUPERTYPE OF (ONEOF(CoatingLayer, OccurrenceShapeElement, PartShapeElement, ShapeFeatureDefinitionElement));
+	Id : OPTIONAL IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ElementOf : ShapedElementSelect;
+	ProductDefinitional : OPTIONAL BOOLEAN;
+	RepresentedGeometry : OPTIONAL ShapeElementRepresentedGeometrySelect;
+END_ENTITY;
+
+ENTITY ShapeElementRelationship
+	SUPERTYPE OF (ONEOF(AssemblyShapeConstraintItemRelationship, AssemblyShapeJointItemRelationship, PartShapeElementRelationship, ShapeFeatureDefinitionElementRelationship));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Relating : ShapeElement;
+	Related : ShapeElement;
+	RepresentedGeometry : OPTIONAL RepresentationItem;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY ShapeFeatureDefinition
+	SUPERTYPE OF (ContactFeatureDefinition);
+	Id : OPTIONAL IdentifierSelect;
+	Name : DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	DefiningGeometry : OPTIONAL GeometricModel;
+	ShapeFeatureType : OPTIONAL ShapeFeatureTypeEnum;
+END_ENTITY;
+
+ENTITY ShapeFeatureDefinitionElement
+	SUPERTYPE OF (ShapeFeatureDefinitionOccurrenceElement)
+	SUBTYPE OF(ShapeElement);
+	SELF\ShapeElement.ElementOf : ShapeFeatureDefinitionOrElementSelect;
+END_ENTITY;
+
+ENTITY ShapeFeatureDefinitionElementRelationship
+	SUPERTYPE OF (ShapeFeatureDefinitionOccurrenceElementRelationship)
+	SUBTYPE OF(ShapeElementRelationship);
+	SELF\ShapeElementRelationship.Relating : ShapeFeatureDefinitionElement;
+	SELF\ShapeElementRelationship.Related : ShapeFeatureDefinitionElement;
+	ParentRelationshipSFDER : OPTIONAL ShapeFeatureDefinitionOrElementRelationshipSelect;
+END_ENTITY;
+
+ENTITY ShapeFeatureDefinitionFitRelationship
+	SUPERTYPE OF (ContactFeatureDefinitionFitRelationship)
+	SUBTYPE OF(ShapeFeatureDefinitionRelationship);
+END_ENTITY;
+
+ENTITY ShapeFeatureDefinitionOccurrenceElement
+	SUBTYPE OF(ShapeFeatureDefinitionElement);
+	DefinitionSFDOE : ShapeFeatureDefinitionOrElementSelect;
+END_ENTITY;
+
+ENTITY ShapeFeatureDefinitionOccurrenceElementRelationship
+	SUBTYPE OF(ShapeFeatureDefinitionElementRelationship);
+	SELF\ShapeFeatureDefinitionElementRelationship.Relating : ShapeFeatureDefinitionOccurrenceElement;
+	SELF\ShapeFeatureDefinitionElementRelationship.Related : ShapeFeatureDefinitionOccurrenceElement;
+	DefinitionSFDOER : OPTIONAL ShapeFeatureDefinitionOrElementRelationshipSelect;
+END_ENTITY;
+
+ENTITY ShapeFeatureDefinitionRelationship
+	ABSTRACT
+	SUPERTYPE OF (ShapeFeatureDefinitionFitRelationship);
+	Id : OPTIONAL IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Relating : ShapeFeatureDefinition;
+	Related : ShapeFeatureDefinition;
+END_ENTITY;
+
+ENTITY SingleOccurrence
+	SUBTYPE OF(DefinitionBasedOccurrence);
+END_ENTITY;
+
+ENTITY SizeProperty;
+	Description : OPTIONAL DescriptorSelect;
+	FileSize : OPTIONAL ValueWithUnit;
+	PageCount : OPTIONAL ValueWithUnit;
+END_ENTITY;
+
+ENTITY SmearedMaterial
+	SUBTYPE OF(ZoneStructuralMakeup);
+	TotalThickness : NumericalValue;
+END_ENTITY;
+
+ENTITY Specification;
+	Id : IdentifierSelect;
+	Name : OPTIONAL DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Category : SpecificationCategory;
+	Package : BOOLEAN;
+END_ENTITY;
+
+ENTITY SpecificationAssignment;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AssociationType : ClassSelect;
+	AssignedSpecification : Specification;
+	AssignedTo : ProductClass;
+END_ENTITY;
+
+ENTITY SpecificationCategory;
+	Id : IdentifierSelect;
+	Description : DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ImplicitExclusiveCondition : BOOLEAN;
+END_ENTITY;
+
+ENTITY SpecificationCategoryAssignment;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AssignedCategory : SpecificationCategory;
+	AssignedTo : ProductClass;
+	Mandatory : BOOLEAN;
+END_ENTITY;
+
+ENTITY SpecificationCategoryHierarchy;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SubCategory : SpecificationCategory;
+	SuperCategory : SpecificationCategory;
+END_ENTITY;
+
+ENTITY SpecificationConditionAssignment;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	ConditionType : ClassSelect;
+	AssignedCondition : Condition;
+	AssignedTo : ProductClass;
+END_ENTITY;
+
+ENTITY SpecificationInclusion;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	IfCondition : ConditionParameterSelect;
+	IncludedSpecification : ConditionParameterSelect;
+END_ENTITY;
+
+ENTITY SpecificationInclusionAssignment;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	AssignedInclusion : SpecificationInclusion;
+	AssignedTo : ProductClass;
+END_ENTITY;
+
+ENTITY SpecifiedOccurrence
+	SUBTYPE OF(Occurrence);
+	SELF\Occurrence.Definition : Occurrence;
+	UpperUsage : Occurrence;
+END_ENTITY;
+
+ENTITY StandardUncertainty
+	SUPERTYPE OF (ExpandedUncertainty)
+	SUBTYPE OF(UncertaintyQualifier);
+	UncertaintyValue : REAL;
+END_ENTITY;
+
+ENTITY State
+	SUPERTYPE OF (ONEOF(StateObserved, StatePredicted));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY StateAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssignedState : State;
+	AssignedTo : StateAssignmentSelect;
+END_ENTITY;
+
+ENTITY StateCauseEffect
+	SUBTYPE OF(StateRelationship);
+END_ENTITY;
+
+ENTITY StateComposition
+	SUBTYPE OF(StateRelationship);
+END_ENTITY;
+
+ENTITY StateDefinition;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Definition : ProxyItemSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY StateDefinitionAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssignedStateDefinition : StateDefinition;
+	AssignedTo : StateDefinitionAssignmentSelect;
+END_ENTITY;
+
+ENTITY StateDefinitionCauseEffect
+	SUBTYPE OF(StateDefinitionRelationship);
+END_ENTITY;
+
+ENTITY StateDefinitionComposition
+	SUBTYPE OF(StateDefinitionRelationship);
+END_ENTITY;
+
+ENTITY StateDefinitionConfirmedAssignment
+	SUBTYPE OF(StateDefinitionStateAssignment);
+	SELF\StateDefinitionStateAssignment.AssignedTo : StateObserved;
+END_ENTITY;
+
+ENTITY StateDefinitionHypothesisAssignment
+	SUBTYPE OF(StateDefinitionStateAssignment);
+	SELF\StateDefinitionStateAssignment.AssignedTo : StateObserved;
+END_ENTITY;
+
+ENTITY StateDefinitionPredictedAssignment
+	SUBTYPE OF(StateDefinitionStateAssignment);
+	SELF\StateDefinitionStateAssignment.AssignedTo : StatePredicted;
+END_ENTITY;
+
+ENTITY StateDefinitionRelationship
+	SUPERTYPE OF (ONEOF(StateDefinitionCauseEffect, StateDefinitionComposition, StateDefinitionTransition));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Relating : StateDefinition;
+	Related : StateDefinition;
+END_ENTITY;
+
+ENTITY StateDefinitionStateAssignment
+	SUPERTYPE OF (ONEOF(StateDefinitionConfirmedAssignment, StateDefinitionHypothesisAssignment, StateDefinitionPredictedAssignment));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : OPTIONAL ClassSelect;
+	AssignedStateDefinition : StateDefinition;
+	AssignedTo : State;
+END_ENTITY;
+
+ENTITY StateDefinitionStateAssignmentRelationship
+	SUPERTYPE OF (StateHypothesisToConfirmationRelationship);
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Relating : StateDefinitionStateAssignment;
+	Related : StateDefinitionStateAssignment;
+END_ENTITY;
+
+ENTITY StateDefinitionTransition
+	SUBTYPE OF(StateDefinitionRelationship);
+DERIVE
+	EndState : StateDefinition := SELF\StateDefinitionRelationship.Relating;
+	StartState : StateDefinition := SELF\StateDefinitionRelationship.Related;
+END_ENTITY;
+
+ENTITY StateHypothesisToConfirmationRelationship
+	SUBTYPE OF(StateDefinitionStateAssignmentRelationship);
+	SELF\StateDefinitionStateAssignmentRelationship.Relating : StateDefinitionConfirmedAssignment;
+	SELF\StateDefinitionStateAssignmentRelationship.Related : StateDefinitionHypothesisAssignment;
+DERIVE
+	ConfirmedState : StateDefinitionConfirmedAssignment := SELF\StateDefinitionStateAssignmentRelationship.Relating;
+	HypothesizedState : StateDefinitionHypothesisAssignment := SELF\StateDefinitionStateAssignmentRelationship.Related;
+END_ENTITY;
+
+ENTITY StateObserved
+	SUBTYPE OF(State);
+END_ENTITY;
+
+ENTITY StatePredicted
+	SUBTYPE OF(State);
+END_ENTITY;
+
+ENTITY StatePredictedToObserved
+	SUBTYPE OF(StateRelationship);
+	SELF\StateRelationship.Relating : StatePredicted;
+	SELF\StateRelationship.Related : StateObserved;
+END_ENTITY;
+
+ENTITY StateRelationship
+	SUPERTYPE OF (ONEOF(StateCauseEffect, StateComposition, StatePredictedToObserved, StateTransition));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Relating : State;
+	Related : State;
+END_ENTITY;
+
+ENTITY StateTransition
+	SUBTYPE OF(StateRelationship);
+DERIVE
+	EndState : State := SELF\StateRelationship.Relating;
+	StartState : State := SELF\StateRelationship.Related;
+END_ENTITY;
+
+ENTITY StockMaterial;
+	Id : IdentifierSelect;
+	Name : DescriptorSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	StockMaterialType : StockCategoryEnum;
+	PropertyValues : SET[1:?] OF MaterialPropertyValue;
+	ReferenceDirection : OPTIONAL Direction;
+END_ENTITY;
+
+ENTITY StringValue
+	SUBTYPE OF(PropertyValue);
+	ValueComponent : MultiLingualStringSelect;
+END_ENTITY;
+
+ENTITY StyledModel
+	SUBTYPE OF(GeometricRepresentation);
+	DefinedIn : DigitalFile;
+END_ENTITY;
+
+ENTITY SubEdge
+	SUBTYPE OF(Edge);
+	ParentEdge : Edge;
+END_ENTITY;
+
+ENTITY SubsetMember;
+	Subset : ClassSelect;
+	Superset : ClassSelect;
+END_ENTITY;
+
+ENTITY SuppliedObjectRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Relating : SuppliedObjectSelect;
+	Related : SuppliedObjectSelect;
+WHERE
+WR1: TYPEOF(Relating) = TYPEOF(Related);
+END_ENTITY;
+
+ENTITY SupplierSolution
+	SUBTYPE OF(AlternativeSolution);
+	ProbabilityRate : OPTIONAL REAL;
+	Supplier : Organization;
+END_ENTITY;
+
+ENTITY Surface
+	SUPERTYPE OF (ONEOF(OrientedSurface, RectangularTrimmedSurface))
+	SUBTYPE OF(DetailedGeometricModelItem);
+	SELF\RepresentationItem.External : ExternalItem;
+END_ENTITY;
+
+ENTITY SurfaceCondition;
+	Id : IdentifierSelect;
+	ConditionType : ClassString;
+	AssignedTo : AssignedShapePropertySelect;
+	DefinedIn : DigitalFile;
+END_ENTITY;
+
+ENTITY SurfaceCurve
+	SUBTYPE OF(Curve);
+END_ENTITY;
+
+ENTITY SurfaceWithDirection;
+	DefiningSurface : Surface;
+	MaterialDirection : Direction;
+END_ENTITY;
+
+ENTITY SystemBreakdown
+	SUBTYPE OF(Breakdown);
+DERIVE
+	SELF\Breakdown.BreakdownType : STRING := 'system';
+END_ENTITY;
+
+ENTITY TechnicalSolution
+	SUBTYPE OF(AlternativeSolution);
+END_ENTITY;
+
+ENTITY ThicknessLaminateTable
+	SUBTYPE OF(ZoneStructuralMakeup);
+	TableComponents : LIST[2:?] OF ThicknessLaminateTableComponentSelect;
+END_ENTITY;
+
+ENTITY ThicknessSizeDimension;
+	Id : IdentifierSelect;
+	AppliedTo : ShapeElement;
+	Thickness : NumericalValue;
+END_ENTITY;
+
+ENTITY ThreeDGeometrySet
+	SUBTYPE OF(ConstituentShapeRepresentation);
+	BasisRole : ClassSelect;
+	BasisSurface : Surface;
+	DefiningBoundary : SET[1:?] OF Curve;
+	ThreeDGeometry : ExternalGeometricModel;
+END_ENTITY;
+
+ENTITY TimeInterval
+	SUPERTYPE OF (ONEOF(TimeIntervalWithBounds, TimeIntervalWithId));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY TimeIntervalAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedTimeInterval : TimeInterval;
+	AssignedTo : GeneralOrganizationalDataSelect;
+END_ENTITY;
+
+ENTITY TimeIntervalEffectivity
+	SUBTYPE OF(DatedEffectivity);
+	EffectivityPeriod : Duration;
+WHERE
+WR1: EXISTS(SELF\DatedEffectivity.StartDefinition) OR EXISTS(SELF\DatedEffectivity.EndDefinition);
+END_ENTITY;
+
+ENTITY TimeIntervalRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : TimeInterval;
+	Related : TimeInterval;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY TimeIntervalWithBounds
+	SUBTYPE OF(TimeInterval);
+	Duration : OPTIONAL Duration;
+	PrimaryBound : OPTIONAL EventOrDateSelect;
+	SecondaryBound : OPTIONAL EventOrDateSelect;
+WHERE
+WR1: NOT (EXISTS (SecondaryBound) AND EXISTS (Duration));
+WR2: EXISTS (PrimaryBound) OR EXISTS (SecondaryBound);
+END_ENTITY;
+
+ENTITY TimeIntervalWithId
+	SUBTYPE OF(TimeInterval);
+	SELF\TimeInterval.Id : IdentifierSelect;
+END_ENTITY;
+
+ENTITY ToolAttachmentPointFrame
+	SUBTYPE OF(AxisPlacement);
+END_ENTITY;
+
+ENTITY ToolCentrePointFrame
+	SUBTYPE OF(AxisPlacement);
+END_ENTITY;
+
+ENTITY ToolPartRelationship
+	SUBTYPE OF(PartViewRelationship);
+	Placement : OPTIONAL TransformationSelect;
+DERIVE
+	SELF\PartViewRelationship.RelationType : STRING := 'tool part';
+WHERE
+WR1: NOT ('GEOMETRICREPRESENTATIONRELATIONSHIPWITHPLACEMENTTRANSFORMATION' IN TYPEOF(Placement)) OR (Placement.Definitional = FALSE);
+END_ENTITY;
+
+ENTITY TopologicalRepresentationItem
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(ConnectedEdgeSet, Edge, Path, Vertex))
+	SUBTYPE OF(RepresentationItem);
+END_ENTITY;
+
+ENTITY TopologyToGeometryAssociationByMultipleElementPairs
+	SUBTYPE OF(RepresentationRelationship);
+	Origin : SET[1:?] OF TopologyGeometryAssociationTopologicalItemsSelect;
+	Target : SET[1:?] OF TopologyGeometryAssociationGeometricItemsSelect;
+END_ENTITY;
+
+ENTITY TransformedGeometricModel
+	SUBTYPE OF(GeometricModel);
+	SELF\Representation.Items : SET[1:?] OF AxisPlacement;
+INVERSE
+	DerivedFrom : GeometricRepresentationRelationship FOR Related;
+WHERE
+WR1: (SCHEMA_NAME + 'GEOMETRICREPRESENTATIONRELATIONSHIPWITHOPERATORTRANSFORMATION' IN TYPEOF(DerivedFrom)) OR  (SCHEMA_NAME + 'GEOMETRICREPRESENTATIONRELATIONSHIPWITHPLACEMENTTRANSFORMATION' IN TYPEOF(DerivedFrom));
+END_ENTITY;
+
+ENTITY TrimmedCurve
+	SUBTYPE OF(Curve);
+END_ENTITY;
+
+ENTITY TwistedCrossSectionalGroupShapeElement
+	SUBTYPE OF(CrossSectionalGroupShapeElement);
+	TwistDirection : OPTIONAL TwistDirectionEnum;
+	TwistPeriod : OPTIONAL ValueWithUnit;
+END_ENTITY;
+
+ENTITY UncertaintyQualifier
+	SUPERTYPE OF (ONEOF(QualitativeUncertainty, StandardUncertainty));
+	Description : OPTIONAL DescriptorSelect;
+	MeasureName : MultiLingualStringSelect;
+	SameAs : OPTIONAL Proxy;
+END_ENTITY;
+
+ENTITY Unit;
+	Name : ClassSelect;
+	Kind : OPTIONAL ClassSelect;
+	Prefix : OPTIONAL ClassSelect;
+	Quantity : OPTIONAL ClassSelect;
+END_ENTITY;
+
+ENTITY UserDefined11
+	SUBTYPE OF(RepresentationItem);
+	Definition : CharacterString;
+END_ENTITY;
+
+ENTITY Validation;
+	Id : IdentifierSelect;
+	Description : DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	ValidatedBy : OPTIONAL SET[1:?] OF Evidence;
+	Validates : ValidationSelect;
+END_ENTITY;
+
+ENTITY ValueLimit
+	SUBTYPE OF(NumericalValue);
+	Qualifier : TypeQualifierSelect;
+END_ENTITY;
+
+ENTITY ValueList
+	SUBTYPE OF(PropertyValue);
+	Values : LIST[1:?] OF PropertyValue;
+END_ENTITY;
+
+ENTITY ValueRange
+	SUBTYPE OF(ValueWithUnit);
+	LowerLimit : REAL;
+	UpperLimit : REAL;
+END_ENTITY;
+
+ENTITY ValueSet
+	SUBTYPE OF(PropertyValue);
+	Values : SET[1:?] OF PropertyValue;
+END_ENTITY;
+
+ENTITY ValueWithTolerances
+	SUBTYPE OF(ValueWithUnit);
+	LowerLimit : REAL;
+	TolerancedValue : REAL;
+	UpperLimit : REAL;
+END_ENTITY;
+
+ENTITY ValueWithUnit
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(NumericalValue, ValueRange, ValueWithTolerances))
+	SUBTYPE OF(PropertyValue);
+	SignificantDigits : OPTIONAL INTEGER;
+	Unit : UnitSelect;
+END_ENTITY;
+
+ENTITY Verification;
+	Id : IdentifierSelect;
+	Description : DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	VerifiedBy : OPTIONAL SET[1:?] OF Evidence;
+	Verifies : RequirementSatisfactionAssertion;
+END_ENTITY;
+
+ENTITY VerificationRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : OPTIONAL ClassSelect;
+	Relating : Verification;
+	Related : Verification;
+END_ENTITY;
+
+ENTITY Vertex
+	SUPERTYPE OF (VertexOnEdge)
+	SUBTYPE OF(TopologicalRepresentationItem);
+END_ENTITY;
+
+ENTITY VertexOnEdge
+	SUBTYPE OF(Vertex);
+	DistanceFromStartOrEnd : PositiveLengthMeasure;
+	MeasureFromStartOrEnd : BOOLEAN;
+	ParentEdge : EdgeWithLength;
+WHERE
+WR1 : self.DistanceFromStartOrEnd < self.ParentEdge.EdgeLength;
+END_ENTITY;
+
+ENTITY VertexPoint
+	SUBTYPE OF(DetailedGeometricModelItem);
+	SELF\RepresentationItem.External : ExternalItem;
+END_ENTITY;
+
+ENTITY ViewContext;
+	Description : OPTIONAL DescriptorSelect;
+	ApplicationDomain : ApplicationDomainSelect;
+	LifeCycleStage : LifeCycleStageSelect;
+INVERSE
+	AdditionalView : SET[0:?] OF PartView FOR AdditionalContexts;
+	InitialView : SET[1:?] OF PartView FOR InitialContext;
+UNIQUE
+UR1: ApplicationDomain, LifeCycleStage;
+END_ENTITY;
+
+ENTITY ViewOccurrenceRelationship
+	SUPERTYPE OF (ONEOF(AssemblyOccurrenceRelationship, CollectedPartRelationship));
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : PartView;
+	Related : DefinitionBasedOccurrence;
+END_ENTITY;
+
+ENTITY WireColourBasedIdentificationCode
+	SUBTYPE OF(PropertyDefinition);
+END_ENTITY;
+
+ENTITY WireIdentification
+	SUBTYPE OF(OccurrenceTransportFeature);
+	Code : OPTIONAL WireColourBasedIdentificationCode;
+END_ENTITY;
+
+ENTITY WireOccurrence
+	SUBTYPE OF(QuantifiedOccurrence);
+END_ENTITY;
+
+ENTITY WireOccurrenceTerminal
+	SUBTYPE OF(OccurrenceTerminal);
+	SELF\OccurrenceTerminal.AssociatedTransportFeature : WireIdentification;
+	SELF\ShapeElement.ElementOf : WireOccurrence;
+END_ENTITY;
+
+ENTITY WiringHarnessAssemblyDesign
+	SUBTYPE OF(AssemblyDefinition);
+	Topology : OPTIONAL ConnectedEdgeWithLengthSetRepresentation;
+END_ENTITY;
+
+ENTITY WorkOrder;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	InResponseTo : OPTIONAL SET[1:?] OF WorkRequest;
+	OrderType : ClassSelect;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+END_ENTITY;
+
+ENTITY WorkOrderAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedTo : WorkOrderAssignmentSelect;
+	AssignedWorkOrder : WorkOrder;
+END_ENTITY;
+
+ENTITY WorkOrderRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : WorkOrder;
+	Related : WorkOrder;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY WorkRequest;
+	Id : IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	VersionId : OPTIONAL IdentifierSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RequestType : ClassSelect;
+	NotifiedPersons : OPTIONAL SET[1:?] OF DateAndPersonOrganization;
+	Requestor : DateAndPersonOrganization;
+	SameAs : OPTIONAL SET[1:?] OF Proxy;
+	Scope : OPTIONAL SET[1:?] OF ActivityAssignmentSelect;
+	Status : OPTIONAL ClassSelect;
+END_ENTITY;
+
+ENTITY WorkRequestAssignment;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	Role : ClassSelect;
+	AssignedTo : WorkRequestAssignmentSelect;
+	AssignedWorkRequest : WorkRequest;
+END_ENTITY;
+
+ENTITY WorkRequestRelationship;
+	Id : OPTIONAL IdentifierSelect;
+	Description : OPTIONAL DescriptorSelect;
+	ClassifiedAs : OPTIONAL SET[1:?] OF Classification;
+	RelationType : ClassSelect;
+	Relating : WorkRequest;
+	Related : WorkRequest;
+WHERE
+	WR1: Relating :<>: Related;
+END_ENTITY;
+
+ENTITY ZonalBreakdown
+	SUBTYPE OF(Breakdown);
+DERIVE
+	SELF\Breakdown.BreakdownType : STRING := 'zonal';
+END_ENTITY;
+
+ENTITY ZoneStructuralMakeup
+	ABSTRACT
+	SUPERTYPE OF (ONEOF(PercentageLaminateTable, SmearedMaterial, ThicknessLaminateTable))
+	SUBTYPE OF(LaminateTable);
+	Boundary : ZoneStructuralMakeupShapeRepresentation;
+END_ENTITY;
+
+ENTITY ZoneStructuralMakeupShapeRepresentation
+	SUPERTYPE OF (ONEOF(EdgeZoneShape, PointZoneShape));
+END_ENTITY;
+
+END_SCHEMA;

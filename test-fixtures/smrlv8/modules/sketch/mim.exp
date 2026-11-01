@@ -1,0 +1,15 @@
+(*
+  Part1000: $Id: $
+ STEPmod.CVS.Id: mim.exp,v 1.6 2012/10/11 05:49:13 liutkuviene Exp
+  ISO TC184/SC4/WG12 N7856 - ISO/TS 10303-1792 Sketch - EXPRESS MIM
+  Supersedes ISO TC184/SC4/WG12 N7212
+*)
+
+SCHEMA Sketch_mim;
+
+USE FROM Geometric_constraints_mim;
+USE FROM Solid_model_mim; -- ISO/TS 10303-1793
+
+USE FROM sketch_schema;  -- ISO 10303-108
+
+END_SCHEMA;

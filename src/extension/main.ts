@@ -270,7 +270,7 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
             const diagnosticsByUri = new Map<string, vscode.Diagnostic[]>();
             for (const conflict of result.conflicts) {
               const schemas = [...new Set(conflict.locations.map((location) => location.schema))].sort();
-              const message = `${conflict.category} '${conflict.name}' is declared in multiple schemas in the closure of '${result.schema}': ${schemas.join(", ")}.`;
+              const message = `${conflict.category} '${conflict.name}' is declared more than once among the declarations visible in '${result.schema}': ${schemas.join(", ")} (ISO 10303-11:2004 10.1 b).`;
               for (const location of conflict.locations) {
                 const diagnostic = new vscode.Diagnostic(
                   new vscode.Range(
@@ -283,7 +283,7 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
                   vscode.DiagnosticSeverity.Error,
                 );
                 diagnostic.source = "EXPRESSsuite";
-                diagnostic.code = "duplicate-schema-closure-declaration";
+                diagnostic.code = "duplicate-interfaced-declaration";
                 diagnostic.relatedInformation = conflict.locations
                   .filter((candidate) => candidate !== location)
                   .map((candidate) => new vscode.DiagnosticRelatedInformation(

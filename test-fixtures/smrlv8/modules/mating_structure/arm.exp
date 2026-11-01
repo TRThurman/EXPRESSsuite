@@ -1,0 +1,45 @@
+(*
+   Part1000: $Id: $
+ STEPmod.CVS.Id: arm.exp,v 1.20 2018/06/04 16:25:33 kevin Exp
+   ISO TC184/SC4/WG12 N10130 - ISO/TS 10303-1815 Mating structure - EXPRESS ARM
+   Supersedes ISO TC184/SC4/WG12 N9695
+*)
+
+SCHEMA Mating_structure_arm;
+
+USE FROM General_design_connectivity_arm;   -- ISO/TS 10303-1844
+USE FROM Item_definition_structure_arm;   -- ISO/TS 10303-1345
+
+TYPE mating_type = EXTENSIBLE ENUMERATION OF (
+  bolted_joint,
+  brazing,
+  clasping,
+  clinching,
+  clipping,
+  doweling,
+  flanging,
+  foam_injection,
+  friction_welding,
+  gluing,
+  laser_welding,
+  press_fit,
+  riveting,
+  sewing,
+  soldering,
+  spot_welding,
+  stapling,
+  welding);
+END_TYPE;
+
+ENTITY Mated_assembly_occurrence_relationship;
+  mating_joints : OPTIONAL SET[1:?] OF Assembly_shape_joint; 
+  mating_material : OPTIONAL SET [1:?] OF Definition_based_product_occurrence;
+  mating_types : OPTIONAL SET [1:?] OF mating_type;
+  relating : Assembled_part_association;
+  related : Assembled_part_association;
+WHERE
+  WR1: relating.relating_view :=: related.relating_view;
+  WR2: SIZEOF(QUERY(mj <* mating_joints | NOT(mj.associated_definition :=: relating.relating_view)))= 0;
+END_ENTITY;
+
+END_SCHEMA;

@@ -14,6 +14,7 @@ src/**
 assets/**
 !assets/expresssuite-icon.png
 vitest.config.js
+vitest.smrlv8.config.js
 esbuild.mjs
 .github/**
 node_modules/

@@ -5,9 +5,10 @@ import { describe, expect, test } from "vitest";
 import { createExpressP11Services } from "../language/express-module.js";
 import { Attribute_id, isAttribute_qualifier, isEntityDefinition, isGroup_qualifier, isInverse_attr } from "../language/generated/ast.js";
 
-const services = createExpressP11Services(EmptyFileSystem).ExpressP11;
-const validate = validationHelper(services);
-const completion = expectCompletion(services);
+/** Fresh services per document: every case declares `SCHEMA probe`, and same-named schemas in one workspace shadow each other. */
+const fresh = () => createExpressP11Services(EmptyFileSystem).ExpressP11;
+const validate = (text: string) => validationHelper(fresh())(text);
+const completion = (input: Parameters<ReturnType<typeof expectCompletion>>[0]) => expectCompletion(fresh())(input);
 
 /**
  * Two branches under one root, each declaring `shared_name`, plus an entity in

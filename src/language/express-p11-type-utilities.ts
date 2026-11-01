@@ -222,9 +222,16 @@ export class ExpressP11Schema {
         def.add(resource.type, resource.resource.getName(), resource);
       }
 
+      // ISO 10303-11:2004 11.2: a REFERENCE FROM with no names makes visible "all
+      // the EXPRESS items declared in or use'd by the foreign schema" (ruling
+      // 2026-10-30: the clause wins), so take the foreign schema's own
+      // declarations and its USE closure, never what it merely references
+      // (11.3: "it is not possible to chain reference's").
       for (const i of this.fullInterfaces.filter((i) => i.type === InterfaceType.ReferenceFrom)) {
-        for (const resource of i.schema.getLocalDefinitions()) {
-          def.add(resource.type, resource.resource.getName(), resource);
+        for (const resources of i.schema.getAllResources(memoPool, false, exclude).resources.values()) {
+          for (const resource of resources.values()) {
+            def.add(resource.type, resource.resource.getName(), resource);
+          }
         }
       }
     } else {

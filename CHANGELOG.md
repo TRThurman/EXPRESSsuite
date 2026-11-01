@@ -18,9 +18,55 @@
 - Step over any number of index qualifiers when finding the operand of an
   attribute reference, so `s.segments[i][j].parent_surface` resolves.
 - Name the attribute in the linking error for an unresolved `.a`.
+- A `REFERENCE FROM` with no item list now makes visible what the foreign
+  schema declares and what it use's (ISO 10303-11:2004 11.2), not only its
+  own declarations, for supertype and attribute-type resolution.
+- The declaration-name-case check treats a schema named `<module>_arm_lf`
+  as an ARM schema. An ARM long form was held to the MIM convention, so every
+  initial-capital entity in it was noted.
+- The informal-proposition check no longer aborts a document's validation
+  with a TypeError when the document parsed without a schema body (a
+  fragment); it has nothing to check there.
+- The type container and the scope index process documents in URI order,
+  so supertype resolution, `reference-statement-missing` and duplicate
+  declaration results no longer depend on the order in which the file system
+  lists a workspace.
+- An unqualified name in an expression or in a RULE's FOR list binds through
+  the schema's interfaces (ISO 10303-11:2004 clause 11) before the workspace
+  index, and the index is consulted in document-URI order. The index holds
+  every schema of the workspace, so a same-named declaration in an unrelated
+  schema could win, and which one won depended on the order in which the file
+  system listed the documents: on macOS, `class` in the published
+  `Catalog_data_information_mim` bound to another schema's `class`, raising
+  four `reference-statement-missing` errors that Linux did not raise.
 
 ### Validation
 
+- Report an identifier that denotes two different declarations in one
+  schema's scope (`duplicate-interfaced-declaration`, ISO 10303-11:2004
+  10.1 b), in every schema whose scope has the clash, during every validation
+  pass; the former entity-only `Entity has non-unique name` check is folded
+  into it, and the Problems view now shows the clash without running a
+  command. The scope follows clause 11 (USE re-exports along chains and
+  renames, REFERENCE sees declared-in and use'd-by items but never chains,
+  item lists filter, one declaration by several routes counts once) and is
+  proved in `lean/ExpressSuite/Interfaces.lean`. Entity names are keyed
+  case-significantly in short forms; long forms fold case for every kind and
+  report identical repeats as the warning `redundant-declaration` (WG11
+  N239). The command **Detect Duplicate Declarations in Schema Closure** now
+  uses the same relation (it no longer re-exports `REFERENCE FROM` items along
+  `USE FROM` chains or ignores item lists) and publishes the same code.
+
+### Testing
+
+- The EXPRESS schema files of the published ISO 10303 SMRL v8 are a
+  regression corpus: 1,410 `.exp` files under `test-fixtures/smrlv8`,
+  byte-identical to the distribution. `npm run test:smrlv8` loads the 1,287
+  files the default settings admit as one workspace and the 103 long forms
+  directly, and compares every diagnostic with the baselines under
+  `test-fixtures/smrlv8-baseline`; CI runs it on one Linux runner. The
+  baselines pin behaviour, not correctness; the known false-positive classes
+  are listed in the baseline README.
 - Report an attribute reference that is ambiguous under 12.7.3
   (`ambiguous-attribute-reference`, warning): the nearest depth that declares
   the name holds declarations in two or more entities, as with `basis_curve`

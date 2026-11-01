@@ -1,0 +1,283 @@
+(*
+$Id: counterbore_countersink_schema.exp,v 1.24 2017/11/07 16:21:13 brandonus Exp $
+ISO 10303 TC184/SC4/WG12 N9785
+
+EXPRESS Source:
+ISO 10303-113 ed1 Mechanical design - Counterbore countersink schema
+
+The following permission notice and disclaimer shall be included in all copies of this EXPRESS schema ("the Schema"), 
+and derivations of the Schema:
+
+Copyright ISO 2017  All rights reserved
+Permission is hereby granted, free of charge in perpetuity, to any person obtaining a copy of the Schema,
+to use, copy, modify, merge and distribute free of charge, copies of the Schema for the purposes of developing, 
+implementing, installing and using software based on the Schema, and to permit persons to whom the Schema is furnished to do so, 
+subject to the following conditions:
+
+THE SCHEMA IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SCHEMA OR THE 
+USE OR OTHER DEALINGS IN THE SCHEMA.
+
+In addition, any modified copy of the Schema shall include the following notice:
+
+THIS SCHEMA HAS BEEN MODIFIED FROM THE SCHEMA DEFINED IN
+ISO 10303-113 ed1 Mechanical design - Counterbore countersink schema
+AND SHOULD NOT BE INTERPRETED AS COMPLYING WITH THAT STANDARD
+*)
+SCHEMA counterbore_countersink_schema '{iso standard 10303 part(113) version(1) object(1) counterbore_countersink_schema(2)}';
+
+REFERENCE FROM geometry_schema --ISO 10303-42
+      (axis2_placement_3d);
+
+REFERENCE FROM measure_schema   --ISO 10303-41
+         (length_measure_with_unit,
+          positive_length_measure_with_unit,
+          plane_angle_measure_with_unit,
+          positive_plane_angle_measure_with_unit); 
+
+REFERENCE FROM product_definition_schema --ISO 10303-41
+          (product_definition);
+          
+REFERENCE FROM product_property_definition_schema --ISO 1030-41
+         (characterized_object,
+          property_definition,
+          shape_aspect);       
+
+REFERENCE FROM product_property_representation_schema --ISO 10303-41
+		(shape_representation);
+
+REFERENCE FROM product_structure_schema --ISO 10303-44
+          (multi_level_reference_designator);
+
+REFERENCE FROM representation_schema --ISO 10303-43
+		(representation);
+             
+REFERENCE FROM shape_tolerance_schema   --ISO 10303-47
+         (length_tolerance_value,
+          limits_and_fits,
+          plane_angle_tolerance_value);
+
+TYPE tolerance_value_or_limits_and_fits = SELECT (length_tolerance_value,
+               limits_and_fits);
+END_TYPE;
+
+ENTITY counterbore_definition
+  SUBTYPE OF (characterized_object);
+       counterbore_diameter   : hole_diameter;
+	    counterbore_depth     : hole_depth;
+END_ENTITY;
+
+ENTITY counterbore_hole_definition
+  SUBTYPE OF (characterized_object);
+       counterbore              : LIST [1:?] OF UNIQUE counterbore_definition;
+  	   drill_diameter           : hole_diameter;
+  	   drill_depth              : OPTIONAL hole_depth;
+  	   through_hole				: Boolean;
+  	   geometric_model          : shape_representation;
+-- Informal proposition
+--- IP1: counterbore members shall in ascending order in the list organized according to hole_diameter 
+--- IP2: counterbore[1] shall have a larger diameter than drill_diameter.
+--- IP3: The axis2_placement_3d in the geometric_model shall define the reference position and orientation for the counterbore_hole_definition.
+--- IP4: The z axis of the axis2_placement_3d shall point into the material of the item being bored.
+--- IP5: The placement of the axis2_placement_3d shall be on the surface of the item being bored.
+--- IP6: The drill axis and each bore axis shall be congruent with the z axis of the placement.
+  WHERE
+    WR1: through_hole XOR EXISTS(drill_depth);
+--description:1 or other shall be true but not both.
+    WR2: SIZEOF(QUERY( ri <* geometric_model\representation.items | 
+               ('GEOMETRY_SCHEMA.AXIS2_PLACEMENT_3D' IN TYPEOF (ri))
+               )) = 1;
+    --One item in the geometric_model shall be an axis2_placement_3d
+END_ENTITY;
+
+ENTITY simplified_counterbore_hole_definition
+	SUBTYPE OF (counterbore_hole_definition);
+		SELF\counterbore_hole_definition.geometric_model RENAMED position	:	shape_representation;
+  WHERE
+    WR1: SIZEOF(position\representation.items) = 1;
+    --There shall be exactly one item in the representation.
+END_ENTITY;
+
+ENTITY counterbore_hole_occurrence
+  SUBTYPE OF (shape_aspect);
+   definition : counterbore_hole_definition;
+  WHERE
+   WR1: 'PRODUCT_DEFINITION_SCHEMA.PRODUCT_DEFINITION' IN TYPEOF(SELF\shape_aspect.of_shape\property_definition.definition);
+   WR2: 'PRODUCT_PROPERTY_DEFINITION_SCHEMA.PRODUCT_DEFINITION_SHAPE' IN TYPEOF(SELF\shape_aspect.of_shape);
+   WR3: SELF\shape_aspect.product_definitional = TRUE;
+   --desc: The placement of the hole shall be on the surface of the item.
+-- Informal proposition
+--- IP1: A member of counterbore_hole_occurrence shall be associated with a application_context_schema.product_definition_context
+---      whose application_context_schema.product_definition_context.life_cycle_stage attribute is 'design'.
+
+END_ENTITY;
+
+ENTITY counterbore_hole_occurrence_in_assembly
+  SUBTYPE OF (counterbore_hole_occurrence);
+  modified_components : LIST [1:?] OF UNIQUE multi_level_reference_designator;
+-- Informal proposition:
+--- IP1: The placement of the hole shall be on the surface of the first member of modified_components.  
+END_ENTITY;
+
+ENTITY countersink_hole_definition
+  SUBTYPE OF (characterized_object);
+     countersink_diameter        : hole_diameter;
+     countersink_angle           : positive_plane_angle_measure_with_unit;
+     countersink_angle_tolerance : plane_angle_tolerance_value;
+     drill_diameter              : hole_diameter;
+     drill_depth                 : OPTIONAL hole_depth;
+     geometric_model             : shape_representation;
+     through_hole				 : Boolean;
+-- Informal proposition
+--- IP1: countersink_diameter shall have a larger diameter than drill_diameter.
+--- IP2: The axis2_placement_3d in the geometric_model shall define the reference position and orientation for the counterbore_hole_definition.
+--- IP3: The z axis of the axis2_placement_3d shall point into the material of the item being bored.
+--- IP4: The placement of the axis2_placement_3d shall be on the surface of the item being bored.
+--- IP5: The drill axis and the countersink axis shall be congruent with the z axis of the placement.
+  WHERE
+    WR1: through_hole XOR EXISTS(drill_depth);
+--description:1 or other shall be true but not both
+    WR2: SIZEOF(QUERY( ri <* geometric_model\representation.items | 
+               ('GEOMETRY_SCHEMA.AXIS2_PLACEMENT_3D' IN TYPEOF (ri))
+               )) = 1;
+    --One item in the geometric_model shall be an axis2_placement_3d
+END_ENTITY;
+
+ENTITY simplified_countersink_hole_definition
+	SUBTYPE OF (countersink_hole_definition);
+	 SELF\countersink_hole_definition.geometric_model RENAMED position : shape_representation;
+  WHERE
+    WR1: SIZEOF(position\representation.items) = 1;
+    --There shall be exactly one item in the representation.
+(* No longer need WR2. subsumed by countersink_hole_definition.WR2.
+    WR2: SIZEOF(QUERY( ri <* position\representation.items | 
+               NOT ('GEOMETRY_SCHEMA.AXIS2_PLACEMENT_3D' IN TYPEOF (ri))
+               )) = 0;
+    --The item in the representation shall be an axis2_placement_3d
+*)
+END_ENTITY;
+
+ENTITY countersink_hole_occurrence
+  SUBTYPE OF (shape_aspect);
+   definition                    : countersink_hole_definition;
+  WHERE
+   WR1: 'PRODUCT_DEFINITION_SCHEMA.PRODUCT_DEFINITION' IN TYPEOF(SELF\shape_aspect.of_shape\property_definition.definition);
+   WR2: 'PRODUCT_PROPERTY_DEFINITION_SCHEMA.PRODUCT_DEFINITION_SHAPE' IN TYPEOF(SELF\shape_aspect.of_shape);
+   WR3: SELF\shape_aspect.product_definitional = TRUE;
+   ---desc. The placement of the hole shall be on the surface of the item.
+-- Informal proposition
+--- IP1: A member of countersink_hole_occurrence shall be associated with a application_context_schema.product_definition_context
+---      whose application_context_schema.product_definition_context.life_cycle_stage attribute is 'design'.
+END_ENTITY;
+
+ENTITY countersink_hole_occurrence_in_assembly
+  SUBTYPE OF (countersink_hole_occurrence);
+  modified_components : LIST [1:?] OF UNIQUE multi_level_reference_designator;
+-- Informal proposition:
+--- IP1: The placement of the hole shall be on the surface of the first member of modified_components.  
+END_ENTITY;
+
+ENTITY counterdrill_hole_definition
+  SUBTYPE OF (characterized_object);
+     counterbore                  : counterbore_definition;
+     counterdrill_angle           : positive_plane_angle_measure_with_unit;
+     counterdrill_angle_tolerance : plane_angle_tolerance_value;
+     drill_diameter               : hole_diameter;
+     drill_depth                  : OPTIONAL hole_depth;
+     geometric_model             : shape_representation;
+     through_hole				 : Boolean;
+-- Informal proposition
+--- IP1: The counterbore shall have a larger diameter than the drill_diameter.
+--- IP2: The axis2_placement_3d in the geometric_model shall define the reference position and orientation for the counterbore_hole_definition.
+--- IP3: The z axis of the axis2_placement_3d shall point into the material of the item being bored.
+--- IP4: The placement of the axis2_placement_3d shall be on the surface of the item being bored.
+--- IP5: The drill axis and the counterdrill axis and each bore axis shall be congruent with the z axis of the placement.
+  WHERE
+    WR1: through_hole XOR EXISTS(drill_depth);
+--description:1 or other shall be true but not both
+    WR2: SIZEOF(QUERY( ri <* geometric_model\representation.items | 
+               ('GEOMETRY_SCHEMA.AXIS2_PLACEMENT_3D' IN TYPEOF (ri))
+               )) = 1;
+    --One item in the geometric_model shall be an axis2_placement_3d
+ END_ENTITY;
+
+  
+ENTITY simplified_counterdrill_hole_definition
+	SUBTYPE OF (counterdrill_hole_definition);
+	 SELF\counterdrill_hole_definition.geometric_model RENAMED position : shape_representation;
+  WHERE
+    WR1: SIZEOF(position\representation.items) = 1;
+    --There shall be exactly one item in the representation.
+(* No longer need WR2. subsumed by counterdrill_hole_definition.WR2.
+    WR2: SIZEOF(QUERY( ri <* position\representation.items | 
+               NOT ('GEOMETRY_SCHEMA.AXIS2_PLACEMENT_3D' IN TYPEOF (ri))
+               )) = 0;
+    --The item in the representation shall be an axis2_placement_3d
+*)
+END_ENTITY;
+
+ENTITY counterdrill_hole_occurrence
+  SUBTYPE OF (shape_aspect);
+   definition                    : counterdrill_hole_definition;
+  WHERE
+   WR1: 'PRODUCT_DEFINITION_SCHEMA.PRODUCT_DEFINITION' IN TYPEOF(SELF\shape_aspect.of_shape\property_definition.definition);
+   WR2: 'PRODUCT_PROPERTY_DEFINITION_SCHEMA.PRODUCT_DEFINITION_SHAPE' IN TYPEOF(SELF\shape_aspect.of_shape);
+   WR3: SELF\shape_aspect.product_definitional = TRUE;
+---desc: The placement shall be on the surface of the item.
+-- Informal proposition
+--- IP1: A member of counterdrill_hole_occurrence shall be associated with a application_context_schema.product_definition_context
+---      whose application_context_schema.product_definition_context.life_cycle_stage attribute is 'design'.
+END_ENTITY;
+
+ENTITY counterdrill_hole_occurrence_in_assembly
+  SUBTYPE OF (counterdrill_hole_occurrence);
+  modified_components : LIST [1:?] OF UNIQUE multi_level_reference_designator;
+-- Informal proposition:
+--- IP1: The placement of the hole shall be on the surface of the first member of modified_components.  
+END_ENTITY;
+
+ENTITY spotface_definition
+  SUBTYPE OF (counterbore_definition);
+        spotface_radius : positive_length_measure_with_unit;
+        spotface_radius_tolerance : OPTIONAL length_tolerance_value;
+END_ENTITY;
+
+ENTITY spotface_hole_definition
+  SUBTYPE OF (counterbore_hole_definition);
+  SELF\counterbore_hole_definition.counterbore RENAMED spotface : LIST [1:?] OF UNIQUE spotface_definition;
+(* no need for IP after the above change as sequence data is already controlled.
+-- Informal proposition
+--- IP1:spotface_definition shall in ascending order in the list organized according to hole_diameter 
+*)
+END_ENTITY;
+
+ENTITY simplified_spotface_hole_definition
+	SUBTYPE OF (spotface_hole_definition, simplified_counterbore_hole_definition);
+END_ENTITY;
+
+ENTITY spotface_occurrence
+  SUBTYPE OF (counterbore_hole_occurrence);
+   SELF\counterbore_hole_occurrence.definition   : spotface_hole_definition;
+END_ENTITY;
+
+ENTITY spotface_occurrence_in_assembly
+  SUBTYPE OF (counterbore_hole_occurrence_in_assembly);
+   SELF\counterbore_hole_occurrence.definition   : spotface_hole_definition;
+END_ENTITY;
+
+ENTITY hole_depth;
+       depth                     : positive_length_measure_with_unit;
+       depth_tolerance           : OPTIONAL length_tolerance_value;
+END_ENTITY;
+
+ENTITY hole_diameter;
+       diameter                 : positive_length_measure_with_unit;
+       diameter_tolerance       : OPTIONAL tolerance_value_or_limits_and_fits;
+-- Informal proposition:
+--- IP1 : If a limits_and_fits is provided for the diameter_tolerance the limits_and_fits shall be for a hole.
+END_ENTITY;
+ 
+ END_SCHEMA;
