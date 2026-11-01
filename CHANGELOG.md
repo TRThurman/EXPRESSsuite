@@ -4,6 +4,17 @@
 
 ### Bug Fixes
 
+- Find a description across files. The hover and **Show Description** show
+  the remark of the declaration the word at the cursor is bound to, through
+  the schema's USE and REFERENCE statements (ISO 10303-11:2004 clause 11),
+  wherever that remark lives: hovering `string_literal` in a schema that does
+  `REFERENCE FROM iso13584_expressions_schema (string_literal)` shows
+  iso13584_expressions_schema's description of it, and a `<<express:...>>`
+  cross-reference in a description opens its target from any file. Two
+  defects kept this from working: the server created its remark index on the
+  first hover request, so nothing the workspace had parsed before that was
+  ever indexed, and the hover looked a remark found in another file up in the
+  active file's own index.
 - Bind names under the project's case rules (ISO 10303-11:2004 7.1.2, SC4
   conventions, WG11 N239): an exact match first, otherwise a match regardless
   of case among the kinds that do not carry case. Attribute, type, function,

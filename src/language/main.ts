@@ -16,19 +16,43 @@ const connection = createConnection(ProposedFeatures.all);
 const { shared, ExpressP11 } = createExpressP11Services({ connection, ...NodeFileSystem });
 const schemaClosureDuplicateAnalyzer = new SchemaClosureDuplicateAnalyzer(ExpressP11);
 
+// Created with the server, not on the first request: its parse-phase
+// listener must be in place before the workspace's initial build, or nothing
+// parsed before the first hover is indexed.
+const annotationIndex = shared.workspace.AnnotationIndex;
+
+const IDENTIFIER_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
+const TAG_PATH_RE = /^[A-Za-z_][A-Za-z0-9_.]*$/;
+
 // Custom LSP requests (DESIGN §3.2.2, §3.2.3). Registered before
 // startLanguageServer so handlers are wired by the time the client begins
 // requesting.
 connection.onRequest("express/getAnnotations", (params: { uri: string }) => {
   if (!params || typeof params.uri !== "string") return [];
-  return shared.workspace.AnnotationIndex.getAnnotations(params.uri);
+  return annotationIndex.getAnnotations(params.uri);
 });
 
 connection.onRequest("express/findAnnotationsForEntity", (params: { entityName: string }) => {
   if (!params || typeof params.entityName !== "string") return [];
-  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(params.entityName)) return [];
-  return shared.workspace.AnnotationIndex.findByEntityName(params.entityName);
+  if (!IDENTIFIER_RE.test(params.entityName)) return [];
+  return annotationIndex.findByEntityName(params.entityName);
 });
+
+connection.onRequest("express/findAnnotationsByPath", (params: { path: string }) => {
+  if (!params || typeof params.path !== "string") return [];
+  if (!TAG_PATH_RE.test(params.path)) return [];
+  return annotationIndex.findByPath(params.path);
+});
+
+connection.onRequest(
+  "express/findAnnotationsAt",
+  (params: { uri: string; position: { line: number; character: number } }) => {
+    if (!params || typeof params.uri !== "string" || !params.position) return null;
+    const { line, character } = params.position;
+    if (!Number.isInteger(line) || !Number.isInteger(character) || line < 0 || character < 0) return null;
+    return annotationIndex.annotationsAt(params.uri, { line, character }) ?? null;
+  },
+);
 
 connection.onRequest(
   "express/resolveEntity",

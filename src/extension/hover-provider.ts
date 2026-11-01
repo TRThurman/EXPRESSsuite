@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import type { LanguageClient } from "vscode-languageclient/node";
 import { type RemarkAnnotation } from "./annotation-index.js";
-import { getAnnotationIndex, invalidateAnnotationIndex } from "./annotation-client.js";
+import { invalidateAnnotationIndex, resolveDescriptionAt } from "./annotation-client.js";
 import { renderAsciiMathSvgAsync, svgToDataUri } from "./hover-math.js";
 import { time } from "./perf.js";
 import { EXPRESSSUITE_COMMANDS } from "../shared/commands.js";
@@ -97,35 +97,11 @@ export class ExpressHoverProvider implements vscode.HoverProvider {
     const word = document.getText(wordRange);
     const stop = time(`hover.${word}`);
 
-    const idx = await getAnnotationIndex(document, languageClient);
-    let matches = idx.byEntityName(word);
-    if (matches.length === 0 && languageClient) {
-      // §3.2.5c — workspace-wide lookup for cross-schema hovers. The active
-      // file may not contain the description; e.g. hovering `cartesian_point`
-      // in a downstream schema where the description lives in geometry_schema.
-      try {
-        const remote = (await languageClient.sendRequest("express/findAnnotationsForEntity", {
-          entityName: word,
-        })) as Array<{ uri: string; annotation: RemarkAnnotation }>;
-        if (Array.isArray(remote) && remote.length > 0) {
-          matches = remote.map((r) => r.annotation);
-        }
-      } catch {
-        /* server not ready; fall through */
-      }
-    }
-    if (matches.length === 0) { stop(); return undefined; }
-
-    const candidatePaths = new Set<string>();
-    for (const m of matches) {
-      if (m.parts.length >= 2 && m.parts[1] === word) {
-        candidatePaths.add(`${m.parts[0]}.${m.parts[1]}`);
-      }
-    }
-    const path = candidatePaths.size > 0 ? Array.from(candidatePaths)[0] : undefined;
-    if (!path) { stop(); return undefined; }
-
-    const anns = idx.byPath(path);
+    // The declaration the word is bound to, wherever its remark lives
+    // (§3.2.5c: cross-schema hovers), then name-only matches.
+    const resolved = await resolveDescriptionAt(document, position, word, languageClient);
+    if (!resolved) { stop(); return undefined; }
+    const { path, annotations: anns } = resolved;
     const primary = pickPrimary(anns, path);
     if (!primary) { stop(); return undefined; }
 
