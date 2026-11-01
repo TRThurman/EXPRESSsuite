@@ -34,13 +34,13 @@ import {
   ExpressConflict,
   ExpressP11ConflictManager,
   ExpressP11Entity,
-  ExpressP11OptimizedAttributeList,
   ExpressP11OptimizedResourceList,
   ExpressP11ParameterTypeResolution,
   ExpressP11ParameterTypeResolver,
   ExpressP11Schema,
   ExpressP11TypeFactory,
   InterfaceType,
+  normalizeAttributeName,
 } from "./express-p11-type-utilities.js";
 import { ExpressP11MemoPool } from "./express-p11-memo-pool.js";
 import { NIL } from "uuid";
@@ -57,6 +57,13 @@ type ConcreteType = {
 type SubSuperTypeDefinition = {
   name: string;
   schema: string;
+};
+
+/** One depth of the 12.7.3 walk: the entity itself, a supertype depth or a subtype depth. */
+export type VisibleAttributeCandidates = {
+  depth: number;
+  direction: "self" | "ancestor" | "descendant";
+  declarations: Attribute_decl[];
 };
 
 type ExpressSink = {
@@ -82,7 +89,6 @@ export class ExpressP11TypeContainer {
   protected readonly memoizedAllResourcesFromCall = new Map<string, EntityDefinition[]>();
   protected readonly memoizedAllDefinitionsFromCall = new Map<string, SubSuperTypeDefinition[]>();
 
-  protected readonly memoizedAttributesCall = new ExpressP11OptimizedAttributeList();
   protected resolveAttributeTypeCall: number = 0;
 
   private workspaceConfiguration: Configuration = {
@@ -164,7 +170,6 @@ export class ExpressP11TypeContainer {
     this.memoizedSubtypesCall.clear();
     this.memoizedAllResourcesFromCall.clear();
     this.memoizedAllDefinitionsFromCall.clear();
-    this.memoizedAttributesCall.clear();
     this.schemas.clear();
     this.memoPool.reset();
     this.conflictManager.reset();
@@ -204,6 +209,7 @@ export class ExpressP11TypeContainer {
 
             const supertypeDefinition = allAvailable.resources.get(DefinitionType.Entity)?.get(supertypeName);
             if (supertypeDefinition) entity.addSuperType(supertypeDefinition.resource as ExpressP11Entity);
+            else entity.unresolvedSupertypes.push(supertypeName);
           }
         }
       }
@@ -355,34 +361,84 @@ export class ExpressP11TypeContainer {
     }
   }
 
-  public getAllAttributes(entity: EntityDefinition, filter: string = ""): Attribute_decl[] {
+  /**
+   * Attribute declarations visible from `entity` under ISO 10303-11:2004 12.7.3,
+   * flattened nearest first: the entity's own, then each supertype depth, then
+   * each subtype depth. `filter` keeps the declarations whose name equals it
+   * case-insensitively; empty keeps every declaration (completion).
+   * `includeDescendants` false stops after the supertypes, the 9.2.1.3 reading
+   * for INVERSE FOR. The linker binds the first exact match of this list.
+   */
+  public getVisibleAttributes(entity: EntityDefinition, filter: string = "", includeDescendants: boolean = true): Attribute_decl[] {
+    return this.getVisibleAttributeCandidates(entity, filter, includeDescendants).flatMap((candidate) => candidate.declarations);
+  }
+
+  /**
+   * The same candidates grouped by depth and direction, for the ambiguity check
+   * (two declarations at the first non-empty depth) and the type builder. When
+   * the type container's entity for the node is a different node (duplicate
+   * schema names across files), the walk falls back to the AST and covers the
+   * entity and its supertypes only.
+   */
+  public getVisibleAttributeCandidates(entity: EntityDefinition, filter: string = "", includeDescendants: boolean = true): VisibleAttributeCandidates[] {
+    const wanted = filter.length > 0 ? normalizeAttributeName(filter) : undefined;
+    const nameOf = (attribute: Attribute_decl): string | undefined => this.nameProvider.getName(attribute);
+    const pick = (byName: ReadonlyMap<string, Attribute_decl[]>): Attribute_decl[] =>
+      wanted === undefined ? [...byName.values()].flat() : (byName.get(wanted) ?? []);
+    const result: VisibleAttributeCandidates[] = [];
     const expressEntity = this.getExpressP11EntityFrom(entity);
-    if (!expressEntity) return [];
-
-    const memoKey = expressEntity.graphKey;
-    const hasBeenComputed = this.memoizedAttributesCall.resources.has(memoKey.toString());
-    if (hasBeenComputed && memoKey !== NIL) {
-      return this.memoizedAttributesCall.findByName(memoKey.toString(), filter);
+    if (!expressEntity || expressEntity.getNode() !== entity) {
+      this.astAncestorLevels(entity).forEach((level, depth) => {
+        const declarations = level.flatMap((e) =>
+          this.getAttributesV2(e).filter((attribute) => {
+            const name = nameOf(attribute);
+            return name !== undefined && (wanted === undefined || normalizeAttributeName(name) === wanted);
+          })
+        );
+        result.push({ depth, direction: depth === 0 ? "self" : "ancestor", declarations });
+      });
+      return result;
     }
+    result.push({ depth: 0, direction: "self", declarations: pick(expressEntity.ownAttributesByName(nameOf)) });
+    expressEntity.getAncestorLevels().forEach((level, index) => {
+      result.push({ depth: index + 1, direction: "ancestor", declarations: level.flatMap((e) => pick(e.ownAttributesByName(nameOf))) });
+    });
+    if (includeDescendants) {
+      expressEntity.getDescendantLevels().forEach((level, index) => {
+        result.push({ depth: index + 1, direction: "descendant", declarations: level.flatMap((e) => pick(e.ownAttributesByName(nameOf))) });
+      });
+    }
+    return result;
+  }
 
-    const typeGraph = this.getFullSubSuperGraph(entity);
-    for (const e of typeGraph) {
-      for (const a of this.getAttributesV2(e)) {
-        const attributeName = this.nameProvider.getName(a);
-        if (attributeName) this.memoizedAttributesCall.add(expressEntity.graphKey.toString(), attributeName, a);
+  /** True when `entity` or one of its supertypes names a supertype that could not be resolved. */
+  public hasUnresolvedSupertypes(entity: EntityDefinition): boolean {
+    const expressEntity = this.getExpressP11EntityFrom(entity);
+    if (expressEntity && expressEntity.getNode() === entity) return expressEntity.hasUnresolvedSupertypes();
+    return this.astAncestorLevels(entity)
+      .flat()
+      .some((e) => (e.types?.supertypes?.entities ?? []).some((reference) => !reference.entity.ref));
+  }
+
+  /** `[[entity], direct supertypes, ...]` over the AST's resolved SUBTYPE OF references; cycles stop at the visited set. */
+  private astAncestorLevels(entity: EntityDefinition): EntityDefinition[][] {
+    const visited = new Set<EntityDefinition>([entity]);
+    const levels: EntityDefinition[][] = [[entity]];
+    let frontier: EntityDefinition[] = [entity];
+    while (frontier.length > 0) {
+      const level: EntityDefinition[] = [];
+      for (const current of frontier) {
+        for (const reference of current.types?.supertypes?.entities ?? []) {
+          const target = reference.entity.ref;
+          if (!target || visited.has(target)) continue;
+          visited.add(target);
+          level.push(target);
+        }
       }
+      if (level.length > 0) levels.push(level);
+      frontier = level;
     }
-    //this.getFullSubSuperGraph(entity).forEach((e) => this.getAttributesV2(e).forEach((a) => attributes.push(a)));
-    // for (const key of this.getFullSubSuperGraph(entity)) {
-    //   const ename = key.name;
-    //   const sname = AstUtils.getContainerOfType(key, isSchemaDefinition)?.name;
-    //   this.memoizedAttributesCall.set(`${ename}.${sname}`, attributes);
-    // }
-    //this.memoizedAttributesCall.set(memoKey.toString(), attributes);
-    // console.timeEnd(`${memoKey}`);
-
-    // return attributes;
-    return this.memoizedAttributesCall.findByName(expressEntity.graphKey.toString(), filter);
+    return levels;
   }
 
   protected getAttributes(type: ConcreteType): Attribute_decl[] {

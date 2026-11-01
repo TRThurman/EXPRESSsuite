@@ -1,0 +1,5 @@
+name = "expresssuite-proofs"
+defaultTargets = ["ExpressSuite"]
+
+[[lean_lib]]
+name = "ExpressSuite"

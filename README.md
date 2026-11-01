@@ -32,17 +32,67 @@ If you reference, cite, or build on this work, see [§ Citation](#citation) belo
 EXPRESSsuite reports additional ISO TC 184/SC 4 authoring problems in the
 standard VS Code **Problems** view:
 
+- **Entity-name case is significant (project requirement)** — EXPRESSsuite
+  is tailored for ISO 10303 development, where the case of an entity name
+  carries meaning: ARM entity names begin with an uppercase letter
+  (`Product`), MIM and integrated-resource entity names are lowercase
+  (`product`), and the two are different entities. References bind only to
+  the exact spelling, so `SUBTYPE OF (mesh)` does not name `ENTITY Mesh`, and
+  an ARM reference written in lowercase is an error in the ARM. This is a
+  deliberate project departure from ISO 10303-11:2004 7.1.2, which makes
+  letter case insignificant outside string literals (project ruling,
+  2026-10-29). The published SMRLv8 follows the convention without exception
+  in its ARMs (3,460 of 3,460 entity names) and MIMs (1,359 of 1,359).
+- **Schema-name case (project requirement)** — a schema whose name ends in
+  `arm` or `mim` begins with an uppercase letter (`Mesh_topology_arm`,
+  `Mesh_topology_mim`; project ruling, 2026-10-30). The published SMRLv8
+  follows this in every module `arm.exp` and `mim.exp` (1,735 ARM and 1,737
+  MIM schema names); the only exceptions are 104 lowercase copies in
+  `modules/analytical_model/arm_concatenated.exp` and `mim_concatenated.exp`.
+  Schema names that do not end in `arm` or `mim` are uncontrolled (project
+  ruling, 2026-10-30). A schema reference (`USE FROM`, `REFERENCE FROM`)
+  binds only to the exact spelling, as an entity reference does, so
+  `REFERENCE FROM GEOMETRY_SCHEMA` does not name `geometry_schema` (project
+  ruling, 2026-10-30). No diagnostic checks the naming rule yet.
+- **Case is not significant in type, attribute, function, rule and
+  subtype-constraint names (project requirement)** — two spellings that
+  differ only in case denote the same declaration, as ISO 10303-11:2004 7.1.2
+  provides; only entity names and the schema-name rule above carry case
+  (project ruling, 2026-10-30). Known gap: the linker still binds type and
+  attribute references to the exact spelling (in SMRLv8, 3 type and 23
+  attribute references fail only by case). The casing diagnostics below are
+  style hints and remain.
 - **Declaration-name casing** — entities in schemas whose names end in
   `_arm` must begin with an uppercase letter. Entities in other schemas and
   all type names must be lowercase. Casing diagnostics include a quick fix.
 - **Duplicate loop indices** — a `LOCAL` variable must not redeclare the
-  index implicitly declared by a `REPEAT` increment control. EXPRESS
-  identifiers are compared without regard to case.
+  index implicitly declared by a `REPEAT` increment control. Loop-index and
+  variable names are compared without regard to case.
 - **Informal proposition signatures** — annotations such as
   `(*"schema.entity.wr:IP1" ... *)` must have a matching `--IP1:` signature
   as the final entry inside the corresponding `ENTITY` or `TYPE`. Missing,
   malformed, misplaced, and unmatched signatures are reported, as are
   malformed `.IPn` and `.ipn` annotation keys.
+
+- **Attribute redeclaration types** — the type of `SELF\e.attr : T` must be
+  the same as, or a specialization of, the original attribute's type
+  (ISO 10303-11:2004 9.2.3.4, 9.2.7). Defined types and selects are seen
+  through on both sides, so narrowing `compound_item_definition` to a
+  `LIST [2:3] OF point_and_vector_member` is accepted, while `LIST OF REAL` is
+  not. The relation is proved sound in `lean/`.
+- **Index qualifiers** — `x[1]` is reported when the declared type of `x` can
+  never hold an aggregate value (ISO 10303-11:2004 12.6.1).
+- **Ambiguous attribute references** — `x.a` is reported when `a` is declared
+  by two or more entities at the same nearest depth of the declared type of
+  `x` (ISO 10303-11:2004 12.7.3, last sentence); qualify it with a group
+  reference such as `x\e.a`.
+
+Attribute references resolve as 12.7.3 prescribes: `x.a` is looked up in the
+declared type of `x`, its supertypes and its subtypes, nearest first, never in
+a sibling entity; `x\e` may name any entity in the same subtype/supertype
+graph (12.7.4) and `x\e.a` then means `e`'s own declaration. Hover,
+go-to-definition, completion and validation all follow this one rule, which
+is proved against the clause text in `lean/`.
 
 For workspace-level ambiguity checks, run **EXPRESSsuite: Detect Duplicate
 Declarations in Schema Closure** from the Command Palette or an EXPRESS

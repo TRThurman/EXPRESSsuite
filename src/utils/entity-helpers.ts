@@ -223,21 +223,3 @@ export const getDataTypesFromParameterId = (param: Parameter_id): CustomExpressD
 
   return getTypesFromParameterType(parameterType);
 };
-
-export const getFullSubSuperGraph = (entity: EntityDefinition | undefined): CustomExpressDescription<EntityDefinition>[] => {
-  const graph: CustomExpressDescription<EntityDefinition>[] = [];
-
-  if (!entity || !isEntityDefinition(entity)) return [];
-  getSuperTypes(entity).forEach((supertype) => {
-    graph.push(supertype);
-  });
-  //   getSubTypes(entity, references).forEach((subtype) => {
-  //     graph.push(subtype);
-  //   });
-  //   const subGraphs: CustomExpressDescription<EntityDefinition>[] = [];
-  //   graph.forEach((type) => {
-  //     subGraphs.push(...getSubTypes(type.node, references));
-  //   });
-  //   graph.push(...subGraphs);
-  return graph;
-};

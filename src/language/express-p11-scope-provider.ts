@@ -103,126 +103,24 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         return this.createScopeForNodes(types);
       }
 
-      //Inverse attribute
+      // INVERSE ... FOR [entity.]attribute (ISO 10303-11:2004 9.2.1.3): an explicit
+      // attribute of the referencing entity, which includes the ones it inherits;
+      // with an entity prefix, that entity's own explicit attributes.
       if (context.property === "forAttribute" && isInverse_attr(context.container)) {
         const inverseAttribute = context.container;
         const ofType = inverseAttribute.forEntity ? inverseAttribute.forEntity : inverseAttribute.type;
         if (ofType.error || !ofType.ref) return EMPTY_SCOPE;
-        const attributes = this.typeContainer.getAllAttributes(ofType.ref, context.reference.$refText);
-        const scope = this.createScopeForNodes(attributes);
-        return scope;
+        const candidates = inverseAttribute.forEntity
+          ? this.typeContainer.getAttributesV2(ofType.ref)
+          : this.typeContainer.getVisibleAttributes(ofType.ref, context.reference.$refText, false);
+        return this.createScopeForNodes(candidates.filter((attribute) => isExplicit_attr(attribute.$container)));
       }
 
       if (isGroup_qualifier(context.container) || isAttribute_qualifier(context.container)) {
-        enum Qualifier {
-          Group,
-          Attribute,
-        }
-        const searchingFor: Qualifier = isGroup_qualifier(context.container) ? Qualifier.Group : Qualifier.Attribute;
+        const searchingFor = isGroup_qualifier(context.container) ? QualifierKind.Group : QualifierKind.Attribute;
+        const { nodes: nodesInScope, type: nodesInScopeType } = this.qualifierOperand(context.container, schema);
 
-        const nodesInScope: AstNode[] = [];
-        let nodesInScopeType: ScopeType = ScopeType.Empty;
-
-        if (isQualified_attribute(context.container.$container)) {
-          if (searchingFor === Qualifier.Group) {
-            const entity = AstUtils.getContainerOfType(context.container, isEntityDefinition);
-            if (entity) {
-              nodesInScopeType = ScopeType.Entities;
-              //   for (const entityDef of this.typeContainer.getFullSubSuperGraph(entity)) {
-              //     nodesInScope.push(entityDef);
-              //   }
-              nodesInScope.push(entity);
-            }
-          }
-
-          if (searchingFor === Qualifier.Attribute) {
-            const entity = context.container.$container.group?.entity?.ref;
-            // if (!entity) console.log("couldnt read");
-            if (!entity || !isEntityDefinition(entity)) return EMPTY_SCOPE;
-            nodesInScope.push(entity);
-            nodesInScopeType = ScopeType.Entity;
-          }
-        }
-
-        if (isComplex_Primary_body(context.container.$container) || isAssignment_stmt_body(context.container.$container)) {
-          const complexbody = context.container.$container;
-          const index = context.container.$containerIndex ?? 0;
-          let leftMember: AstNode | string;
-          //if (!context.container.$containerIndex) return EMPTY_SCOPE;
-          if (index > 0) leftMember = complexbody.qualifiers[index - 1];
-          else leftMember = complexbody.$container.head;
-
-          if (isIndex_qualifier(leftMember) && isComplex_Primary_body(leftMember.$container)) {
-            const subIndex = leftMember.$containerIndex ?? -1;
-            if (subIndex >= 0) {
-              if (subIndex > 0) leftMember = complexbody.qualifiers[index - 2];
-              else leftMember = complexbody.$container.head;
-              //leftMember = leftMember.$container.qualifiers[leftMember.$containerIndex ?? 0 - 1];
-            }
-          }
-
-          if (isComplex_Primary_reference(leftMember) || isProcedure_call_Or_Assigment_stmt_reference(leftMember)) {
-            // if (!leftMember.to.ref) console.log("couldnt read");
-
-            if (!leftMember.to.ref) return EMPTY_SCOPE;
-            const leftNode = leftMember.to.ref;
-            if (!leftNode) return EMPTY_SCOPE;
-            const { nodes, type } = this.getSimpleScopeOptions(leftNode, schema);
-            nodesInScope.push(...nodes);
-            nodesInScopeType = type;
-          }
-          if (isBuilt_in_constant_or_function(leftMember)) {
-            switch (leftMember.toLowerCase()) {
-              case "self": {
-                const self = this.resolveSelfType(context.container);
-                if (self.nodes.length > 0) {
-                  nodesInScope.push(...self.nodes);
-                  nodesInScopeType = self.type;
-                }
-                break;
-              }
-            }
-          }
-          if (isQualifier(leftMember)) {
-            switch (leftMember.$type) {
-              case "Attribute_qualifier":
-                const attribute = (leftMember as Attribute_qualifier).target?.ref;
-
-                if (!attribute) break;
-                switch (attribute.$type) {
-                  case "Redeclared_attribute":
-                  case "Attribute_id":
-                    if (
-                      !isExplicit_attr(attribute.$container) &&
-                      !isDerived_attr(attribute.$container) &&
-                      !isInverse_attr(attribute.$container)
-                    )
-                      return EMPTY_SCOPE;
-                    const attr = attribute.$container; //reference.reference.ref?.$container as Explicit_attr;
-                    const attributeType = this.typeContainer.resolveAttribute(attr);
-                    if (attributeType.type === ExpressP11ParameterTypeResolutionType.EntityDefinition) {
-                      nodesInScope.push(...attributeType.value);
-                      nodesInScopeType = ScopeType.Entities;
-                    }
-
-                    break;
-                }
-                break;
-              case "Group_qualifier":
-                const entity = (leftMember as Group_qualifier).entity?.ref;
-                // if (!entity) console.log("couldnt read");
-
-                if (!isEntityDefinition(entity)) break;
-                if (entity) {
-                  nodesInScope.push(entity);
-                  nodesInScopeType = ScopeType.Entity;
-                }
-                break;
-            }
-          }
-        }
-
-        if (searchingFor === Qualifier.Attribute) {
+        if (searchingFor === QualifierKind.Attribute) {
           if (nodesInScope.length < 1) return EMPTY_SCOPE;
 
           switch (nodesInScopeType) {
@@ -237,7 +135,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
           }
         }
 
-        if (searchingFor === Qualifier.Group) {
+        if (searchingFor === QualifierKind.Group) {
           return this.resolveGroupQualifierScope(nodesInScope, context.reference.$refText);
         }
       }
@@ -247,6 +145,118 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     } catch {
       return EMPTY_SCOPE;
     }
+  }
+
+  /**
+   * The declarations the left operand of a qualifier evaluates to, and how the
+   * qualifier is to be read against them: `Entities` for an entity- or
+   * select-typed operand, `Entity` for the partial complex entity value after a
+   * group reference, `Enums` for an enumeration type. Shared by linking (through
+   * getScope) and by the link-target census, so both read the operand alike.
+   * `undefined` when the qualifier is not inside a known schema.
+   */
+  getQualifierOperand(qualifier: Attribute_qualifier | Group_qualifier): { nodes: AstNode[]; type: ScopeType } | undefined {
+    const schemaNode = AstUtils.getContainerOfType(qualifier, isSchemaDefinition);
+    if (!schemaNode?.name) return undefined;
+    const schema = this.typeContainer.getSchemas().get(schemaNode.name);
+    if (!schema) return undefined;
+    try {
+      return this.qualifierOperand(qualifier, schema);
+    } catch {
+      return undefined;
+    }
+  }
+
+  private qualifierOperand(qualifier: Attribute_qualifier | Group_qualifier, schema: ExpressP11Schema): { nodes: AstNode[]; type: ScopeType } {
+    const empty = { nodes: [], type: ScopeType.Empty };
+    const searchingFor = isGroup_qualifier(qualifier) ? QualifierKind.Group : QualifierKind.Attribute;
+
+    const nodesInScope: AstNode[] = [];
+    let nodesInScopeType: ScopeType = ScopeType.Empty;
+
+    if (isQualified_attribute(qualifier.$container)) {
+      if (searchingFor === QualifierKind.Group) {
+        const entity = AstUtils.getContainerOfType(qualifier, isEntityDefinition);
+        if (entity) {
+          nodesInScopeType = ScopeType.Entities;
+          nodesInScope.push(entity);
+        }
+      }
+
+      if (searchingFor === QualifierKind.Attribute) {
+        const entity = qualifier.$container.group?.entity?.ref;
+        if (!entity || !isEntityDefinition(entity)) return empty;
+        nodesInScope.push(entity);
+        nodesInScopeType = ScopeType.Entity;
+      }
+    }
+
+    if (isComplex_Primary_body(qualifier.$container) || isAssignment_stmt_body(qualifier.$container)) {
+      const complexbody = qualifier.$container;
+      const index = qualifier.$containerIndex ?? 0;
+      // The operand is the nearest preceding qualifier that is not an index, or
+      // the head. Index qualifiers are stepped over however many there are: the
+      // element type of a nested aggregate is read from the declaration by
+      // getTypesFromParameterType, which strips every aggregation level.
+      let position = index - 1;
+      while (position >= 0 && isIndex_qualifier(complexbody.qualifiers[position])) position -= 1;
+      const leftMember: AstNode | string = position >= 0 ? complexbody.qualifiers[position] : complexbody.$container.head;
+
+      if (isComplex_Primary_reference(leftMember) || isProcedure_call_Or_Assigment_stmt_reference(leftMember)) {
+        if (!leftMember.to.ref) return empty;
+        const leftNode = leftMember.to.ref;
+        if (!leftNode) return empty;
+        const { nodes, type } = this.getSimpleScopeOptions(leftNode, schema);
+        nodesInScope.push(...nodes);
+        nodesInScopeType = type;
+      }
+      if (isBuilt_in_constant_or_function(leftMember)) {
+        switch (leftMember.toLowerCase()) {
+          case "self": {
+            const self = this.resolveSelfType(qualifier);
+            if (self.nodes.length > 0) {
+              nodesInScope.push(...self.nodes);
+              nodesInScopeType = self.type;
+            }
+            break;
+          }
+        }
+      }
+      if (isQualifier(leftMember)) {
+        switch (leftMember.$type) {
+          case "Attribute_qualifier":
+            const attribute = (leftMember as Attribute_qualifier).target?.ref;
+
+            if (!attribute) break;
+            switch (attribute.$type) {
+              case "Redeclared_attribute":
+              case "Attribute_id":
+                if (!isExplicit_attr(attribute.$container) && !isDerived_attr(attribute.$container) && !isInverse_attr(attribute.$container))
+                  return empty;
+                const attr = attribute.$container;
+                const attributeType = this.typeContainer.resolveAttribute(attr);
+                if (attributeType.type === ExpressP11ParameterTypeResolutionType.EntityDefinition) {
+                  nodesInScope.push(...attributeType.value);
+                  nodesInScopeType = ScopeType.Entities;
+                }
+
+                break;
+            }
+            break;
+          case "Group_qualifier":
+            const entity = (leftMember as Group_qualifier).entity?.ref;
+
+            if (!isEntityDefinition(entity)) break;
+            if (entity) {
+              nodesInScope.push(entity);
+              nodesInScopeType = ScopeType.Entity;
+            }
+            break;
+        }
+      }
+    }
+
+    return { nodes: nodesInScope, type: nodesInScopeType };
   }
 
   private resolveGroupQualifierScope(options: AstNode[], filter: string = ""): Scope {
@@ -269,20 +279,29 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     return this.createScopeForNodes(options, undefined);
   }
 
+  /**
+   * ISO 10303-11:2004 12.7.3. For an entity-typed operand the attribute shall be
+   * declared in that entity, a supertype or a subtype of it; for a select-typed
+   * operand, in a member or a supertype or subtype of a member. The candidates
+   * are listed nearest first (the entity, then each supertype depth, then each
+   * subtype depth) so that the linker's first match is the nearest declaration.
+   * After a group reference (`Entity`) only the named entity's own declarations
+   * count: "shall occur within the entity declaration for that partial complex
+   * entity data type".
+   */
   private resolveAttributeQualifierScope(options: AstNode[], type: ScopeType, filter: string = ""): Scope {
     const attributes: Attribute_decl[] = [];
     if (type === ScopeType.Entities) {
-      const graphProcessed: string[] = [];
-      for (const type of options) {
-        if (!graphProcessed.includes(this.typeContainer.getGraphKey(type as EntityDefinition))) {
-          for (const attribute of this.typeContainer.getAllAttributes(type as EntityDefinition, filter)) {
-            attributes.push(attribute);
-          }
-          graphProcessed.push(this.typeContainer.getGraphKey(type as EntityDefinition));
+      const seen = new Set<Attribute_decl>();
+      for (const option of options) {
+        if (!isEntityDefinition(option)) continue;
+        for (const attribute of this.typeContainer.getVisibleAttributes(option, filter)) {
+          if (seen.has(attribute)) continue;
+          seen.add(attribute);
+          attributes.push(attribute);
         }
       }
-      const scope = this.createScopeForNodes(attributes);
-      return scope;
+      return this.createScopeForNodes(attributes);
     }
 
     if (type === ScopeType.Entity && options.length == 1) {
@@ -443,9 +462,14 @@ export const isReferenceToControlledType = (context: ReferenceInfo): boolean => 
   return context.property === "type" && isTypeExtension(context.container);
 };
 
-enum ScopeType {
+export enum ScopeType {
   Entities,
   Entity,
   Enums,
   Empty,
+}
+
+enum QualifierKind {
+  Group,
+  Attribute,
 }
