@@ -4,6 +4,14 @@
 
 ### Bug Fixes
 
+- Bind names under the project's case rules (ISO 10303-11:2004 7.1.2, SC4
+  conventions, WG11 N239): an exact match first, otherwise a match regardless
+  of case among the kinds that do not carry case. Attribute, type, function,
+  procedure, constant, enumeration, parameter and local names now bind
+  regardless of case everywhere (`SELF\Value_with_unit.Unit` names the
+  attribute `unit`); entity and schema names still bind exact-case in a short
+  form; in a long form (`_lf`) every name binds regardless of case. The
+  linker used to bind every reference to the exact spelling.
 - Resolve an attribute reference `x.a` against the declared type of `x`, its
   supertypes and its subtypes only (ISO 10303-11:2004 12.7.3), nearest first.
   The scope used to be the whole connected subtype/supertype graph, so `x.a`

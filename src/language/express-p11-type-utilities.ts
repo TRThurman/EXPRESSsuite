@@ -26,10 +26,30 @@ import { NIL, v4 as uuidv4 } from "uuid";
 
 /**
  * Name equality for attribute lookup. EXPRESS identifiers are case-insensitive
- * (ISO 10303-11:2004 7.1.1), so candidates are gathered case-insensitively; the
- * linker's final match on the written `$refText` stays exact.
+ * (ISO 10303-11:2004 7.1.2), so candidates are gathered case-insensitively and
+ * the linker binds them under the case rule (express-p11-case-rule-scope.ts).
  */
 export const normalizeAttributeName = (name: string): string => name.toLowerCase();
+
+/**
+ * A name lookup under the case rule: the exact key first; otherwise, when the
+ * kind folds case (every kind but ENTITY and SCHEMA in a short form, every
+ * kind in a long form), the first key equal regardless of case. See
+ * express-p11-case-rule-scope.ts for the rule and its sources.
+ */
+export function getUnderCaseRule<V>(map: ReadonlyMap<string, V> | undefined, name: string, folds: boolean): V | undefined {
+  if (!map) return undefined;
+  const exact = map.get(name);
+  if (exact !== undefined || !folds) return exact;
+  const lower = name.toLowerCase();
+  for (const [key, value] of map) if (key.toLowerCase() === lower) return value;
+  return undefined;
+}
+
+/** True for a long-form schema name (`<module>_arm_lf`, `<module>_mim_lf`). */
+export function isLongForm(schemaName: string | undefined): boolean {
+  return /_lf$/i.test(schemaName ?? "");
+}
 
 export abstract class ExpressResource<T extends AstNode> {
   protected owner: ExpressP11Schema | undefined;
@@ -179,6 +199,17 @@ export class ExpressP11Schema {
   }
   public getLocalDefinition(name: string): Definition | undefined {
     return this.localResourceRegistry.get(name);
+  }
+  /** `getLocalDefinition` under the case rule: exact first, otherwise regardless of case among the kinds that fold. */
+  public getLocalDefinitionUnderCaseRule(name: string, longForm: boolean = false): Definition | undefined {
+    const exact = this.localResourceRegistry.get(name);
+    if (exact) return exact;
+    const lower = name.toLowerCase();
+    for (const [key, definition] of this.localResourceRegistry) {
+      if (key.toLowerCase() !== lower) continue;
+      if (longForm || definition.type !== DefinitionType.Entity) return definition;
+    }
+    return undefined;
   }
 
   public getEntities(): Map<string, ExpressP11Entity> {
@@ -516,7 +547,7 @@ export class ExpressP11EnumType extends ExpressP11Type {
     // const base = this.owner
     //   ?.getAllResources(memoPool)
     //   .find((r) => r.type === DefinitionType.EnumType && r.resource.name === this.baseName);
-    const base = this.owner?.getAllResources(memoPool)?.resources.get(DefinitionType.EnumType)?.get(this.baseName!);
+    const base = getUnderCaseRule(this.owner?.getAllResources(memoPool)?.resources.get(DefinitionType.EnumType), this.baseName!, true);
     if (base) this.base = base.resource as ExpressP11EnumType;
   }
 }
@@ -565,7 +596,7 @@ export class ExpressP11SelectType extends ExpressP11Type {
     // const base = this.owner
     //   ?.getAllResources(memoPool)
     //   .find((r) => r.type === DefinitionType.SelectType && r.resource.name === this.baseName);
-    const base = this.owner?.getAllResources(memoPool)?.resources.get(DefinitionType.SelectType)?.get(this.baseName!);
+    const base = getUnderCaseRule(this.owner?.getAllResources(memoPool)?.resources.get(DefinitionType.SelectType), this.baseName!, true);
     if (base) this.base = base.resource as ExpressP11SelectType;
   }
   private resolveSelectValues(memoPool: ExpressP11MemoPool): void {
@@ -573,12 +604,12 @@ export class ExpressP11SelectType extends ExpressP11Type {
       //   const selectEntity = this.owner
       //     ?.getAllResources(memoPool)
       //     .find((r) => r.type === DefinitionType.Entity && r.resource.getName() === selectValue);
-      const selectEntity = this.owner?.getAllResources(memoPool)?.resources.get(DefinitionType.Entity)?.get(selectValue);
+      const selectEntity = getUnderCaseRule(this.owner?.getAllResources(memoPool)?.resources.get(DefinitionType.Entity), selectValue, isLongForm(this.owner?.getName()));
       if (selectEntity) {
         this.simpleValues.push(selectEntity.resource as ExpressP11Entity);
         continue;
       }
-      const selectType = this.owner?.getAllResources(memoPool)?.resources.get(DefinitionType.SelectType)?.get(selectValue);
+      const selectType = getUnderCaseRule(this.owner?.getAllResources(memoPool)?.resources.get(DefinitionType.SelectType), selectValue, true);
       if (selectType) {
         this.selectTypeValues.push(selectType.resource as ExpressP11SelectType);
       }
@@ -660,7 +691,7 @@ export class ExpressP11ParameterTypeResolver {
     }
     if (isInverse_attr(attribute)) {
       const entityName = attribute.type.$refText;
-      const entityObj = schemaObj.getAllResources(memoPool).resources.get(DefinitionType.Entity)?.get(entityName);
+      const entityObj = getUnderCaseRule(schemaObj.getAllResources(memoPool).resources.get(DefinitionType.Entity), entityName, isLongForm(schemaObj.getName()));
       if (entityObj)
         return {
           type: ExpressP11ParameterTypeResolutionType.EntityDefinition,
@@ -681,7 +712,7 @@ export class ExpressP11ParameterTypeResolver {
 
       if (parameterType.of.error) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
       const name = parameterType.of.$refText;
-      const namedTypeResource = schema.getAllResources(memoPool).findByName(name);
+      const namedTypeResource = schema.getAllResources(memoPool).findByNameUnderCaseRule(name, isLongForm(schema.getName()));
       if (!namedTypeResource) return { type: ExpressP11ParameterTypeResolutionType.Unresolved, value: undefined };
       switch (namedTypeResource.type) {
         case DefinitionType.Entity:
@@ -735,6 +766,17 @@ export class ExpressP11OptimizedResourceList {
     return this.resource;
   }
 
+  /** `findByName` under the case rule: exact in any kind first; otherwise regardless of case among the kinds that fold (all kinds in a long form). */
+  public findByNameUnderCaseRule(name: string, longForm: boolean): Definition | undefined {
+    const exact = this.findByName(name);
+    if (exact) return exact;
+    const lower = name.toLowerCase();
+    for (const [kind, definitions] of this.resource) {
+      if (kind === DefinitionType.Entity && !longForm) continue;
+      for (const [key, definition] of definitions) if (key.toLowerCase() === lower) return definition;
+    }
+    return undefined;
+  }
   public findByName(name: string): Definition | undefined {
     let result: Definition | undefined;
     this.resource.forEach((v) => {

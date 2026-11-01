@@ -45,6 +45,8 @@ import { schemaHasDeclarations } from "../utils/schema-helpers.js";
 import { getReferenceSpecifications, getUseSpecifications } from "../utils/interface-helpers.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
 import { ScopeClash, declarationNameRange } from "./express-p11-scope-index.js";
+import { isLongForm } from "./express-p11-type-utilities.js";
+import { foldsCase } from "./express-p11-case-rule-scope.js";
 import { ExpressP11ScopeProvider, ScopeType } from "./express-p11-scope-provider.js";
 import { ExpressTypeBuilder } from "./type-system/express-type-builder.js";
 import { mentionsExtensibleSelect, notIndexableClosed, renderType, spec } from "./type-system/express-type-model.js";
@@ -472,7 +474,12 @@ export class ExpressP11Validator {
             return;
           }
 
-          if (resourceImported.name !== resourceNeeded.reference.$refText) {
+          // The written spelling must be the imported (possibly renamed) name, compared under the case rule.
+          const written = resourceNeeded.reference.$refText;
+          const sameName =
+            resourceImported.name === written ||
+            (foldsCase(reference.$type, isLongForm(currentSchemaName)) && resourceImported.name.toLowerCase() === written.toLowerCase());
+          if (!sameName) {
             this.issueRenameReferenceDiagnostic(resourceImported, accept, resourceNeeded);
             return;
           }

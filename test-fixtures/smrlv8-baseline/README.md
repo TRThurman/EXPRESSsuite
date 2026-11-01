@@ -18,20 +18,20 @@ correctness: several of the classes below are known false positives.
 The corpus folder loaded as one workspace with the extension's default
 settings: `useOptimizedConfiguration` on, so files whose name contains `lf`
 or `concatenated` and the `business_object_models` folder are not loaded.
-1,287 of the 1,410 files load; 6,419 diagnostics
-(3,967 error, 704 information, 1,748 warning) in
-278 files. `files` maps file to code to the 1-based start
+1,287 of the 1,410 files load; 6,341 diagnostics
+(3,889 error, 704 information, 1,748 warning) in
+266 files. `files` maps file to code to the 1-based start
 line of every diagnostic. `parseErrors` lists the files with lexer or parser
 errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 26-line fragment the distribution ships beside the module, not a schema.
 
 | code                                     |  count |
 |------------------------------------------|--------|
-| linking-error                            |  3,464 |
+| linking-error                            |  3,392 |
 | (none)                                   |  1,737 |
 | declaration-name-case                    |    704 |
 | duplicate-interfaced-declaration         |    229 |
-| reference-statement-missing              |    182 |
+| reference-statement-missing              |    176 |
 | duplicate-loop-index                     |     72 |
 | redeclaration-not-specialization         |      9 |
 | informal-proposition-malformed-signature |      7 |
@@ -66,17 +66,17 @@ modules and visible together in a third (or in one of the two). The files:
 
 The 103 published long forms (`modules/*/arm_lf.exp`,
 `modules/*/mim_lf.exp`), each built alone in services of its own with the
-excludes cleared: 34,833 diagnostics in 88 files (15 long forms have none),
+excludes cleared: 7,548 diagnostics in 88 files (15 long forms have none),
 counts per file and code (no line numbers: the files are large and the
 counts are what a change moves). No long form has a parse error, a
 `duplicate-interfaced-declaration` or a `redundant-declaration`.
 
 | code                             |  count |
 |----------------------------------|--------|
-| linking-error                    | 34,263 |
+| linking-error                    |  6,967 |
 | duplicate-loop-index             |    457 |
-| ambiguous-attribute-reference    |     70 |
-| redeclaration-not-specialization |     32 |
+| ambiguous-attribute-reference    |     78 |
+| redeclaration-not-specialization |     35 |
 | declaration-name-case            |     11 |
 
 ## Known classes that are not defects in the schemas
@@ -84,10 +84,10 @@ counts are what a change moves). No long form has a parse error, a
 - `linking-error` "The attribute '…' could not be found" (also "The entity
   '…' could not be found" and "A reference could not be resolved"): an
   attribute or group reference the linker cannot bind. The largest class in
-  both baselines (3,464 of the default-settings sites, 1,489 of them
+  both baselines (3,392 of the default-settings sites, 1,487 of them
   in `resources/automotive_design/automotive_design.exp` and
   `domain_models/managed_model_based_3d_engineering_domain/DomainModel.exp`;
-  34,263 in the long forms). Not classified
+  6,967 in the long forms). Not classified
   site by site. The sampled long-form sites (AP203 ARM and MIM long forms,
   2026-10-30) are valid EXPRESS whose operand is a QUERY variable over a
   nested QUERY, a function result or an attribute path, which the linker

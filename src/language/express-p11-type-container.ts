@@ -41,6 +41,8 @@ import {
   ExpressP11Schema,
   ExpressP11TypeFactory,
   InterfaceType,
+  getUnderCaseRule,
+  isLongForm,
   normalizeAttributeName,
 } from "./express-p11-type-utilities.js";
 import { ExpressP11MemoPool } from "./express-p11-memo-pool.js";
@@ -194,7 +196,10 @@ export class ExpressP11TypeContainer {
         if (this.hasSuperTypes(eType.node)) {
           for (const supertype of eType.node.types.supertypes!.entities!) {
             const supertypeName = supertype.entity.$refText;
-            const supertypeObject = allAvailable.find((def) => def.name === supertypeName);
+            // Entity names bind exact-case in a short form; a long form binds regardless of case (WG11 N239).
+            const supertypeObject =
+              allAvailable.find((def) => def.name === supertypeName) ??
+              (isLongForm(schema.name) ? allAvailable.find((def) => def.name.toLowerCase() === supertypeName.toLowerCase()) : undefined);
             if (supertypeObject) eType.supertypes.push(supertypeObject);
           }
         }
@@ -215,7 +220,7 @@ export class ExpressP11TypeContainer {
           for (const supertype of entity.getNode().types.supertypes!.entities!) {
             const supertypeName = supertype.entity.$refText;
 
-            const supertypeDefinition = allAvailable.resources.get(DefinitionType.Entity)?.get(supertypeName);
+            const supertypeDefinition = getUnderCaseRule(allAvailable.resources.get(DefinitionType.Entity), supertypeName, isLongForm(schema.getName()));
             if (supertypeDefinition) entity.addSuperType(supertypeDefinition.resource as ExpressP11Entity);
             else entity.unresolvedSupertypes.push(supertypeName);
           }
@@ -303,7 +308,7 @@ export class ExpressP11TypeContainer {
                 });
               }
               //new
-              const def = interfacedSchema?.getLocalDefinition(resource.resource.$refText);
+              const def = interfacedSchema?.getLocalDefinitionUnderCaseRule(resource.resource.$refText);
               if (def) expressSchema.partiallyInterfaceWith({ interface: InterfaceType.ReferenceFrom, ...def });
             }
           }
@@ -332,7 +337,7 @@ export class ExpressP11TypeContainer {
                 });
               }
               //new
-              const def = interfacedSchema?.getLocalDefinition(resource.resource.$refText);
+              const def = interfacedSchema?.getLocalDefinitionUnderCaseRule(resource.resource.$refText);
               if (def) expressSchema.partiallyInterfaceWith({ interface: InterfaceType.UseFrom, ...def });
             }
           }
