@@ -57,7 +57,9 @@ export function validateInformalPropositions(document: LangiumDocument<ExpressFi
   if (!isExpressFile(root)) {
     return [];
   }
-  const declarations = getDeclarations(root.schemas);
+  // The grammar wants at least one schema, so a document with none (empty, or
+  // remarks only) parses to a root without the list rather than an empty one.
+  const declarations = getDeclarations(root.schemas ?? []);
   const annotations = getAnnotations(text);
   const signatures = getSignatures(text, declarations);
   const diagnostics: Diagnostic[] = [];
