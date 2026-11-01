@@ -128,3 +128,15 @@ describe("schema closure duplicate declarations", () => {
     expect(result.conflicts[0].locations.every((location) => location.range.start.line >= 0)).toBe(true);
   });
 });
+
+describe("documents without a schema", () => {
+  // Such a document parses to a root without a schema list; the command
+  // used to throw on it, which surfaced as "Could not detect duplicate
+  // declarations".
+  test.each([
+    ["empty", ""],
+    ["a remark only", "(* nothing but a remark *)"],
+  ])("reports no conflicts for a document that is %s", async (_label, source) => {
+    await expect(analyze(source)).resolves.toEqual({ conflicts: [] });
+  });
+});

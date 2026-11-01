@@ -32,7 +32,8 @@ export class SchemaClosureDuplicateAnalyzer {
     if (!document) return { conflicts: [] };
 
     const offset = document.textDocument.offsetAt(position);
-    const current = document.parseResult.value.schemas.find((schema) => {
+    // A document with no schema (empty, or remarks only) has no schema list at all.
+    const current = (document.parseResult.value.schemas ?? []).find((schema) => {
       const range = schema.$cstNode?.offset;
       const end = schema.$cstNode?.end;
       return range !== undefined && end !== undefined && offset >= range && offset <= end;

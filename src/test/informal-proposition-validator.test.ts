@@ -1,6 +1,6 @@
 import { EmptyFileSystem } from "langium";
 import { validationHelper } from "langium/test";
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { createExpressP11Services } from "../language/express-module.js";
 import { InformalPropositionIssues } from "../language/informal-proposition-validator.js";
 
@@ -127,5 +127,25 @@ describe("informal proposition signatures", () => {
     `);
 
     expect(ipIssues(result.diagnostics)).toHaveLength(0);
+  });
+});
+
+describe("documents without a schema", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  // The grammar requires a schema, so these parse to a root without a schema
+  // list. The check used to iterate it and throw, which aborted the whole
+  // document's validation with "An error occurred during validation".
+  test.each([
+    ["empty", ""],
+    ["whitespace only", "   \n\n"],
+    ["a remark only", "(* nothing but a remark *)\n"],
+    ["a tagged remark only", '(*"example_schema.datum" A description. *)\n'],
+  ])("validates a document that is %s without throwing", async (_label, text) => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+    const result = await validate(text);
+    expect(logged).not.toHaveBeenCalled();
+    expect(ipIssues(result.diagnostics)).toHaveLength(0);
+    expect(result.diagnostics.map((diagnostic) => diagnostic.data?.code)).toEqual(["parsing-error"]);
   });
 });

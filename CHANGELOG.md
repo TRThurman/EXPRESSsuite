@@ -4,6 +4,12 @@
 
 ### Bug Fixes
 
+- Validate an empty or remarks-only `.exp` file without throwing. Such a
+  file parses to a root without a schema list; the informal-proposition
+  check iterated it and threw, which aborted the whole document's validation
+  ("An error occurred during validation: TypeError: ... is not iterable"
+  in the server log), and the duplicate-declaration command failed on it
+  the same way.
 - No more "EXPRESSsuite has finished loading your workspace" popup. It
   appeared after every build: at startup, after each save and after the
   Build command. The status bar shows a check mark for a moment instead and
