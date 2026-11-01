@@ -6,6 +6,7 @@ import { EXPRESSSUITE_COMMANDS } from "../shared/commands.js";
 
 export class ExpressP11StatusBarItem {
   private statusBarItem: vscode.StatusBarItem;
+  private readyTimer: ReturnType<typeof setTimeout> | undefined;
   constructor(private client: LanguageClient) {
     this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     this.setProgressHandler();
@@ -36,14 +37,20 @@ export class ExpressP11StatusBarItem {
 
           break;
         case "end":
-          vscode.window.showInformationMessage("EXPRESSsuite has finished loading your workspace.");
-          this.setFullBuildHander();
+          // The status bar carries the state; no popup. A toast here fired at
+          // startup, after every save and after the Build command.
+          this.statusBarItem.show();
+          this.statusBarItem.text = "$(check) EXPRESSsuite ready";
+          this.statusBarItem.tooltip = "EXPRESSsuite has finished building your workspace";
+          clearTimeout(this.readyTimer);
+          this.readyTimer = setTimeout(() => this.setFullBuildHander(), 3000);
           break;
       }
     });
   }
 
   public dispose(): void {
+    clearTimeout(this.readyTimer);
     this.statusBarItem.hide();
     this.statusBarItem.dispose();
   }

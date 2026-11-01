@@ -4,6 +4,10 @@
 
 ### Bug Fixes
 
+- No more "EXPRESSsuite has finished loading your workspace" popup. It
+  appeared after every build: at startup, after each save and after the
+  Build command. The status bar shows a check mark for a moment instead and
+  then offers the Build button again.
 - Find a description across files. The hover and **Show Description** show
   the remark of the declaration the word at the cursor is bound to, through
   the schema's USE and REFERENCE statements (ISO 10303-11:2004 clause 11),
