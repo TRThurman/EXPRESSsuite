@@ -621,17 +621,6 @@ export class ExpressP11TypeFactory {
   static getType(def: TypeDefinition): ExpressP11Type | undefined {
     if (isEnumeration_type(def.underlyingType)) {
       const enumType = def.underlyingType as Enumeration_type;
-      //basic enum
-      if (enumType.items) {
-        return new ExpressP11EnumType(
-          def.name,
-          enumType.isExtensible,
-          false,
-          undefined,
-          enumType.items.items.map((i) => ({ node: i } as EnumValue)),
-          def
-        );
-      }
       //extension
       if (enumType.extension) {
         const baseName = enumType.extension.type?.$refText;
@@ -644,6 +633,17 @@ export class ExpressP11TypeFactory {
           def
         );
       }
+      // Basic enum. An EXTENSIBLE ENUMERATION may declare no items at all
+      // (ISO 10303-11:2004 8.4.1); it is still an enumeration, so a BASED_ON
+      // extension of it must find it among the enumeration resources.
+      return new ExpressP11EnumType(
+        def.name,
+        enumType.isExtensible,
+        false,
+        undefined,
+        enumType.items?.items.map((i) => ({ node: i } as EnumValue)) ?? [],
+        def
+      );
     }
     if (isSelect_type(def.underlyingType)) {
       const selectType = def.underlyingType as Select_type;

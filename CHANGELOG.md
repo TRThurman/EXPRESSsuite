@@ -113,6 +113,14 @@
   lets the request proceed and the providers return nothing for it.
 - Package `CHANGELOG.md` with the extension, so the Marketplace listing has
   a Changelog tab. `.vscodeignore` had excluded it.
+- Bind the `BASED_ON` target of an enumeration extension when the base is an
+  `EXTENSIBLE ENUMERATION` declared with no items (ISO 10303-11:2004 8.4.1),
+  as the four `a3m_*_type_name` enumerations of
+  `Annotated_3d_model_equivalence_criteria_arm` are. The type factory filed an
+  item-less enumeration as a plain type, so the extension's scope, which holds
+  enumeration types only, never offered it, and every such extension was
+  reported as "not available and may require an interface" (18 sites in the
+  SMRL v8 short forms). Found by the 0.5.0-0 smoke test.
 
 ### Tests
 

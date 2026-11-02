@@ -1,8 +1,8 @@
 {
   "documents": 1287,
-  "diagnostics": 6341,
+  "diagnostics": 6323,
   "bySeverity": {
-    "error": 3889,
+    "error": 3871,
     "information": 704,
     "warning": 1748
   },
@@ -15,7 +15,7 @@
     "informal-proposition-malformed-signature": 7,
     "informal-proposition-misplaced-signature": 3,
     "informal-proposition-missing-annotation": 6,
-    "linking-error": 3392,
+    "linking-error": 3374,
     "parsing-error": 2,
     "redeclaration-not-specialization": 9,
     "reference-statement-missing": 176
@@ -2516,21 +2516,9 @@
         101
       ]
     },
-    "modules/annotated_3d_model_equivalence_assembly/arm.exp": {
-      "linking-error": [
-        18,
-        22,
-        35,
-        68
-      ]
-    },
     "modules/annotated_3d_model_equivalence_assembly/mim.exp": {
       "linking-error": [
-        29,
-        33,
-        46,
         56,
-        79,
         106,
         106,
         214,
@@ -2539,19 +2527,7 @@
     },
     "modules/annotated_3d_model_equivalence_shape/arm.exp": {
       "linking-error": [
-        24,
-        32,
-        54,
-        99,
         186
-      ]
-    },
-    "modules/annotated_3d_model_equivalence_shape/mim.exp": {
-      "linking-error": [
-        27,
-        35,
-        57,
-        103
       ]
     },
     "modules/ap203_configuration_controlled_3d_design_of_mechanical_parts_and_assemblies/arm.exp": {
@@ -5254,12 +5230,6 @@
         28,
         73,
         74
-      ]
-    },
-    "modules/wiring_harness_assembly_design/arm.exp": {
-      "linking-error": [
-        25,
-        115
       ]
     },
     "resources/aic_advanced_brep/aic_advanced_brep.exp": {
