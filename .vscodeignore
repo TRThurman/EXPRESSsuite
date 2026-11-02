@@ -25,6 +25,8 @@ bin/**
 langium-config.json
 # Phase 3 design / fixture artifacts (not shipped to marketplace)
 DESIGN-viewers-integration.md
+# Project documentation lives in the repository, not in the package (2.5 MB of decks).
+docs/**
 UPGRADE-PROTOCOL.md
 test-fixtures/
 scripts/

@@ -205,6 +205,7 @@ Project documentation under [`docs/`](docs/):
 
 | Path | Audience |
 |---|---|
+| [`docs/expresssuite-capabilities.pptx`](docs/expresssuite-capabilities.pptx) | Capabilities deck for STEP developers and model reviewers (37 slides, 0.5.0); source [`docs/expresssuite-capabilities.tex`](docs/expresssuite-capabilities.tex), built with Beamer and [`docs/build-capabilities-pptx.py`](docs/build-capabilities-pptx.py) |
 | [`docs/easyEXPRESS-viewers.adoc`](docs/easyEXPRESS-viewers.adoc) | Technical white paper (architecture, security model, data privacy, performance) |
 | [`docs/easyEXPRESS-viewers.pptx`](docs/easyEXPRESS-viewers.pptx) | Implementor-oriented PowerPoint deck (21 slides) |
 | [`docs/easyEXPRESS-viewers-user-guide.pptx`](docs/easyEXPRESS-viewers-user-guide.pptx) | User-oriented PowerPoint deck (19 slides, screenshot-led) |
