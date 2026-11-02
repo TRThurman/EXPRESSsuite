@@ -117,7 +117,11 @@ match the esbuild bundle. Publish the CI-built release asset.
 ## Checklist
 
 - [ ] CI green on `main`
-- [ ] `CHANGELOG.md` has no stale `[Unreleased]` heading
+- [ ] `CHANGELOG.md`: the hand-written `## Unreleased` section is re-headed
+      `## [<version>](https://github.com/TRThurman/EXPRESSsuite/compare/<previous>...<version>) (<date>)`
+      and covers every `feat:`/`fix:` commit since the previous tag. `release-it`
+      does not write to the file (no `infile` in `.release-it.json`); its generated
+      commit list is the GitHub Release body only.
 - [ ] run **Create release version**, supplying `version` if promoting a pre-release
 - [ ] GitHub Release exists with the `.vsix` attached
 - [ ] Marketplace shows the new version (automatic with `VSCE_PAT`, else upload by hand)
