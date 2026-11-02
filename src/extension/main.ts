@@ -32,10 +32,21 @@ export function activate(context: vscode.ExtensionContext): void {
 
 function registerViewerCommands(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
-    vscode.commands.registerCommand(EXPRESSSUITE_COMMANDS.showDescription, async (arg?: { path?: string }) => {
+    vscode.commands.registerCommand(EXPRESSSUITE_COMMANDS.showDescription, async (arg?: { path?: string; sourceUri?: string }) => {
       const stop = time("command.showDescription");
       const editor = vscode.window.activeTextEditor;
-      if (!editor || editor.document.languageId !== "express") {
+      // A click in a description panel names the file the panel was opened
+      // from: while the panel, not an editor, is the active tab, VS Code
+      // reports no active text editor, so the panel's file stands in for it.
+      let document = editor?.document;
+      if (typeof arg?.sourceUri === "string") {
+        try {
+          document = await vscode.workspace.openTextDocument(vscode.Uri.parse(arg.sourceUri));
+        } catch {
+          document = undefined;
+        }
+      }
+      if (!document || document.languageId !== "express") {
         vscode.window.showInformationMessage("Place the cursor in an EXPRESS file first.");
         return;
       }
@@ -45,8 +56,9 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
       let asked: string;
       if (arg?.path) {
         asked = arg.path;
-        resolved = await resolveDescriptionByPath(editor.document, arg.path, client);
+        resolved = await resolveDescriptionByPath(document, arg.path, client);
       } else {
+        if (!editor) return;
         const wordRange = editor.document.getWordRangeAtPosition(
           editor.selection.active,
           /[A-Za-z_][A-Za-z0-9_]*/,

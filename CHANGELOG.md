@@ -124,7 +124,9 @@
 - Follow an `<<express:...>>` cross-reference inside the **Show Description**
   panel. Asciidoctor renders it as an in-page anchor with no target, so a
   click did nothing; it now opens the target's description, as the same link
-  does from a hover. Found by the 0.5.0-1 smoke test.
+  does from a hover. The panel passes its own source file along, because VS
+  Code reports no active text editor while the panel is the active tab.
+  Found by the 0.5.0-1 and 0.5.0-2 smoke tests.
 
 ### Tests
 

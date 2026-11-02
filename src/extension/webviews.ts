@@ -195,7 +195,10 @@ export async function showDescriptionPreview(
     if (msg.kind === "navigate") {
       // A click on an `<<express:tag,label>>` cross-reference in the rendered
       // description: open that tag's description, as the hover's link does.
-      void vscode.commands.executeCommand(EXPRESSSUITE_COMMANDS.showDescription, { path: msg.targetName });
+      void vscode.commands.executeCommand(EXPRESSSUITE_COMMANDS.showDescription, {
+        path: msg.targetName,
+        sourceUri: sourceUri.toString(),
+      });
     } else if (msg.kind === "log") {
       logMessage("descriptionPreview", msg.level, msg.message);
     }
