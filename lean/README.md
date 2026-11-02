@@ -14,7 +14,9 @@ SC4 validation diagnostics:
   the type of a redeclared attribute shall be the same as, or a specialization
   of, the original attribute's type. Relation: `spec` (Specialisation.lean).
 - `index-on-non-aggregate` — ISO 10303-11:2004 12.6.1: the operand of an index
-  qualifier shall be an aggregate value. Predicate: `neverAgg` (IndexOperand.lean).
+  qualifier shall be an aggregate value. Predicate: `notIndexable` (IndexOperand.lean):
+  no value of the type can be indexed by any of the three indexing operators
+  (12.3.1 binary, 12.5.1 string, 12.6.1 aggregate).
 
 `src/language/type-system/express-type-model.ts` is a clause-by-clause
 transcription of these definitions and must be kept in lock-step with them.
@@ -36,7 +38,7 @@ failing guard fails the build.
 | `ExpressSuite/Specialisation.lean` | `Ty` type domain; `simpLe`, `aggLe`, `boundsOk`; `spec`/`specAll`/`specAny` (NEW operand resolved first, then ORIGINAL) | definitions, termination by construction |
 | `ExpressSuite/Meta.lean` | `spec_refl`, `spec_top`, `spec_trans` (modulo `EntTrans`, the transitive closure of entity supertype lists) | proved, no `sorry` |
 | `ExpressSuite/Soundness.lean` | `TypeP` value membership (eengine `kernel/type-p.lisp` transcription); `spec_sound`: if `spec new orig` then every value of `new` is a value of `orig` | proved, no `sorry` |
-| `ExpressSuite/IndexOperand.lean` | `neverAgg`; `neverAgg_sound`: if `neverAgg t` then no value of `t` is an aggregate value | proved, no `sorry` |
+| `ExpressSuite/IndexOperand.lean` | `indexableSimple`, `notIndexable`; `notIndexable_sound`: if `notIndexable t` then no value of `t` is indexable (binary, string or aggregate) | proved, no `sorry` |
 | `ExpressSuite/Cases.lean` | the five wg12-step redeclarations (PRs #233 to #237) encoded from the published SMRLv8 text, the negative controls, and the standard's 9.2.3.4 EXAMPLE 2 and EXAMPLE 3 | `#guard`, build-checked |
 | `ExpressSuite/FpReproGt.lean` | two further valid narrowings (geometric_tolerance ARM) that a relation resolving only the NEW operand rejects | `#guard`, build-checked |
 | `ExpressSuite/Interfaces.lean` | schema scopes (10.1 b, clause 11): `Export` (USE re-export), `Visible`, `Clash`; `step`/`iterate` (the implementation's loop), `visibleIn`, `clashesIn`; `iterate_sound`, `export_complete`, `export_of_stable` (the stop condition is exact), `export_ignores_reference` (11.3), `mem_visibleIn_iff`, `clash_iff` | proved, no `sorry`; the 3074 shape, 11.3 EXAMPLE 2 (plain and chained), lists, renames (including onto a listed name), three-way clashes, propagation by USE, REFERENCE and listed item, USE-plus-REFERENCE routes, function-versus-rule referenceability, cycles and the case rules `#guard` |

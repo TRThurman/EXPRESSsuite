@@ -2,7 +2,7 @@
  * Resolved EXPRESS type domain and the specialization relation, as a literal
  * TypeScript transcription of lean/ExpressSuite/Specialisation.lean (`Ty`,
  * `boundsOk`, `spec`, `specAll`, `specAny`) and lean/ExpressSuite/IndexOperand.lean
- * (`neverAgg`). The Lean files carry the proofs (reflexivity, transitivity,
+ * (`indexableSimple`, `notIndexable`). The Lean files carry the proofs (reflexivity, transitivity,
  * GENERIC as top, denotational soundness against eengine's value semantics);
  * this file must stay in lock-step with them, clause by clause.
  *
@@ -20,7 +20,7 @@ export type Ty =
    *  `node` is TypeScript-only bookkeeping for attribute lookup; the Lean relation has no such field */
   | { kind: "ent"; name: string; supers: string[]; node?: unknown }
   | { kind: "defn"; name: string; under: Ty }
-  /** `extensible` is TypeScript-only bookkeeping (the Lean relation ignores it); see neverAggregateClosed */
+  /** `extensible` is TypeScript-only bookkeeping (the Lean relation ignores it); see mentionsExtensibleSelect */
   | { kind: "sel"; name: string; members: Ty[]; extensible?: boolean }
   /** hi === undefined encodes the unbounded upper bound `?` */
   | { kind: "agg"; k: AggK; lo: number; hi: number | undefined; elem: Ty };
