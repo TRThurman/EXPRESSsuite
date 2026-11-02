@@ -18,7 +18,7 @@
   "preview": true,
   "publisher": "TRThurman",
   "license": "MIT",
-  "version": "0.5.0-2",
+  "version": "0.5.0-3",
   "type": "module",
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base",
