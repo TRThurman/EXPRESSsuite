@@ -659,24 +659,25 @@ END_ENTITY;
     \toprule
     \textbf{Check} & \textbf{Lean proof} & \textbf{Complexity} \\
     \midrule
-    redeclaration-not-specialization & yes & 157 \\
-    duplicate-interfaced-declaration (and redundant-declaration) & yes & 139 \\
-    index-on-non-aggregate & yes & 138 \\
+    redeclaration-not-specialization & yes & 158 \\
+    duplicate-interfaced-declaration (and redundant-declaration) & yes & 149 \\
+    index-on-non-aggregate & yes & 139 \\
     informal-proposition-* & no & 54 \\
-    reference-statement-missing & no & 30 \\
-    ambiguous-attribute-reference & yes & 15 \\
+    reference-statement-missing & no & 34 \\
+    ambiguous-attribute-reference & yes & 17 \\
     declaration-name-case & no & 14 \\
     duplicate-loop-index & no & 7 \\
     \midrule
-    proved checks & & 449 of 554 \\
+    proved checks & & 463 of 572 \\
     \bottomrule
   \end{tabular}
   \medskip
 
   \color{sc4grey}
-  McCabe cyclomatic complexity per check: its validator method plus the module that
-  implements its relation, measured with ESLint's \code{complexity} rule on 0.5.0. The
-  resolved-type builder (216) serves the two type checks and is split between them.
+  McCabe cyclomatic complexity per check: its validator method with its inner functions,
+  plus the module that implements its relation, measured with ESLint's \code{complexity}
+  rule on 0.5.0 by \code{docs/check-complexity.py}. The resolved-type builder (218) serves
+  the two type checks and is split between them.
 \end{frame}
 
 %--------------------------------------------------------------------
