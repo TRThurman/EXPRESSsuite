@@ -10,7 +10,7 @@ import {
 } from "langium";
 import type { LangiumSharedServices } from "langium/lsp";
 import { CancellationToken, Connection, WorkDoneProgress } from "vscode-languageserver";
-import { allowedDocuments } from "../utils/file-filter.js";
+import { allowedDocuments, isAllowedFile } from "../utils/file-filter.js";
 import { EXPRESSSUITE_TOKEN } from "../shared/notifications.js";
 import { EXPRESSSUITE_CONFIGURATION_SECTION } from "../shared/commands.js";
 import { Configuration } from "./express-p11-workspace-manager.js";
@@ -229,5 +229,29 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
       // editor request does not unnecessarily relink the entire workspace.
       this.isFirstLoad = false;
     } catch { /* build errors are handled per-document */ }
+  }
+
+  /**
+   * Documents excluded by the optimized configuration (`expresssuite.useOptimizedConfiguration`,
+   * `expresssuite.excludedFiles`, `expresssuite.excludedFolders`) are filtered out of every build
+   * in `buildDocuments`. When a user opens one in the editor, `update` registers it as an unparsed
+   * placeholder at `Changed`, and it stays there forever.
+   *
+   * Every per-document LSP request (hover and completion need `Linked`, the outline and folding
+   * need `Parsed`, code actions need `Validated`, ...) first awaits `waitUntil(state, uri)`.
+   * Langium's `awaitDocumentState` rejects that with `RequestFailed` as soon as the rest of the
+   * workspace is built ("Document state of <uri> is Changed, requiring Linked, but workspace
+   * state is already Validated"), and while a build is running it would wait for a document
+   * phase that never comes. The comment at that guard in Langium names the two ways out: build
+   * the document, or relax the state requirement. Building is exactly what the exclusion is
+   * meant to avoid, so the requirement is relaxed for excluded documents: the request proceeds
+   * on whatever the document holds. The providers all guard against a missing syntax tree and
+   * the scope provider has no schema for an excluded document, so they quietly yield nothing.
+   */
+  protected override awaitDocumentState(state: DocumentState, uri: URI, cancelToken: CancellationToken): Promise<URI> {
+    if (!isAllowedFile(uri, this.workspaceConfiguration)) {
+      return Promise.resolve(uri);
+    }
+    return super.awaitDocumentState(state, uri, cancelToken);
   }
 }
