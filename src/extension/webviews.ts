@@ -4,6 +4,7 @@ import * as path from "node:path";
 import type { RemarkAnnotation } from "./annotation-index.js";
 import { validateMessage } from "./webview-message.js";
 import { renderMath, renderMathBatch } from "./plurimath-pool.js";
+import { EXPRESSSUITE_COMMANDS } from "../shared/commands.js";
 
 /* DESIGN §1.2.8.10 resource limits — see also hover-math.ts. */
 const MAX_EXPR_CHARS = 16_384;
@@ -191,7 +192,11 @@ export async function showDescriptionPreview(
   panel.webview.onDidReceiveMessage((raw) => {
     const msg = validateMessage(raw);
     if (!msg) return;
-    if (msg.kind === "log") {
+    if (msg.kind === "navigate") {
+      // A click on an `<<express:tag,label>>` cross-reference in the rendered
+      // description: open that tag's description, as the hover's link does.
+      void vscode.commands.executeCommand(EXPRESSSUITE_COMMANDS.showDescription, { path: msg.targetName });
+    } else if (msg.kind === "log") {
       logMessage("descriptionPreview", msg.level, msg.message);
     }
   });

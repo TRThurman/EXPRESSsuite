@@ -4,6 +4,8 @@
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { expressTagFromHref } from "../shared/express-xref.js";
+
 declare function acquireVsCodeApi(): { postMessage: (m: unknown) => void };
 
 const vscode = (window as any).__vscode ?? acquireVsCodeApi();
@@ -109,7 +111,21 @@ async function main(): Promise<void> {
     return;
   }
 
-  document.getElementById("content")!.innerHTML = html;
+  const content = document.getElementById("content")!;
+  content.innerHTML = html;
+  // An `<<express:tag,label>>` cross-reference renders as an in-page anchor
+  // (`href="#express:tag"`) with no target in this page. A click opens that
+  // tag's description on the host, which is what the same link does from a
+  // hover; every other link keeps its default behaviour.
+  content.addEventListener("click", (ev) => {
+    const anchor = (ev.target as Element | null)?.closest?.("a");
+    if (!anchor) return;
+    const tag = expressTagFromHref(anchor.getAttribute("href"));
+    if (!tag) return;
+    ev.preventDefault();
+    log("info", `xref -> navigate(${tag})`);
+    vscode.postMessage({ kind: "navigate", targetName: tag });
+  });
   log("info", "render complete");
 }
 

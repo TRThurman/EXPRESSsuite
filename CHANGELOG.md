@@ -121,6 +121,10 @@
   enumeration types only, never offered it, and every such extension was
   reported as "not available and may require an interface" (18 sites in the
   SMRL v8 short forms). Found by the 0.5.0-0 smoke test.
+- Follow an `<<express:...>>` cross-reference inside the **Show Description**
+  panel. Asciidoctor renders it as an in-page anchor with no target, so a
+  click did nothing; it now opens the target's description, as the same link
+  does from a hover. Found by the 0.5.0-1 smoke test.
 
 ### Tests
 
