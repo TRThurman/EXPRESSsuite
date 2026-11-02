@@ -31,13 +31,23 @@ everything downstream should use.
 
 ## Marketplace publishing
 
-**If the `VSCE_PAT` repository secret is set**, `release-public.yaml`
-publishes automatically, with `--packagePath` pointing at the `.vsix`
-`release-it` just built — so the Marketplace bits are byte-identical to the
-attached release asset rather than a second independent build.
+`release-public.yaml` publishes automatically through **Marketplace Trusted
+Publishing** (OpenID Connect). The job holds `permissions: id-token: write`,
+and `vsce publish --oidc` exchanges the GitHub OIDC token for a 15-minute
+Marketplace credential. No secret is stored anywhere. The Marketplace side is
+a Trusted Publishing policy on the `TRThurman` publisher
+(<https://marketplace.visualstudio.com/manage> → publisher → **Trusted
+Publishing**) naming repository owner `TRThurman`, repository `EXPRESSsuite`,
+workflow `release-public.yaml`, no environment; created 2026-11-02.
 
-**If it is not set**, the step skips silently and the release still
-succeeds. Publish by hand:
+`--packagePath` points at the `.vsix` `release-it` just built, so the
+Marketplace bits are byte-identical to the attached release asset rather than
+a second independent build.
+
+The step runs on every public release. A failed token exchange does not fall
+back to anything, and it fails *after* `release-it` has already pushed the
+release commit, the tag and the GitHub Release. Recovery is a manual upload
+of the attached asset; the release itself does not need redoing:
 
 ```bash
 gh release download <version> --repo TRThurman/EXPRESSsuite --pattern '*.vsix' -D ~/Downloads
@@ -63,39 +73,23 @@ The `TRThurman` publisher is owned by a **personal Microsoft account**
   enumerates every publisher the signed-in account can manage, instead of
   returning a bare 403 when you guess wrong.
 
-## Setting up `VSCE_PAT`
+## Personal Access Tokens (retired path)
 
-The token is an **Azure DevOps** credential — `dev.azure.com`, *not*
-`portal.azure.com`, which rejects personal Microsoft accounts with a tenant
-error. The tokens page is organization-scoped: pick an organization at
-<https://aex.dev.azure.com/me>, then go to
-`https://dev.azure.com/{org}/_usersSettings/tokens`.
+The PAT route (a `VSCE_PAT` repository secret, `vsce publish --pat`) was
+documented up to 0.4.2 but never exercised; those releases were uploaded by
+hand. Azure DevOps global PATs, the "All accessible organizations" scope the
+Marketplace required, are being decommissioned (VS Code docs: 2026-12-01;
+Azure DevOps blog, 23 October 2026 update: 2027-01-27), and the VS Code docs
+mark PAT publishing "Not Recommended". Trusted Publishing above replaces it.
 
-```text
-Organization  All accessible organizations    <- not a single org
-Expiration    1 year (the maximum; default is 30 days)
-Scopes        Custom defined -> show all scopes -> Marketplace -> Manage
-```
-
-Verify before trusting it — this costs seconds and catches both the
-wrong-organization and wrong-scope mistakes:
-
-```bash
-npx @vscode/vsce verify-pat TRThurman --pat "<token>"
-```
-
-Then store it as a repository secret named exactly `VSCE_PAT`
-(Settings → Secrets and variables → Actions), or:
-
-```bash
-gh secret set VSCE_PAT --repo TRThurman/EXPRESSsuite
-```
-
-The workflow gate tests *presence*, not validity (`secrets.VSCE_PAT != ''`).
-An expired or wrongly-scoped token therefore **fails the release job** rather
-than skipping — and it fails *after* `release-it` has already pushed the
-release commit, the tag, and the GitHub Release. Recovery is a manual upload
-of the attached asset; the release itself does not need redoing.
+If a token is ever needed again (for example `vsce verify-pat` or
+`vsce ls-publishers`): it is an **Azure DevOps** credential, `dev.azure.com`,
+*not* `portal.azure.com`, which rejects personal Microsoft accounts with a
+tenant error. Pick an organization at <https://aex.dev.azure.com/me>, then
+`https://dev.azure.com/{org}/_usersSettings/tokens`; organization "All
+accessible organizations", scope Custom defined → show all scopes →
+Marketplace → Manage. Verify with
+`npx @vscode/vsce verify-pat TRThurman --pat "<token>"` before trusting it.
 
 ## Irreversibility
 
@@ -124,7 +118,7 @@ match the esbuild bundle. Publish the CI-built release asset.
       commit list is the GitHub Release body only.
 - [ ] run **Create release version**, supplying `version` if promoting a pre-release
 - [ ] GitHub Release exists with the `.vsix` attached
-- [ ] Marketplace shows the new version (automatic with `VSCE_PAT`, else upload by hand)
+- [ ] Marketplace shows the new version (automatic through Trusted Publishing; if the publish step failed, upload the release asset by hand)
 - [ ] verify: the gallery query below returns the new version
 
 ```bash

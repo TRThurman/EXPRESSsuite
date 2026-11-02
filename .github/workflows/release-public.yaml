@@ -12,16 +12,16 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      # Step `if` cannot read the `secrets` context, and a step's own `env` is not
-      # visible to its `if`. Deriving a boolean here is the documented workaround:
-      # the value is "true"/"false", so the token itself is not exposed job-wide.
-      HAS_VSCE_PAT: ${{ secrets.VSCE_PAT != '' }}
     permissions:
       # release-it pushes the release commit and tag and creates the GitHub
       # Release. The repository default for GITHUB_TOKEN is read-only, so
       # without this the push fails with 403 for github-actions[bot].
       contents: write
+      # `vsce publish --oidc` requests a GitHub OIDC token and exchanges it for a
+      # short-lived Marketplace credential under the publisher's Trusted
+      # Publishing policy (repository TRThurman/EXPRESSsuite, workflow
+      # release-public.yaml). No stored secret is involved.
+      id-token: write
     steps:
       - name: Checkout source code
         uses: actions/checkout@v7
@@ -48,12 +48,12 @@ jobs:
       - name: Publish to the VS Code Marketplace
         # Publishes the exact .vsix that release-it's `before:github:release` hook
         # built and attached to the GitHub Release, so the Marketplace bits are
-        # byte-identical to the release asset. Skipped when no VSCE_PAT secret is
-        # configured, which keeps the workflow usable on forks. A Marketplace
-        # version number can never be reused -- only unpublished -- so this runs
-        # only after release-it has succeeded, and only on the public release
-        # workflow, never on release-pre.
-        if: env.HAS_VSCE_PAT == 'true'
+        # byte-identical to the release asset. Authenticates through Marketplace
+        # Trusted Publishing (--oidc); a failed token exchange fails the job and
+        # does not fall back to a PAT. A Marketplace version number can never be
+        # reused -- only unpublished -- so this runs only after release-it has
+        # succeeded, and only on the public release workflow, never on
+        # release-pre.
         run: |
           shopt -s nullglob
           pkgs=(*.vsix)
@@ -62,8 +62,6 @@ jobs:
             exit 1
           fi
           echo "publishing ${pkgs[0]}"
-          vsce publish --packagePath "${pkgs[0]}" --pat "$VSCE_PAT"
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          vsce publish --oidc --packagePath "${pkgs[0]}"
       - name: End message
         run: echo 'Done'
