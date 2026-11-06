@@ -1,6 +1,6 @@
 # Lean 4 proofs behind EXPRESSsuite's type checks
 
-Machine-checked ground truth for the attribute-reference scope and for three
+Machine-checked ground truth for the attribute-reference scope and for four
 SC4 validation diagnostics:
 
 - attribute and group reference scope — ISO 10303-11:2004 12.7.3 (`x.a`: the
@@ -17,6 +17,13 @@ SC4 validation diagnostics:
   qualifier shall be an aggregate value. Predicate: `notIndexable` (IndexOperand.lean):
   no value of the type can be indexed by any of the three indexing operators
   (12.3.1 binary, 12.5.1 string, 12.6.1 aggregate).
+- `unqualified-group-reference` — ISO 10303-11:2004 12.7.4, Rules and
+  restrictions: a group reference not further qualified with an attribute
+  reference shall be an operand of `=` or `||`. Decision procedure: `qualsOk`
+  and `check` (GroupReference.lean); the TypeScript loop is `violatesAt`.
+  `qualsOk_eq_kind` proves the restriction equal to threading the
+  partial-complex-entity-value kind through the qualifiers (12.7.3, 12.7.4
+  first paragraph, 12.6.1), which is why `x\e\f.a` and `x\e[i]` are reported.
 
 `src/language/type-system/express-type-model.ts` is a clause-by-clause
 transcription of these definitions and must be kept in lock-step with them.
@@ -39,6 +46,7 @@ failing guard fails the build.
 | `ExpressSuite/Meta.lean` | `spec_refl`, `spec_top`, `spec_trans` (modulo `EntTrans`, the transitive closure of entity supertype lists) | proved, no `sorry` |
 | `ExpressSuite/Soundness.lean` | `TypeP` value membership (eengine `kernel/type-p.lisp` transcription); `spec_sound`: if `spec new orig` then every value of `new` is a value of `orig` | proved, no `sorry` |
 | `ExpressSuite/IndexOperand.lean` | `indexableSimple`, `notIndexable`; `notIndexable_sound`: if `notIndexable t` then no value of `t` is indexable (binary, string or aggregate) | proved, no `sorry` |
+| `ExpressSuite/GroupReference.lean` | qualifier lists and expressions abstracted to what 12.7.4 decides; `qualsOk` (the restriction), `violatesAt`/`reported` (the TypeScript loop), `kindAfter`/`okKind` (partial-value semantics), `check`/`wellKinded` over expressions; `qualsOk_iff_forall`, `reported_eq_nil_iff`, `reported_is_group`, `qualsOk_eq_kind`, `check_eq_wellKinded`, `qualsOk_mono`, `qualsOk_of_groupsAttrQualified` | proved, no `sorry`; issue 102, 12.7.4 EXAMPLE 1, `\|\|`, parentheses, `<>`, unary, parameters, chains and indexes `#guard` |
 | `ExpressSuite/Cases.lean` | the five wg12-step redeclarations (PRs #233 to #237) encoded from the published SMRLv8 text, the negative controls, and the standard's 9.2.3.4 EXAMPLE 2 and EXAMPLE 3 | `#guard`, build-checked |
 | `ExpressSuite/FpReproGt.lean` | two further valid narrowings (geometric_tolerance ARM) that a relation resolving only the NEW operand rejects | `#guard`, build-checked |
 | `ExpressSuite/Interfaces.lean` | schema scopes (10.1 b, clause 11): `Export` (USE re-export), `Visible`, `Clash`; `step`/`iterate` (the implementation's loop), `visibleIn`, `clashesIn`; `iterate_sound`, `export_complete`, `export_of_stable` (the stop condition is exact), `export_ignores_reference` (11.3), `mem_visibleIn_iff`, `clash_iff` | proved, no `sorry`; the 3074 shape, 11.3 EXAMPLE 2 (plain and chained), lists, renames (including onto a listed name), three-way clashes, propagation by USE, REFERENCE and listed item, USE-plus-REFERENCE routes, function-versus-rule referenceability, cycles and the case rules `#guard` |
