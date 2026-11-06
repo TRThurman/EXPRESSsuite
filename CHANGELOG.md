@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.5.1](https://github.com/TRThurman/EXPRESSsuite/compare/0.5.0...0.5.1) (2026-11-06)
 
 ### Bug Fixes
 
