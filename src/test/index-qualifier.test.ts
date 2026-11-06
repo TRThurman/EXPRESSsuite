@@ -47,7 +47,10 @@ describe("index qualifier on a non-aggregate operand", () => {
     expect(result.document.textDocument.getText(found[0].range)).toBe("[1]");
   });
 
-  test("datum_target corrected form: no index on the_datum", async () => {
+  // The index alone is removed here; the `\datum` that ends the_datum's
+  // expression is itself invalid (ISO 10303-11:2004 12.7.4), reported as
+  // unqualified-group-reference (group-reference-placement.test.ts, issue #102).
+  test("datum_target with the index removed: no index on the_datum", async () => {
     const result = await validate(
       datumSchema(`
         datum_basis_relationship : SET OF shape_aspect_relationship :=
