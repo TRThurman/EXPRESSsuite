@@ -268,10 +268,11 @@ npm run build        # langium-generate + tsc + esbuild
 npm run lint         # eslint
 npm test             # vitest, the unit suite
 npm run test:smrlv8  # the SMRL v8 corpus against its baselines (minutes, multi-GB heap)
+lean/check.sh        # the Lean proofs: lake build, no sorry, only the three standard axioms
 npm run rebuild      # clean build from scratch
 ```
 
-Continuous integration runs the build/lint/test matrix on macOS, Ubuntu, and Windows via [`.github/workflows/ci.yaml`](.github/workflows/ci.yaml), audits the production dependencies, runs the SMRL v8 corpus on one Linux runner, and uploads platform-specific `.vsix` artifacts.
+Continuous integration runs the build/lint/test matrix on macOS, Ubuntu, and Windows via [`.github/workflows/ci.yaml`](.github/workflows/ci.yaml), audits the production dependencies, runs the SMRL v8 corpus and builds the Lean proofs on one Linux runner each, and uploads platform-specific `.vsix` artifacts.
 
 ### The SMRL v8 corpus
 
