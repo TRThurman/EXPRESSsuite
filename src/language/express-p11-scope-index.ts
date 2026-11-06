@@ -32,7 +32,7 @@ import {
  *   REFERENCE FROM t brings the constants, entities, functions, procedures and
  *   types declared in t and everything t use's (11.2, fourth sentence; ruling
  *   2026-10-30: the clause wins).
- * - `clashesIn` is `clash`: one identifier, two or more different
+ * - `clashesIn` is `Clash`: one identifier, two or more different
  *   declarations (10.1 b). One declaration reached by several routes counts
  *   once (10.1 b, second sentence). Implicit interfaces (11.4) bring no
  *   identifier and play no part.
