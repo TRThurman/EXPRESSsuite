@@ -18,6 +18,16 @@
   adds 30 errors in the default workspace and 406 in the long forms, each
   agreeing with an independent token scan (`group-reference-corpus-oracle.test.ts`).
 
+### Tests
+
+- CI builds the Lean proofs (`lean/check.sh` in a new `lean` job): a proof
+  that does not check, a `#guard` that does not hold, a `sorry`, or an axiom
+  other than `propext`, `Classical.choice` and `Quot.sound` fails the build
+  ([#97](https://github.com/TRThurman/EXPRESSsuite/issues/97)).
+- The unit suite checks that every Lean name cited in `src/`, `docs/` and
+  `lean/README.md` occurs in the Lean code (`lean-citations.test.ts`); it
+  found `clash` cited for the relation `Clash`.
+
 ## [0.5.0](https://github.com/TRThurman/EXPRESSsuite/compare/0.4.2...0.5.0) (2026-11-02)
 
 ### Features

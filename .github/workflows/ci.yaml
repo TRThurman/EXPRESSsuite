@@ -67,6 +67,30 @@ jobs:
         continue-on-error: true
         run: npm audit
 
+  lean:
+    name: Lean proofs
+    # The proofs behind the type checks (lean/README.md). lean/check.sh runs
+    # `lake build`, which fails on a proof that does not check or a #guard that
+    # does not hold, and then fails on a `sorry` or on an axiom other than
+    # propext, Classical.choice and Quot.sound. Pure Lean 4 core, no Mathlib:
+    # elan installs the toolchain pinned in lean/lean-toolchain and the build
+    # takes about a minute, so nothing is cached. One runner, because the
+    # proofs do not vary by OS. Lean names cited in src/, docs/ and
+    # lean/README.md are checked by src/test/lean-citations.test.ts in `test`.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install elan
+        # The installer at a release tag, not master; no default toolchain,
+        # so the one in lean/lean-toolchain is the one used.
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/v4.2.3/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Build and check the proofs
+        run: lean/check.sh
+
   corpus:
     name: SMRL v8 corpus
     # The EXPRESS schemas of the published ISO 10303 SMRL v8 (test-fixtures/

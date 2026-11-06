@@ -33,10 +33,14 @@ transcription of these definitions and must be kept in lock-step with them.
 ```bash
 export PATH="$HOME/.elan/bin:$PATH"   # toolchain pinned in lean-toolchain
 lake build                            # exit 0 = every proof and every #guard passes
+./check.sh                            # lake build, then: no sorry, axioms as stated below
 ```
 
 Pure Lean 4 core, no Mathlib. `#guard` lines are build-checked facts: a
-failing guard fails the build.
+failing guard fails the build. CI runs `check.sh` in the `lean` job of
+`.github/workflows/ci.yaml`, and the unit suite checks that every Lean name
+cited in `src/`, `docs/` and this README occurs in the Lean code
+(`src/test/lean-citations.test.ts`).
 
 ## Files
 
