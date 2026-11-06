@@ -22,8 +22,17 @@ updates:
     # Explicitly block known breaking / API-sensitive majors
     #
     ignore:
-      # VS Code API compatibility (VERY sensitive)
+      # VS Code API compatibility (VERY sensitive). The minor version is the VS
+      # Code version, and vsce refuses to package when @types/vscode is newer
+      # than engines.vscode (it did for #99, ~1.144 against ^1.140). Raised by
+      # hand, together with engines.vscode, when the minimum VS Code moves.
       - dependency-name: "@types/vscode"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+
+      # Langium pins vscode-languageserver (langium 4.4.0: ~10.1.0). Another
+      # major here installs a second copy whose Connection type does not match
+      # Langium's, and tsc fails (#101). Moves when Langium moves.
+      - dependency-name: "vscode-languageserver"
         update-types: ["version-update:semver-major"]
 
       # Build / language toolchain (handle manually)
