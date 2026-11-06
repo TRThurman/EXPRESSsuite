@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+### Bug Fixes
+
+- Report a group reference that is not further qualified with an attribute
+  reference and is not an operand of `=` or `||`
+  (`unqualified-group-reference`, error, ISO 10303-11:2004 12.7.4, Rules and
+  restrictions), such as `the_datum : datum :=
+  datum_basis_relationship[1]\shape_aspect_relationship.related_shape_aspect\datum;`
+  ([#102](https://github.com/TRThurman/EXPRESSsuite/issues/102)). A group
+  reference followed by another group reference or by an index is reported
+  too (12.7.4, 12.6.1). Assignment targets are statements, not expressions,
+  and are not checked (13.3). The restriction, the check's per-qualifier loop
+  and the partial-value semantics are proved equal in
+  `lean/ExpressSuite/GroupReference.lean`. On the SMRL v8 corpus the check
+  adds 30 errors in the default workspace and 406 in the long forms, each
+  agreeing with an independent token scan (`group-reference-corpus-oracle.test.ts`).
+
 ## [0.5.0](https://github.com/TRThurman/EXPRESSsuite/compare/0.4.2...0.5.0) (2026-11-02)
 
 ### Features
