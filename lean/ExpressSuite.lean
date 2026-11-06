@@ -6,3 +6,4 @@ import ExpressSuite.Cases
 import ExpressSuite.IndexOperand
 import ExpressSuite.Inheritance
 import ExpressSuite.Interfaces
+import ExpressSuite.GroupReference
