@@ -18,9 +18,9 @@ correctness: several of the classes below are known false positives.
 The corpus folder loaded as one workspace with the extension's default
 settings: `useOptimizedConfiguration` on, so files whose name contains `lf`
 or `concatenated` and the `business_object_models` folder are not loaded.
-1,287 of the 1,410 files load; 6,323 diagnostics
-(3,871 error, 704 information, 1,748 warning) in
-263 files. `files` maps file to code to the 1-based start
+1,287 of the 1,410 files load; 6,353 diagnostics
+(3,901 error, 704 information, 1,748 warning) in
+272 files. `files` maps file to code to the 1-based start
 line of every diagnostic. `parseErrors` lists the files with lexer or parser
 errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 26-line fragment the distribution ships beside the module, not a schema.
@@ -33,6 +33,7 @@ errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 | duplicate-interfaced-declaration         |    229 |
 | reference-statement-missing              |    176 |
 | duplicate-loop-index                     |     72 |
+| unqualified-group-reference              |     30 |
 | redeclaration-not-specialization         |      9 |
 | informal-proposition-malformed-signature |      7 |
 | informal-proposition-missing-annotation  |      6 |
@@ -66,7 +67,7 @@ modules and visible together in a third (or in one of the two). The files:
 
 The 103 published long forms (`modules/*/arm_lf.exp`,
 `modules/*/mim_lf.exp`), each built alone in services of its own with the
-excludes cleared: 7,548 diagnostics in 88 files (15 long forms have none),
+excludes cleared: 7,954 diagnostics in 94 files (9 long forms have none),
 counts per file and code (no line numbers: the files are large and the
 counts are what a change moves). No long form has a parse error, a
 `duplicate-interfaced-declaration` or a `redundant-declaration`.
@@ -75,9 +76,40 @@ counts are what a change moves). No long form has a parse error, a
 |----------------------------------|--------|
 | linking-error                    |  6,967 |
 | duplicate-loop-index             |    457 |
+| unqualified-group-reference      |    406 |
 | ambiguous-attribute-reference    |     78 |
 | redeclaration-not-specialization |     35 |
 | declaration-name-case            |     11 |
+
+## unqualified-group-reference: verified site by site
+
+ISO 10303-11:2004 12.7.4, Rules and restrictions: a group reference that is
+not further qualified with an attribute reference shall be an operand of `=`
+or `||`; one followed by another group reference or by an index is reported
+too (12.7.4 first paragraph, 12.6.1). Checked 2026-11-05 against an
+independent token scan of every `\e` not followed by `.` outside comments and
+string literals: every reported site is a scan candidate, and every candidate
+not reported is an operand of `||` (13 of 43 in the default workspace, 1,063
+of 1,469 in the long forms; no candidate in the corpus is an operand of `=`).
+Each reported site breaks the rule:
+
+- default workspace, 30 sites in 11 files: 19 actual parameters
+  (`TYPEOF(SELF\e) <> TYPEOF(SELF)` in nine ARM domain rules,
+  `TYPEOF(...used_representation\shape_representation)` in two IF conditions,
+  `using_product_definition_of_shape_aspect(...\shape_aspect)`,
+  `dimension_of(...\geometric_representation_item)`,
+  `using_shape_aspect_of_shape_representation(...\shape_representation)`),
+  2 whole DERIVE expressions (`modules/assembly_feature_definition/mim.exp`
+  lines 51 and 54, the shape of EXPRESSsuite issue 102), 1 `RETURN`
+  (`assembly_feature_relationship_schema` line 368), 2 operands of `+`
+  (lines 244 and 275 of the same file), and 6 group references followed by
+  another group reference (`SELF\physical_quantity_symmetry_by_library_reference\externally_defined_item.source`,
+  `SELF\tensor_order_and_symmetry_by_library_reference\externally_defined_item.source`,
+  `coca\circle\conic.position` in `procedural_sketch_schema` lines 539 and 541);
+- long forms, 406 sites in 55 files from 34 distinct lines: the same
+  `TYPEOF(SELF\e)` domain rules, `is_int_expr(SELF\numeric_expression)` (in
+  long forms only), and the two `externally_defined_item` chains (the 12
+  sites followed by a group reference).
 
 ## Known classes that are not defects in the schemas
 

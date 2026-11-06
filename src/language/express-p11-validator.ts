@@ -14,20 +14,25 @@ import {
 import {
   Assignment_stmt_body,
   Attribute_decl,
+  BinaryExpression,
   Attribute_qualifier,
   Complex_Primary_body,
   EntityDefinition,
+  Expression,
   ExpressAstType,
   Local_decl,
   Reference_clause,
   SchemaDefinition,
+  Simple_factor,
   Use_clause,
   isAttribute_decl,
+  isAttribute_qualifier,
   isConstant_body,
   isDerived_attr,
   isEntityDefinition,
   isExplicit_attr,
   isFunction_head,
+  isGroup_qualifier,
   isIndex_qualifier,
   isInverse_attr,
   isProcedure_call_Or_Assigment_stmt_reference,
@@ -61,7 +66,7 @@ export function registerValidationChecks(services: ExpressP11Services) {
     Assignment_stmt_body: validator.checkIndexQualifierOperands,
     Attribute_decl: validator.checkAttributeNameStartsWithLowerCase,
     Attribute_qualifier: validator.checkAmbiguousAttributeReference,
-    Complex_Primary_body: validator.checkIndexQualifierOperands,
+    Complex_Primary_body: [validator.checkIndexQualifierOperands, validator.checkGroupReferencePlacement],
     EntityDefinition: validator.checkRedeclaredAttributeTypes,
     Local_decl: validator.checkLocalVariablesDoNotDuplicateLoopIndices,
     SchemaDefinition: [
@@ -81,6 +86,7 @@ export enum ExpressP11Issues {
   DuplicateLoopIndex = "duplicate-loop-index",
   RedeclarationNotSpecialization = "redeclaration-not-specialization",
   IndexOnNonAggregate = "index-on-non-aggregate",
+  UnqualifiedGroupReference = "unqualified-group-reference",
   AmbiguousAttributeReference = "ambiguous-attribute-reference",
   DuplicateInterfacedDeclaration = "duplicate-interfaced-declaration",
   RedundantDeclaration = "redundant-declaration",
@@ -99,6 +105,11 @@ export type RedeclarationData = {
 
 export type IndexOperandData = {
   operandType: string;
+};
+
+export type GroupReferenceData = {
+  entity: string;
+  followedBy: "nothing" | "group" | "index";
 };
 
 export type AmbiguousAttributeData = {
@@ -121,6 +132,21 @@ export type ReferenceStatementData = {
   sourceSchema: string;
 };
 type NamedNode = { name: string; node: AstNode };
+
+/**
+ * Whether a primary is an operand of `=` or `||`, seen through parentheses:
+ * `acc` of `check` in lean/ExpressSuite/GroupReference.lean. A factor that
+ * only holds the primary or a parenthesised expression is transparent; one
+ * with a unary operator, and every other node, is not.
+ */
+function isOperandOfEqualOrConstructor(primary: AstNode): boolean {
+  const bare = (node: AstNode) => (node.$type === "Simple_factor" || node.$type === "Temp") && !(node as Simple_factor).op;
+  let parent = primary.$container;
+  while (parent && bare(parent)) parent = parent.$container;
+  if (parent?.$type === "Expression") return (parent as Expression).op === "=";
+  if (parent?.$type === "BinaryExpression") return (parent as BinaryExpression).op === "||";
+  return false;
+}
 type SchemaName = string;
 /**
  * Implementation of custom validations.
@@ -246,6 +272,42 @@ export class ExpressP11Validator {
         });
       }
       current = this.typeBuilder.afterQualifier(current, qualifier);
+    });
+  }
+
+  /**
+   * ISO 10303-11:2004 12.7.4, Rules and restrictions: "A group reference which
+   * is not further qualified with an attribute reference shall appear as an
+   * operand of either the entity value comparison operator (=) or the complex
+   * entity instance constructor (||)." A group reference followed by another
+   * group reference or by an index is reported as well: the expression to the
+   * left of a group reference shall evaluate to a complex entity instance
+   * (12.7.4) and an index needs an aggregate (12.6.1); a partial complex
+   * entity value is neither. Only expressions are checked: an assignment
+   * target may end in a group reference (13.3). The loop is `violatesAt` of
+   * lean/ExpressSuite/GroupReference.lean, proved equal to the restriction
+   * (`qualsOk_iff_forall`) and to the partial-value semantics
+   * (`qualsOk_eq_kind`).
+   */
+  checkGroupReferencePlacement(body: Complex_Primary_body, accept: ValidationAcceptor): void {
+    const qualifiers = body.qualifiers ?? [];
+    qualifiers.forEach((qualifier, index) => {
+      if (!isGroup_qualifier(qualifier)) return;
+      const next = qualifiers[index + 1];
+      if (isAttribute_qualifier(next)) return;
+      if (next === undefined && isOperandOfEqualOrConstructor(body.$container)) return;
+      const data: GroupReferenceData = {
+        entity: qualifier.entity.$refText,
+        followedBy: next === undefined ? "nothing" : isGroup_qualifier(next) ? "group" : "index",
+      };
+      const reference = `Group reference '\\${data.entity}'`;
+      const message =
+        data.followedBy === "nothing"
+          ? `${reference} is not further qualified with an attribute reference, so it denotes a partial complex entity value, which may appear only as an operand of = or || (ISO 10303-11:2004 12.7.4).`
+          : data.followedBy === "group"
+            ? `${reference} is followed by another group reference; the expression to the left of a group reference shall evaluate to a complex entity instance, which a partial complex entity value is not (ISO 10303-11:2004 12.7.4).`
+            : `${reference} is followed by an index; a partial complex entity value is not an aggregate (ISO 10303-11:2004 12.7.4, 12.6.1).`;
+      accept("error", message, { node: body, property: "qualifiers", index, code: ExpressP11Issues.UnqualifiedGroupReference, data });
     });
   }
 

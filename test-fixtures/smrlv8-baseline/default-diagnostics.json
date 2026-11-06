@@ -1,8 +1,8 @@
 {
   "documents": 1287,
-  "diagnostics": 6323,
+  "diagnostics": 6353,
   "bySeverity": {
-    "error": 3871,
+    "error": 3901,
     "information": 704,
     "warning": 1748
   },
@@ -18,7 +18,8 @@
     "linking-error": 3374,
     "parsing-error": 2,
     "redeclaration-not-specialization": 9,
-    "reference-statement-missing": 176
+    "reference-statement-missing": 176,
+    "unqualified-group-reference": 30
   },
   "parseErrors": {
     "modules/solid_with_local_modification/Revisedent.exp": {
@@ -2734,6 +2735,14 @@
         15
       ]
     },
+    "modules/assembly_feature_definition/mim.exp": {
+      "unqualified-group-reference": [
+        37,
+        39,
+        51,
+        54
+      ]
+    },
     "modules/assembly_feature_relationship/arm.exp": {
       "linking-error": [
         42,
@@ -3391,6 +3400,13 @@
         253
       ]
     },
+    "modules/foundation_representation/arm.exp": {
+      "unqualified-group-reference": [
+        33,
+        65,
+        66
+      ]
+    },
     "modules/functional_assignment_to_part/arm.exp": {
       "duplicate-loop-index": [
         113,
@@ -3502,6 +3518,12 @@
         17,
         18,
         19
+      ]
+    },
+    "modules/independent_property_definition/mim.exp": {
+      "unqualified-group-reference": [
+        37,
+        37
       ]
     },
     "modules/individual_involvement_in_activity/mim.exp": {
@@ -4407,6 +4429,9 @@
         289,
         358,
         365
+      ],
+      "unqualified-group-reference": [
+        292
       ]
     },
     "modules/part_template_2d_shape/mim.exp": {
@@ -4840,10 +4865,25 @@
         64
       ]
     },
+    "modules/product_replacement/arm.exp": {
+      "unqualified-group-reference": [
+        22
+      ]
+    },
     "modules/product_structure_and_classification/mim.exp": {
       "linking-error": [
         15,
         23
+      ]
+    },
+    "modules/product_version_relationship/arm.exp": {
+      "unqualified-group-reference": [
+        19
+      ]
+    },
+    "modules/product_view_definition/arm.exp": {
+      "unqualified-group-reference": [
+        67
       ]
     },
     "modules/product_view_definition_reference/mim.exp": {
@@ -4870,6 +4910,12 @@
         336,
         339,
         340
+      ]
+    },
+    "modules/property_space/mim.exp": {
+      "unqualified-group-reference": [
+        48,
+        48
       ]
     },
     "modules/requirement_decomposition/arm.exp": {
@@ -5054,6 +5100,12 @@
         12,
         12,
         15
+      ]
+    },
+    "modules/shape_property_assignment/arm.exp": {
+      "unqualified-group-reference": [
+        131,
+        141
       ]
     },
     "modules/signal/arm.exp": {
@@ -5495,6 +5547,19 @@
         418,
         443,
         444
+      ],
+      "unqualified-group-reference": [
+        34,
+        37,
+        88,
+        92,
+        125,
+        129,
+        241,
+        244,
+        272,
+        275,
+        368
       ]
     },
     "resources/automotive_design/automotive_design.exp": {
@@ -7290,6 +7355,12 @@
     "resources/presentation_definition_schema/presentation_definition_schema.exp": {
       "duplicate-loop-index": [
         553
+      ]
+    },
+    "resources/procedural_sketch_schema/procedural_sketch_schema.exp": {
+      "unqualified-group-reference": [
+        539,
+        541
       ]
     },
     "resources/product_property_representation_schema/product_property_representation_schema.exp": {
