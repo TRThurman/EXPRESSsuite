@@ -33,10 +33,58 @@ description of an OPTIONAL attribute.
 
 ## Before you start
 
-1. Open the folder `docs/tutorial/demo/` in VS Code (File > Open Folder).
-2. Open `demo_widgets.exp`. `demo_support.exp` stays in the workspace so that
+### A build with the command
+
+Describe Declaration is not in EXPRESSsuite 0.5.1 or earlier. Until a release
+has it, build it from a clone of the repository:
+
+```
+git clone https://github.com/TRThurman/EXPRESSsuite.git
+cd EXPRESSsuite
+npm ci
+npm run langium:generate
+npm run build
+```
+
+### The demo in a window of its own
+
+From the same directory, open the demo folder in a VS Code window that runs
+this build in a profile of its own:
+
+```
+code --user-data-dir out/demo-profile \
+     --extensions-dir out/demo-extensions \
+     --extensionDevelopmentPath="$PWD" \
+     docs/tutorial/demo
+```
+
+Use `code-insiders` for VS Code Insiders; in PowerShell, put the command on
+one line without the `\`. The profile of its own keeps an EXPRESSsuite
+installed from the Marketplace, and any other extension for EXPRESS files,
+out of this window: otherwise both would check the same file. `out/` is not
+tracked by git. VS Code asks whether you trust the folder; it is the demo
+from your clone.
+
+Your other VS Code windows stay open beside the demo window and can look the
+same, with the same file open. Check that you are in the demo window:
+
+- The title bar begins `[Extension Development Host]` and names `demo`.
+- With `demo_widgets.exp` open, the Problems panel lists the four warnings of
+  section 1, each with a code starting `annotation-`. If it lists
+  `The schema 'demo_support' could not be found`, the window has the file
+  open but not the folder: use File > Open Folder and pick
+  `docs/tutorial/demo/`.
+- The right-click menu in `demo_widgets.exp` has **Describe Declaration**. If
+  it does not, the window is running a build without the command.
+
+Close the demo window when you are done; it does not close your other
+windows.
+
+### Running the command
+
+1. Open `demo_widgets.exp`. `demo_support.exp` stays in the workspace so that
    links to it can be checked.
-3. Run the command from the right-click menu (**Describe Declaration**) or
+2. Run the command from the right-click menu (**Describe Declaration**) or
    from the command palette (**EXPRESSsuite: Describe Declaration**).
 
 Every edit the command makes is shown in VS Code's refactor preview first.
@@ -63,6 +111,9 @@ lists four warnings from the description check, each with a code starting
 | the `limit_gauge` block, which sits between two declarations | `annotation-inside-schema` | a description block belongs after `END_SCHEMA;` |
 
 The `widget` block is clean and draws nothing.
+
+The check offers no quick fixes. A lightbulb on one of these rows comes from
+VS Code's own chat, if it is enabled, not from EXPRESSsuite.
 
 The check has twelve codes. All are warnings except
 `annotation-link-unverified`, which is information:
