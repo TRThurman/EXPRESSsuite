@@ -6,7 +6,8 @@ import { memberNamesOf, type DescribeKind } from "./keys.js";
 export type LinkCheck = "declared" | "undeclared" | "unknown-schema" | "unsupported";
 
 export type Resolution =
-  | { kind: "reachable"; schema: string }
+  /** `name` is the declared name in `schema`, which a renamed USE or REFERENCE item does not show (ruling R15). */
+  | { kind: "reachable"; schema: string; name: string }
   | { kind: "unique-elsewhere"; schema: string }
   | { kind: "ambiguous"; schemas: string[] }
   | { kind: "none" };
@@ -41,12 +42,14 @@ export class LinkResolver {
 
   resolve(from: SchemaDefinition, name: string): Resolution {
     const lower = name.toLowerCase();
-    const reached: string[] = [];
+    const reached: Array<{ schema: string; name: string }> = [];
     for (const arrival of this.scopeIndex.visibleIn(from)) {
-      if (arrival.effectiveName.toLowerCase() === lower && !reached.includes(arrival.decl.schema)) reached.push(arrival.decl.schema);
+      if (arrival.effectiveName.toLowerCase() === lower && !reached.some((found) => found.schema === arrival.decl.schema)) {
+        reached.push({ schema: arrival.decl.schema, name: arrival.decl.name });
+      }
     }
-    if (reached.length === 1) return { kind: "reachable", schema: reached[0] };
-    if (reached.length > 1) return { kind: "ambiguous", schemas: reached };
+    if (reached.length === 1) return { kind: "reachable", ...reached[0] };
+    if (reached.length > 1) return { kind: "ambiguous", schemas: reached.map((found) => found.schema) };
     const elsewhere = this.scopeIndex.declaringSchemas(name);
     if (elsewhere.length === 1) return { kind: "unique-elsewhere", schema: elsewhere[0] };
     if (elsewhere.length > 1) return { kind: "ambiguous", schemas: elsewhere };

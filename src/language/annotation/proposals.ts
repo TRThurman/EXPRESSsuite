@@ -7,7 +7,7 @@ export interface LinkProposal {
   start: number;
   end: number;
   text: string;
-  /** Identifier matched. */
+  /** Identifier the link names; for a reachable declaration, its declared name, also when imported under another (R15). */
   name: string;
   status: "auto" | "proposed" | "ambiguous" | "subject";
   schema?: string;
@@ -92,7 +92,9 @@ export function linkProposals(
             proposal = { start, end, text: span, name, status: "ambiguous", schemas: resolution.schemas };
           } else {
             const status = hasUnderscore && resolution.kind === "reachable" ? "auto" : "proposed";
-            proposal = { start, end, text: span, name, status, schema: resolution.schema };
+            // A renamed import links under its declared name (ruling R15).
+            const linked = resolution.kind === "reachable" ? resolution.name : name;
+            proposal = { start, end, text: span, name: linked, status, schema: resolution.schema };
           }
           break;
         }

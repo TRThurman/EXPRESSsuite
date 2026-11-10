@@ -39,11 +39,16 @@ SCHEMA demo_lf;
 ENTITY gadget;
 END_ENTITY;
 END_SCHEMA;
+
+SCHEMA rename_schema;
+USE FROM support_schema (item AS local_item);
+END_SCHEMA;
 `;
 
 describe("annotation link resolver", () => {
   let resolver: LinkResolver;
   let demo: SchemaDefinition;
+  let rename: SchemaDefinition;
 
   beforeAll(async () => {
     const services = createExpressP11Services(EmptyFileSystem).ExpressP11;
@@ -52,11 +57,12 @@ describe("annotation link resolver", () => {
     const root = document.parseResult.value;
     if (!isExpressFile(root)) throw new Error("not an express file");
     demo = root.schemas.find((schema) => schema.name === "demo_schema")!;
+    rename = root.schemas.find((schema) => schema.name === "rename_schema")!;
     resolver = new LinkResolver(services.validation.TypeContainer.getScopeIndex(), services.references.NameProvider);
   });
 
   test("resolve: reachable through USE FROM", () => {
-    expect(resolver.resolve(demo, "shape_aspect")).toEqual({ kind: "reachable", schema: "support_schema" });
+    expect(resolver.resolve(demo, "shape_aspect")).toEqual({ kind: "reachable", schema: "support_schema", name: "shape_aspect" });
   });
   test("resolve: unique elsewhere, long form not counted", () => {
     expect(resolver.resolve(demo, "gadget")).toEqual({ kind: "unique-elsewhere", schema: "far_schema" });
@@ -68,7 +74,11 @@ describe("annotation link resolver", () => {
     expect(resolver.resolve(demo, "nothing")).toEqual({ kind: "none" });
   });
   test("resolve: compares without regard to case", () => {
-    expect(resolver.resolve(demo, "Shape_Aspect")).toEqual({ kind: "reachable", schema: "support_schema" });
+    expect(resolver.resolve(demo, "Shape_Aspect")).toEqual({ kind: "reachable", schema: "support_schema", name: "shape_aspect" });
+  });
+  test("resolve: a renamed USE item resolves to the declared name in the declaring schema (R15)", () => {
+    expect(resolver.resolve(rename, "local_item")).toEqual({ kind: "reachable", schema: "support_schema", name: "item" });
+    expect(resolver.resolve(rename, "Local_Item")).toEqual({ kind: "reachable", schema: "support_schema", name: "item" });
   });
 
   test("check: declared, undeclared, unknown schema", () => {

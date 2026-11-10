@@ -242,6 +242,22 @@ describe("describe edit: new blocks", () => {
     );
   });
 
+  test("a renamed USE item is linked under its declared name, and the check finds nothing (R15)", async () => {
+    const source = DEMO.replace("USE FROM support_schema;", "USE FROM support_schema (shape_aspect AS local_aspect);");
+    const fixture = await load(source);
+    const text = "A widget refines a local_aspect.";
+    expect(fixture.service.proposals(fixture.uri, "demo_schema.widget", text).find((p) => p.text === "local_aspect")).toMatchObject({
+      status: "auto",
+      schema: "support_schema",
+      name: "shape_aspect",
+    });
+    const result = fixture.service.edit(request(fixture, { text }));
+    expect(apply(fixture, result.edits)).toBe(
+      `${source}\n\n(*"demo_schema.widget"\nA **widget** refines a <<express:support_schema.shape_aspect,local_aspect>>.\n*)\n`
+    );
+    expect(result.findings).toEqual([]);
+  });
+
   test("a hand-written undeclared link is returned as a finding", async () => {
     const { result } = await describeTyped(DEMO, { text: "See <<express:support_schema.nope,nope>>." });
     expect(result.findings).toEqual([expect.objectContaining({ code: "annotation-link-undeclared" })]);
