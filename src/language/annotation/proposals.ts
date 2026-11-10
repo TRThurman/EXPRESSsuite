@@ -17,6 +17,8 @@ export interface LinkProposal {
 const MAX_WORDS = 6;
 const WORD = /[A-Za-z_][A-Za-z0-9_]*/g;
 const PROTECTED = /<<express:[^>]*>>|\*\*[^*]+\*\*/g;
+/** Between two words of one run: horizontal whitespace with at most one line break, so no paragraph break falls in a link. */
+const RUN_GAP = /^[^\S\r\n\v\f\u2028\u2029]*(?:\r\n|\r|\n)?[^\S\r\n\v\f\u2028\u2029]*$/;
 
 interface Word {
   start: number;
@@ -70,7 +72,7 @@ export function linkProposals(
       const run = words.slice(i, i + n);
       let contiguous = true;
       for (let k = 1; k < n; k++) {
-        if (!/^\s+$/.test(text.slice(run[k - 1].end, run[k].start))) contiguous = false;
+        if (!RUN_GAP.test(text.slice(run[k - 1].end, run[k].start))) contiguous = false;
       }
       if (!contiguous) continue;
       const start = run[0].start;

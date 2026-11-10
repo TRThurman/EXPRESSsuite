@@ -114,4 +114,11 @@ describe("annotation link proposals", () => {
   test("a run is not carried across punctuation", () => {
     expect(propose("shape. aspects").map((p) => p.text)).toEqual([]);
   });
+
+  test("a run is carried across one line break, not across a blank line", () => {
+    expect(propose("one shape\naspect").map((p) => p.text)).toEqual(["shape\naspect"]);
+    expect(propose("one shape\r\n  aspect").map((p) => p.text)).toEqual(["shape\r\n  aspect"]);
+    expect(propose("one shape\n\naspect").map((p) => p.text)).toEqual([]);
+    expect(propose("one shape \n \n aspect").map((p) => p.text)).toEqual([]);
+  });
 });
