@@ -111,6 +111,20 @@ describe("annotation check", () => {
     expect(await codeList(demo(`(*"demo_schema.widget.__x"\nA widget.\n*)`))).toEqual([]);
   });
 
+  test("informal-proposition keys in the forms that validator reads are left to it (M2)", async () => {
+    const blocks = [
+      `(*"demo_schema.widget.wr:IP1"\nText.\n*)`,
+      `(*"demo_schema.widget.IP2"\nText.\n*)`,
+      `(*"Demo_Schema.Widget.ip3"\nText.\n*)`,
+      `(*"demo_schema.widget.WR:ip4"\nText.\n*)`,
+    ].join("\n");
+    expect(await codeList(demo(blocks))).toEqual([]);
+  });
+
+  test("a two-part key named like a proposition is still an orphan", async () => {
+    expect(await codeList(demo(`(*"demo_schema.IP1"\nText.\n*)`))).toEqual(["annotation-orphan-key"]);
+  });
+
   test("duplicate key on the second block", async () => {
     const found = await codes(demo(`(*"demo_schema.widget"\nOne.\n*)\n(*"demo_schema.widget"\nTwo.\n*)`));
     expect(found.map((d) => d.code)).toEqual(["annotation-duplicate-key"]);

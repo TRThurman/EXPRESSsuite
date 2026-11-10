@@ -5,6 +5,7 @@ import type { Diagnostic } from "vscode-languageserver";
 import { isExpressFile } from "../generated/ast.js";
 import type { ExpressFile } from "../generated/ast.js";
 import { isLongFormSchemaName } from "../express-p11-scope-index.js";
+import { isInformalPropositionKey } from "../informal-proposition-validator.js";
 import { annotationContexts, findExpressLinks, firstSentenceEnd } from "./blocks.js";
 import { annotationKeyOf, describeTargets } from "./keys.js";
 import type { DescribeTarget } from "./keys.js";
@@ -143,7 +144,8 @@ export function validateAnnotations(document: LangiumDocument<ExpressFile>, reso
       }
       seen.add(lower);
 
-      if (!/\.wr:ip\d+$/.test(bare) && !declared.has(bare)) {
+      // Informal-proposition keys belong to the informal-proposition validator.
+      if (!/\.wr:ip\d+$/.test(bare) && !isInformalPropositionKey(block.key) && !declared.has(bare)) {
         report(AnnotationIssues.OrphanKey, block.keyStart, block.keyEnd, `No declaration has the key "${block.key}"; the text would be published without a subject.`);
       }
 
