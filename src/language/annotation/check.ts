@@ -120,7 +120,7 @@ export function validateAnnotations(document: LangiumDocument<ExpressFile>, reso
   };
   reportBlocksInsideSchemas(root, report);
   const contexts = annotationContexts(root, text).filter((context) => !isLongFormSchemaName(context.schema));
-  if (contexts.length === 0) return [];
+  if (contexts.length === 0) return diagnostics;
 
   const declared = new Set<string>();
   for (const node of AstUtils.streamAst(root)) {
