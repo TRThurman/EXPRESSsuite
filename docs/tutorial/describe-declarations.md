@@ -40,7 +40,10 @@ description of an OPTIONAL attribute.
    from the command palette (**EXPRESSsuite: Describe Declaration**).
 
 Every edit the command makes is shown in VS Code's refactor preview first.
-Nothing is written until you press **Apply**. After applying, one undo (Ctrl+Z
+The preview lists the change unticked, because the command asks VS Code for
+your confirmation, and **Apply** stays disabled until you tick it (the file's
+checkbox ticks every change in the file). Nothing is written until you tick
+the change and press **Apply**. After applying, one undo (Ctrl+Z
 or Cmd+Z) reverts the whole edit. Pressing Escape at any step writes nothing.
 
 If you try a flow and want the demo back as it was, use `git restore` on
@@ -100,7 +103,8 @@ description.
    lines. Leave both ticked.
 6. The link list offers words that name declarations (`widget`, `widgets`).
    Nothing is ticked. Tick none, or tick the words you want linked, and accept.
-7. VS Code opens the refactor preview. Press **Apply**.
+7. VS Code opens the refactor preview with the change unticked. Tick it,
+   then press **Apply**.
 
 Expected:
 
@@ -123,7 +127,7 @@ refuses it at once, before the target list, and changes nothing.
 4. The target list starts with `demo_widgets.widget.size`. Pick it, then
    **Description**. No links step appears: the only declared name in the text
    is `widget`, the owner of the attribute, which is written in bold.
-5. Press **Apply** in the preview.
+5. Tick the change in the preview and press **Apply**.
 
 Expected: the block `(*"demo_widgets.widget.size"` is inserted directly after
 the `demo_widgets.widget` block and holds
@@ -149,7 +153,7 @@ An empty text is refused: pressing Enter with nothing typed shows
    type `The widget to scale.` For `demo_widgets.scaled_size.factor` leave the
    box empty and press Enter. An empty box means no block.
 5. Each text names `widget`, which is offered as a link; tick nothing and
-   accept both links steps. Press **Apply**.
+   accept both links steps. Tick the change and press **Apply**.
 
 Expected: two blocks, `(*"demo_widgets.scaled_size"` and
 `(*"demo_widgets.scaled_size.w"`, one after the other, placed after the
@@ -173,7 +177,7 @@ description.
 4. Pick `demo_widgets.limit_gauge.wr:positive_limit` and **Description**.
 5. No links step appears: `limit_gauge`, the only declared name in the
    sentence, is the owner of the rule and is written in bold.
-6. Press **Apply**.
+6. Tick the change and press **Apply**.
 
 Expected: the block `(*"demo_widgets.limit_gauge.wr:positive_limit"` holds
 
@@ -186,7 +190,8 @@ The upper limit of a **limit_gauge** is greater than zero.
 1. Put the cursor in `widget`, run the command, and type
    `A widget can be fitted to more than one mount.`
 2. Pick `demo_widgets.widget` and **Note**.
-3. The links step offers `mount`; tick nothing. Press **Apply**.
+3. The links step offers `mount`; tick nothing. Tick the change in the
+   preview and press **Apply**.
 
 Expected: a block `(*"demo_widgets.widget.__note"` directly after the
 `demo_widgets.widget` block, with `A **widget** can be fitted to more than one
@@ -236,11 +241,11 @@ The comment above `mount` covers two declarations:
 2. Run **Describe Declaration**, pick `demo_widgets.mount`, **Description**.
    There is nothing to clean up in a plain sentence, so no clean-up list
    appears. The links step offers `widget`; tick nothing.
-3. Apply. The sentence leaves the comment; its line stays, blank, and the rest
+3. Tick the change and apply. The sentence leaves the comment; its line stays, blank, and the rest
    of the comment stays.
 4. Select `A bracket carries a mount.`, run the command, and pick
    `demo_widgets.bracket`. The links step offers `mount`; tick nothing.
-5. Apply.
+5. Tick the change and apply.
 
 Expected: two new blocks, `demo_widgets.mount` and `demo_widgets.bracket`,
 with `A **mount** holds a widget in place.` and `A **bracket** carries a

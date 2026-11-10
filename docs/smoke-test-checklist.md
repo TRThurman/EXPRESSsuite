@@ -83,10 +83,13 @@ Reload VS Code.  Open `wg12-step/schemas/resources/geometry_schema/geometry_sche
 Use a scratch `.exp` file with a schema holding an entity with an OPTIONAL
 attribute, a function with two parameters, and an entity with a WHERE rule.
 Right-click menu: **Describe Declaration** (or the command palette).
+The refactor preview lists each change unticked with **Apply** disabled;
+"Apply" below means tick the change (the file's checkbox), then **Apply**.
 
 - Select a `(* ... *)` comment above an entity, run the command, pick the
   entity (the default is first), "Description", tick no links, accept.
-  Expected: VS Code's refactor preview opens; after Apply the block
+  Expected: VS Code's refactor preview opens with the change unticked and
+  **Apply** disabled; after ticking it and Apply the block
   `(*"schema.entity"` ... `*)` follows `END_SCHEMA;`, the comment is removed,
   and **one undo restores both**.
 - With no selection, "Type the text" for the OPTIONAL attribute. Expected: the

@@ -42,7 +42,8 @@ Actions:
 5. In the clean-up list leave both items ticked (comment markers, hard-wrapped
    lines); press Enter.
 6. In the links list (`widget`, `widgets`) tick nothing; press Enter.
-7. In the refactor preview, pause, then click **Apply**.
+7. In the refactor preview, pause on the unticked change, tick it, then click
+   **Apply**.
 8. Scroll to the `widget` block after END_SCHEMA and show the new block
    directly below it. Show that the comment above `tagged_widget` is gone.
 9. Press Cmd+Z once and show the comment back and the block gone. Press
@@ -67,7 +68,7 @@ Actions:
 3. Pick **Type the text**. Type `The largest extent of a widget.` Press
    Enter.
 4. Confirm the first entry, `demo_widgets.widget.size`. Pick **Description**.
-   No links step appears. Click **Apply** in the preview.
+   No links step appears. Tick the change in the preview; click **Apply**.
 5. Scroll to the new block.
 
 Narration: "With nothing selected, the text can be typed. The name of the
@@ -90,7 +91,7 @@ Actions:
 4. First input box (`w`): type `The widget to scale.` Press Enter.
 5. Second input box (`factor`): press Enter with nothing typed.
 6. Two links steps follow (each offers `widget`): tick nothing, press Enter
-   each time; click **Apply**.
+   each time; tick the change; click **Apply**.
 7. Show the two new blocks.
 
 Narration: "A function asks for each parameter in turn. Parameter text goes into
@@ -109,7 +110,7 @@ Actions:
 2. Click on the line `positive_limit : upper > 0.0;`.
 3. Run **Describe Declaration**; pick **Use the clipboard**.
 4. Confirm `demo_widgets.limit_gauge.wr:positive_limit`; pick **Description**.
-   No links step appears. Click **Apply**.
+   No links step appears. Tick the change; click **Apply**.
 
 Narration: "The rule is already written. Its English statement, copied from
 wherever it lives, becomes the description. The entity that owns the rule is
@@ -127,7 +128,7 @@ Actions:
    `A widget can be fitted to more than one mount.`
 2. Confirm `demo_widgets.widget`; pick **Note**. Point out that there are no
    parameter boxes.
-3. In the links step (`mount`) tick nothing. Click **Apply**.
+3. In the links step (`mount`) tick nothing. Tick the change; click **Apply**.
 
 Narration: "A note has its own key, which ends in dot, underscore underscore
 note, and takes no member texts. Examples work the same way."
@@ -142,7 +143,8 @@ Actions:
 1. Run **Describe Declaration** on `widget` again with typed text `Widgets are
    counted in a parts list.`; pick `demo_widgets.widget` and **Description**.
 2. In the links step (`Widgets`) tick nothing.
-3. The list offers **Append** and **Replace**. Pick **Append**; click **Apply**.
+3. The list offers **Append** and **Replace**. Pick **Append**; tick the change; click
+   **Apply**.
 
 Narration: "When a block already exists the tool asks whether to append or
 replace. It never overwrites without asking."
@@ -156,9 +158,9 @@ Actions:
 1. Scroll to the comment above `mount`.
 2. Select the sentence `A mount holds a widget in place.` Run the command; the
    first entry is `demo_widgets.mount`. Pick **Description**. No clean-up list
-   appears. In the links step (`widget`) tick nothing. Apply.
+   appears. In the links step (`widget`) tick nothing. Tick and apply.
 3. Select `A bracket carries a mount.`; run the command; pick
-   `demo_widgets.bracket`; links step (`mount`), tick nothing. Apply.
+   `demo_widgets.bracket`; links step (`mount`), tick nothing. Tick and apply.
 
 Narration: "One comment can cover several declarations. Select a sentence at a
 time. Each selection leaves the comment when its edit is applied, and what is
