@@ -7,6 +7,7 @@ import { ExpressP11StatusBarItem } from "./express-p11-status-bar-item.js";
 import { registerHoverProvider } from "./hover-provider.js";
 import { getAnnotationIndex, resolveDescriptionAt, resolveDescriptionByPath } from "./annotation-client.js";
 import { showDescriptionPreview, showExpressGPreview, openMathPlayground } from "./webviews.js";
+import { descriptionRequest } from "./show-description-argument.js";
 import { initPlurimathPool, shutdownPlurimathPool } from "./plurimath-pool.js";
 import { time } from "./perf.js";
 import {
@@ -32,14 +33,15 @@ export function activate(context: vscode.ExtensionContext): void {
 
 function registerViewerCommands(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
-    vscode.commands.registerCommand(EXPRESSSUITE_COMMANDS.showDescription, async (arg?: { path?: string; sourceUri?: string }) => {
+    vscode.commands.registerCommand(EXPRESSSUITE_COMMANDS.showDescription, async (argument?: unknown) => {
       const stop = time("command.showDescription");
+      const arg = descriptionRequest(argument);
       const editor = vscode.window.activeTextEditor;
       // A click in a description panel names the file the panel was opened
       // from: while the panel, not an editor, is the active tab, VS Code
       // reports no active text editor, so the panel's file stands in for it.
       let document = editor?.document;
-      if (typeof arg?.sourceUri === "string") {
+      if (arg.sourceUri !== undefined) {
         try {
           document = await vscode.workspace.openTextDocument(vscode.Uri.parse(arg.sourceUri));
         } catch {
@@ -52,9 +54,11 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
       }
       // A cross-reference names a tag path; the cursor names a word, which
       // the server resolves to its declaration through the schema's interfaces.
+      // The right-click menu passes the file's URI, which names no declaration
+      // (see descriptionRequest), so the cursor decides there too.
       let resolved;
       let asked: string;
-      if (arg?.path) {
+      if (arg.path) {
         asked = arg.path;
         resolved = await resolveDescriptionByPath(document, arg.path, client);
       } else {
