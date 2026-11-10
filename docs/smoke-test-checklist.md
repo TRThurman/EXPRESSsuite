@@ -107,6 +107,9 @@ Right-click menu: **Describe Declaration** (or the command palette).
   clean-ups, links, Append / Replace, the preview). Expected: nothing is
   written each time.
 - Pick "Note" on the function. Expected: no parameter input boxes.
+- Run "Note" on the function again. Expected: "Append" / "Replace" / "Add
+  another" is offered; "Add another" writes a second `.__note` block directly
+  after the first.
 - Right-click the new block's declaration, **Show Description**. Expected: the
   new block's links render.
 - **PASS** if all of the above hold.

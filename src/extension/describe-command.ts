@@ -77,7 +77,7 @@ async function describeDeclaration(client: LanguageClient): Promise<void> {
 
   const roleKey = target.key + ROLE_SUFFIX[role];
   const exists = targets.existing.some((key) => key.toLowerCase() === roleKey.toLowerCase());
-  const mode = exists ? await pickMode(roleKey) : "new";
+  const mode = exists ? await pickMode(roleKey, role) : "new";
   if (!mode) return;
 
   const request: DescribeRequest = {
@@ -222,14 +222,18 @@ async function pickProposals(proposals: LinkProposal[], what: string): Promise<L
   return picked?.map((item) => item.proposal);
 }
 
-/** Step 7. */
-async function pickMode(roleKey: string): Promise<"append" | "replace" | undefined> {
-  const picked = await vscode.window.showQuickPick(["Append", "Replace"], {
+/** Step 7: a note or an example may also get another block of its own (ruling R12). */
+async function pickMode(roleKey: string, role: BlockRole): Promise<DescribeRequest["mode"] | undefined> {
+  const choices: Array<{ label: string; mode: DescribeRequest["mode"] }> = [
+    { label: "Append", mode: "append" },
+    { label: "Replace", mode: "replace" },
+  ];
+  if (role !== "description") choices.push({ label: "Add another", mode: "add" });
+  const picked = await vscode.window.showQuickPick(choices, {
     title: TITLE,
     placeHolder: `"${roleKey}" already has a block`,
   });
-  if (!picked) return undefined;
-  return picked === "Append" ? "append" : "replace";
+  return picked?.mode;
 }
 
 /** Step 8: findings carry no block key, so each message is listed. */

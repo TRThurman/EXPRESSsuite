@@ -194,6 +194,11 @@ mount.` The key ends in `.__note`;
 **Example** gives `.__example`. A Note or an Example takes no parameter or item
 texts, so the function steps of flow 4 do not appear.
 
+Run it again with another note for `widget`. The note now exists, so the
+command asks **Append**, **Replace** or **Add another**. **Add another** writes
+a second `(*"demo_widgets.widget.__note"` block directly after the first; a
+declaration may have several notes and examples, but one description.
+
 ## 7. Append or replace
 
 `widget` already has a description. Run the command on it again (typed text,

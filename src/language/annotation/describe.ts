@@ -33,7 +33,8 @@ export interface DescribeRequest {
   text: string;
   accepted: LinkProposal[];
   members: MemberText[];
-  mode: "new" | "append" | "replace";
+  /** "add" writes one more note or example block after the last one with its key (ruling R12). */
+  mode: "new" | "append" | "replace" | "add";
   source: DescribeSource;
 }
 
@@ -71,12 +72,13 @@ interface Comment {
   kind: "remark" | "tail";
 }
 
-/** One block the request writes: created, or an existing one appended to or replaced. */
+/** One block the request writes: created (new, or added after the blocks of its key), or an existing one appended to or replaced. */
 interface BlockWrite {
   target: DescribeTarget;
   key: string;
   body: string;
-  action: "new" | "append" | "replace";
+  action: "new" | "append" | "replace" | "add";
+  /** The existing block an append or replace changes. */
   block?: AnnotationBlock;
   role: BlockRole;
 }
@@ -167,6 +169,7 @@ export class DescribeService {
     const targets = describeTargets(root, this.nameProvider);
     const target = findTarget(targets, request.key) ?? refuse(`"${request.key}" is not a declaration of this file that can be described.`);
     if (request.text.trim() === "") refuse("The text is empty.");
+    if (request.mode === "add" && request.role === "description") refuse("Add another is for a note or an example; a declaration has one description.");
     const members = memberTexts(request, target, targets);
 
     const schema = root.schemas.find((candidate) => candidate.name === target.schema) ?? refuse(`The schema "${target.schema}" is not in this file.`);
@@ -180,7 +183,7 @@ export class DescribeService {
       const action = writeAction(request.mode, write.key, block !== undefined, owner);
       if (block && !isOneRemark(text.slice(block.start, block.end))) refuse(`The block "${block.key}" is not closed with *).`);
       if (!isOneRemark(`(*${eol}${write.body}${eol}*)`)) refuse(`The text for "${write.key}" has an unmatched (* or *).`);
-      writes.push({ ...write, action, block });
+      writes.push({ ...write, action, block: action === "append" || action === "replace" ? block : undefined });
     };
     plan({ target, key: target.key + ROLE_SUFFIX[request.role], body: this.body(request.text, request.accepted, target, request.role, schema, eol), role: request.role }, true);
     for (const { member, text: memberText } of members) {
@@ -192,7 +195,7 @@ export class DescribeService {
       if (write.action === "append") edits.push(appendEdit(text, write.block!, write.body, eol, keptOnAppend(write)));
       if (write.action === "replace") edits.push(replaceEdit(text, write.block!, write.body, eol));
     }
-    edits.push(...placeNewBlocks(writes.filter((write) => write.action === "new"), targets, context, text, eol));
+    edits.push(...placeNewBlocks(writes.filter((write) => write.action === "new" || write.action === "add"), targets, context, text, eol));
 
     if (request.source.kind === "selection") {
       const { start, end } = request.source;
@@ -249,7 +252,7 @@ export class DescribeService {
 // ---------------------------------------------------------------- request shape
 
 const ROLES: ReadonlySet<string> = new Set(["description", "note", "example"]);
-const MODES: ReadonlySet<string> = new Set(["new", "append", "replace"]);
+const MODES: ReadonlySet<string> = new Set(["new", "append", "replace", "add"]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -381,7 +384,7 @@ function writeAction(mode: DescribeRequest["mode"], key: string, exists: boolean
     return "new";
   }
   if (!exists) {
-    if (owner) refuse(`"${key}" has no block to ${mode === "append" ? "append to" : "replace"}.`);
+    if (owner) refuse(`"${key}" has no block to ${mode === "append" ? "append to" : mode === "replace" ? "replace" : "add another after"}.`);
     return "new";
   }
   return mode;
@@ -461,6 +464,14 @@ function firstBlock(context: AnnotationContext, key: string): AnnotationBlock | 
   return context.blocks.find((block) => block.key.toLowerCase() === lower);
 }
 
+/** The last block whose key is `key`, role suffix included. */
+function lastBlockWithKey(context: AnnotationContext, key: string): AnnotationBlock | undefined {
+  const lower = key.toLowerCase();
+  let last: AnnotationBlock | undefined;
+  for (const block of context.blocks) if (block.key.toLowerCase() === lower) last = block;
+  return last;
+}
+
 /** The last block whose key, without a `.__` role suffix, is `key`. */
 function lastBlockOf(context: AnnotationContext, key: string): AnnotationBlock | undefined {
   const lower = key.toLowerCase();
@@ -519,14 +530,18 @@ export function separatorBreaks(context: AnnotationContext, offset: number, text
   return candidates.find((count) => count > 0) ?? DEFAULT_SEPARATOR_BREAKS;
 }
 
-/** One insertion per offset; the blocks at an offset are in document order, each after its separator. */
+/**
+ * One insertion per offset; the blocks at an offset are in document order, each after its separator.
+ * An added block goes directly after the last block with its key.
+ */
 function placeNewBlocks(writes: ReadonlyArray<BlockWrite>, targets: ReadonlyArray<DescribeTarget>, context: AnnotationContext, text: string, eol: string): OffsetEdit[] {
   const schemaTargets = targets.filter((target) => target.schema === context.schema);
   const ordered = [...writes].sort((a, b) => schemaTargets.indexOf(a.target) - schemaTargets.indexOf(b.target));
   const created = new Map<string, number>();
   const groups = new Map<number, string[]>();
   for (const write of ordered) {
-    const offset = anchorOffset(write.target, schemaTargets, context, created, text);
+    const added = write.action === "add" ? lastBlockWithKey(context, write.key) : undefined;
+    const offset = added ? closedEnd(added, text) : anchorOffset(write.target, schemaTargets, context, created, text);
     created.set(write.target.key.toLowerCase(), offset);
     groups.set(offset, [...(groups.get(offset) ?? []), blockText(write.key, write.body, eol)]);
   }

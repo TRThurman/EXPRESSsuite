@@ -1,5 +1,5 @@
 import { EmptyFileSystem, TextDocument, type LangiumDocument } from "langium";
-import { parseDocument } from "langium/test";
+import { parseDocument, validationHelper } from "langium/test";
 import type { TextEdit } from "vscode-languageserver";
 import { describe, expect, test } from "vitest";
 import { createExpressP11Services } from "../language/express-module.js";
@@ -397,6 +397,43 @@ describe("describe edit: existing blocks", () => {
   });
 });
 
+describe("describe edit: add another note or example (R12)", () => {
+  const NOTE = (text: string) => `(*"demo_schema.widget.__note"\n${text}\n*)`;
+  const FUNCTION_BLOCK = '(*"demo_schema.f"\nReturns TRUE.\n*)';
+
+  async function annotationCodes(text: string): Promise<string[]> {
+    const result = await validationHelper(createExpressP11Services(EmptyFileSystem).ExpressP11)(text);
+    return result.diagnostics.filter((d) => String(d.code).startsWith("annotation-")).map((d) => String(d.code));
+  }
+
+  test("two adds give three note blocks in order, each after the last, and the check finds nothing", async () => {
+    const source = demo(undefined, `\n${NOTE("First note.")}\n${FUNCTION_BLOCK}\n`);
+    const second = await describeTyped(source, { role: "note", mode: "add", text: "Second note." });
+    expect(second.result.refused).toBeUndefined();
+    const third = await describeTyped(second.after, { role: "note", mode: "add", text: "Third note." });
+    expect(third.result.refused).toBeUndefined();
+    expect(third.after).toBe(demo(undefined, `\n${NOTE("First note.")}\n${NOTE("Second note.")}\n${NOTE("Third note.")}\n${FUNCTION_BLOCK}\n`));
+    expect(third.result.findings).toEqual([]);
+    expect(await annotationCodes(third.after)).toEqual([]);
+  });
+
+  test("an example is added after the last example", async () => {
+    const example = (text: string) => `(*"demo_schema.widget.__example"\n${text}\n*)`;
+    const source = demo(undefined, `\n${WIDGET_BLOCK}\n\n${example("One.")}\n`);
+    const { after } = await describeTyped(source, { role: "example", mode: "add", text: "Two." });
+    expect(after).toBe(demo(undefined, `\n${WIDGET_BLOCK}\n\n${example("One.")}\n\n${example("Two.")}\n`));
+  });
+
+  test("add is refused for a description, and without a block to follow", async () => {
+    const existing = await describeTyped(demo(undefined, `\n${WIDGET_BLOCK}\n`), { mode: "add", text: "More." });
+    expect(existing.result.refused).toMatch(/note or an example/);
+    expect(existing.result.edits).toEqual([]);
+    const none = await describeTyped(DEMO, { role: "note", mode: "add", text: "A note." });
+    expect(none.result.refused).toMatch(/no block/);
+    expect(none.result.edits).toEqual([]);
+  });
+});
+
 describe("describe edit: an unclosed anchor block", () => {
   test("a new block whose anchor block is not closed is refused, nothing is written", async () => {
     // The outer remark never closes, so the block runs to the end of the file.
@@ -553,6 +590,7 @@ describe("isDescribeRequest", () => {
     expect(isDescribeRequest(null)).toBe(false);
     expect(isDescribeRequest({ ...valid, role: "figure" })).toBe(false);
     expect(isDescribeRequest({ ...valid, mode: "merge" })).toBe(false);
+    expect(isDescribeRequest({ ...valid, role: "note", mode: "add", members: [] })).toBe(true);
     expect(isDescribeRequest({ ...valid, version: 1.5 })).toBe(false);
     expect(isDescribeRequest({ ...valid, source: { kind: "selection", start: 0 } })).toBe(false);
     expect(isDescribeRequest({ ...valid, accepted: [{ start: 0, end: 1 }] })).toBe(false);
