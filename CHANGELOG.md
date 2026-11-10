@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Bug Fixes
+
+- **Show Description** from the editor's right-click menu opens the
+  description of the name at the cursor. VS Code passes a command run from
+  that menu the editor's file URI; the command read the URI's path as a
+  declaration path, reported `No description found for "<file path>"` and
+  opened nothing. The command palette, hovers and description-panel links
+  were not affected.
+
 ## [0.5.1](https://github.com/TRThurman/EXPRESSsuite/compare/0.5.0...0.5.1) (2026-11-06)
 
 ### Bug Fixes
