@@ -18,6 +18,15 @@ The first line holds the key (`schema.declaration`, or
 a line. The command writes such blocks for you, checks the links in them, and
 never puts one inside `SCHEMA ... END_SCHEMA;`.
 
+Where a new block goes: directly after the block of the nearest earlier
+declaration in the file that already has one; if no earlier declaration has a
+block, directly after `END_SCHEMA;`.
+
+When the text names the declaration being described (for a member, the
+declaration that owns it), the name is written in bold, `**name**`. Other
+words that name declarations are offered as links in a list with nothing
+ticked; that list appears only when there is at least one such word.
+
 The command writes no wording of its own, with one exception: the sentence
 `The value of this attribute need not be specified.` at the end of the
 description of an OPTIONAL attribute.
@@ -95,8 +104,9 @@ description.
 
 Expected:
 
-- After `END_SCHEMA;` a block `(*"demo_widgets.tagged_widget"` appears with the
-  comment text on one line. The name of the subject is in bold:
+- A block `(*"demo_widgets.tagged_widget"` appears directly after the
+  `demo_widgets.widget` block, the nearest earlier declaration with a block.
+  The text is on one line and the subject is in bold:
   `A **tagged widget** is a widget with a tag, ...`.
 - The comment above `tagged_widget` is gone.
 - One undo brings back the comment and removes the block.
@@ -111,13 +121,15 @@ refuses it and changes nothing.
 2. Run **Describe Declaration** and pick **Type the text**.
 3. Type `The largest extent of a widget.` and press Enter.
 4. The target list starts with `demo_widgets.widget.size`. Pick it, then
-   **Description**, then accept the links step with none ticked.
+   **Description**. No links step appears: the only declared name in the text
+   is `widget`, the owner of the attribute, which is written in bold.
 5. Press **Apply** in the preview.
 
-Expected: the block `(*"demo_widgets.widget.size"` holds
+Expected: the block `(*"demo_widgets.widget.size"` is inserted directly after
+the `demo_widgets.widget` block and holds
 
 ```
-The largest extent of a widget. The value of this attribute need not be specified.
+The largest extent of a **widget**. The value of this attribute need not be specified.
 ```
 
 The second sentence is the one thing the tool adds. It goes after one space at
@@ -136,10 +148,13 @@ An empty text is refused: pressing Enter with nothing typed shows
 4. One input box asks for each parameter. For `demo_widgets.scaled_size.w`
    type `The widget to scale.` For `demo_widgets.scaled_size.factor` leave the
    box empty and press Enter. An empty box means no block.
-5. Accept the links steps and press **Apply**.
+5. Each text names `widget`, which is offered as a link; tick nothing and
+   accept both links steps. Press **Apply**.
 
 Expected: two blocks, `(*"demo_widgets.scaled_size"` and
-`(*"demo_widgets.scaled_size.w"`. There is none for `factor`.
+`(*"demo_widgets.scaled_size.w"`, one after the other, placed after the
+block of the nearest earlier declaration that has one. There is none for
+`factor`.
 
 Parameter texts (and the texts of enumeration items, for a TYPE) are blocks of
 their own, written in the same step as the function, so the tool never asks for
@@ -156,30 +171,34 @@ description.
 2. Put the cursor in the line `positive_limit : upper > 0.0;`.
 3. Run **Describe Declaration** and pick **Use the clipboard**.
 4. Pick `demo_widgets.limit_gauge.wr:positive_limit` and **Description**.
-5. The link list offers the entity name, none ticked. Tick `limit_gauge` if you
-   want it linked, and accept.
+5. No links step appears: `limit_gauge`, the only declared name in the
+   sentence, is the owner of the rule and is written in bold.
 6. Press **Apply**.
 
-Expected: the block `(*"demo_widgets.limit_gauge.wr:positive_limit"` holds the
-sentence you copied.
+Expected: the block `(*"demo_widgets.limit_gauge.wr:positive_limit"` holds
 
-The clipboard is read once. Nothing leaves your machine.
+```
+The upper limit of a **limit_gauge** is greater than zero.
+```
 
 ## 6. Notes and examples
 
 1. Put the cursor in `widget`, run the command, and type
    `A widget can be fitted to more than one mount.`
 2. Pick `demo_widgets.widget` and **Note**.
-3. Press **Apply**.
+3. The links step offers `mount`; tick nothing. Press **Apply**.
 
-Expected: a block `(*"demo_widgets.widget.__note"`. The key ends in `.__note`;
+Expected: a block `(*"demo_widgets.widget.__note"` directly after the
+`demo_widgets.widget` block, with `A **widget** can be fitted to more than one
+mount.` The key ends in `.__note`;
 **Example** gives `.__example`. A Note or an Example takes no parameter or item
 texts, so the function steps of flow 4 do not appear.
 
 ## 7. Append or replace
 
 `widget` already has a description. Run the command on it again (typed text,
-`demo_widgets.widget`, **Description**).
+`demo_widgets.widget`, **Description**; the links step offers any other
+declared names in your text).
 
 The command asks **Append** or **Replace**:
 
@@ -202,15 +221,20 @@ The comment above `mount` covers two declarations:
 ```
 
 1. Select the line `A mount holds a widget in place.` (only that line).
-2. Run **Describe Declaration**, pick `demo_widgets.mount`, **Description**,
-   and accept the clean-ups and links.
+2. Run **Describe Declaration**, pick `demo_widgets.mount`, **Description**.
+   There is nothing to clean up in a plain sentence, so no clean-up list
+   appears. The links step offers `widget`; tick nothing.
 3. Apply. The line leaves the comment; the rest of the comment stays.
 4. Select `A bracket carries a mount.`, run the command, and pick
-   `demo_widgets.bracket`.
+   `demo_widgets.bracket`. The links step offers `mount`; tick nothing.
 5. Apply.
 
-Expected: two new blocks, and a comment with its first sentence only. Delete
-the comment by hand if you do not need it.
+Expected: two new blocks, `demo_widgets.mount` and `demo_widgets.bracket`,
+with `A **mount** holds a widget in place.` and `A **bracket** carries a
+mount.`. The first is directly after `END_SCHEMA;` unless an earlier
+declaration has a block (none does here); the second follows it. The comment
+keeps its first sentence only. Delete the comment by hand if you do not need
+it.
 
 ## 9. What the command checks before it writes
 
