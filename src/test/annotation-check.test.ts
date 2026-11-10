@@ -116,6 +116,16 @@ describe("annotation check", () => {
     expect(found.map((d) => d.code)).toEqual(["annotation-duplicate-key"]);
   });
 
+  test("repeated role blocks (.__ suffix) draw no duplicate key (R10)", async () => {
+    const roles = [
+      `(*"demo_schema.__expressg"\nFigure 1.\n*)`,
+      `(*"demo_schema.__expressg"\nFigure 2.\n*)`,
+      `(*"demo_schema.widget.__note"\nOne note.\n*)`,
+      `(*"demo_schema.widget.__note"\nAnother note.\n*)`,
+    ].join("\n");
+    expect(await codeList(demo(roles))).toEqual([]);
+  });
+
   test("unkeyed remark after END_SCHEMA", async () => {
     expect(await codeList(demo(`(* a working note *)`))).toEqual(["annotation-unkeyed-remark"]);
   });

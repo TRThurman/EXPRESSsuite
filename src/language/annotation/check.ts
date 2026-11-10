@@ -136,10 +136,13 @@ export function validateAnnotations(document: LangiumDocument<ExpressFile>, reso
     const seen = new Set<string>();
     for (const block of context.blocks) {
       const lower = block.key.toLowerCase();
-      if (seen.has(lower)) report(AnnotationIssues.DuplicateKey, block.keyStart, block.keyEnd, `Another description block with key "${block.key}" precedes this one.`);
+      const bare = lower.replace(/\.__[^.]*$/, "");
+      // Ruling R10: role blocks (`.__note`, `.__example`, `.__expressg`, ...) may repeat.
+      if (bare === lower && seen.has(lower)) {
+        report(AnnotationIssues.DuplicateKey, block.keyStart, block.keyEnd, `Another description block with key "${block.key}" precedes this one.`);
+      }
       seen.add(lower);
 
-      const bare = lower.replace(/\.__[^.]*$/, "");
       if (!/\.wr:ip\d+$/.test(bare) && !declared.has(bare)) {
         report(AnnotationIssues.OrphanKey, block.keyStart, block.keyEnd, `No declaration has the key "${block.key}"; the text would be published without a subject.`);
       }
