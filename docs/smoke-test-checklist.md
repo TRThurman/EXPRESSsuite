@@ -98,6 +98,9 @@ Right-click menu: **Describe Declaration** (or the command palette).
 - With no selection, "Use the clipboard" (copy a sentence naming a declared
   entity first) for the WHERE rule. Expected: the proposed-links list offers
   the entity name, none ticked.
+- Select from inside a comment into the EXPRESS code below it and run the
+  command. Expected: an error naming the reason appears at once, before the
+  target list, and nothing is written.
 - Run again on a described declaration. Expected: "Append" / "Replace" is
   offered.
 - Press Escape at each step in turn (source, target, kind, each input box,

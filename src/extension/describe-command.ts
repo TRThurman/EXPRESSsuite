@@ -48,6 +48,11 @@ async function describeDeclaration(client: LanguageClient): Promise<void> {
   if (!source) return;
 
   const targets = await client.sendRequest<DescribeTargetsResult | null>("express/describeTargets", { uri, start, end });
+  // A selection the edit could not remove stops the command here, before any choice (ruling R14).
+  if (targets?.sourceRefusal) {
+    void vscode.window.showErrorMessage(`${TITLE}: ${targets.sourceRefusal}`);
+    return;
+  }
   if (!targets || targets.targets.length === 0) {
     void vscode.window.showInformationMessage("This file has no declaration that can be described.");
     return;

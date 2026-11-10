@@ -113,7 +113,7 @@ Expected:
 
 A selection used as the source is removed from the comment when the edit is
 applied. If the selection runs from a comment into EXPRESS code, the command
-refuses it and changes nothing.
+refuses it at once, before the target list, and changes nothing.
 
 ## 3. Describe an OPTIONAL attribute by typed text
 

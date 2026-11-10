@@ -42,6 +42,8 @@ export interface DescribeTargetsResult {
   targets: DescribeTarget[];
   defaultKey?: string;
   existing: string[];
+  /** Why a non-empty selection cannot be the source, by the rule the edit applies (ruling R14). */
+  sourceRefusal?: string;
 }
 
 export interface DescribeEditResult {
@@ -105,16 +107,32 @@ export class DescribeService {
   targets(uri: string, start: number, end: number): DescribeTargetsResult {
     const document = this.find(uri);
     if (!document) return { version: -1, targets: [], existing: [] };
-    const version = document.textDocument.version;
+    const text = document.textDocument.getText();
+    const result: DescribeTargetsResult = { version: document.textDocument.version, targets: [], existing: [] };
     const root = document.parseResult.value;
     // A document with no schema parses to a root without the list.
-    if (!isExpressFile(root) || !root.schemas?.length) return { version, targets: [], existing: [] };
-    const targets = describeTargets(root, this.nameProvider);
-    const contexts = annotationContexts(root, document.textDocument.getText());
-    const result: DescribeTargetsResult = { version, targets, existing: existingKeys(targets, contexts) };
-    const defaultKey = defaultTargetKey(root, targets, start, end, this.nameProvider);
-    if (defaultKey) result.defaultKey = defaultKey;
+    if (isExpressFile(root) && root.schemas?.length) {
+      result.targets = describeTargets(root, this.nameProvider);
+      result.existing = existingKeys(result.targets, annotationContexts(root, text));
+      const defaultKey = defaultTargetKey(root, result.targets, start, end, this.nameProvider);
+      if (defaultKey) result.defaultKey = defaultKey;
+    }
+    if (start < end) {
+      const refusal = this.sourceRefusal(text, start, end);
+      if (refusal) result.sourceRefusal = refusal;
+    }
     return result;
+  }
+
+  /** The refusal the edit would give for removing the selection [start, end) as its source; undefined when it can be removed. */
+  private sourceRefusal(text: string, start: number, end: number): string | undefined {
+    try {
+      selectionRemoval(text, commentsOf(this.lexer, text), start, end);
+      return undefined;
+    } catch (error) {
+      if (error instanceof Refusal) return error.message;
+      throw error;
+    }
   }
 
   proposals(uri: string, key: string, text: string): LinkProposal[] {

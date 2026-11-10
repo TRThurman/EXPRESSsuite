@@ -148,6 +148,23 @@ describe("describe targets", () => {
     expect(typing.service.targets(typing.uri, 0, 0).targets.map((target) => target.key)).toEqual(["demo_schema", "demo_schema.f"]);
   });
 
+  test("a selection that cannot be a source is refused with the targets, by the edit's rule (R14)", async () => {
+    const fixture = await load(DEMO);
+    const at = (selected: { start: number; end: number }) => fixture.service.targets(fixture.uri, selected.start, selected.end);
+    const intoCode = at(selection(DEMO, "A widget is used here. *)\nENTITY widget"));
+    expect(intoCode.sourceRefusal).toMatch(/not wholly inside/);
+    expect(intoCode.targets.length).toBeGreaterThan(0);
+    expect(at(selection(DEMO, "ENTITY widget;")).sourceRefusal).toMatch(/not wholly inside/);
+    const nested = demo("(* A widget (* inner *) is used here. *)");
+    const nestedFixture = await load(nested);
+    const breaking = selection(nested, "A widget (* inner");
+    expect(nestedFixture.service.targets(nestedFixture.uri, breaking.start, breaking.end).sourceRefusal).toMatch(/break/);
+
+    expect(at(selection(DEMO, "A widget is used here.")).sourceRefusal).toBeUndefined();
+    const cursor = DEMO.indexOf("ENTITY widget");
+    expect(fixture.service.targets(fixture.uri, cursor, cursor).sourceRefusal).toBeUndefined();
+  });
+
   test("an unknown document gives no targets", async () => {
     const fixture = await load(DEMO);
     expect(fixture.service.targets("file:///nowhere.exp", 0, 0)).toEqual({ version: -1, targets: [], existing: [] });
