@@ -95,6 +95,9 @@ Right-click menu: **Describe Declaration** (or the command palette).
 - On the function, give text for the first parameter and leave the second
   input box empty. Expected: a block for the function and one for the first
   parameter only.
+- Run "Description" on the function again and pick "Append". Expected: a
+  message names the first parameter as already described; only the second
+  parameter's input box appears; the first parameter's block is unchanged.
 - With no selection, "Use the clipboard" (copy a sentence naming a declared
   entity first) for the WHERE rule. Expected: the proposed-links list offers
   the entity name, none ticked.

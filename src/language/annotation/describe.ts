@@ -378,6 +378,12 @@ function memberTexts(request: DescribeRequest, target: DescribeTarget, targets: 
   return result;
 }
 
+/**
+ * What the request does with the block `key`. The command sends no text for a member that already
+ * has a block (ruling R13), so member blocks are only written as new ones. A request that still
+ * gives such text is refused with mode "new", and with "append" or "replace" changes the member's
+ * block as the owner's.
+ */
 function writeAction(mode: DescribeRequest["mode"], key: string, exists: boolean, owner: boolean): BlockWrite["action"] {
   if (mode === "new") {
     if (exists) refuse(`"${key}" already has a block; append to it or replace it.`);

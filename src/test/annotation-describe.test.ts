@@ -347,7 +347,22 @@ describe("describe edit: existing blocks", () => {
     expect(after).toBe(demo(undefined, '\n(*"Demo_Schema.Widget"\nA **widget** is a thing.\n\nIt is used here.\n*)\n'));
   });
 
-  test("an existing member block follows the mode; a missing one is created", async () => {
+  test("replace on the owner never touches an existing member block; member text creates the missing one (R13)", async () => {
+    // As the command sends it: no text for f.b, which has a block.
+    const source = demo(undefined, '\n(*"demo_schema.f"\nOld.\n*)\n(*"demo_schema.f.b"\nOld b.\n*)\n');
+    const { after, result } = await describeTyped(source, {
+      key: "demo_schema.f",
+      mode: "replace",
+      text: "Returns TRUE.",
+      members: [{ key: "demo_schema.f.a", text: "The first value.", accepted: [] }],
+    });
+    expect(result.refused).toBeUndefined();
+    expect(after).toBe(
+      demo(undefined, '\n(*"demo_schema.f"\nReturns TRUE.\n*)\n(*"demo_schema.f.a"\nThe first value.\n*)\n(*"demo_schema.f.b"\nOld b.\n*)\n')
+    );
+  });
+
+  test("text a request still gives for a member with a block follows the owner's mode; a missing one is created", async () => {
     const source = demo(undefined, '\n(*"demo_schema.f"\nOld.\n*)\n(*"demo_schema.f.b"\nOld b.\n*)\n');
     const { after } = await describeTyped(source, {
       key: "demo_schema.f",

@@ -6,6 +6,7 @@ import type { DescribeTarget } from "../language/annotation/keys.js";
 import { EXPRESSSUITE_COMMANDS } from "../shared/commands.js";
 import { applyCleanups, findCleanups } from "../shared/description-cleanup.js";
 import type { CleanupId } from "../shared/description-cleanup.js";
+import { splitMembers } from "../shared/describe-members.js";
 
 /** Everything the command needs after the source and target steps. */
 interface Chosen {
@@ -63,7 +64,7 @@ async function describeDeclaration(client: LanguageClient): Promise<void> {
   const role = await pickRole();
   if (!role) return;
 
-  const memberTexts = role === "description" ? await askMembers(target) : [];
+  const memberTexts = role === "description" ? await askMembers(target, targets.existing) : [];
   if (!memberTexts) return;
 
   const main = await prepareText(client, uri, target.key, "Description text", source.text);
@@ -166,10 +167,21 @@ async function pickRole(): Promise<BlockRole | undefined> {
   return picked?.role;
 }
 
-/** Step 4: one input box per parameter or item; empty means no block. Undefined means cancelled. */
-async function askMembers(target: DescribeTarget): Promise<Array<{ key: string; text: string }> | undefined> {
+/**
+ * Step 4: one input box per parameter or item that has no block yet; empty means no block. The
+ * members that have one are named and skipped (ruling R13). Undefined means cancelled.
+ */
+async function askMembers(target: DescribeTarget, existing: readonly string[]): Promise<Array<{ key: string; text: string }> | undefined> {
+  const { ask, described } = splitMembers(target.members ?? [], existing);
+  if (described.length > 0) {
+    const one = described.length === 1;
+    void vscode.window.showInformationMessage(
+      `${TITLE}: ${described.join(", ")} already ${one ? "has a description and is" : "have descriptions and are"} skipped; ` +
+        `describe ${one ? "it" : "each"} on its own to change it.`,
+    );
+  }
   const result: Array<{ key: string; text: string }> = [];
-  for (const key of target.members ?? []) {
+  for (const key of ask) {
     const text = await vscode.window.showInputBox({
       title: TITLE,
       prompt: `Text for ${key} (leave empty for no block)`,

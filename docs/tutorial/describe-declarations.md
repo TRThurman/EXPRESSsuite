@@ -157,8 +157,8 @@ block of the nearest earlier declaration that has one. There is none for
 `factor`.
 
 Parameter texts (and the texts of enumeration items, for a TYPE) are blocks of
-their own, written in the same step as the function, so the tool never asks for
-them later. The block of the function itself holds no argument list.
+their own, written in the same step as the function. The block of the function
+itself holds no argument list.
 
 ## 5. Describe a WHERE rule from the clipboard
 
@@ -214,6 +214,12 @@ The command asks **Append** or **Replace**:
 - **Replace** swaps the old text for the new one.
 
 If you cancel here, nothing is written.
+
+Parameter and item blocks are not appended to or replaced with their owner's.
+Run the command again on `scaled_size` with a description: the input box for
+`factor` appears, but `w`, which already has a block, gets none, and a message
+names it. To change the text of `w`, describe `demo_widgets.scaled_size.w`
+itself.
 
 ## 8. Use a comment piece by piece
 
