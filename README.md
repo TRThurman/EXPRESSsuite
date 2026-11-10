@@ -230,7 +230,7 @@ Project documentation under [`docs/`](docs/):
 | [`docs/easyEXPRESS-viewers.pptx`](docs/easyEXPRESS-viewers.pptx) | Implementor-oriented PowerPoint deck (21 slides) |
 | [`docs/easyEXPRESS-viewers-user-guide.pptx`](docs/easyEXPRESS-viewers-user-guide.pptx) | User-oriented PowerPoint deck (19 slides, screenshot-led) |
 | [`docs/tutorial/describe-declarations.md`](docs/tutorial/describe-declarations.md) | Tutorial for Describe Declaration with a demo workspace ([`docs/tutorial/demo/`](docs/tutorial/demo/)) and a video storyboard ([`docs/tutorial/storyboard.md`](docs/tutorial/storyboard.md)) |
-| [`docs/smoke-test-checklist.md`](docs/smoke-test-checklist.md) | Cross-platform manual smoke-test plan (S1–S6 + per-schema acceptance) |
+| [`docs/smoke-test-checklist.md`](docs/smoke-test-checklist.md) | Cross-platform manual smoke-test plan (S1–S7 + per-schema acceptance) |
 | [`DESIGN-viewers-integration.md`](DESIGN-viewers-integration.md) | Full design protocol document (Phase 0 reconnaissance → Phase 4 validation) |
 | [`CHANGELOG.md`](CHANGELOG.md) | Release notes |
 

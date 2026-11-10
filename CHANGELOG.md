@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+- **Describe Declaration** (right-click menu or command palette) writes the
+  description block of a declaration, `(*"schema.name"` ... `*)`, after
+  `END_SCHEMA;` from a selected comment, typed text or the clipboard. It
+  offers clean-ups for copied text (comment markers, hyphenation, hard wraps,
+  non-ASCII characters), links names with an underscore that the schema
+  reaches and proposes links for other declared names, writes parameter and
+  enumeration-item texts as blocks of their own, ends an OPTIONAL attribute's
+  description with `The value of this attribute need not be specified.`,
+  appends to or replaces a block or adds another note or example, removes the
+  selection it used from its comment, and shows the change in the refactor
+  preview, undone in one step. Tutorial, demo workspace and storyboard:
+  `docs/tutorial/`.
+- The description blocks after `END_SCHEMA;` are checked (`annotation-*`,
+  warnings; `annotation-link-unverified` is information): links to undeclared
+  items or with a space, links to the block's own subject, keys no declaration
+  has, a key repeated (notes, examples and other `.__` blocks may repeat),
+  remarks without a key that would be published, non-ASCII characters, an
+  attribute link in the first sentence of a declaration's description, an
+  OPTIONAL attribute's description without the closing sentence, an entity
+  description that only names its supertype, and a keyed block inside
+  `SCHEMA ... END_SCHEMA;`. Long forms are not checked. On the SMRL v8 corpus
+  the check adds 4 `annotation-unkeyed-remark` warnings in the default
+  workspace.
+
 ## [0.5.1](https://github.com/TRThurman/EXPRESSsuite/compare/0.5.0...0.5.1) (2026-11-06)
 
 ### Bug Fixes

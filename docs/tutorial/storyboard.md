@@ -154,7 +154,7 @@ line, and the new text.
 
 Actions:
 1. Scroll to the comment above `mount`.
-2. Select the line `A mount holds a widget in place.` Run the command; the
+2. Select the sentence `A mount holds a widget in place.` Run the command; the
    first entry is `demo_widgets.mount`. Pick **Description**. No clean-up list
    appears. In the links step (`widget`) tick nothing. Apply.
 3. Select `A bracket carries a mount.`; run the command; pick
@@ -164,7 +164,8 @@ Narration: "One comment can cover several declarations. Select a sentence at a
 time. Each selection leaves the comment when its edit is applied, and what is
 not selected stays."
 
-Expected screen: the comment above `mount` with only its first sentence; the
+Expected screen: the comment above `mount` with its first sentence, a blank
+line and its closing `*)` on a line of its own; the
 block `demo_widgets.mount` (`A **mount** holds a widget in place.`) directly
 after `END_SCHEMA;`, and `demo_widgets.bracket` (`A **bracket** carries a
 mount.`) directly after it.

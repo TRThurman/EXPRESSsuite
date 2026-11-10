@@ -71,10 +71,10 @@ The check has twelve codes. All are warnings except
 | `annotation-link-space` | a link target contains a space |
 | `annotation-self-link` | the block links to its own subject |
 | `annotation-orphan-key` | no declaration has the key |
-| `annotation-duplicate-key` | an earlier block in the same schema has the same key |
+| `annotation-duplicate-key` | an earlier block in the same schema has the same key; notes, examples and other `.__` blocks may repeat |
 | `annotation-unkeyed-remark` | a plain remark after `END_SCHEMA;` |
 | `annotation-non-ascii` | a character outside ASCII in the text |
-| `annotation-first-sentence-attribute-link` | the first sentence of a declaration's block links one of its attributes |
+| `annotation-first-sentence-attribute-link` | the first sentence of a declaration's description links an attribute of an entity, its own or any other |
 | `annotation-optional-sentence` | the description of an OPTIONAL attribute does not end with the sentence above |
 | `annotation-bare-subtype` | the description of an entity only says "A **x** is a type of <<express:...>>." |
 | `annotation-inside-schema` | a keyed block between `SCHEMA` and `END_SCHEMA;` |
@@ -231,11 +231,13 @@ The comment above `mount` covers two declarations:
    A bracket carries a mount. *)
 ```
 
-1. Select the line `A mount holds a widget in place.` (only that line).
+1. Select the sentence `A mount holds a widget in place.` (only the sentence,
+   not the spaces before it or the line break after it).
 2. Run **Describe Declaration**, pick `demo_widgets.mount`, **Description**.
    There is nothing to clean up in a plain sentence, so no clean-up list
    appears. The links step offers `widget`; tick nothing.
-3. Apply. The line leaves the comment; the rest of the comment stays.
+3. Apply. The sentence leaves the comment; its line stays, blank, and the rest
+   of the comment stays.
 4. Select `A bracket carries a mount.`, run the command, and pick
    `demo_widgets.bracket`. The links step offers `mount`; tick nothing.
 5. Apply.
@@ -244,8 +246,16 @@ Expected: two new blocks, `demo_widgets.mount` and `demo_widgets.bracket`,
 with `A **mount** holds a widget in place.` and `A **bracket** carries a
 mount.`. The first is directly after `END_SCHEMA;` unless an earlier
 declaration has a block (none does here); the second follows it. The comment
-keeps its first sentence only. Delete the comment by hand if you do not need
-it.
+keeps its first sentence, then a blank line where the mount sentence was, and
+its closing `*)` on a line of its own:
+
+```
+(* The next two entities cover the fixed parts of an assembly.
+
+    *)
+```
+
+Delete the comment by hand if you do not need it.
 
 ## 9. What the command checks before it writes
 
@@ -259,14 +269,14 @@ Rules for the text of a description:
 
 | Rule | The check reports |
 |---|---|
-| Links name declared items, as `<<express:schema.name,text>>` or `<<express:schema.owner.member,text>>` | `annotation-link-undeclared` |
+| Links name declared items, as `<<express:schema.name,text>>` or `<<express:schema.owner.member,text>>`, or a schema, as `<<express:schema,text>>` | `annotation-link-undeclared` |
 | No space in the link target | `annotation-link-space` |
 | A block does not link to its own subject | `annotation-self-link` |
 | ASCII only | `annotation-non-ascii` |
-| The first sentence of an entity's description does not link its attributes | `annotation-first-sentence-attribute-link` |
+| The first sentence of a declaration's description links no attribute of any entity | `annotation-first-sentence-attribute-link` |
 | An OPTIONAL attribute's description ends with the standard sentence | `annotation-optional-sentence` |
 | An entity's description says more than that it is a subtype | `annotation-bare-subtype` |
-| One block per key; every key has a declaration | `annotation-duplicate-key`, `annotation-orphan-key` |
+| One block per key, except notes, examples and other `.__` blocks; every key has a declaration | `annotation-duplicate-key`, `annotation-orphan-key` |
 | Working notes stay inside the schema as `--` lines | `annotation-unkeyed-remark` |
 | No description block inside `SCHEMA ... END_SCHEMA;` | `annotation-inside-schema` |
 
