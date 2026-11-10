@@ -85,6 +85,20 @@ describe("annotation check", () => {
     expect(await codeList(demo(`(*"demo_schema.widget"\nThe <<express:demo_schema.widget,widget>> is itself.\n*)`))).toEqual(["annotation-self-link"]);
   });
 
+  test("a member block linking a declaration named like the member is no self link", async () => {
+    const found = await codeList(
+      demo(`(*"demo_schema.widget.size"\nThe size, see <<express:demo_schema.size,size>>.\n*)`, "TYPE size = INTEGER;\nEND_TYPE;")
+    );
+    expect(found).toEqual([]);
+  });
+
+  test("a member block linking its own key is a self link", async () => {
+    const found = await codeList(
+      demo(`(*"demo_schema.widget.size"\nThe <<express:demo_schema.widget.size,size>> itself.\n*)`, "TYPE size = INTEGER;\nEND_TYPE;")
+    );
+    expect(found).toEqual(["annotation-self-link"]);
+  });
+
   test("orphan key", async () => {
     expect(await codeList(demo(`(*"demo_schema.ghost"\nNothing.\n*)`))).toEqual(["annotation-orphan-key"]);
   });

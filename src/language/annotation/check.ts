@@ -51,10 +51,9 @@ export function checkBlock(block: { key: string; body: string }, target: Describ
     findings.push(finding(AnnotationIssues.LinkSpace, m.index, m.index + m[0].length, `Link target "${m[1]}" contains a space.`));
   }
 
-  const parts = key.toLowerCase().split(".");
-  const selfTargets = new Set([key.toLowerCase(), `${parts[0]}.${parts[parts.length - 1]}`]);
+  const selfTarget = key.toLowerCase();
   for (const link of findExpressLinks(body)) {
-    if (selfTargets.has(link.target.toLowerCase())) {
+    if (link.target.toLowerCase() === selfTarget) {
       findings.push(finding(AnnotationIssues.SelfLink, link.start, link.end, `The description links to its own subject "${link.target}".`));
       continue;
     }
