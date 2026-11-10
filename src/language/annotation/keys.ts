@@ -100,8 +100,9 @@ export function describeTargets(root: ExpressFile, nameProvider: NameProvider): 
       return target;
     };
     add(schema, "schema", schema.name);
-    for (const constant of schema.body.constant?.items ?? []) add(constant, "constant", constant.name);
-    for (const declaration of schema.body.declarations) {
+    // A schema being typed, or whose body failed to parse, has no body; a function being typed, no head.
+    for (const constant of schema.body?.constant?.items ?? []) add(constant, "constant", constant.name);
+    for (const declaration of schema.body?.declarations ?? []) {
       if (isRule_decl(declaration)) continue;
       addDeclaration(declaration, add, nameProvider);
     }
@@ -145,9 +146,9 @@ function* membersOf(declaration: AstNode): Generator<Member> {
       for (const item of underlying.items?.items ?? underlying.extension?.items?.items ?? []) yield { node: item, kind: "enumeration-item" };
     }
   } else if (isFunctionDefinition(declaration)) {
-    yield* parametersOf(declaration.head.parameters);
+    yield* parametersOf(declaration.head?.parameters ?? []);
   } else if (isProcedureDefinition(declaration)) {
-    yield* parametersOf(declaration.head.parameters);
+    yield* parametersOf(declaration.head?.parameters ?? []);
   }
 }
 

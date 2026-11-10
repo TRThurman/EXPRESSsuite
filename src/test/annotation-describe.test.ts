@@ -139,6 +139,15 @@ describe("describe targets", () => {
     expect(result.existing).toEqual(["demo_schema.widget", "demo_schema.widget.__note"]);
   });
 
+  test("a schema without a body, or with a function being typed, gives its targets (I1)", async () => {
+    const empty = await load("SCHEMA demo_schema;\nEND_SCHEMA;\n");
+    expect(empty.service.targets(empty.uri, 0, 0).targets.map((target) => target.key)).toEqual(["demo_schema"]);
+    const broken = await load("SCHEMA demo_schema;\n%%% not EXPRESS\nEND_SCHEMA;\n");
+    expect(broken.service.targets(broken.uri, 0, 0).targets.map((target) => target.key)).toEqual(["demo_schema"]);
+    const typing = await load("SCHEMA demo_schema;\nFUNCTION f\nEND_SCHEMA;\n");
+    expect(typing.service.targets(typing.uri, 0, 0).targets.map((target) => target.key)).toEqual(["demo_schema", "demo_schema.f"]);
+  });
+
   test("an unknown document gives no targets", async () => {
     const fixture = await load(DEMO);
     expect(fixture.service.targets("file:///nowhere.exp", 0, 0)).toEqual({ version: -1, targets: [], existing: [] });

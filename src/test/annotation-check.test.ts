@@ -166,6 +166,22 @@ describe("annotation check", () => {
     expect(await codeList(text)).toEqual([]);
   });
 
+  describe("a schema without a body, or with one being typed (I1)", () => {
+    const AFTER = `(*"demo_schema"\nA demo.\n*)\n(* a working note *)\n`;
+
+    test("SCHEMA s; END_SCHEMA; is checked", async () => {
+      expect(await codeList(`SCHEMA demo_schema;\nEND_SCHEMA;\n${AFTER}`)).toEqual(["annotation-unkeyed-remark"]);
+    });
+
+    test("a body that fails to parse is checked", async () => {
+      expect(await codeList(`SCHEMA demo_schema;\n%%% not EXPRESS\nEND_SCHEMA;\n${AFTER}`)).toEqual(["annotation-unkeyed-remark"]);
+    });
+
+    test("a function being typed, without its head, is checked", async () => {
+      expect(await codeList(`SCHEMA demo_schema;\nFUNCTION f\nEND_SCHEMA;\n${AFTER}`)).toEqual(["annotation-unkeyed-remark"]);
+    });
+  });
+
   describe("blocks inside a schema", () => {
     const inside = (body: string, after = ""): string => `${SUPPORT}
 SCHEMA demo_schema;
