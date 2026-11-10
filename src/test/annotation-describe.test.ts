@@ -260,6 +260,31 @@ describe("describe edit: existing blocks", () => {
     expect(result.findings).toEqual([]);
   });
 
+  test("append to an OPTIONAL attribute ending with the mandatory sentence keeps one sentence, after the new text (R7)", async () => {
+    const source = demo(undefined, '\n(*"demo_schema.widget.size"\nThe size. The value of this attribute need not be specified.\n*)\n');
+    const { after, result } = await describeTyped(source, { key: "demo_schema.widget.size", mode: "append", text: "More about size." });
+    expect(after).toBe(
+      demo(undefined, '\n(*"demo_schema.widget.size"\nThe size.\n\nMore about size. The value of this attribute need not be specified.\n*)\n')
+    );
+    expect(result.findings).toEqual([]);
+  });
+
+  test("append to an OPTIONAL attribute whose body is only the mandatory sentence leaves one sentence (R7)", async () => {
+    const source = demo(undefined, '\n(*"demo_schema.widget.size"\nThe value of this attribute need not be specified.\n*)\n');
+    const { after, result } = await describeTyped(source, { key: "demo_schema.widget.size", mode: "append", text: "More about size." });
+    expect(after).toBe(demo(undefined, '\n(*"demo_schema.widget.size"\nMore about size. The value of this attribute need not be specified.\n*)\n'));
+    expect(result.findings).toEqual([]);
+  });
+
+  test("append to an OPTIONAL attribute whose body lacks the sentence ends the new paragraph with it", async () => {
+    const source = demo(undefined, '\n(*"demo_schema.widget.size"\nThe size.\n*)\n');
+    const { after, result } = await describeTyped(source, { key: "demo_schema.widget.size", mode: "append", text: "More about size." });
+    expect(after).toBe(
+      demo(undefined, '\n(*"demo_schema.widget.size"\nThe size.\n\nMore about size. The value of this attribute need not be specified.\n*)\n')
+    );
+    expect(result.findings).toEqual([]);
+  });
+
   test("replace writes the whole body", async () => {
     const { after } = await describeTyped(EXISTING, { mode: "replace", text: "A widget is used here." });
     expect(after).toBe(demo(undefined, `\n${WIDGET_BLOCK}\n`));
@@ -318,6 +343,23 @@ describe("describe edit: existing blocks", () => {
       expect(result.refused).toMatch(/not closed/);
       expect(result.edits).toEqual([]);
     }
+  });
+});
+
+describe("describe edit: an unclosed anchor block", () => {
+  test("a new block whose anchor block is not closed is refused, nothing is written", async () => {
+    // The outer remark never closes, so the block runs to the end of the file.
+    const source = `${DEMO}\n(*"demo_schema.widget"\nA widget (* inner *)`;
+    const { result } = await describeTyped(source, { key: "demo_schema.widget.count", text: "The count of parts." });
+    expect(result.refused).toMatch(/"demo_schema\.widget" is not closed/);
+    expect(result.edits).toEqual([]);
+  });
+
+  test("a note after an unclosed description block is refused", async () => {
+    const source = `${DEMO}\n(*"demo_schema.widget"\nA widget (* inner *)`;
+    const { result } = await describeTyped(source, { role: "note", text: "A note on use." });
+    expect(result.refused).toMatch(/"demo_schema\.widget" is not closed/);
+    expect(result.edits).toEqual([]);
   });
 });
 

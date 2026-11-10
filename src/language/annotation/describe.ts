@@ -171,7 +171,7 @@ export class DescribeService {
 
     const edits: OffsetEdit[] = [];
     for (const write of writes) {
-      if (write.action === "append") edits.push(appendEdit(text, write.block!, write.body, eol));
+      if (write.action === "append") edits.push(appendEdit(text, write.block!, write.body, eol, keptOnAppend(write)));
       if (write.action === "replace") edits.push(replaceEdit(text, write.block!, write.body, eol));
     }
     edits.push(...placeNewBlocks(writes.filter((write) => write.action === "new"), targets, context, text, eol));
@@ -380,10 +380,22 @@ export function acceptedSpans(recomputed: ReadonlyArray<LinkProposal>, ticked: R
   });
 }
 
+/**
+ * The existing body an append keeps (ruling R7): for an OPTIONAL explicit attribute's description,
+ * without the trailing mandatory sentence (and the space before it), since the new text brings it.
+ */
+function keptOnAppend(write: BlockWrite): string {
+  const old = write.block?.body ?? "";
+  if (write.role !== "description" || write.target.kind !== "explicit-attribute" || !write.target.optional) return old;
+  if (old === OPTIONAL_SENTENCE) return "";
+  if (old.endsWith(` ${OPTIONAL_SENTENCE}`)) return old.slice(0, old.length - OPTIONAL_SENTENCE.length - 1).trimEnd();
+  return old;
+}
+
 /** The body the block has once the edit is applied: what the check reads. */
 function finalBody(write: BlockWrite, eol: string): string {
-  if (write.action === "append" && write.block && write.block.body !== "") return `${write.block.body}${eol}${eol}${write.body}`;
-  return write.body;
+  const kept = write.action === "append" ? keptOnAppend(write) : "";
+  return kept !== "" ? `${kept}${eol}${eol}${write.body}` : write.body;
 }
 
 // ---------------------------------------------------------------- blocks: placement, separators, append, replace
@@ -449,20 +461,26 @@ export function endSchemaInsertion(context: AnnotationContext, text: string): nu
 /**
  * Insertion offset for a new block of `target`: after the last block of the same key; else after
  * the blocks of the nearest preceding target of the schema that has one (a member's owner precedes
- * it, and blocks this request creates count); else after the `END_SCHEMA;` line.
+ * it, and blocks this request creates count); else after the `END_SCHEMA;` line. Refuses an anchor
+ * block that is not closed: its end is where the scan gave up, inside it.
  */
 function anchorOffset(target: DescribeTarget, schemaTargets: ReadonlyArray<DescribeTarget>, context: AnnotationContext, created: ReadonlyMap<string, number>, text: string): number {
   const own = lastBlockOf(context, target.key);
-  if (own) return own.end;
+  if (own) return closedEnd(own, text);
   const index = schemaTargets.indexOf(target);
   for (let i = index - 1; i >= 0; i--) {
     const previous = schemaTargets[i].key.toLowerCase();
     const pending = created.get(previous);
     if (pending !== undefined) return pending;
     const block = lastBlockOf(context, previous);
-    if (block) return block.end;
+    if (block) return closedEnd(block, text);
   }
   return endSchemaInsertion(context, text);
+}
+
+function closedEnd(block: AnnotationBlock, text: string): number {
+  if (!isOneRemark(text.slice(block.start, block.end))) refuse(`The block "${block.key}" is not closed with *).`);
+  return block.end;
 }
 
 function lineBreakCount(gap: string): number {
@@ -507,10 +525,13 @@ function closingLineStart(text: string, block: AnnotationBlock): number {
   return text[i - 1] === "\n" || text[i - 1] === "\r" ? i : close;
 }
 
-/** A blank line and `body` after the existing body, before the closing `*)` line. */
-export function appendEdit(text: string, block: AnnotationBlock, body: string, eol: string): OffsetEdit {
-  if (block.body === "") return replaceEdit(text, block, body, eol);
-  return { start: block.bodyStart + block.body.length, end: closingLineStart(text, block), newText: `${eol}${eol}${body}${eol}` };
+/**
+ * A blank line and `body` after the part `kept` of the existing body (a prefix of it; by default all
+ * of it), before the closing `*)` line. Nothing kept is a replace.
+ */
+export function appendEdit(text: string, block: AnnotationBlock, body: string, eol: string, kept: string = block.body): OffsetEdit {
+  if (kept === "") return replaceEdit(text, block, body, eol);
+  return { start: block.bodyStart + kept.length, end: closingLineStart(text, block), newText: `${eol}${eol}${body}${eol}` };
 }
 
 /** `body` in place of the whole existing body, between the key line and the closing `*)` line. */
