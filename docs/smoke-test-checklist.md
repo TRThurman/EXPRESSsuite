@@ -78,6 +78,48 @@ Reload VS Code.  Open `wg12-step/schemas/resources/geometry_schema/geometry_sche
 - Run S1–S4.  Should still work; the LSP is fine, the host-side fallback
   resolver kicks in for cross-file xrefs.
 
+### S7 — Describe Declaration
+
+Use a scratch `.exp` file with a schema holding an entity with an OPTIONAL
+attribute, a function with two parameters, and an entity with a WHERE rule.
+Right-click menu: **Describe Declaration** (or the command palette).
+The refactor preview lists each change unticked with **Apply** disabled;
+"Apply" below means tick the change (the file's checkbox), then **Apply**.
+
+- Select a `(* ... *)` comment above an entity, run the command, pick the
+  entity (the default is first), "Description", tick no links, accept.
+  Expected: VS Code's refactor preview opens with the change unticked and
+  **Apply** disabled; after ticking it and Apply the block
+  `(*"schema.entity"` ... `*)` follows `END_SCHEMA;`, the comment is removed,
+  and **one undo restores both**.
+- With no selection, "Type the text" for the OPTIONAL attribute. Expected: the
+  sentence `The value of this attribute need not be specified.` is appended
+  after one space.
+- On the function, give text for the first parameter and leave the second
+  input box empty. Expected: a block for the function and one for the first
+  parameter only.
+- Run "Description" on the function again and pick "Append". Expected: a
+  message names the first parameter as already described; only the second
+  parameter's input box appears; the first parameter's block is unchanged.
+- With no selection, "Use the clipboard" (copy a sentence naming a declared
+  entity first) for the WHERE rule. Expected: the proposed-links list offers
+  the entity name, none ticked.
+- Select from inside a comment into the EXPRESS code below it and run the
+  command. Expected: an error naming the reason appears at once, before the
+  target list, and nothing is written.
+- Run again on a described declaration. Expected: "Append" / "Replace" is
+  offered.
+- Press Escape at each step in turn (source, target, kind, each input box,
+  clean-ups, links, Append / Replace, the preview). Expected: nothing is
+  written each time.
+- Pick "Note" on the function. Expected: no parameter input boxes.
+- Run "Note" on the function again. Expected: "Append" / "Replace" / "Add
+  another" is offered; "Add another" writes a second `.__note` block directly
+  after the first.
+- Right-click the new block's declaration, **Show Description**. Expected: the
+  new block's links render.
+- **PASS** if all of the above hold.
+
 ## Per-schema acceptance run (DESIGN §4.2.4)
 
 After S1–S6 pass on `geometry_schema.exp`, repeat the core surfaces on

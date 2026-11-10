@@ -1,0 +1,65 @@
+SCHEMA demo_widgets;
+
+USE FROM demo_support;
+
+(* The next two entities cover the fixed parts of an assembly.
+   A mount holds a widget in place.
+   A bracket carries a mount. *)
+ENTITY mount;
+  position : anchor;
+END_ENTITY;
+
+ENTITY bracket;
+  carries : mount;
+END_ENTITY;
+
+ENTITY widget
+  SUBTYPE OF (anchor);
+  size : OPTIONAL REAL;
+  count : INTEGER;
+END_ENTITY;
+
+(* A tagged widget is a widget with a tag, so that it can be counted
+   apart from the plain widgets in a parts list. *)
+ENTITY tagged_widget
+  SUBTYPE OF (widget);
+  tag : STRING;
+END_ENTITY;
+
+FUNCTION scaled_size
+  (w : widget; factor : REAL) : REAL;
+  RETURN (w.size * factor);
+END_FUNCTION;
+
+(*"demo_widgets.limit_gauge"
+A **limit_gauge** sets the largest size a widget may have.
+*)
+ENTITY limit_gauge;
+  upper : REAL;
+WHERE
+  positive_limit : upper > 0.0;
+END_ENTITY;
+
+ENTITY plate;
+  coating : finish;
+END_ENTITY;
+
+ENTITY rail;
+  reach : REAL;
+END_ENTITY;
+
+END_SCHEMA;
+
+(*"demo_widgets.widget"
+A **widget** is a part that is fitted to a <<express:demo_widgets.mount,mount>>.
+*)
+
+(*"demo_widgets.plate"
+A **plate** is a flat part with a <<express:demo_widgets.coating_rule,coating rule>>.
+*)
+
+(* Check the wording of the plate and the rail before release. *)
+
+(*"demo_widgets.rail"
+The <<express:demo_widgets.rail.reach,reach>> of a **rail** is the distance it spans.
+*)

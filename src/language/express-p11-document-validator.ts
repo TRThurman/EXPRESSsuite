@@ -14,10 +14,24 @@ import { CancellationToken } from "vscode-languageserver";
 import { isQuery_expression } from "./generated/ast.js";
 import { ExpressFile } from "./generated/ast.js";
 import { validateInformalPropositions } from "./informal-proposition-validator.js";
+import { validateAnnotations } from "./annotation/check.js";
+import { LinkResolver } from "./annotation/link-resolver.js";
+import type { ExpressP11Services } from "./express-module.js";
+import type { ExpressP11TypeContainer } from "./express-p11-type-container.js";
+import type { NameProvider } from "langium";
 
 type Diagnostic = NonNullable<LangiumDocument["diagnostics"]>[number];
 
 export class ExpressDocumentValidator extends DefaultDocumentValidator {
+  protected readonly typeContainer: ExpressP11TypeContainer;
+  protected readonly nameProvider: NameProvider;
+
+  constructor(services: ExpressP11Services) {
+    super(services);
+    this.typeContainer = services.validation.TypeContainer;
+    this.nameProvider = services.references.NameProvider;
+  }
+
   override async validateDocument(
     document: LangiumDocument,
     options: ValidationOptions = {},
@@ -49,6 +63,13 @@ export class ExpressDocumentValidator extends DefaultDocumentValidator {
     try {
       diagnostics.push(...(await this.validateAst(parseResult.value, options, cancelToken)));
       diagnostics.push(...validateInformalPropositions(document as LangiumDocument<ExpressFile>));
+      diagnostics.push(
+        ...validateAnnotations(
+          document as LangiumDocument<ExpressFile>,
+          new LinkResolver(this.typeContainer.getScopeIndex(), this.nameProvider),
+          this.nameProvider
+        )
+      );
     } catch (err) {
       if (isOperationCancelled(err)) {
         throw err;

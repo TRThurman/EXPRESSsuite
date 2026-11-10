@@ -99,6 +99,12 @@
         "enablement": "editorLangId == express"
       },
       {
+        "command": "expresssuite.describeDeclaration",
+        "title": "Describe Declaration",
+        "category": "EXPRESSsuite",
+        "enablement": "editorLangId == express"
+      },
+      {
         "command": "expresssuite.showDescription",
         "title": "Show Description",
         "category": "EXPRESSsuite"
@@ -121,6 +127,11 @@
     ],
     "menus": {
       "editor/context": [
+        {
+          "command": "expresssuite.describeDeclaration",
+          "when": "editorLangId == express",
+          "group": "navigation@5"
+        },
         {
           "command": "expresssuite.showDescription",
           "when": "editorLangId == express",

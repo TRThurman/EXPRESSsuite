@@ -51,6 +51,11 @@ const LINE_COMMENT_RE = /^[\t ]*--[^\r\n]*/gm;
 const IP_LIKE_SIGNATURE_RE = /^\s*(IP[0-9]+)\b/i;
 const VALID_SIGNATURE_RE = /^(IP[0-9]+):[\t ]*$/;
 
+/** Whether this validator reads `key` as an informal-proposition annotation key (`s.d.wr:IPn`, or the malformed `s.d.IPn`). */
+export function isInformalPropositionKey(key: string): boolean {
+  return IP_LIKE_ANNOTATION_KEY_RE.test(key.trim());
+}
+
 export function validateInformalPropositions(document: LangiumDocument<ExpressFile>): Diagnostic[] {
   const text = document.textDocument.getText();
   const root = document.parseResult.value;

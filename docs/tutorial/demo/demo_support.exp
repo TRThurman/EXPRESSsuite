@@ -1,0 +1,12 @@
+SCHEMA demo_support;
+
+ENTITY anchor
+  ABSTRACT SUPERTYPE;
+  label : STRING;
+END_ENTITY;
+
+ENTITY finish;
+  name : STRING;
+END_ENTITY;
+
+END_SCHEMA;

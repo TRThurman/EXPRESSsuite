@@ -1,14 +1,15 @@
 {
   "documents": 1287,
-  "diagnostics": 6353,
+  "diagnostics": 6357,
   "bySeverity": {
     "error": 3901,
     "information": 704,
-    "warning": 1748
+    "warning": 1752
   },
   "byCode": {
     "(none)": 1737,
     "ambiguous-attribute-reference": 4,
+    "annotation-unkeyed-remark": 4,
     "declaration-name-case": 704,
     "duplicate-interfaced-declaration": 229,
     "duplicate-loop-index": 72,
@@ -3122,9 +3123,17 @@
       ]
     },
     "modules/elemental_topology/arm.exp": {
+      "annotation-unkeyed-remark": [
+        139
+      ],
       "linking-error": [
         56,
         106
+      ]
+    },
+    "modules/elemental_topology/mim.exp": {
+      "annotation-unkeyed-remark": [
+        26
       ]
     },
     "modules/expression/mim.exp": {
@@ -5415,6 +5424,11 @@
         41
       ]
     },
+    "resources/aic_manifold_surface/aic_manifold_surface.exp": {
+      "annotation-unkeyed-remark": [
+        372
+      ]
+    },
     "resources/aic_mechanical_design_shaded_presentation/aic_mechanical_design_shaded_presentation.exp": {
       "linking-error": [
         172,
@@ -5435,6 +5449,11 @@
         201,
         209,
         209
+      ]
+    },
+    "resources/aic_non_manifold_surface/aic_non_manifold_surface.exp": {
+      "annotation-unkeyed-remark": [
+        385
       ]
     },
     "resources/aic_topologically_bounded_surface/aic_topologically_bounded_surface.exp": {
