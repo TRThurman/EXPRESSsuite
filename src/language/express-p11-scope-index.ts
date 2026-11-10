@@ -145,6 +145,37 @@ export class ExpressP11ScopeIndex {
     this.computeExports();
   }
 
+  /** Schemas whose own declarations include `name` (compared without regard to case); long forms are left out. */
+  declaringSchemas(name: string): string[] {
+    const lower = name.toLowerCase();
+    const schemas: string[] = [];
+    for (const record of this.records.values()) {
+      if (isLongFormSchemaName(record.name) || schemas.includes(record.name)) continue;
+      if (record.locals.some((decl) => decl.name.toLowerCase() === lower)) schemas.push(record.name);
+    }
+    return schemas;
+  }
+
+  /** The declaration `name` that `schema` declares itself (names compared without regard to case). */
+  localDeclaration(schema: string, name: string): ScopeDecl | undefined {
+    const lower = name.toLowerCase();
+    for (const record of this.recordsNamed(schema)) {
+      const found = record.locals.find((decl) => decl.name.toLowerCase() === lower);
+      if (found) return found;
+    }
+    return undefined;
+  }
+
+  /** True when a schema of that name (any case) is in the workspace. */
+  hasSchema(name: string): boolean {
+    return this.recordsNamed(name).length > 0;
+  }
+
+  private recordsNamed(name: string): SchemaRecord[] {
+    const lower = name.toLowerCase();
+    return [...this.records.values()].filter((record) => record.name.toLowerCase() === lower);
+  }
+
   /** Names declared by more than one schema in the workspace (concatenated copies, duplicated files). */
   get shadowedSchemaNames(): string[] {
     return [...this.byName.entries()].filter(([, records]) => records.length > 1).map(([name]) => name);
