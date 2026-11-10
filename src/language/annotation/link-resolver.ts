@@ -26,12 +26,13 @@ export class LinkResolver {
     private readonly nameProvider: NameProvider
   ) {}
 
-  /** `schema.name` or `schema.owner.member`; every other shape is "unsupported". */
+  /** `schema`, `schema.name` or `schema.owner.member`; every other shape is "unsupported". */
   check(target: string): LinkCheck {
     const parts = target.split(".");
-    if ((parts.length !== 2 && parts.length !== 3) || !parts.every((part) => IDENTIFIER.test(part))) return "unsupported";
+    if (parts.length > 3 || !parts.every((part) => IDENTIFIER.test(part))) return "unsupported";
     const [schema, name, member] = parts;
     if (isLongFormSchemaName(schema) || !this.scopeIndex.hasSchema(schema)) return "unknown-schema";
+    if (name === undefined) return "declared";
     const decl = this.scopeIndex.localDeclaration(schema, name);
     if (!decl) return "undeclared";
     if (member === undefined) return "declared";

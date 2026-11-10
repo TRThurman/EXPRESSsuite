@@ -71,6 +71,13 @@ describe("annotation check", () => {
     expect(found[0].severity).toBe(3);
   });
 
+  test("a link to a schema of the workspace is declared; to another schema, information (R11)", async () => {
+    expect(await codeList(demo(`(*"demo_schema.widget"\nSee <<express:support_schema,the support schema>>.\n*)`))).toEqual([]);
+    const found = await codes(demo(`(*"demo_schema.widget"\nSee <<express:missing_schema,x>>.\n*)`));
+    expect(found.map((d) => d.code)).toEqual(["annotation-link-unverified"]);
+    expect(found[0].severity).toBe(3);
+  });
+
   test("link of an unsupported shape is information (R1)", async () => {
     const found = await codes(demo(`(*"demo_schema.widget"\nSee <<express:demo_schema.widget.wr:WR1,x>>.\n*)`));
     expect(found.map((d) => d.code)).toEqual(["annotation-link-unverified"]);

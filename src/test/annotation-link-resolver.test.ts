@@ -86,9 +86,15 @@ describe("annotation link resolver", () => {
     expect(resolver.isAttributeTarget("demo_schema.widget.nope")).toBe(false);
     expect(resolver.isAttributeTarget("support_schema.item")).toBe(false);
   });
+  test("check: a one-part target names a schema of the workspace (R11)", () => {
+    expect(resolver.check("demo_schema")).toBe("declared");
+    expect(resolver.check("Demo_Schema")).toBe("declared");
+    expect(resolver.check("missing_schema")).toBe("unknown-schema");
+    expect(resolver.check("demo_lf")).toBe("unknown-schema");
+  });
   test("check: other shapes are unsupported", () => {
     expect(resolver.check("demo_schema.widget.wr:WR1")).toBe("unsupported");
-    expect(resolver.check("demo_schema")).toBe("unsupported");
     expect(resolver.check("a.b.c.d")).toBe("unsupported");
+    expect(resolver.check("demo schema")).toBe("unsupported");
   });
 });
