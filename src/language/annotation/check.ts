@@ -1,4 +1,4 @@
-import { AstUtils } from "langium";
+import { AstUtils, CstUtils } from "langium";
 import type { LangiumDocument, NameProvider } from "langium";
 import { DiagnosticSeverity } from "vscode-languageserver";
 import type { Diagnostic } from "vscode-languageserver";
@@ -22,6 +22,7 @@ export enum AnnotationIssues {
   FirstSentenceAttributeLink = "annotation-first-sentence-attribute-link",
   OptionalSentence = "annotation-optional-sentence",
   BareSubtype = "annotation-bare-subtype",
+  InsideSchema = "annotation-inside-schema",
 }
 
 export const OPTIONAL_SENTENCE = "The value of this attribute need not be specified.";
@@ -107,6 +108,17 @@ export function validateAnnotations(document: LangiumDocument<ExpressFile>, reso
   // A document with no schema parses to a root without the list.
   if (!isExpressFile(root) || !root.schemas?.length) return [];
   const text = document.textDocument.getText();
+  const diagnostics: Diagnostic[] = [];
+  const report = (code: AnnotationIssues, start: number, end: number, message: string, severity: BlockFinding["severity"] = "warning"): void => {
+    diagnostics.push({
+      range: { start: document.textDocument.positionAt(start), end: document.textDocument.positionAt(end) },
+      severity: severity === "information" ? DiagnosticSeverity.Information : DiagnosticSeverity.Warning,
+      message,
+      code,
+      source: "EXPRESSsuite",
+    });
+  };
+  reportBlocksInsideSchemas(root, report);
   const contexts = annotationContexts(root, text).filter((context) => !isLongFormSchemaName(context.schema));
   if (contexts.length === 0) return [];
 
@@ -119,17 +131,6 @@ export function validateAnnotations(document: LangiumDocument<ExpressFile>, reso
   for (const target of describeTargets(root, nameProvider)) {
     if (!targets.has(target.key.toLowerCase())) targets.set(target.key.toLowerCase(), target);
   }
-
-  const diagnostics: Diagnostic[] = [];
-  const report = (code: AnnotationIssues, start: number, end: number, message: string, severity: BlockFinding["severity"] = "warning"): void => {
-    diagnostics.push({
-      range: { start: document.textDocument.positionAt(start), end: document.textDocument.positionAt(end) },
-      severity: severity === "information" ? DiagnosticSeverity.Information : DiagnosticSeverity.Warning,
-      message,
-      code,
-      source: "EXPRESSsuite",
-    });
-  };
 
   for (const context of contexts) {
     const seen = new Set<string>();
@@ -153,4 +154,27 @@ export function validateAnnotations(document: LangiumDocument<ExpressFile>, reso
     }
   }
   return diagnostics;
+}
+
+type Report = (code: AnnotationIssues, start: number, end: number, message: string) => void;
+
+const KEYED_REMARK_RE = /^\(\*\s*"([^"\r\n]+)"/;
+
+/** A keyed remark between a schema's head and its END_SCHEMA; is published nowhere sensible, so it is reported. */
+function reportBlocksInsideSchemas(root: ExpressFile, report: Report): void {
+  for (const schema of root.schemas) {
+    if (!schema.$cstNode || !schema.name || isLongFormSchemaName(schema.name)) continue;
+    for (const leaf of CstUtils.streamCst(schema.$cstNode)) {
+      if (!leaf.hidden || (leaf as { tokenType?: { name?: string } }).tokenType?.name !== "ML_COMMENT") continue;
+      const keyed = KEYED_REMARK_RE.exec(leaf.text);
+      if (!keyed) continue;
+      const keyStart = leaf.offset + keyed[0].length - 1 - keyed[1].length;
+      report(
+        AnnotationIssues.InsideSchema,
+        keyStart,
+        keyStart + keyed[1].length,
+        `Description block "${keyed[1]}" is inside SCHEMA ${schema.name} ... END_SCHEMA; description blocks belong after END_SCHEMA;.`
+      );
+    }
+  }
 }

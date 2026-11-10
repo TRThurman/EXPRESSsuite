@@ -155,4 +155,45 @@ describe("annotation check", () => {
     const text = `SCHEMA demo_mim_lf;\nENTITY widget;\nEND_ENTITY;\nEND_SCHEMA;\n(* a note *)\n`;
     expect(await codeList(text)).toEqual([]);
   });
+
+  describe("blocks inside a schema", () => {
+    const inside = (body: string, after = ""): string => `${SUPPORT}
+SCHEMA demo_schema;
+${body}
+END_SCHEMA;
+${after}
+`;
+    const ENTITY = `ENTITY widget;\n  size : INTEGER;\nEND_ENTITY;`;
+
+    test("between two declarations", async () => {
+      expect(await codeList(inside(`${ENTITY}\n(*"demo_schema.widget"\nA widget.\n*)\nTYPE other = INTEGER;\nEND_TYPE;`))).toEqual(["annotation-inside-schema"]);
+    });
+
+    test("inside an entity body", async () => {
+      expect(await codeList(inside(`ENTITY widget;\n  size : INTEGER;\n(*"demo_schema.widget.size"\nThe size.\n*)\nEND_ENTITY;`))).toEqual(["annotation-inside-schema"]);
+    });
+
+    test("inside a function body", async () => {
+      const fn = `FUNCTION f(x : INTEGER) : INTEGER;\n(*"demo_schema.f"\nA function.\n*)\nRETURN (x);\nEND_FUNCTION;`;
+      expect(await codeList(inside(`${ENTITY}\n${fn}`))).toEqual(["annotation-inside-schema"]);
+    });
+
+    test("an informal-proposition block inside is flagged too", async () => {
+      const found = await codeList(inside(`ENTITY widget;\nWHERE\n  wr1: TRUE;\n--IP1:\nEND_ENTITY;\n(*"demo_schema.widget.wr:IP1"\nText.\n*)`));
+      expect(found).toEqual(["annotation-inside-schema"]);
+    });
+
+    test("an unkeyed remark and a line remark inside draw nothing", async () => {
+      expect(await codeList(inside(`${ENTITY}\n(* a note *)\n--"demo_schema.widget" a line remark`))).toEqual([]);
+    });
+
+    test("the same block after END_SCHEMA draws nothing", async () => {
+      expect(await codeList(inside(ENTITY, `(*"demo_schema.widget"\nA widget.\n*)`))).toEqual([]);
+    });
+
+    test("a long-form schema with a keyed remark inside draws nothing", async () => {
+      const text = `SCHEMA demo_mim_lf;\nENTITY widget;\n(*"demo_mim_lf.widget"\nx\n*)\nEND_ENTITY;\nEND_SCHEMA;\n`;
+      expect(await codeList(text)).toEqual([]);
+    });
+  });
 });
