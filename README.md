@@ -27,6 +27,16 @@ If you reference, cite, or build on this work, see [§ Citation](#citation) belo
 - [Refactoring](https://code.visualstudio.com/docs/editor/refactoring): Rename Symbol with cross-file scope tracking.
 - Code snippets for common EXPRESS patterns.
 
+### Describe Declaration
+
+The **Describe Declaration** command (right-click menu or command palette)
+writes the description block of a declaration after `END_SCHEMA;` from a
+selected comment, typed text or the clipboard. It proposes links, appends the
+OPTIONAL sentence to optional attributes, shows the edit in the refactor
+preview, and is undone in one step. A check reports description blocks with
+undeclared links, unkeyed remarks and blocks inside a schema. Tutorial and
+demo workspace: [`docs/tutorial/describe-declarations.md`](docs/tutorial/describe-declarations.md).
+
 ### SC4 validation
 
 EXPRESSsuite reports additional ISO TC 184/SC 4 authoring problems in the
@@ -219,6 +229,7 @@ Project documentation under [`docs/`](docs/):
 | [`docs/easyEXPRESS-viewers.adoc`](docs/easyEXPRESS-viewers.adoc) | Technical white paper (architecture, security model, data privacy, performance) |
 | [`docs/easyEXPRESS-viewers.pptx`](docs/easyEXPRESS-viewers.pptx) | Implementor-oriented PowerPoint deck (21 slides) |
 | [`docs/easyEXPRESS-viewers-user-guide.pptx`](docs/easyEXPRESS-viewers-user-guide.pptx) | User-oriented PowerPoint deck (19 slides, screenshot-led) |
+| [`docs/tutorial/describe-declarations.md`](docs/tutorial/describe-declarations.md) | Tutorial for Describe Declaration with a demo workspace ([`docs/tutorial/demo/`](docs/tutorial/demo/)) and a video storyboard ([`docs/tutorial/storyboard.md`](docs/tutorial/storyboard.md)) |
 | [`docs/smoke-test-checklist.md`](docs/smoke-test-checklist.md) | Cross-platform manual smoke-test plan (S1–S6 + per-schema acceptance) |
 | [`DESIGN-viewers-integration.md`](DESIGN-viewers-integration.md) | Full design protocol document (Phase 0 reconnaissance → Phase 4 validation) |
 | [`CHANGELOG.md`](CHANGELOG.md) | Release notes |
