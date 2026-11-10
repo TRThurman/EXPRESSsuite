@@ -128,15 +128,15 @@ interface Member {
 
 function* membersOf(declaration: AstNode): Generator<Member> {
   if (isEntityDefinition(declaration)) {
-    for (const explicit of declaration.body.attributes) {
+    for (const explicit of declaration.body?.attributes ?? []) {
       for (const attribute of explicit.attributes) {
         yield { node: attribute, kind: isRedeclared_attribute(attribute) ? "redeclared-attribute" : "explicit-attribute" };
       }
     }
-    for (const derived of declaration.body.derived?.attributes ?? []) {
+    for (const derived of declaration.body?.derived?.attributes ?? []) {
       yield { node: derived, kind: isRedeclared_attribute(derived.attribute) ? "redeclared-attribute" : "derived-attribute" };
     }
-    for (const inverse of declaration.body.inverse?.attributes ?? []) {
+    for (const inverse of declaration.body?.inverse?.attributes ?? []) {
       yield { node: inverse, kind: isRedeclared_attribute(inverse.attribute) ? "redeclared-attribute" : "inverse-attribute" };
     }
   } else if (isTypeDefinition(declaration)) {
@@ -188,8 +188,8 @@ function addDeclaration(
     add(declaration, "entity", name, supertypes.length > 0 ? { supertypes } : {});
     addMembers(undefined);
     // Document order: explicit, derived, inverse, then UNIQUE, then WHERE.
-    for (const rule of declaration.body.unique?.rules ?? []) addRule(rule, "unique-rule", rule.name);
-    addRules(declaration.body.where);
+    for (const rule of declaration.body?.unique?.rules ?? []) addRule(rule, "unique-rule", rule.name);
+    addRules(declaration.body?.where);
   } else if (isTypeDefinition(declaration)) {
     const enumeration = isEnumeration_type(declaration.underlyingType) && (declaration.underlyingType.items !== undefined || declaration.underlyingType.extension?.items !== undefined);
     const target = add(declaration, enumeration ? "enumeration-type" : "type", name);
