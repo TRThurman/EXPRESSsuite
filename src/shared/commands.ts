@@ -2,6 +2,7 @@ export const EXPRESSSUITE_COMMANDS = {
   buildWorkspace: "expresssuite.buildWorkspace",
   buildGraph: "expresssuite.buildGraph",
   detectDuplicateDeclarationsInClosure: "expresssuite.detectDuplicateDeclarationsInClosure",
+  describeDeclaration: "expresssuite.describeDeclaration",
   showDescription: "expresssuite.showDescription",
   showExpressG: "expresssuite.showExpressG",
   openMathPlayground: "expresssuite.openMathPlayground",

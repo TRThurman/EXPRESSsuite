@@ -8,6 +8,7 @@ import { registerHoverProvider } from "./hover-provider.js";
 import { getAnnotationIndex, resolveDescriptionAt, resolveDescriptionByPath } from "./annotation-client.js";
 import { showDescriptionPreview, showExpressGPreview, openMathPlayground } from "./webviews.js";
 import { initPlurimathPool, shutdownPlurimathPool } from "./plurimath-pool.js";
+import { registerDescribeCommand } from "./describe-command.js";
 import { time } from "./perf.js";
 import {
   DETECT_SCHEMA_CLOSURE_DUPLICATES_REQUEST,
@@ -27,6 +28,7 @@ export function activate(context: vscode.ExtensionContext): void {
   initPlurimathPool(context);
   registerHoverProvider(context, client);
   registerViewerCommands(context);
+  registerDescribeCommand(context, client);
   stop(/* threshold */ 1500);
 }
 
