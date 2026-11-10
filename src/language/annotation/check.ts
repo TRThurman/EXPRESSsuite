@@ -1,4 +1,4 @@
-import { AstUtils, CstUtils } from "langium";
+import { CstUtils } from "langium";
 import type { LangiumDocument, NameProvider } from "langium";
 import { DiagnosticSeverity } from "vscode-languageserver";
 import type { Diagnostic } from "vscode-languageserver";
@@ -7,7 +7,7 @@ import type { ExpressFile } from "../generated/ast.js";
 import { isLongFormSchemaName } from "../express-p11-scope-index.js";
 import { isInformalPropositionKey } from "../informal-proposition-validator.js";
 import { annotationContexts, findExpressLinks, firstSentenceEnd } from "./blocks.js";
-import { annotationKeyOf, describeTargets } from "./keys.js";
+import { declaredKeys, describeTargets } from "./keys.js";
 import type { DescribeTarget } from "./keys.js";
 import type { LinkResolver } from "./link-resolver.js";
 
@@ -123,13 +123,11 @@ export function validateAnnotations(document: LangiumDocument<ExpressFile>, reso
   const contexts = annotationContexts(root, text).filter((context) => !isLongFormSchemaName(context.schema));
   if (contexts.length === 0) return diagnostics;
 
-  const declared = new Set<string>();
-  for (const node of AstUtils.streamAst(root)) {
-    const key = annotationKeyOf(node, nameProvider);
-    if (key) declared.add(key.toLowerCase());
-  }
+  // Keys and targets serve only keyed blocks; a file whose contexts hold none skips collecting them.
+  const keyed = contexts.some((context) => context.blocks.length > 0);
+  const declared = keyed ? declaredKeys(root, nameProvider) : new Set<string>();
   const targets = new Map<string, DescribeTarget>();
-  for (const target of describeTargets(root, nameProvider)) {
+  for (const target of keyed ? describeTargets(root, nameProvider) : []) {
     if (!targets.has(target.key.toLowerCase())) targets.set(target.key.toLowerCase(), target);
   }
 

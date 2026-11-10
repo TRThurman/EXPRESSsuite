@@ -1,7 +1,7 @@
-import { EmptyFileSystem } from "langium";
+import { AstUtils, EmptyFileSystem } from "langium";
 import { parseDocument } from "langium/test";
 import { describe, expect, test } from "vitest";
-import { annotationKeyOf, describeTargets, memberNamesOf } from "../language/annotation/keys.js";
+import { annotationKeyOf, declaredKeys, describeTargets, memberNamesOf } from "../language/annotation/keys.js";
 import { createExpressP11Services } from "../language/express-module.js";
 import { Enumeration_type, ExpressFile, TypeDefinition, isRule_decl } from "../language/generated/ast.js";
 
@@ -106,5 +106,78 @@ END_SCHEMA;`,
     expect([...memberNamesOf(declaration, nameProvider)]).toEqual([["x", "enumeration-item"], ["y", "enumeration-item"]]);
     const item = (declaration as TypeDefinition).underlyingType as Enumeration_type;
     expect(annotationKeyOf(item.extension!.items!.items[0], nameProvider)).toBe("ext_schema.t.x");
+  });
+
+  describe("declaredKeys", () => {
+    /** Declarations nested in a function and a rule, local constants, unnamed rules, and a long form. */
+    const NESTED = `
+SCHEMA demo_schema;
+CONSTANT max_size : INTEGER := 10; END_CONSTANT;
+TYPE colour = EXTENSIBLE ENUMERATION OF (red, green); WHERE WR1 : TRUE; END_TYPE;
+TYPE more_colour = EXTENSIBLE ENUMERATION BASED_ON colour WITH (blue); END_TYPE;
+ENTITY widget;
+  size, weight : OPTIONAL INTEGER;
+DERIVE area : INTEGER := 1;
+INVERSE parts : SET [0:?] OF part FOR whole;
+UNIQUE UR1 : size; weight;
+WHERE WR1 : TRUE; size < 100;
+END_ENTITY;
+ENTITY part; whole : widget; END_ENTITY;
+ENTITY big_widget SUBTYPE OF (widget);
+  SELF\\widget.size : INTEGER;
+  SELF\\widget.weight RENAMED heavy : INTEGER;
+END_ENTITY;
+SUBTYPE_CONSTRAINT sc FOR widget; ABSTRACT SUPERTYPE; END_SUBTYPE_CONSTRAINT;
+FUNCTION f (a, b : INTEGER; c : REAL) : INTEGER;
+  TYPE local_type = ENUMERATION OF (on, off); WHERE LT1 : TRUE; END_TYPE;
+  ENTITY local_entity; x : INTEGER; WHERE LW1 : x > 0; END_ENTITY;
+  FUNCTION g (q : INTEGER) : INTEGER; RETURN (q); END_FUNCTION;
+  CONSTANT local_c : INTEGER := 1; END_CONSTANT;
+  LOCAL v : INTEGER; END_LOCAL;
+  RETURN (a);
+END_FUNCTION;
+PROCEDURE pr (VAR z : INTEGER);
+  PROCEDURE inner (w : INTEGER); END_PROCEDURE;
+END_PROCEDURE;
+RULE r FOR (widget);
+  ENTITY rule_entity; y : INTEGER; END_ENTITY;
+  LOCAL n : INTEGER; END_LOCAL;
+WHERE RW1 : TRUE; TRUE;
+END_RULE;
+END_SCHEMA;
+SCHEMA demo_lf; ENTITY gadget; y : INTEGER; END_ENTITY; END_SCHEMA;
+`;
+
+    test("collects from the declarations down exactly the keys annotationKeyOf gives over every node", async () => {
+      const document = await parseDocument<ExpressFile>(services, NESTED);
+      expect(document.parseResult.parserErrors).toEqual([]);
+      const root = document.parseResult.value;
+      const everyNode = new Set<string>();
+      for (const node of AstUtils.streamAst(root)) {
+        const key = annotationKeyOf(node, nameProvider);
+        if (key) everyNode.add(key.toLowerCase());
+      }
+      const declared = declaredKeys(root, nameProvider);
+      expect([...declared].sort()).toEqual([...everyNode].sort());
+      for (const key of [
+        "demo_schema.max_size", "demo_schema.more_colour.blue", "demo_schema.widget.ur:ur1", "demo_schema.big_widget.heavy",
+        "demo_schema.local_entity.wr:lw1", "demo_schema.local_type.wr:lt1", "demo_schema.g.q", "demo_schema.local_c",
+        "demo_schema.inner.w", "demo_schema.rule_entity.y", "demo_schema.r.wr:rw1", "demo_lf.gadget.y",
+      ]) {
+        expect(declared.has(key), key).toBe(true);
+      }
+      expect(declared.has("demo_schema.f.v")).toBe(false);
+      expect(declared.has("demo_schema.r.n")).toBe(false);
+    });
+
+    test("the fixture of describeTargets gives the same keys both ways", async () => {
+      const root = await parse();
+      const everyNode = new Set<string>();
+      for (const node of AstUtils.streamAst(root)) {
+        const key = annotationKeyOf(node, nameProvider);
+        if (key) everyNode.add(key.toLowerCase());
+      }
+      expect([...declaredKeys(root, nameProvider)].sort()).toEqual([...everyNode].sort());
+    });
   });
 });

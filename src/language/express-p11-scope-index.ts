@@ -90,6 +90,8 @@ type SchemaRecord = {
   name: string;
   uri: string;
   locals: ScopeDecl[];
+  /** The first local declaration of each lower-case name. */
+  localsByLowerName: Map<string, ScopeDecl>;
   specs: Array<Use_clause | Reference_clause>;
   exports: Map<string, ExportEntry>;
 };
@@ -110,6 +112,8 @@ export class ExpressP11ScopeIndex {
   private records = new Map<SchemaDefinition, SchemaRecord>();
   /** Records per schema name, in document order. */
   private byName = new Map<string, SchemaRecord[]>();
+  /** Records per lower-case schema name, in document order. */
+  private byLowerName = new Map<string, SchemaRecord[]>();
   private declIds = new WeakMap<AstNode, number>();
   private nextDeclId = 0;
   private clashCache = new Map<SchemaDefinition, ScopeClash[]>();
@@ -117,6 +121,7 @@ export class ExpressP11ScopeIndex {
   build(documents: LangiumDocument[]): void {
     this.records = new Map();
     this.byName = new Map();
+    this.byLowerName = new Map();
     this.declIds = new WeakMap();
     this.nextDeclId = 0;
     this.clashCache = new Map();
@@ -126,11 +131,18 @@ export class ExpressP11ScopeIndex {
       const uri = document.uri.toString();
       for (const schema of file.schemas ?? []) {
         if (!schema.name) continue;
+        const locals = this.collectLocals(schema, uri);
+        const localsByLowerName = new Map<string, ScopeDecl>();
+        for (const decl of locals) {
+          const lower = decl.name.toLowerCase();
+          if (!localsByLowerName.has(lower)) localsByLowerName.set(lower, decl);
+        }
         const record: SchemaRecord = {
           node: schema,
           name: schema.name,
           uri,
-          locals: this.collectLocals(schema, uri),
+          locals,
+          localsByLowerName,
           specs: (schema.body?.specifications ?? []).filter(
             (spec): spec is Use_clause | Reference_clause => isUse_clause(spec) || isReference_clause(spec)
           ),
@@ -140,6 +152,10 @@ export class ExpressP11ScopeIndex {
         const named = this.byName.get(schema.name);
         if (named) named.push(record);
         else this.byName.set(schema.name, [record]);
+        const lowerName = schema.name.toLowerCase();
+        const lowerNamed = this.byLowerName.get(lowerName);
+        if (lowerNamed) lowerNamed.push(record);
+        else this.byLowerName.set(lowerName, [record]);
       }
     }
     this.computeExports();
@@ -151,7 +167,7 @@ export class ExpressP11ScopeIndex {
     const schemas: string[] = [];
     for (const record of this.records.values()) {
       if (isLongFormSchemaName(record.name) || schemas.includes(record.name)) continue;
-      if (record.locals.some((decl) => decl.name.toLowerCase() === lower)) schemas.push(record.name);
+      if (record.localsByLowerName.has(lower)) schemas.push(record.name);
     }
     return schemas;
   }
@@ -159,8 +175,8 @@ export class ExpressP11ScopeIndex {
   /** The declaration `name` that `schema` declares itself (names compared without regard to case). */
   localDeclaration(schema: string, name: string): ScopeDecl | undefined {
     const lower = name.toLowerCase();
-    for (const record of this.recordsNamed(schema)) {
-      const found = record.locals.find((decl) => decl.name.toLowerCase() === lower);
+    for (const record of this.byLowerName.get(schema.toLowerCase()) ?? []) {
+      const found = record.localsByLowerName.get(lower);
       if (found) return found;
     }
     return undefined;
@@ -168,12 +184,7 @@ export class ExpressP11ScopeIndex {
 
   /** True when a schema of that name (any case) is in the workspace. */
   hasSchema(name: string): boolean {
-    return this.recordsNamed(name).length > 0;
-  }
-
-  private recordsNamed(name: string): SchemaRecord[] {
-    const lower = name.toLowerCase();
-    return [...this.records.values()].filter((record) => record.name.toLowerCase() === lower);
+    return this.byLowerName.has(name.toLowerCase());
   }
 
   /** Names declared by more than one schema in the workspace (concatenated copies, duplicated files). */

@@ -25,7 +25,7 @@ import {
   isUnique_rule,
   isWhere_clause,
 } from "../generated/ast.js";
-import type { Declaration, Formal_parameter } from "../generated/ast.js";
+import type { Declaration, Formal_parameter, Where_clause } from "../generated/ast.js";
 import { isLongFormSchemaName } from "../express-p11-scope-index.js";
 
 export type DescribeKind =
@@ -108,6 +108,52 @@ export function describeTargets(root: ExpressFile, nameProvider: NameProvider): 
     }
   }
   return targets;
+}
+
+/**
+ * The lower-case key of every node that {@link annotationKeyOf} keys, long-form schemas included,
+ * collected from the declarations down instead of by visiting every node: each schema, constant,
+ * declaration and global rule (also those declared inside a function, procedure or rule), their
+ * attributes, parameters and enumeration items, and their named UNIQUE and WHERE rules.
+ */
+export function declaredKeys(root: ExpressFile, nameProvider: NameProvider): Set<string> {
+  const keys = new Set<string>();
+  for (const schema of root.schemas ?? []) {
+    if (!schema.name) continue;
+    const prefix = schema.name;
+    const add = (key: string): void => {
+      keys.add(key.toLowerCase());
+    };
+    const walk = (declaration: AstNode): void => {
+      const name = declarationNameOf(declaration, nameProvider);
+      if (name) {
+        const owner = `${prefix}.${name}`;
+        add(owner);
+        for (const member of membersOf(declaration)) {
+          const memberName = memberNameOf(member.node, nameProvider);
+          if (memberName) add(`${owner}.${memberName}`);
+        }
+        if (isEntityDefinition(declaration)) {
+          for (const rule of declaration.body?.unique?.rules ?? []) if (rule.name) add(`${owner}.ur:${rule.name}`);
+        }
+        for (const rule of whereClauseOf(declaration)?.rules ?? []) if (rule.id) add(`${owner}.wr:${rule.id}`);
+      }
+      // Declarations and constants of an algorithm head are keyed by the schema too.
+      const head = isFunctionDefinition(declaration) || isProcedureDefinition(declaration) || isRule_decl(declaration) ? declaration.algoHead : undefined;
+      for (const nested of head?.declarations ?? []) walk(nested);
+      for (const constant of head?.constant?.items ?? []) walk(constant);
+    };
+    add(prefix);
+    for (const constant of schema.body?.constant?.items ?? []) walk(constant);
+    for (const declaration of schema.body?.declarations ?? []) walk(declaration);
+  }
+  return keys;
+}
+
+function whereClauseOf(declaration: AstNode): Where_clause | undefined {
+  if (isEntityDefinition(declaration)) return declaration.body?.where;
+  if (isTypeDefinition(declaration) || isRule_decl(declaration)) return declaration.where;
+  return undefined;
 }
 
 /** Lower-case member name to kind, for the members of `declaration` that a key's last segment can name. */
