@@ -269,6 +269,15 @@ describe("describe edit: existing blocks", () => {
     expect(result.findings).toEqual([]);
   });
 
+  test("append to an OPTIONAL attribute whose sentence follows a blank line keeps one sentence, after the new text (R7)", async () => {
+    const source = demo(undefined, '\n(*"demo_schema.widget.size"\nThe size.\n\nThe value of this attribute need not be specified.\n*)\n');
+    const { after, result } = await describeTyped(source, { key: "demo_schema.widget.size", mode: "append", text: "More about size." });
+    expect(after).toBe(
+      demo(undefined, '\n(*"demo_schema.widget.size"\nThe size.\n\nMore about size. The value of this attribute need not be specified.\n*)\n')
+    );
+    expect(result.findings).toEqual([]);
+  });
+
   test("append to an OPTIONAL attribute whose body is only the mandatory sentence leaves one sentence (R7)", async () => {
     const source = demo(undefined, '\n(*"demo_schema.widget.size"\nThe value of this attribute need not be specified.\n*)\n');
     const { after, result } = await describeTyped(source, { key: "demo_schema.widget.size", mode: "append", text: "More about size." });

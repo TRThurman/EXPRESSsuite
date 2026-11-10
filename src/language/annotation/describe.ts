@@ -382,13 +382,14 @@ export function acceptedSpans(recomputed: ReadonlyArray<LinkProposal>, ticked: R
 
 /**
  * The existing body an append keeps (ruling R7): for an OPTIONAL explicit attribute's description,
- * without the trailing mandatory sentence (and the space before it), since the new text brings it.
+ * without the trailing mandatory sentence (and the whitespace before it: a space, a line break or a
+ * blank line), since the new text brings it.
  */
 function keptOnAppend(write: BlockWrite): string {
   const old = write.block?.body ?? "";
   if (write.role !== "description" || write.target.kind !== "explicit-attribute" || !write.target.optional) return old;
   if (old === OPTIONAL_SENTENCE) return "";
-  if (old.endsWith(` ${OPTIONAL_SENTENCE}`)) return old.slice(0, old.length - OPTIONAL_SENTENCE.length - 1).trimEnd();
+  if (old.endsWith(OPTIONAL_SENTENCE) && /\s$/.test(old.slice(0, -OPTIONAL_SENTENCE.length))) return old.slice(0, -OPTIONAL_SENTENCE.length).trimEnd();
   return old;
 }
 
