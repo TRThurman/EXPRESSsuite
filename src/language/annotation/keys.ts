@@ -142,7 +142,7 @@ function* membersOf(declaration: AstNode): Generator<Member> {
   } else if (isTypeDefinition(declaration)) {
     const underlying = declaration.underlyingType;
     if (isEnumeration_type(underlying)) {
-      for (const item of underlying.items?.items ?? []) yield { node: item, kind: "enumeration-item" };
+      for (const item of underlying.items?.items ?? underlying.extension?.items?.items ?? []) yield { node: item, kind: "enumeration-item" };
     }
   } else if (isFunctionDefinition(declaration)) {
     yield* parametersOf(declaration.head.parameters);
@@ -191,7 +191,7 @@ function addDeclaration(
     for (const rule of declaration.body.unique?.rules ?? []) addRule(rule, "unique-rule", rule.name);
     addRules(declaration.body.where);
   } else if (isTypeDefinition(declaration)) {
-    const enumeration = isEnumeration_type(declaration.underlyingType) && declaration.underlyingType.items !== undefined;
+    const enumeration = isEnumeration_type(declaration.underlyingType) && (declaration.underlyingType.items !== undefined || declaration.underlyingType.extension?.items !== undefined);
     const target = add(declaration, enumeration ? "enumeration-type" : "type", name);
     addMembers(target);
     addRules(declaration.where);

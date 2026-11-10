@@ -3,7 +3,7 @@ import { parseDocument } from "langium/test";
 import { describe, expect, test } from "vitest";
 import { annotationKeyOf, describeTargets, memberNamesOf } from "../language/annotation/keys.js";
 import { createExpressP11Services } from "../language/express-module.js";
-import { ExpressFile, isRule_decl } from "../language/generated/ast.js";
+import { Enumeration_type, ExpressFile, TypeDefinition, isRule_decl } from "../language/generated/ast.js";
 
 const services = createExpressP11Services(EmptyFileSystem).ExpressP11;
 const nameProvider = services.references.NameProvider;
@@ -84,5 +84,27 @@ describe("annotation keys", () => {
       ["size", "explicit-attribute"], ["label", "redeclared-attribute"], ["tag", "redeclared-attribute"],
       ["area", "derived-attribute"], ["owner", "inverse-attribute"],
     ]);
+  });
+
+  test("enumeration items of a BASED_ON extension are members of the extending type", async () => {
+    const document = await parseDocument<ExpressFile>(
+      services,
+      `SCHEMA ext_schema;
+TYPE b = EXTENSIBLE ENUMERATION OF (p, q); END_TYPE;
+TYPE t = ENUMERATION BASED_ON b WITH (x, y); END_TYPE;
+END_SCHEMA;`,
+    );
+    const root = document.parseResult.value;
+    const targets = describeTargets(root, nameProvider);
+    expect(targets.map((target) => target.key)).toEqual([
+      "ext_schema", "ext_schema.b", "ext_schema.b.p", "ext_schema.b.q",
+      "ext_schema.t", "ext_schema.t.x", "ext_schema.t.y",
+    ]);
+    const t = targets.find((target) => target.key === "ext_schema.t");
+    expect(t).toMatchObject({ kind: "enumeration-type", members: ["ext_schema.t.x", "ext_schema.t.y"] });
+    const declaration = root.schemas[0].body.declarations.find((d) => "name" in d && d.name === "t")!;
+    expect([...memberNamesOf(declaration, nameProvider)]).toEqual([["x", "enumeration-item"], ["y", "enumeration-item"]]);
+    const item = (declaration as TypeDefinition).underlyingType as Enumeration_type;
+    expect(annotationKeyOf(item.extension!.items!.items[0], nameProvider)).toBe("ext_schema.t.x");
   });
 });
