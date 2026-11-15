@@ -50,7 +50,20 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
       case ExpressP11Issues.DeclarationNameCase:
         return this.fixDeclarationNameCase(diagnostic, document);
     }
-    return undefined;
+    return this.fixAnnotation(diagnostic, document);
+  }
+
+  /** The correction that an annotation diagnostic carries in its data (`annotation-continuation-without-list`, `annotation-glued-continuation`). */
+  private fixAnnotation(diagnostic: Diagnostic, document: LangiumDocument<ExpressFile>): CodeAction | undefined {
+    const fix = (diagnostic.data as { fix?: { title: string; newText: string; range: Diagnostic["range"] } } | undefined)?.fix;
+    if (typeof diagnostic.code !== "string" || !diagnostic.code.startsWith("annotation-") || !fix) return undefined;
+    const eol = document.textDocument.getText().includes("\r\n") ? "\r\n" : "\n";
+    return {
+      title: fix.title,
+      kind: CodeActionKind.QuickFix,
+      diagnostics: [diagnostic],
+      edit: { changes: { [document.textDocument.uri]: [{ range: fix.range, newText: fix.newText.replace(/\n/g, eol) }] } },
+    };
   }
 
   private fixDeclarationNameCase(
