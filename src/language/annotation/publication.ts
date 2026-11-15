@@ -64,11 +64,6 @@ function chainOwner(lines: AsciiDocLine[], plus: number, memo: Map<number, Chain
       let top = prev.delimiter.match;
       while (top - 1 >= 0 && TRANSPARENT.has(lines[top - 1].kind)) top--;
       if (top - 1 >= 0 && lines[top - 1].kind === "continuation") return chainOwner(lines, top - 1, memo);
-      // A delimited block written directly under a list item's text, with no blank line, is part of the item.
-      for (let i = top - 1; i >= 0; i--) {
-        if (lines[i].kind === "list-item") return { start: i, listItem: true };
-        if (lines[i].kind === "blank" || lines[i].kind === "delimiter" || lines[i].kind === "verbatim" || lines[i].kind === "continuation") break;
-      }
       return { start: top, listItem: false };
     }
     for (let i = j; i >= 0; i--) {

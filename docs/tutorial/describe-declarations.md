@@ -374,8 +374,9 @@ macro as one paragraph of text. The check follows the chain back, through the
 blocks), to the line that starts it. Every AsciiDoc list form counts as a list
 item: `*` to `*****`, `-`, `.` to `.....`, `1.`, `a.`, `A.`, `i)`, `I)`, `1)`,
 checklist items and `term::`, `term:::`, `term::::`, `term;;`. A delimited block
-written directly under a list item's text, with no blank line, is part of the
-item. Quick fix: replace the `+` with a blank line.
+written directly under a list item's text, without a `+`, is not part of the
+item (Asciidoctor puts it outside the item), so a `+` after it is reported.
+Quick fix: replace the `+` with a blank line.
 
 ```
 A paragraph, not a list item.
@@ -425,7 +426,8 @@ A note written as an open block.
 --
 ```
 
-reports both `--` lines.
+reports both `--` lines. A remark that ends `-- *)` counts as well: its last
+line is `--`.
 
 `annotation-list-chain-macro`. Source: metanorma/iso-10303 issue 862
 (metanorma-plugin-lutaml 0.7.68 and later). The plugin blanks a `+` line before

@@ -85,14 +85,13 @@ describe("annotation-continuation-without-list (XS-PUB-001)", () => {
     expect(codes(". item\n+\nimage::a.gif[]\n+\nimage::b.gif[]", false)).toEqual([]);
   });
 
-  test("a block written directly under a list item's text is part of the item, so a + after it is a continuation", () => {
-    expect(codes("* item\n[stem]\n++++\nx\n++++\n+\ntext", false)).toEqual([]);
-    expect(codes("* item\nmore text\n====\nx\n====\n+\nimage::a.gif[]", false)).toEqual([]);
+  test("a delimited block directly under a list item's text is not part of the item (Asciidoctor 2.0.26)", () => {
+    expect(codes("* item text\n[stem]\n++++\nx\n++++\n+\nimage::a.gif[]", false)).toEqual(["annotation-continuation-without-list"]);
+    expect(codes("* item text\n----\ncode\n----\n+\nimage::a.gif[]", false)).toEqual(["annotation-continuation-without-list"]);
   });
 
-  test("the same block under a paragraph, or after a blank line, is not", () => {
-    expect(codes("text\n[stem]\n++++\nx\n++++\n+\ntext")).toEqual(["annotation-continuation-without-list"]);
-    expect(codes("* item\n\n====\nx\n====\n+\ntext")).toEqual(["annotation-continuation-without-list"]);
+  test("the same block attached with a + is part of the item", () => {
+    expect(codes("* item text\n+\n[stem]\n++++\nx\n++++\n+\nimage::a.gif[]", false)).toEqual([]);
   });
 
   test("a + inside a listing block is text", () => {
