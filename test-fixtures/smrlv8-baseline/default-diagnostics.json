@@ -1,10 +1,10 @@
 {
   "documents": 1287,
-  "diagnostics": 6357,
+  "diagnostics": 6663,
   "bySeverity": {
     "error": 3901,
     "information": 704,
-    "warning": 1752
+    "warning": 2058
   },
   "byCode": {
     "(none)": 1737,
@@ -19,6 +19,7 @@
     "linking-error": 3374,
     "parsing-error": 2,
     "redeclaration-not-specialization": 9,
+    "reference-name-case": 306,
     "reference-statement-missing": 176,
     "unqualified-group-reference": 30
   },
@@ -2488,10 +2489,16 @@
         28,
         28,
         58
+      ],
+      "reference-name-case": [
+        58
       ]
     },
     "modules/altered_package/arm.exp": {
       "linking-error": [
+        42
+      ],
+      "reference-name-case": [
         42
       ]
     },
@@ -2503,6 +2510,9 @@
     "modules/analysis_product_relationships/mim.exp": {
       "linking-error": [
         10
+      ],
+      "reference-name-case": [
+        10
       ]
     },
     "modules/analytical_model/arm.exp": {
@@ -2510,6 +2520,10 @@
         100,
         101,
         102,
+        102,
+        123
+      ],
+      "reference-name-case": [
         102,
         123
       ],
@@ -2529,6 +2543,9 @@
     },
     "modules/annotated_3d_model_equivalence_shape/arm.exp": {
       "linking-error": [
+        186
+      ],
+      "reference-name-case": [
         186
       ]
     },
@@ -2723,6 +2740,11 @@
         181,
         187,
         187
+      ],
+      "reference-name-case": [
+        151,
+        158,
+        181
       ]
     },
     "modules/assembly_constraints/arm.exp": {
@@ -2733,6 +2755,9 @@
     },
     "modules/assembly_constraints/mim.exp": {
       "linking-error": [
+        15
+      ],
+      "reference-name-case": [
         15
       ]
     },
@@ -2758,6 +2783,9 @@
         21,
         23,
         23
+      ],
+      "reference-name-case": [
+        21
       ]
     },
     "modules/assembly_module_usage_view/arm.exp": {
@@ -2798,6 +2826,9 @@
         18,
         18
       ],
+      "reference-name-case": [
+        18
+      ],
       "reference-statement-missing": [
         15
       ]
@@ -2805,6 +2836,9 @@
     "modules/assembly_module_with_packaged_connector_component/arm.exp": {
       "linking-error": [
         24,
+        24
+      ],
+      "reference-name-case": [
         24
       ],
       "reference-statement-missing": [
@@ -2820,6 +2854,9 @@
       "linking-error": [
         46,
         46
+      ],
+      "reference-name-case": [
+        46
       ]
     },
     "modules/assembly_technology/arm.exp": {
@@ -2827,6 +2864,10 @@
         63,
         63,
         65,
+        65
+      ],
+      "reference-name-case": [
+        63,
         65
       ]
     },
@@ -2845,6 +2886,11 @@
         107,
         118
       ],
+      "reference-name-case": [
+        36,
+        86,
+        118
+      ],
       "reference-statement-missing": [
         35,
         107
@@ -2852,6 +2898,9 @@
     },
     "modules/basic_geometric_topology/arm.exp": {
       "linking-error": [
+        28
+      ],
+      "reference-name-case": [
         28
       ]
     },
@@ -2930,6 +2979,9 @@
         221,
         225,
         228
+      ],
+      "reference-name-case": [
+        16
       ]
     },
     "modules/catalog_data_information/mim.exp": {
@@ -2990,6 +3042,9 @@
         1757,
         1757
       ],
+      "reference-name-case": [
+        16
+      ],
       "reference-statement-missing": [
         904,
         906
@@ -3000,15 +3055,31 @@
         107,
         137,
         138
+      ],
+      "reference-name-case": [
+        88,
+        107,
+        113,
+        114,
+        137,
+        138
       ]
     },
     "modules/cfd_model/arm.exp": {
       "linking-error": [
         72
+      ],
+      "reference-name-case": [
+        72
       ]
     },
     "modules/cfd_results/arm.exp": {
       "linking-error": [
+        106,
+        107,
+        108
+      ],
+      "reference-name-case": [
         106,
         107,
         108
@@ -3026,11 +3097,19 @@
         33,
         34,
         43
+      ],
+      "reference-name-case": [
+        33,
+        34,
+        43
       ]
     },
     "modules/chemical_substance/arm.exp": {
       "linking-error": [
         151
+      ],
+      "reference-name-case": [
+        185
       ]
     },
     "modules/class_of_involvement_in_activity/mim.exp": {
@@ -3055,6 +3134,9 @@
     },
     "modules/composite_surface/arm.exp": {
       "linking-error": [
+        44
+      ],
+      "reference-name-case": [
         44
       ]
     },
@@ -3091,6 +3173,9 @@
     "modules/curve_swept_solid/mim.exp": {
       "linking-error": [
         8
+      ],
+      "reference-name-case": [
+        8
       ]
     },
     "modules/default_tolerance/mim.exp": {
@@ -3114,11 +3199,17 @@
     "modules/design_management/mim.exp": {
       "linking-error": [
         13
+      ],
+      "reference-name-case": [
+        13
       ]
     },
     "modules/device_marking/arm.exp": {
       "linking-error": [
         67,
+        67
+      ],
+      "reference-name-case": [
         67
       ]
     },
@@ -3127,6 +3218,10 @@
         139
       ],
       "linking-error": [
+        56,
+        106
+      ],
+      "reference-name-case": [
         56,
         106
       ]
@@ -3227,6 +3322,29 @@
         693,
         693
       ],
+      "reference-name-case": [
+        170,
+        180,
+        203,
+        217,
+        267,
+        394,
+        403,
+        415,
+        416,
+        424,
+        431,
+        447,
+        460,
+        497,
+        507,
+        584,
+        611,
+        645,
+        652,
+        679,
+        693
+      ],
       "reference-statement-missing": [
         490,
         597
@@ -3269,6 +3387,9 @@
         216,
         223,
         226
+      ],
+      "reference-name-case": [
+        161
       ]
     },
     "modules/externally_conditioned_data_quality_criteria/mim.exp": {
@@ -3293,6 +3414,18 @@
         191,
         198,
         201
+      ],
+      "reference-name-case": [
+        35,
+        67,
+        74,
+        81,
+        109,
+        116,
+        123,
+        130,
+        134,
+        138
       ]
     },
     "modules/externally_conditioned_data_quality_inspection_result/arm.exp": {
@@ -3346,15 +3479,43 @@
         244,
         416,
         416
+      ],
+      "reference-name-case": [
+        416,
+        471,
+        472
       ]
     },
     "modules/fea_definition_relationships/arm.exp": {
       "linking-error": [
         66
+      ],
+      "reference-name-case": [
+        66
+      ]
+    },
+    "modules/finite_element_analysis/arm.exp": {
+      "reference-name-case": [
+        98,
+        108,
+        134,
+        148
       ]
     },
     "modules/finite_elements/arm.exp": {
       "linking-error": [
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        123,
+        123,
+        123
+      ],
+      "reference-name-case": [
         60,
         60,
         60,
@@ -3444,11 +3605,17 @@
     "modules/functional_specification/mim.exp": {
       "linking-error": [
         13
+      ],
+      "reference-name-case": [
+        13
       ]
     },
     "modules/functional_usage_view/arm.exp": {
       "linking-error": [
         73,
+        73
+      ],
+      "reference-name-case": [
         73
       ]
     },
@@ -3480,6 +3647,9 @@
         192,
         193,
         385
+      ],
+      "reference-name-case": [
+        385
       ]
     },
     "modules/geometric_model_relationship/arm.exp": {
@@ -3492,6 +3662,11 @@
         40,
         43,
         45
+      ],
+      "reference-name-case": [
+        35,
+        35,
+        37
       ]
     },
     "modules/geometric_tolerance/arm.exp": {
@@ -3527,6 +3702,9 @@
         17,
         18,
         19
+      ],
+      "reference-name-case": [
+        17
       ]
     },
     "modules/independent_property_definition/mim.exp": {
@@ -3604,6 +3782,10 @@
         240,
         240
       ],
+      "reference-name-case": [
+        182,
+        237
+      ],
       "reference-statement-missing": [
         183,
         238
@@ -3621,6 +3803,12 @@
       "linking-error": [
         14,
         20
+      ]
+    },
+    "modules/kinematic_analysis_control_and_result/arm.exp": {
+      "reference-name-case": [
+        24,
+        34
       ]
     },
     "modules/kinematic_motion_representation/arm.exp": {
@@ -3651,6 +3839,11 @@
         164,
         186,
         186
+      ],
+      "reference-name-case": [
+        39,
+        74,
+        85
       ]
     },
     "modules/kinematic_state/arm.exp": {
@@ -3729,6 +3922,10 @@
         199,
         199,
         199
+      ],
+      "reference-name-case": [
+        18,
+        64
       ]
     },
     "modules/kinematic_structure/arm.exp": {
@@ -3743,6 +3940,12 @@
         91,
         91,
         91,
+        283,
+        502,
+        747
+      ],
+      "reference-name-case": [
+        70,
         283,
         502,
         747
@@ -3769,6 +3972,11 @@
         104,
         104,
         104
+      ],
+      "reference-name-case": [
+        40,
+        80,
+        104
       ]
     },
     "modules/land/arm.exp": {
@@ -3776,6 +3984,12 @@
         34,
         34,
         87,
+        87,
+        135,
+        227
+      ],
+      "reference-name-case": [
+        34,
         87,
         135,
         227
@@ -3806,6 +4020,9 @@
         309,
         315,
         315
+      ],
+      "reference-name-case": [
+        309
       ],
       "reference-statement-missing": [
         163,
@@ -3883,6 +4100,18 @@
         1119,
         1424
       ],
+      "reference-name-case": [
+        218,
+        219,
+        566,
+        592,
+        619,
+        620,
+        1020,
+        1023,
+        1032,
+        1424
+      ],
       "reference-statement-missing": [
         182,
         207,
@@ -3917,6 +4146,10 @@
         39,
         40
       ],
+      "reference-name-case": [
+        39,
+        40
+      ],
       "reference-statement-missing": [
         38
       ]
@@ -3930,6 +4163,11 @@
         241,
         273,
         275,
+        275
+      ],
+      "reference-name-case": [
+        241,
+        273,
         275
       ],
       "reference-statement-missing": [
@@ -3951,6 +4189,11 @@
         450,
         450
       ],
+      "reference-name-case": [
+        52,
+        53,
+        450
+      ],
       "reference-statement-missing": [
         239,
         259
@@ -3958,6 +4201,9 @@
     },
     "modules/layered_interconnect_simple_template/mim.exp": {
       "linking-error": [
+        16
+      ],
+      "reference-name-case": [
         16
       ]
     },
@@ -3971,6 +4217,9 @@
     },
     "modules/layout_macro_definition/mim.exp": {
       "linking-error": [
+        11
+      ],
+      "reference-name-case": [
         11
       ]
     },
@@ -4016,6 +4265,11 @@
         214,
         223,
         223
+      ]
+    },
+    "modules/machining_features/arm.exp": {
+      "reference-name-case": [
+        934
       ]
     },
     "modules/machining_features/mim.exp": {
@@ -4070,6 +4324,10 @@
         101,
         102,
         102
+      ],
+      "reference-name-case": [
+        65,
+        87
       ]
     },
     "modules/mechanical_design_presentation_representation_with_draughting/arm.exp": {
@@ -4093,6 +4351,12 @@
         32,
         33,
         96
+      ],
+      "reference-name-case": [
+        64,
+        65,
+        71,
+        102
       ],
       "reference-statement-missing": [
         57
@@ -4121,20 +4385,40 @@
         204,
         204,
         237
+      ],
+      "reference-name-case": [
+        54,
+        55,
+        140,
+        141,
+        147,
+        181,
+        202,
+        205,
+        237
       ]
     },
     "modules/model_based_3d_geometrical_dimensioning_and_tolerancing_representation/arm.exp": {
       "linking-error": [
+        38
+      ],
+      "reference-name-case": [
         38
       ]
     },
     "modules/model_parameter/arm.exp": {
       "linking-error": [
         85
+      ],
+      "reference-name-case": [
+        85
       ]
     },
     "modules/modified_swept_solid/arm.exp": {
       "linking-error": [
+        34
+      ],
+      "reference-name-case": [
         34
       ]
     },
@@ -4148,10 +4432,19 @@
         113,
         114,
         114
+      ],
+      "reference-name-case": [
+        65,
+        87,
+        113,
+        114
       ]
     },
     "modules/network_functional_design_view/mim.exp": {
       "linking-error": [
+        14
+      ],
+      "reference-name-case": [
         14
       ]
     },
@@ -4160,6 +4453,10 @@
         54,
         54,
         55,
+        104
+      ],
+      "reference-name-case": [
+        54,
         104
       ],
       "reference-statement-missing": [
@@ -4203,6 +4500,9 @@
         399,
         400,
         400
+      ],
+      "reference-name-case": [
+        291
       ]
     },
     "modules/package/arm.exp": {
@@ -4213,6 +4513,10 @@
         206,
         223,
         227
+      ],
+      "reference-name-case": [
+        102,
+        106
       ],
       "reference-statement-missing": [
         74,
@@ -4235,6 +4539,9 @@
         35,
         41
       ],
+      "reference-name-case": [
+        19
+      ],
       "reference-statement-missing": [
         41
       ]
@@ -4244,6 +4551,10 @@
         64,
         64,
         65,
+        65
+      ],
+      "reference-name-case": [
+        64,
         65
       ]
     },
@@ -4284,10 +4595,17 @@
         24,
         50,
         50
+      ],
+      "reference-name-case": [
+        24,
+        50
       ]
     },
     "modules/part_feature_grouping/mim.exp": {
       "linking-error": [
+        12
+      ],
+      "reference-name-case": [
         12
       ]
     },
@@ -4318,6 +4636,9 @@
     },
     "modules/part_template/mim.exp": {
       "linking-error": [
+        12
+      ],
+      "reference-name-case": [
         12
       ]
     },
@@ -4439,6 +4760,9 @@
         358,
         365
       ],
+      "reference-name-case": [
+        283
+      ],
       "unqualified-group-reference": [
         292
       ]
@@ -4520,6 +4844,9 @@
         31,
         37
       ],
+      "reference-name-case": [
+        31
+      ],
       "reference-statement-missing": [
         37
       ]
@@ -4555,6 +4882,9 @@
         134,
         177
       ],
+      "reference-name-case": [
+        133
+      ],
       "reference-statement-missing": [
         38,
         104,
@@ -4578,6 +4908,9 @@
         40,
         41,
         107
+      ],
+      "reference-name-case": [
+        14
       ]
     },
     "modules/physical_connectivity_definition/arm.exp": {
@@ -4613,6 +4946,10 @@
         55,
         55,
         55
+      ],
+      "reference-name-case": [
+        17,
+        52
       ]
     },
     "modules/physical_layout_template/mim.exp": {
@@ -4624,6 +4961,9 @@
       ],
       "linking-error": [
         17
+      ],
+      "reference-name-case": [
+        17
       ]
     },
     "modules/physical_node_requirement_to_implementing_component_allocation/arm.exp": {
@@ -4633,6 +4973,12 @@
         59,
         65,
         66,
+        111
+      ],
+      "reference-name-case": [
+        40,
+        42,
+        59,
         111
       ]
     },
@@ -4663,6 +5009,9 @@
     "modules/planned_characteristic/mim.exp": {
       "linking-error": [
         15
+      ],
+      "reference-name-case": [
+        15
       ]
     },
     "modules/printed_physical_layout_template/arm.exp": {
@@ -4684,6 +5033,9 @@
         205,
         256
       ],
+      "reference-name-case": [
+        205
+      ],
       "reference-statement-missing": [
         58,
         155,
@@ -4698,6 +5050,10 @@
       "linking-error": [
         19,
         20
+      ],
+      "reference-name-case": [
+        19,
+        20
       ]
     },
     "modules/process_plan/arm.exp": {
@@ -4706,10 +5062,19 @@
         74,
         80,
         88
+      ],
+      "reference-name-case": [
+        73,
+        74,
+        80,
+        88
       ]
     },
     "modules/product_analysis/mim.exp": {
       "linking-error": [
+        12
+      ],
+      "reference-name-case": [
         12
       ]
     },
@@ -4784,6 +5149,9 @@
     "modules/product_class/arm.exp": {
       "linking-error": [
         24
+      ],
+      "reference-name-case": [
+        24
       ]
     },
     "modules/product_class/mim.exp": {
@@ -4806,11 +5174,27 @@
         105,
         108,
         108
+      ],
+      "reference-name-case": [
+        88,
+        88,
+        94,
+        99,
+        105
       ]
     },
     "modules/product_data_quality_criteria/mim.exp": {
       "linking-error": [
         13
+      ],
+      "reference-name-case": [
+        13
+      ]
+    },
+    "modules/product_data_quality_definition/arm.exp": {
+      "reference-name-case": [
+        25,
+        29
       ]
     },
     "modules/product_data_quality_definition/mim.exp": {
@@ -4820,6 +5204,9 @@
         27,
         31,
         35
+      ],
+      "reference-name-case": [
+        20
       ]
     },
     "modules/product_data_quality_inspection_result/arm.exp": {
@@ -4837,10 +5224,18 @@
         101,
         102,
         102
+      ],
+      "reference-name-case": [
+        58,
+        69,
+        98
       ]
     },
     "modules/product_data_quality_inspection_result/mim.exp": {
       "linking-error": [
+        17
+      ],
+      "reference-name-case": [
         17
       ]
     },
@@ -4861,6 +5256,9 @@
         14,
         22,
         28
+      ],
+      "reference-name-case": [
+        12
       ],
       "reference-statement-missing": [
         28
@@ -4900,6 +5298,9 @@
         11,
         12,
         13
+      ],
+      "reference-name-case": [
+        11
       ]
     },
     "modules/production_rule/arm.exp": {
@@ -4919,6 +5320,11 @@
         336,
         339,
         340
+      ],
+      "reference-name-case": [
+        52,
+        128,
+        314
       ]
     },
     "modules/property_space/mim.exp": {
@@ -4931,10 +5337,16 @@
       "linking-error": [
         113,
         113
+      ],
+      "reference-name-case": [
+        113
       ]
     },
     "modules/requirement_decomposition/mim.exp": {
       "linking-error": [
+        18
+      ],
+      "reference-name-case": [
         18
       ]
     },
@@ -4946,8 +5358,16 @@
         99
       ]
     },
+    "modules/scan_data_3d_shape/arm.exp": {
+      "reference-name-case": [
+        67
+      ]
+    },
     "modules/scan_data_3d_shape/mim.exp": {
       "linking-error": [
+        8
+      ],
+      "reference-name-case": [
         8
       ]
     },
@@ -4988,6 +5408,10 @@
         11,
         13,
         16
+      ],
+      "reference-name-case": [
+        11,
+        13
       ]
     },
     "modules/shape_data_quality_criteria/arm.exp": {
@@ -5042,10 +5466,34 @@
         2212,
         2247,
         2261
+      ],
+      "reference-name-case": [
+        1888,
+        1892,
+        1894,
+        1896,
+        1976,
+        1980,
+        1982,
+        1984,
+        2071,
+        2075,
+        2077,
+        2079,
+        2081,
+        2083,
+        2176,
+        2180,
+        2181,
+        2183,
+        2185
       ]
     },
     "modules/shape_data_quality_criteria/mim.exp": {
       "linking-error": [
+        12
+      ],
+      "reference-name-case": [
         12
       ]
     },
@@ -5090,10 +5538,34 @@
         314,
         344,
         361
+      ],
+      "reference-name-case": [
+        118,
+        127,
+        128,
+        130,
+        138,
+        139,
+        141,
+        149,
+        158,
+        167,
+        177,
+        187,
+        197,
+        244,
+        306,
+        308,
+        310,
+        312,
+        314
       ]
     },
     "modules/shape_data_quality_inspection_result/mim.exp": {
       "linking-error": [
+        17
+      ],
+      "reference-name-case": [
         17
       ]
     },
@@ -5109,6 +5581,9 @@
         12,
         12,
         15
+      ],
+      "reference-name-case": [
+        12
       ]
     },
     "modules/shape_property_assignment/arm.exp": {
@@ -5131,6 +5606,12 @@
         14,
         15,
         16,
+        16
+      ],
+      "reference-name-case": [
+        11,
+        14,
+        15,
         16
       ]
     },
@@ -5158,6 +5639,9 @@
         401,
         401,
         425
+      ],
+      "reference-name-case": [
+        160
       ]
     },
     "modules/stock_material/mim.exp": {
@@ -5271,6 +5755,15 @@
         253,
         263,
         263
+      ],
+      "reference-name-case": [
+        18,
+        145,
+        160,
+        192,
+        199,
+        207,
+        239
       ]
     },
     "modules/vertex_colours_for_tessellated_geometry/arm.exp": {
@@ -7058,6 +7551,12 @@
         11866,
         11866
       ],
+      "reference-name-case": [
+        20,
+        94,
+        95,
+        784
+      ],
       "reference-statement-missing": [
         2600,
         2962,
@@ -7087,11 +7586,20 @@
         273
       ]
     },
+    "resources/domain_schema/domain_schema.exp": {
+      "reference-name-case": [
+        44
+      ]
+    },
     "resources/explicit_constraint_schema/explicit_constraint_schema.exp": {
       "linking-error": [
         31,
         34,
         77
+      ],
+      "reference-name-case": [
+        31,
+        34
       ]
     },
     "resources/explicit_geometric_constraint_schema/explicit_geometric_constraint_schema.exp": {
@@ -7246,6 +7754,14 @@
         869,
         871,
         871
+      ],
+      "reference-name-case": [
+        60,
+        298,
+        312,
+        317,
+        326,
+        331
       ]
     },
     "resources/kinematic_motion_representation_schema/kinematic_motion_representation_schema.exp": {
@@ -7273,6 +7789,9 @@
     },
     "resources/mathematical_context_schema/mathematical_context_schema.exp": {
       "linking-error": [
+        38
+      ],
+      "reference-name-case": [
         38
       ]
     },
@@ -7310,6 +7829,9 @@
         14,
         20,
         35
+      ],
+      "reference-name-case": [
+        14
       ],
       "reference-statement-missing": [
         26,
@@ -7355,6 +7877,9 @@
         84,
         88,
         94
+      ],
+      "reference-name-case": [
+        31
       ],
       "reference-statement-missing": [
         59,
@@ -7546,6 +8071,20 @@
         2360,
         2365,
         2365
+      ],
+      "reference-name-case": [
+        33,
+        35,
+        37,
+        39,
+        41,
+        46,
+        52,
+        58,
+        60,
+        64,
+        2257,
+        2258
       ]
     },
     "resources/shape_data_quality_inspection_result_schema/shape_data_quality_inspection_result_schema.exp": {
@@ -7574,6 +8113,11 @@
         226,
         235,
         237
+      ],
+      "reference-name-case": [
+        74,
+        76,
+        79
       ]
     },
     "resources/shape_tolerance_schema/shape_tolerance_schema.exp": {
@@ -7655,6 +8199,9 @@
         93
       ],
       "linking-error": [
+        33
+      ],
+      "reference-name-case": [
         33
       ],
       "reference-statement-missing": [

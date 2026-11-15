@@ -42,6 +42,22 @@
   detached by metanorma-plugin-lutaml 0.7.68 and later; issue 862). An
   `annotation-orphan-key` is now also reported for a key of another schema than
   the one the block follows. None of them reports on the SMRL v8 corpus.
+- Report a reference spelled differently from the declaration it binds to
+  (`reference-name-case`, warning, with a quick fix that respells it): a
+  supertype in SUBTYPE OF or a supertype expression; an attribute, parameter,
+  local, return or select-member type; a BASED_ON type; an INVERSE entity; a
+  schema or item in USE FROM and REFERENCE FROM. Under the case rule an entity
+  or schema written in another case does not bind in a short form; the check
+  then names the declaration in scope that differs only in case. A schema
+  named in an interface clause is also held to the WG 12 convention: resource
+  schemas lower case, ARM and MIM schemas (long forms included) with an
+  initial upper-case letter. EXPRESS reads names regardless of case (ISO
+  10303-11:2004 7.1.2); the spelling is a WG 12 rule, and the ISO 10303
+  publication builds resolve names by exact spelling (requirement XS-PUB-004).
+  Long forms are not checked: eengine generates them and their names are
+  unique regardless of case (WG11 N239). On the SMRL v8 corpus the check adds
+  306 warnings in 114 files of the default workspace, for example `REFERENCE
+  FROM ISO13584_expressions_schema` against `SCHEMA iso13584_expressions_schema`.
 
 ## [0.5.1](https://github.com/TRThurman/EXPRESSsuite/compare/0.5.0...0.5.1) (2026-11-06)
 
