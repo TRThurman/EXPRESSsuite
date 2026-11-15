@@ -27,6 +27,21 @@
   `SCHEMA ... END_SCHEMA;`. Long forms are not checked. On the SMRL v8 corpus
   the check adds 4 `annotation-unkeyed-remark` warnings in the default
   workspace.
+- Five checks of description blocks for constructs that the ISO 10303
+  publication pipeline mishandles (tutorial section 10, requirements in
+  `docs/REQUIREMENTS-annotation-publication-checks.md`), read through a
+  classifier of the AsciiDoc lines. Warnings, with a quick fix for the first
+  two: `annotation-continuation-without-list` (a `+` whose chain does not start
+  at a list item), `annotation-glued-continuation` (a `+` glued to the `]` of a
+  block macro), `annotation-block-macro-inline` (a block macro not at the start
+  of a line, or in a cell that is not `a|`). Information, behind the new
+  setting `expresssuite.annotations.publicationHazards` (default on):
+  `annotation-open-block-delimiter` (a line `--`, which closes the schema
+  page's `[source]` listing; metanorma/iso-10303 issue 857) and
+  `annotation-list-chain-macro` (a list item whose `+` chain attaches a macro,
+  detached by metanorma-plugin-lutaml 0.7.68 and later; issue 862). An
+  `annotation-orphan-key` is now also reported for a key of another schema than
+  the one the block follows. None of them reports on the SMRL v8 corpus.
 
 ## [0.5.1](https://github.com/TRThurman/EXPRESSsuite/compare/0.5.0...0.5.1) (2026-11-06)
 

@@ -112,11 +112,14 @@ lists four warnings from the description check, each with a code starting
 
 The `widget` block is clean and draws nothing.
 
-The check offers no quick fixes. A lightbulb on one of these rows comes from
-VS Code's own chat, if it is enabled, not from EXPRESSsuite.
+The check offers quick fixes for two codes only, `annotation-continuation-without-list`
+and `annotation-glued-continuation` (section 10). A lightbulb on any other row
+comes from VS Code's own chat, if it is enabled, not from EXPRESSsuite.
 
-The check has twelve codes. All are warnings except
-`annotation-link-unverified`, which is information:
+The check has seventeen codes. The five added last are the publication checks
+of section 10. All are warnings except `annotation-link-unverified`,
+`annotation-open-block-delimiter` and `annotation-list-chain-macro`, which
+are information:
 
 | Code | Meaning |
 |---|---|
@@ -132,6 +135,11 @@ The check has twelve codes. All are warnings except
 | `annotation-optional-sentence` | the description of an OPTIONAL attribute does not end with the sentence above |
 | `annotation-bare-subtype` | the description of an entity only says "A **x** is a type of <<express:...>>." |
 | `annotation-inside-schema` | a keyed block between `SCHEMA` and `END_SCHEMA;` |
+| `annotation-continuation-without-list` | a `+` line whose continuation chain does not start at a list item |
+| `annotation-glued-continuation` | a `+` written straight after the `]` of a block macro |
+| `annotation-block-macro-inline` | a block macro that does not start its line, or sits in a table cell that is not an `a\|` cell |
+| `annotation-open-block-delimiter` (information) | a line that is exactly `--` |
+| `annotation-list-chain-macro` (information) | a list item whose `+` chain attaches a macro, which metanorma-plugin-lutaml 0.7.68 and later detaches |
 
 Keys and link targets compare without regard to case. Long-form schemas get no
 check. Global rules and their WHERE rules are not described by the command.
@@ -335,6 +343,112 @@ Rules for the text of a description:
 | One block per key, except notes, examples and other `.__` blocks; every key has a declaration | `annotation-duplicate-key`, `annotation-orphan-key` |
 | Working notes stay inside the schema as `--` lines | `annotation-unkeyed-remark` |
 | No description block inside `SCHEMA ... END_SCHEMA;` | `annotation-inside-schema` |
+| A key names the schema its block follows | `annotation-orphan-key` |
+| `+` lines, block macros and `--` lines as section 10 describes | the five publication codes |
 
 The clean-up step is where non-ASCII characters (typographic quotes, dashes,
 ligatures from a PDF) can be replaced, so that pasted text passes the check.
+
+## 10. The publication checks
+
+A description block is AsciiDoc. The ISO 10303 publication pipeline (suma,
+metanorma-plugin-lutaml, expressir, Asciidoctor) wraps it in AsciiDoc of its
+own and rewrites some of its lines without parsing it, so a construct can mean
+something else in the published document than it meant to the author. Five
+codes show those constructs while the block is written. They read the block
+through a classifier that knows list markers, continuation chains, delimited
+blocks (`----`, `....`, `====`, `****`, `____`, `--`, `++++`, `////`,
+`|===`) and table cell styles; none decides from one line alone. Inside
+listing, literal, passthrough and comment blocks only `annotation-open-block-delimiter`
+applies. The examples below are synthetic.
+
+**Class A, source errors** (warning). The construct is wrong AsciiDoc whatever
+the pipeline does. Where the correction is unambiguous the check offers a quick
+fix.
+
+`annotation-continuation-without-list`. Source: AsciiDoc itself (TCSC410303-3232).
+A `+` line attaches the block that follows it to a list item. When the chain of
+`+` lines does not start at a list item, Asciidoctor prints the `+` and the
+macro as one paragraph of text. The check follows the chain back, through the
+`+` lines and the blocks they attach (paragraphs, block macros, delimited
+blocks), to the line that starts it. Every AsciiDoc list form counts as a list
+item: `*` to `*****`, `-`, `.` to `.....`, `1.`, `a.`, `A.`, `i)`, `I)`, `1)`,
+checklist items and `term::`, `term:::`, `term::::`, `term;;`. A delimited block
+written directly under a list item's text, with no blank line, is part of the
+item. Quick fix: replace the `+` with a blank line.
+
+```
+A paragraph, not a list item.
++
+image::figure_1.gif[]
+```
+
+reports the `+` (and each further `+` of the chain); `. A step` in place of the
+paragraph reports nothing.
+
+`annotation-glued-continuation`. Source: AsciiDoc itself. A `+` written
+directly after the closing `]` of a block macro, `image::figure_1.gif[]+`, is
+printed as text. Quick fix: remove the `+`; when the macro belongs to a list
+item's chain, put the `+` on a line of its own instead.
+
+`annotation-block-macro-inline`. Source: AsciiDoc itself (TCSC410303-3233). A
+block macro (`image::`, `video::`, `audio::`, `toc::`) is recognised only at
+the start of a line, and in a table only at the start of the content of a cell
+that holds AsciiDoc. It is reported when it follows other text on its line
+(`See image::figure_1.gif[] here.`, `. image::figure_1.gif[]`), or sits in a cell
+that is not an `a|` cell. A cell holds AsciiDoc when its specifier has the
+style `a` (`a|`, `2+a|`) or the table's `[cols=...]` gives its column the
+style `a` (`[cols="1,2a"]`, `[cols="2*a,1"]`). Limits: a `cols` value the
+check cannot read leaves the columns plain, so only cells written `a|` count;
+the rowspans of a table are not tracked when the cells of a row are counted
+against the columns; a macro inside backticks is text and is not reported.
+There is no quick fix.
+
+**Class B, publication hazards** (information). The construct is valid
+AsciiDoc that the current toolchain mishandles. Each message names the
+upstream issue and the versions, and the check is retired when the defect is
+fixed and the WG 12 output gate that covers it passes with the construct
+present. EXPRESSsuite never rewrites these constructs. The setting
+`expresssuite.annotations.publicationHazards` (default on) switches both off;
+the new value is read at the next validation of a document.
+
+`annotation-open-block-delimiter`. Source: metanorma/iso-10303 issue 857 (suma
+0.5.42 schema template). suma wraps each schema listing in `[source]` ...
+`--`, so a line that is exactly `--` anywhere in a remark, also inside a
+nested block, closes that listing and the rest of the schema page is rendered as
+AsciiDoc.
+
+```
+[NOTE]
+--
+A note written as an open block.
+--
+```
+
+reports both `--` lines.
+
+`annotation-list-chain-macro`. Source: metanorma/iso-10303 issue 862
+(metanorma-plugin-lutaml 0.7.68 and later). The plugin blanks a `+` line before
+a macro line (`link`, `image`, `video`, `audio`, `include`) unless the line
+before the `+` matches its regular expression for a list item: `*` or `-` and a
+space, a number or letter and `.` or `)` and a space, or a term, `::` and a
+space. Inside the chain of a `. ` item, a `**` item or a `term:::` item, and
+after an attached macro or paragraph, it does not match, the `+` is lost and the
+macro is detached from the item. The check reports the list item once and
+names the `+` lines.
+
+```
+. A step
++
+image::figure_1.gif[]
++
+image::figure_2.gif[]
+```
+
+reports the item and its two `+` lines; with `* A step` the first `+` survives
+but the second, which follows a macro line, does not.
+
+**Key of another schema.** `annotation-orphan-key` also reports a block whose
+key names another schema than the one whose `END_SCHEMA;` it follows, role
+suffix included (`other_schema.__note` after `demo_schema`): the text is
+printed in no listing.
