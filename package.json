@@ -187,6 +187,11 @@
           ],
           "description": "Exclude folders that contain one of these keywords in their name."
         },
+        "expresssuite.annotations.publicationHazards": {
+          "type": "boolean",
+          "default": true,
+          "description": "Report, as information, constructs in description blocks that are valid AsciiDoc but that the ISO 10303 publication toolchain mishandles (a line `--`; a list item whose continuation chain attaches a macro). Each message names the upstream issue and the versions it applies to."
+        },
         "expresssuite.excludedFiles": {
           "type": "array",
           "items": {

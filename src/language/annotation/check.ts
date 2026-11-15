@@ -10,6 +10,7 @@ import { annotationContexts, findExpressLinks, firstSentenceEnd } from "./blocks
 import { declaredKeys, describeTargets } from "./keys.js";
 import type { DescribeTarget } from "./keys.js";
 import type { LinkResolver } from "./link-resolver.js";
+import { publicationFindings } from "./publication.js";
 
 export enum AnnotationIssues {
   LinkUndeclared = "annotation-link-undeclared",
@@ -24,6 +25,11 @@ export enum AnnotationIssues {
   OptionalSentence = "annotation-optional-sentence",
   BareSubtype = "annotation-bare-subtype",
   InsideSchema = "annotation-inside-schema",
+  ContinuationWithoutList = "annotation-continuation-without-list",
+  GluedContinuation = "annotation-glued-continuation",
+  BlockMacroInline = "annotation-block-macro-inline",
+  OpenBlockDelimiter = "annotation-open-block-delimiter",
+  ListChainMacro = "annotation-list-chain-macro",
 }
 
 export const OPTIONAL_SENTENCE = "The value of this attribute need not be specified.";
@@ -35,6 +41,15 @@ export interface BlockFinding {
   end: number;
   message: string;
   severity: "warning" | "information";
+  /** An unambiguous correction: replace `start`..`end` (offsets in the body) with `newText`. */
+  fix?: { title: string; start: number; end: number; newText: string };
+}
+
+export interface CheckOptions {
+  /** Class B rules, for constructs the publication toolchain mishandles (setting `expresssuite.annotations.publicationHazards`; default on). */
+  publicationHazards?: boolean;
+  /** The 1-based line of the file the body starts on, for messages that name lines. */
+  firstLine?: number;
 }
 
 const SPACE_LINK_RE = /<<express:([^,>]*\s[^,>]*)(?:,[^>]*)?>>/g;
@@ -45,7 +60,12 @@ function finding(code: AnnotationIssues, start: number, end: number, message: st
 }
 
 /** Findings for one block's body; `target` is what its key describes, when anything. */
-export function checkBlock(block: { key: string; body: string }, target: DescribeTarget | undefined, resolver: LinkResolver): BlockFinding[] {
+export function checkBlock(
+  block: { key: string; body: string },
+  target: DescribeTarget | undefined,
+  resolver: LinkResolver,
+  options: CheckOptions = {}
+): BlockFinding[] {
   const { key, body } = block;
   const findings: BlockFinding[] = [];
 
@@ -101,22 +121,40 @@ export function checkBlock(block: { key: string; body: string }, target: Describ
       findings.push(finding(AnnotationIssues.BareSubtype, 0, body.length, "The description only restates the supertype."));
     }
   }
+  for (const f of publicationFindings(body, { hazards: options.publicationHazards ?? true, firstLine: options.firstLine })) {
+    findings.push({ ...f, code: f.code as AnnotationIssues });
+  }
   return findings;
 }
 
-export function validateAnnotations(document: LangiumDocument<ExpressFile>, resolver: LinkResolver, nameProvider: NameProvider): Diagnostic[] {
+export function validateAnnotations(
+  document: LangiumDocument<ExpressFile>,
+  resolver: LinkResolver,
+  nameProvider: NameProvider,
+  options: Pick<CheckOptions, "publicationHazards"> = {}
+): Diagnostic[] {
   const root = document.parseResult.value;
   // A document with no schema parses to a root without the list.
   if (!isExpressFile(root) || !root.schemas?.length) return [];
   const text = document.textDocument.getText();
   const diagnostics: Diagnostic[] = [];
-  const report = (code: AnnotationIssues, start: number, end: number, message: string, severity: BlockFinding["severity"] = "warning"): void => {
+  const range = (start: number, end: number) => ({ start: document.textDocument.positionAt(start), end: document.textDocument.positionAt(end) });
+  const report = (
+    code: AnnotationIssues,
+    start: number,
+    end: number,
+    message: string,
+    severity: BlockFinding["severity"] = "warning",
+    fix?: BlockFinding["fix"]
+  ): void => {
     diagnostics.push({
-      range: { start: document.textDocument.positionAt(start), end: document.textDocument.positionAt(end) },
+      range: range(start, end),
       severity: severity === "information" ? DiagnosticSeverity.Information : DiagnosticSeverity.Warning,
       message,
       code,
       source: "EXPRESSsuite",
+      // The quick fix of the diagnostic, read by the code action provider.
+      ...(fix ? { data: { fix: { title: fix.title, newText: fix.newText, range: range(fix.start, fix.end) } } } : {}),
     });
   };
   reportBlocksInsideSchemas(root, report);
@@ -145,11 +183,16 @@ export function validateAnnotations(document: LangiumDocument<ExpressFile>, reso
       // Informal-proposition keys belong to the informal-proposition validator.
       if (!/\.wr:ip\d+$/.test(bare) && !isInformalPropositionKey(block.key) && !declared.has(bare)) {
         report(AnnotationIssues.OrphanKey, block.keyStart, block.keyEnd, `No declaration has the key "${block.key}"; the text would be published without a subject.`);
+      } else if (!bare.startsWith(`${context.schema.toLowerCase()}.`) && bare !== context.schema.toLowerCase() && !isInformalPropositionKey(block.key) && !/\.wr:ip\d+$/.test(bare)) {
+        // The block follows the END_SCHEMA of its own schema: another schema's key is printed in no listing (XS-PUB-005).
+        report(AnnotationIssues.OrphanKey, block.keyStart, block.keyEnd, `The key "${block.key}" is qualified with another schema than ${context.schema}, after whose END_SCHEMA it stands; the text would be published without a subject.`);
       }
 
       const empty = block.body.length === 0;
-      for (const f of checkBlock(block, targets.get(lower), resolver)) {
-        report(f.code, block.bodyStart + (empty ? 0 : f.start), block.bodyStart + (empty ? 0 : f.end), f.message, f.severity);
+      const firstLine = document.textDocument.positionAt(block.bodyStart).line + 1;
+      for (const f of checkBlock(block, targets.get(lower), resolver, { ...options, firstLine })) {
+        const fix = f.fix && { ...f.fix, start: block.bodyStart + f.fix.start, end: block.bodyStart + f.fix.end };
+        report(f.code, block.bodyStart + (empty ? 0 : f.start), block.bodyStart + (empty ? 0 : f.end), f.message, f.severity, fix);
       }
     }
     for (const remark of context.unkeyed) {

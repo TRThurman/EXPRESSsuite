@@ -16,6 +16,7 @@ import { ExpressFile } from "./generated/ast.js";
 import { validateInformalPropositions } from "./informal-proposition-validator.js";
 import { validateAnnotations } from "./annotation/check.js";
 import { LinkResolver } from "./annotation/link-resolver.js";
+import { ExpressP11ConfigurationProvider } from "./express-p11-configuration-provider.js";
 import type { ExpressP11Services } from "./express-module.js";
 import type { ExpressP11TypeContainer } from "./express-p11-type-container.js";
 import type { NameProvider } from "langium";
@@ -25,9 +26,12 @@ type Diagnostic = NonNullable<LangiumDocument["diagnostics"]>[number];
 export class ExpressDocumentValidator extends DefaultDocumentValidator {
   protected readonly typeContainer: ExpressP11TypeContainer;
   protected readonly nameProvider: NameProvider;
+  private readonly configurationProvider: ExpressP11ConfigurationProvider | undefined;
 
   constructor(services: ExpressP11Services) {
     super(services);
+    const provider = services.shared.workspace.ConfigurationProvider;
+    this.configurationProvider = provider instanceof ExpressP11ConfigurationProvider ? provider : undefined;
     this.typeContainer = services.validation.TypeContainer;
     this.nameProvider = services.references.NameProvider;
   }
@@ -67,7 +71,9 @@ export class ExpressDocumentValidator extends DefaultDocumentValidator {
         ...validateAnnotations(
           document as LangiumDocument<ExpressFile>,
           new LinkResolver(this.typeContainer.getScopeIndex(), this.nameProvider),
-          this.nameProvider
+          this.nameProvider,
+          // `expresssuite.annotations.publicationHazards`, default on; read when the document is validated.
+          { publicationHazards: this.configurationProvider?.getReceivedSetting("annotations", "publicationHazards") !== false }
         )
       );
     } catch (err) {
