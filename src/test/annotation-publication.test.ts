@@ -209,6 +209,12 @@ describe("annotation-open-block-delimiter (XS-PUB-006)", () => {
   test("a CRLF line is exactly --", () => {
     expect(codes("--\r\nx")).toEqual(["annotation-open-block-delimiter"]);
   });
+
+  test("a -- followed by spaces or a tab is reported: Asciidoctor 2.0.26 drops trailing whitespace before it matches a delimiter", () => {
+    const body = "[NOTE]\n--  \ntext\n--\t\n\n-- \r\nx";
+    expect(at(body, "annotation-open-block-delimiter")).toEqual(["--  ", "--\t", "-- "]);
+    expect(codes("----\n-- \n----")).toEqual(["annotation-open-block-delimiter"]);
+  });
 });
 
 describe("annotation-list-chain-macro (XS-PUB-007)", () => {

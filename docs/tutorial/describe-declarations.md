@@ -138,7 +138,7 @@ are information:
 | `annotation-continuation-without-list` | a `+` line whose continuation chain does not start at a list item |
 | `annotation-glued-continuation` | a `+` written straight after the `]` of a block macro |
 | `annotation-block-macro-inline` | a block macro that does not start its line, or sits in a table cell that is not an `a\|` cell |
-| `annotation-open-block-delimiter` (information) | a line that is exactly `--` |
+| `annotation-open-block-delimiter` (information) | a line `--`, also with trailing whitespace |
 | `annotation-list-chain-macro` (information) | a list item whose `+` chain attaches a macro, which metanorma-plugin-lutaml 0.7.68 and later detaches |
 
 Keys and link targets compare without regard to case. Long-form schemas get no
@@ -415,9 +415,10 @@ the new value is read at the next validation of a document.
 
 `annotation-open-block-delimiter`. Source: metanorma/iso-10303 issue 857 (suma
 0.5.42 schema template). suma wraps each schema listing in `[source]` ...
-`--`, so a line that is exactly `--` anywhere in a remark, also inside a
-nested block, closes that listing and the rest of the schema page is rendered as
-AsciiDoc.
+`--`, so a line `--` anywhere in a remark, also inside a nested block, closes
+that listing and the rest of the schema page is rendered as AsciiDoc. Trailing
+whitespace after the `--` makes no difference, because Asciidoctor removes it
+before it matches a delimiter; a `--` with leading whitespace is not reported.
 
 ```
 [NOTE]

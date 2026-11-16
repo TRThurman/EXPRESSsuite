@@ -151,7 +151,8 @@ export function publicationFindings(body: string, options: PublicationOptions): 
       }
     }
 
-    if (options.hazards && line.text === "--") {
+    // Asciidoctor drops the trailing whitespace of every line (Ruby rstrip) before it matches the listing's closing "--".
+    if (options.hazards && /^--[ \t\v\f\0]*$/.test(line.text)) {
       findings.push({
         code: "annotation-open-block-delimiter",
         start: line.start,
