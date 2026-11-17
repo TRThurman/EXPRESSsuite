@@ -39,6 +39,7 @@ CHECKS = {
         ["checkAmbiguousAttributeReference"],
         [(UTILITIES, {"getVisibleLevels", "getAncestorLevels", "getDescendantLevels", "getVisibleSet", "visible"})], False),
     "informal-proposition-*": ([], [(INFORMAL, None)], False),
+    "annotation-*": ([], [("annotation/check.ts", None)], False),
     "reference-statement-missing": (
         ["checkReferencesAreImported", "issueReferenceStatementDiagnostic", "issueRenameReferenceDiagnostic"], [], False),
     "declaration-name-case": (["checkDeclarationNameCasing", "checkAttributeNameStartsWithLowerCase"], [], False),

@@ -1,6 +1,10 @@
+import { DocumentState, URI } from "langium";
 import { startLanguageServer } from "langium/lsp";
 import { NodeFileSystem } from "langium/node";
 import { createConnection, ProposedFeatures } from "vscode-languageserver/node";
+import type { CancellationToken } from "vscode-languageserver/node";
+import { DescribeService, isDescribeRequest } from "./annotation/describe.js";
+import type { DescribeEditResult } from "./annotation/describe.js";
 import { createExpressP11Services } from "./express-module.js";
 import { SchemaClosureDuplicateAnalyzer } from "./schema-closure-duplicates.js";
 import {
@@ -95,6 +99,50 @@ connection.onRequest(
     return schemaClosureDuplicateAnalyzer.analyze(params.uri, params.position, cancelToken);
   },
 );
+
+// Describe Declaration: targets, link proposals and the edit. Each waits until
+// the document is built, so offsets and the AST describe the same text.
+const describeService = new DescribeService(ExpressP11);
+
+const isOffset = (value: unknown): value is number => Number.isInteger(value) && (value as number) >= 0;
+
+async function whenBuilt(uri: string, cancelToken: CancellationToken): Promise<boolean> {
+  try {
+    await shared.workspace.WorkspaceManager.ready;
+    await shared.workspace.DocumentBuilder.waitUntil(DocumentState.IndexedReferences, URI.parse(uri), cancelToken);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+connection.onRequest(
+  "express/describeTargets",
+  async (params: { uri: string; start: number; end: number }, cancelToken) => {
+    if (!params || typeof params.uri !== "string" || !isOffset(params.start) || !isOffset(params.end) || params.end < params.start) {
+      return null;
+    }
+    if (!(await whenBuilt(params.uri, cancelToken))) return null;
+    return describeService.targets(params.uri, params.start, params.end);
+  },
+);
+
+connection.onRequest(
+  "express/describeProposals",
+  async (params: { uri: string; key: string; text: string }, cancelToken) => {
+    if (!params || typeof params.uri !== "string" || typeof params.key !== "string" || typeof params.text !== "string") return [];
+    if (!(await whenBuilt(params.uri, cancelToken))) return [];
+    return describeService.proposals(params.uri, params.key, params.text);
+  },
+);
+
+connection.onRequest("express/describeEdit", async (params: unknown, cancelToken): Promise<DescribeEditResult> => {
+  if (!isDescribeRequest(params)) return { edits: [], findings: [], refused: "The describe request is malformed." };
+  if (!(await whenBuilt(params.uri, cancelToken))) {
+    return { edits: [], findings: [], refused: "The document is not built in the language server." };
+  }
+  return describeService.edit(params);
+});
 
 // Start the language server with the shared services
 startLanguageServer(shared, EXPRESS_SERVICE_REQUIREMENTS);

@@ -6,7 +6,7 @@ import { defineConfig } from "vitest/config";
 // so files run one at a time in a worker with a 6 GB heap.
 export default defineConfig({
   test: {
-    include: ["src/test/smrlv8-*.test.ts"],
+    include: ["src/test/smrlv8-*.test.ts", "src/test/annotation-census.test.ts"],
     reporters: ["verbose"],
     fileParallelism: false,
     pool: "forks",

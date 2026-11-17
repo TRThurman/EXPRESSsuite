@@ -99,6 +99,12 @@
         "enablement": "editorLangId == express"
       },
       {
+        "command": "expresssuite.describeDeclaration",
+        "title": "Describe Declaration",
+        "category": "EXPRESSsuite",
+        "enablement": "editorLangId == express"
+      },
+      {
         "command": "expresssuite.showDescription",
         "title": "Show Description",
         "category": "EXPRESSsuite"
@@ -121,6 +127,11 @@
     ],
     "menus": {
       "editor/context": [
+        {
+          "command": "expresssuite.describeDeclaration",
+          "when": "editorLangId == express",
+          "group": "navigation@5"
+        },
         {
           "command": "expresssuite.showDescription",
           "when": "editorLangId == express",
@@ -175,6 +186,11 @@
             "business_object_models"
           ],
           "description": "Exclude folders that contain one of these keywords in their name."
+        },
+        "expresssuite.annotations.publicationHazards": {
+          "type": "boolean",
+          "default": true,
+          "description": "Report, as information, constructs in description blocks that are valid AsciiDoc but that the ISO 10303 publication toolchain mishandles (a line `--`; a list item whose continuation chain attaches a macro). Each message names the upstream issue and the versions it applies to."
         },
         "expresssuite.excludedFiles": {
           "type": "array",
