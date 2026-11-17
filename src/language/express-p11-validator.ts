@@ -5,6 +5,7 @@ import {
   LangiumDocuments,
   MultiMap,
   NameProvider,
+  Reference,
   ReferenceInfo,
   References,
   ValidationAcceptor,
@@ -30,17 +31,23 @@ import {
   isConstant_body,
   isDerived_attr,
   isEntityDefinition,
+  isEntityRef,
+  isEnumeration_extension,
   isExplicit_attr,
   isFunction_head,
   isGroup_qualifier,
   isIndex_qualifier,
   isInverse_attr,
+  isNamed_type_or_rename,
+  isNamed_types,
   isProcedure_call_Or_Assigment_stmt_reference,
   isRedeclared_attribute,
   isIncrement_control,
   isProcedure_head,
   isReference_clause,
   isResource_or_rename,
+  isSelect_extension,
+  isSelect_list,
   isSchemaDefinition,
   isTypeDefinition,
   isUse_clause,
@@ -73,6 +80,7 @@ export function registerValidationChecks(services: ExpressP11Services) {
       validator.checkDuplicateInterfacedDeclarations,
       validator.checkReferencesAreImported,
       validator.checkDeclarationNameCasing,
+      validator.checkReferenceNameCase,
     ],
   };
   registry.register(checks, validator);
@@ -83,6 +91,7 @@ export enum ExpressP11Issues {
   ReferenceStatementMissing = "reference-statement-missing",
   WrongReferenceLabel = "wrong-reference-label",
   DeclarationNameCase = "declaration-name-case",
+  ReferenceNameCase = "reference-name-case",
   DuplicateLoopIndex = "duplicate-loop-index",
   RedeclarationNotSpecialization = "redeclaration-not-specialization",
   IndexOnNonAggregate = "index-on-non-aggregate",
@@ -122,6 +131,10 @@ export type WrongReferenceLabelData = {
   expectedReference: string;
 };
 
+export type ReferenceNameCaseData = {
+  expectedName: string;
+};
+
 export type DeclarationNameCaseData = {
   expectedName: string;
 };
@@ -151,6 +164,28 @@ type SchemaName = string;
 /**
  * Implementation of custom validations.
  */
+type ReferenceSite = { reference: Reference; container: AstNode; property: string; index?: number };
+
+/** The references whose spelling XS-PUB-004 checks: supertypes, types, and interfaced schemas and items. */
+function referenceNameSites(node: AstNode): ReferenceSite[] {
+  const one = (reference: Reference | undefined, property: string): ReferenceSite[] =>
+    reference ? [{ reference, container: node, property }] : [];
+  if (isEntityRef(node)) return one(node.entity, "entity");
+  if (isNamed_types(node)) return one(node.of, "of");
+  if (isSelect_extension(node) || isEnumeration_extension(node)) return one(node.type, "type");
+  if (isInverse_attr(node)) return one(node.type, "type");
+  if (isUse_clause(node) || isReference_clause(node)) return one(node.schema, "schema");
+  if (isNamed_type_or_rename(node) || isResource_or_rename(node)) return one(node.resource, "resource");
+  if (isSelect_list(node)) return node.types.map((reference, index) => ({ reference, container: node, property: "types", index }));
+  return [];
+}
+
+/** WG 12 convention (RUL-26): ARM and MIM schemas, long forms included, start with an upper-case letter; others are lower case. */
+function conventionalSchemaName(name: string): string {
+  const lower = name.toLowerCase();
+  return /_(arm|mim)(_lf)?$/.test(lower) ? lower.charAt(0).toUpperCase() + lower.slice(1) : lower;
+}
+
 export class ExpressP11Validator {
   protected readonly references: References;
   protected readonly documents: LangiumDocuments;
@@ -415,6 +450,60 @@ export class ExpressP11Validator {
         data,
       });
     }
+  }
+
+  /**
+   * XS-PUB-004: a reference is spelled as the declaration it binds to (a supertype, a type, an interfaced schema or
+   * item), and an interfaced schema name follows the WG 12 convention. EXPRESS reads names regardless of case
+   * (ISO 10303-11:2004 7.1.2); the spelling is a WG 12 rule (RUL-26 for schema names, RUL-36 for SUBTYPE OF). Under
+   * the case rule (express-p11-case-rule-scope.ts) a type written in another case binds and an entity or schema
+   * written in another case does not, in a short form; both are reported here, naming the declaration.
+   */
+  checkReferenceNameCase(schema: SchemaDefinition, accept: ValidationAcceptor): void {
+    // A long form is generated (eengine) and unique regardless of case (WG11 N239); the publication reads short forms.
+    if (isLongForm(schema.name)) return;
+    for (const node of AstUtils.streamAst(schema)) {
+      for (const site of referenceNameSites(node)) {
+        const written = site.reference.$refText;
+        if (!written) continue;
+        const declared = this.declaredSpelling(site, written);
+        const isSchema = site.property === "schema";
+        if (declared !== undefined && declared !== written) {
+          const data: ReferenceNameCaseData = { expectedName: declared };
+          accept("warning", `Reference '${written}' is spelled differently from its declaration '${declared}'.`, {
+            node: site.container,
+            property: site.property,
+            index: site.index,
+            code: ExpressP11Issues.ReferenceNameCase,
+            data,
+          });
+        } else if (isSchema) {
+          const expectedName = conventionalSchemaName(written);
+          if (expectedName === written) continue;
+          const data: ReferenceNameCaseData = { expectedName };
+          accept(
+            "warning",
+            `Schema name '${written}' should be '${expectedName}': resource schemas are lower case, ARM and MIM schemas start with an upper-case letter.`,
+            { node: site.container, property: site.property, code: ExpressP11Issues.ReferenceNameCase, data }
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * The spelling of the declaration a reference binds to; for a reference that does not bind, the spelling of a
+   * declaration in its scope whose name differs from the written one only in case. Undefined when neither exists.
+   */
+  private declaredSpelling(site: ReferenceSite, written: string): string | undefined {
+    const target = site.reference.ref;
+    if (target) {
+      const name = this.nameProvider.getName(target);
+      return name !== undefined && name.toLowerCase() === written.toLowerCase() ? name : undefined;
+    }
+    const lower = written.toLowerCase();
+    const scope = this.scopeProvider.getScope({ reference: site.reference, container: site.container, property: site.property, index: site.index });
+    return scope.getAllElements().find((description) => description.name.toLowerCase() === lower)?.name;
   }
 
   checkLocalVariablesDoNotDuplicateLoopIndices(local: Local_decl, accept: ValidationAcceptor): void {

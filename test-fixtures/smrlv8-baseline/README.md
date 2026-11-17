@@ -18,9 +18,9 @@ correctness: several of the classes below are known false positives.
 The corpus folder loaded as one workspace with the extension's default
 settings: `useOptimizedConfiguration` on, so files whose name contains `lf`
 or `concatenated` and the `business_object_models` folder are not loaded.
-1,287 of the 1,410 files load; 6,353 diagnostics
-(3,901 error, 704 information, 1,748 warning) in
-272 files. `files` maps file to code to the 1-based start
+1,287 of the 1,410 files load; 6,663 diagnostics
+(3,901 error, 704 information, 2,058 warning) in
+281 files. `files` maps file to code to the 1-based start
 line of every diagnostic. `parseErrors` lists the files with lexer or parser
 errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 26-line fragment the distribution ships beside the module, not a schema.
@@ -30,6 +30,7 @@ errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 | linking-error                            |  3,374 |
 | (none)                                   |  1,737 |
 | declaration-name-case                    |    704 |
+| reference-name-case                      |    306 |
 | duplicate-interfaced-declaration         |    229 |
 | reference-statement-missing              |    176 |
 | duplicate-loop-index                     |     72 |
@@ -38,6 +39,7 @@ errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 | informal-proposition-malformed-signature |      7 |
 | informal-proposition-missing-annotation  |      6 |
 | ambiguous-attribute-reference            |      4 |
+| annotation-unkeyed-remark                |      4 |
 | informal-proposition-misplaced-signature |      3 |
 | parsing-error                            |      2 |
 

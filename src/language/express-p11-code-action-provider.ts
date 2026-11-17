@@ -12,6 +12,7 @@ import {
   DeclarationNameCaseData,
   ExpressP11Issues,
   ReferenceStatementData,
+  ReferenceNameCaseData,
   WrongReferenceLabelData,
 } from "./express-p11-validator.js";
 import { ExpressFile } from "./generated/ast.js";
@@ -49,6 +50,8 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
         return this.fixReferenceStatementMissing(diagnostic, document);
       case ExpressP11Issues.DeclarationNameCase:
         return this.fixDeclarationNameCase(diagnostic, document);
+      case ExpressP11Issues.ReferenceNameCase:
+        return this.fixReferenceNameCase(diagnostic, document);
     }
     return this.fixAnnotation(diagnostic, document);
   }
@@ -63,6 +66,18 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
       kind: CodeActionKind.QuickFix,
       diagnostics: [diagnostic],
       edit: { changes: { [document.textDocument.uri]: [{ range: fix.range, newText: fix.newText.replace(/\n/g, eol) }] } },
+    };
+  }
+
+  /** XS-PUB-004: respell a reference as the declaration it binds to, or a schema name by the WG 12 convention. */
+  private fixReferenceNameCase(diagnostic: Diagnostic, document: LangiumDocument<ExpressFile>): CodeAction | undefined {
+    const data = diagnostic.data as ReferenceNameCaseData;
+    if (!data?.expectedName) return undefined;
+    return {
+      title: `Respell as ${data.expectedName}`,
+      kind: CodeActionKind.QuickFix,
+      diagnostics: [diagnostic],
+      edit: { changes: { [document.textDocument.uri]: [{ range: diagnostic.range, newText: data.expectedName }] } },
     };
   }
 
