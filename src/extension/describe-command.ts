@@ -7,6 +7,7 @@ import { EXPRESSSUITE_COMMANDS } from "../shared/commands.js";
 import { applyCleanups, findCleanups } from "../shared/description-cleanup.js";
 import type { CleanupId } from "../shared/description-cleanup.js";
 import { splitMembers } from "../shared/describe-members.js";
+import { SOURCE_CHOICES, SOURCE_PLACEHOLDER, sourceKind } from "./describe-source-prompt.js";
 
 /** Everything the command needs after the source and target steps. */
 interface Chosen {
@@ -120,20 +121,13 @@ interface Source {
 /** Step 1: the selection, or typed text, or the clipboard. */
 async function pickSource(document: vscode.TextDocument, selection: vscode.Selection): Promise<Source | undefined> {
   if (!selection.isEmpty) return { kind: "selection", text: document.getText(selection) };
-  const choice = await vscode.window.showQuickPick(["Type the text", "Use the clipboard"], {
-    title: TITLE,
-    placeHolder: "Where does the description text come from?",
-  });
-  if (!choice) return undefined;
-  let text: string | undefined;
-  let kind: "typed" | "clipboard";
-  if (choice === "Type the text") {
-    kind = "typed";
-    text = await vscode.window.showInputBox({ title: TITLE, prompt: "Description text" });
-  } else {
-    kind = "clipboard";
-    text = await vscode.env.clipboard.readText();
-  }
+  const choice = await vscode.window.showQuickPick(
+    SOURCE_CHOICES.map(({ label, detail }) => ({ label, detail })),
+    { title: TITLE, placeHolder: SOURCE_PLACEHOLDER },
+  );
+  const kind = sourceKind(choice);
+  if (!kind) return undefined;
+  const text = kind === "typed" ? await vscode.window.showInputBox({ title: TITLE, prompt: "Description text" }) : await vscode.env.clipboard.readText();
   if (text === undefined) return undefined;
   if (text.trim() === "") {
     void vscode.window.showInformationMessage(`${TITLE}: there is no text to use.`);
