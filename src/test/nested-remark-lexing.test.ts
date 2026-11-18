@@ -79,11 +79,20 @@ describe("nested remark scanning cost", () => {
   };
 
   test("cost grows about linearly with the number of remarks", () => {
-    const single = fastest(remarkHeavy(2000));
-    const double = fastest(remarkHeavy(4000));
+    const small = remarkHeavy(2000);
+    const large = remarkHeavy(4000);
     // Linear would be 2x; allow generous headroom for timer noise while still
-    // catching quadratic behaviour, which would be about 4x.
-    expect(double / single).toBeLessThan(3);
+    // catching quadratic behaviour, which would be about 4x. Each timing is a
+    // few milliseconds, so another process on the machine can stretch one
+    // measurement past the limit: the best ratio of three attempts is taken,
+    // and the attempts stop at the first one within it. A quadratic matcher is
+    // over the limit on every attempt.
+    let ratio = Infinity;
+    for (let attempt = 0; attempt < 3 && ratio >= 3; attempt++) {
+      const single = fastest(small);
+      ratio = Math.min(ratio, fastest(large) / single);
+    }
+    expect(ratio).toBeLessThan(3);
   });
 
   test("deep nesting is iterative, not recursive", () => {
