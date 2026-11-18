@@ -4,6 +4,7 @@ export const EXPRESSSUITE_COMMANDS = {
   detectDuplicateDeclarationsInClosure: "expresssuite.detectDuplicateDeclarationsInClosure",
   describeDeclaration: "expresssuite.describeDeclaration",
   showDescription: "expresssuite.showDescription",
+  openTutorial: "expresssuite.openTutorial",
   showExpressG: "expresssuite.showExpressG",
   openMathPlayground: "expresssuite.openMathPlayground",
   sendSelectionToMathPlayground: "expresssuite.sendSelectionToMathPlayground",

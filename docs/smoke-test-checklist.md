@@ -120,6 +120,27 @@ The refactor preview lists each change unticked with **Apply** disabled;
   new block's links render.
 - **PASS** if all of the above hold.
 
+### S9 — Open Tutorial
+
+Run this on an installed package (a `.vsix` or the Marketplace), not in an
+extension development host: it checks that the tutorial is in the package.
+
+- In a window with no folder open, run **EXPRESSsuite: Open Tutorial** from the
+  command palette. Expected: a note on Restricted Mode with **Open the demo**
+  (the first time only), then a new window on a folder `tutorial-demo`. In a
+  profile that has not trusted that folder, the window is in Restricted Mode
+  and shows the schema as plain text: click **Restricted Mode** in the status
+  bar and choose **Trust**. Expected then: `demo_widgets.exp` on the left and
+  the tutorial rendered on the right; the Problems panel lists four
+  `annotation-` warnings.
+- Edit and save `demo_widgets.exp`, close that window, run the command again.
+  Expected: a choice between **Continue with my copy of the demo** and **Start
+  over with a fresh copy of the demo**; the first shows the edit, the second
+  the file as shipped.
+- Help → Welcome → Walkthroughs → more. Expected: "EXPRESSsuite tutorial" is listed; its first step has an **Open Tutorial**
+  button that does the same.
+- **PASS** if all of the above hold.
+
 ## Per-schema acceptance run (DESIGN §4.2.4)
 
 After S1–S6 pass on `geometry_schema.exp`, repeat the core surfaces on

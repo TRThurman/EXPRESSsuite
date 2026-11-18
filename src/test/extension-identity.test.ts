@@ -31,7 +31,8 @@ describe("EXPRESSsuite extension identity", () => {
     const commandsExpectedInMenus = implemented.filter(
       (command) => command !== EXPRESSSUITE_COMMANDS.buildWorkspace
         && command !== EXPRESSSUITE_COMMANDS.buildGraph
-        && command !== EXPRESSSUITE_COMMANDS.openMathPlayground,
+        && command !== EXPRESSSUITE_COMMANDS.openMathPlayground
+        && command !== EXPRESSSUITE_COMMANDS.openTutorial,
     );
     expect(menuCommands).toEqual(expect.arrayContaining(commandsExpectedInMenus));
   });

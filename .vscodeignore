@@ -27,6 +27,10 @@ langium-config.json
 DESIGN-viewers-integration.md
 # Project documentation lives in the repository, not in the package (2.5 MB of decks).
 docs/**
+# The tutorial, its demo schemas and the walkthrough pages are shipped: Open Tutorial reads them.
+!docs/tutorial/describe-declarations.md
+!docs/tutorial/demo/**
+!docs/tutorial/walkthrough/**
 UPGRADE-PROTOCOL.md
 test-fixtures/
 scripts/

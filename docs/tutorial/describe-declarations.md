@@ -33,10 +33,39 @@ description of an OPTIONAL attribute.
 
 ## Before you start
 
-### A build with the command
+### The tutorial and the demo from the editor
 
-Describe Declaration is not in EXPRESSsuite 0.5.1 or earlier. Until a release
-has it, build it from a clone of the repository:
+Describe Declaration is in EXPRESSsuite 0.6.0 and later. The tutorial and its
+demo are part of the installed extension:
+
+1. Open the command palette (Ctrl+Shift+P, or Cmd+Shift+P on macOS) and run
+   **EXPRESSsuite: Open Tutorial**. The Welcome page also lists it, under
+   **Walkthroughs**, as "EXPRESSsuite tutorial".
+2. A new window opens with a copy of the demo folder: `demo_widgets.exp` on
+   the left and this text on the right.
+3. The first time, VS Code may open that folder in Restricted Mode, where
+   EXPRESSsuite does not run: the schema shows as plain text and no tutorial
+   appears. If VS Code asks whether you trust the folder, answer yes;
+   otherwise click **Restricted Mode** in the status bar and choose **Trust**.
+   The folder is the copy the extension has just made. The tutorial then opens
+   beside the schema.
+
+The copy is yours to edit; it is in the storage folder that VS Code keeps for
+the extension, and an update of the extension does not change it. Run the
+command again to come back to it (**Continue with my copy of the demo**) or
+to get the demo back as it was (**Start over with a fresh copy of the demo**).
+
+Check that the window is ready:
+
+- With `demo_widgets.exp` open, the Problems panel lists the four warnings of
+  section 1, each with a code starting `annotation-`. If it lists
+  `The schema 'demo_support' could not be found`, the window has the file
+  open but not the folder: run **EXPRESSsuite: Open Tutorial** again.
+- The right-click menu in `demo_widgets.exp` has **Describe Declaration**.
+
+### From a clone of the repository
+
+To try a build that is not released, build it from a clone:
 
 ```
 git clone https://github.com/TRThurman/EXPRESSsuite.git
@@ -45,8 +74,6 @@ npm ci
 npm run langium:generate
 npm run build
 ```
-
-### The demo in a window of its own
 
 From the same directory, open the demo folder in a VS Code window that runs
 this build in a profile of its own:
@@ -62,23 +89,9 @@ Use `code-insiders` for VS Code Insiders; in PowerShell, put the command on
 one line without the `\`. The profile of its own keeps an EXPRESSsuite
 installed from the Marketplace, and any other extension for EXPRESS files,
 out of this window: otherwise both would check the same file. `out/` is not
-tracked by git. VS Code asks whether you trust the folder; it is the demo
-from your clone.
-
-Your other VS Code windows stay open beside the demo window and can look the
-same, with the same file open. Check that you are in the demo window:
-
-- The title bar begins `[Extension Development Host]` and names `demo`.
-- With `demo_widgets.exp` open, the Problems panel lists the four warnings of
-  section 1, each with a code starting `annotation-`. If it lists
-  `The schema 'demo_support' could not be found`, the window has the file
-  open but not the folder: use File > Open Folder and pick
-  `docs/tutorial/demo/`.
-- The right-click menu in `demo_widgets.exp` has **Describe Declaration**. If
-  it does not, the window is running a build without the command.
-
-Close the demo window when you are done; it does not close your other
-windows.
+tracked by git. The title bar of that window begins
+`[Extension Development Host]` and names `demo`. In a clone, `git restore` on
+`docs/tutorial/demo/` gives the demo back as it was.
 
 ### Running the command
 
@@ -94,8 +107,9 @@ checkbox ticks every change in the file). Nothing is written until you tick
 the change and press **Apply**. After applying, one undo (Ctrl+Z
 or Cmd+Z) reverts the whole edit. Pressing Escape at any step writes nothing.
 
-If you try a flow and want the demo back as it was, use `git restore` on
-`docs/tutorial/demo/` or undo the edit.
+If you try a flow and want the demo back as it was, undo the edit, or run
+**EXPRESSsuite: Open Tutorial** again and pick **Start over with a fresh copy
+of the demo**.
 
 ## 1. The check in the Problems panel
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+- **Open Tutorial** (command palette, and a walkthrough on the Welcome page):
+  the tutorial for Describe Declaration and its two demo schemas are now part
+  of the extension. The command copies the demo to the extension's storage
+  folder and opens it in a window of its own, with the tutorial beside the
+  schema; run again, it continues with that copy or starts over with a fresh
+  one. VS Code opens the copy in Restricted Mode the first time; the command
+  says so before it opens the window, and the tutorial appears once the folder
+  is trusted. The package grows by about 40 KB.
+
 ## [0.6.0](https://github.com/TRThurman/EXPRESSsuite/compare/0.5.1...0.6.0) (2026-11-16)
 
 ### Features
