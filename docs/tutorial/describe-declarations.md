@@ -455,3 +455,53 @@ but the second, which follows a macro line, does not.
 key names another schema than the one whose `END_SCHEMA;` it follows, role
 suffix included (`other_schema.__note` after `demo_schema`): the text is
 printed in no listing.
+
+## 11. From a description to the EXPRESS
+
+The other direction: you are reading a description block and want the EXPRESS
+it is for.
+
+1. In `demo_widgets.exp`, go to the block `(*"demo_widgets.widget"` after
+   `END_SCHEMA;`.
+2. Put the cursor on `widget` in the key and press F12 (**Go to Definition**;
+   Cmd+click on macOS and Ctrl+click elsewhere do the same). The editor goes to
+   `ENTITY widget`. With the cursor on `demo_widgets` in the same key it goes
+   to the `SCHEMA` line: the part of the key under the cursor decides.
+3. In the text of the block, press F12 on the bold `**widget**`, and then on
+   the cross-reference `<<express:demo_widgets.mount,mount>>`, on its target or
+   on its display text. The first goes to `ENTITY widget`, the second to the
+   declaration of `mount`.
+4. Go to the block `(*"demo_widgets.rail"` and press F12 on
+   `<<express:demo_widgets.rail.reach,reach>>`: the editor goes to the
+   attribute `reach` of `rail`.
+5. Right-click `widget` and choose **Show Description**. In the panel, click
+   **Go to declaration** under the heading: the editor goes to `ENTITY widget`.
+
+What each form of key goes to:
+
+| Key | Goes to |
+|---|---|
+| `schema` | the schema |
+| `schema.name` | the entity, type, function, procedure, rule, subtype constraint or constant |
+| `schema.entity.attribute` | the attribute: explicit, derived, inverse or redeclared (also written `schema.entity.SELF\supertype.attribute`) |
+| `schema.enumeration_type.item` | the enumeration item |
+| `schema.function.parameter` | the parameter |
+| `schema.entity.wr:label`, `schema.type.wr:label`, `schema.rule.wr:label` | the WHERE rule |
+| `schema.entity.ur:label` | the UNIQUE rule |
+| `schema.entity.wr:IPn` | the `--IPn:` line of the informal proposition; the entity when there is no such line |
+| any of these with `.__note`, `.__example`, `.__figure`, `.__table` | where the key without the suffix goes |
+| `schema.__expressg`, `schema.__fund_cons` and the other schema-level blocks | the schema |
+
+A plain name in the text is looked up as a member of the block's subject (an
+attribute of the entity described, a parameter of the function, an item of
+the enumeration), then as a declaration of the schema, then as one the schema
+reaches through `USE FROM` or `REFERENCE FROM`, then as one declared in
+another schema of the workspace. When several schemas declare the name, VS
+Code lists each. A word that names nothing does nothing.
+
+A name cited under a schema that does not declare it
+(`<<express:this_schema.name>>` for a name that `this_schema` takes from
+another schema) is followed through the schema's interfaces to its
+declaration. A key or cross-reference whose last part names nothing goes to
+its owner, or to the schema; `annotation-orphan-key` and
+`annotation-link-undeclared` report those.

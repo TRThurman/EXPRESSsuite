@@ -126,6 +126,11 @@ async function main(): Promise<void> {
     log("info", `xref -> navigate(${tag})`);
     vscode.postMessage({ kind: "navigate", targetName: tag });
   });
+  // "Go to declaration" above the text: the host knows the key this panel shows.
+  document.getElementById("declaration")?.addEventListener("click", (ev) => {
+    ev.preventDefault();
+    vscode.postMessage({ kind: "declaration" });
+  });
   log("info", "render complete");
 }
 

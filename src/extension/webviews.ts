@@ -141,11 +141,13 @@ async function descriptionHtml(
   math { font-size: 1.1em; }
   a { color: var(--vscode-textLink-foreground); }
   .err { color: var(--vscode-errorForeground); }
-  h1 { font-size: 16px; color: var(--vscode-descriptionForeground); margin-top: 0; }
+  h1 { font-size: 16px; color: var(--vscode-descriptionForeground); margin: 0; }
+  #declaration { display: inline-block; font-size: 12px; margin: 4px 0 12px; cursor: pointer; }
 </style>
 </head>
 <body>
 <h1 id="tag"></h1>
+<a id="declaration" href="#" title="Open the EXPRESS that this description is for">Go to declaration</a>
 <div id="content">Loading…</div>
 <script type="application/json" id="payload">${payload}</script>
 <script nonce="${n}">
@@ -170,6 +172,7 @@ export async function showDescriptionPreview(
   context: vscode.ExtensionContext,
   ann: RemarkAnnotation,
   sourceUri: vscode.Uri,
+  goToDeclaration: (key: string, sourceUri: vscode.Uri) => Promise<void>,
 ): Promise<void> {
   const panel = vscode.window.createWebviewPanel(
     "express.descriptionPreview",
@@ -199,6 +202,9 @@ export async function showDescriptionPreview(
         path: msg.targetName,
         sourceUri: sourceUri.toString(),
       });
+    } else if (msg.kind === "declaration") {
+      // The "Go to declaration" link: the EXPRESS that this panel's key names.
+      void goToDeclaration(ann.tag, sourceUri);
     } else if (msg.kind === "log") {
       logMessage("descriptionPreview", msg.level, msg.message);
     }
