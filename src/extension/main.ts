@@ -33,6 +33,47 @@ export function activate(context: vscode.ExtensionContext): void {
   stop(/* threshold */ 1500);
 }
 
+/**
+ * The "Go to declaration" link of a description panel: opens the EXPRESS that the panel's key
+ * names, in the editor column. Several declarations (a name that several schemas declare) are
+ * offered as a list.
+ */
+async function goToDeclarationOfKey(key: string, sourceUri: vscode.Uri): Promise<void> {
+  type Found = { uri: string; range: { start: { line: number; character: number }; end: { line: number; character: number } } };
+  let found: Found[] = [];
+  try {
+    const answer = await client.sendRequest<Found[]>("express/declarationOfKey", { key, uri: sourceUri.toString() });
+    if (Array.isArray(answer)) found = answer;
+  } catch {
+    /* server not ready */
+  }
+  if (found.length === 0) {
+    vscode.window.showInformationMessage(`No declaration found for "${key}".`);
+    return;
+  }
+  const pick =
+    found.length === 1
+      ? found[0]
+      : await vscode.window
+          .showQuickPick(
+            found.map((target) => ({
+              label: `${path.basename(vscode.Uri.parse(target.uri).fsPath)}:${target.range.start.line + 1}`,
+              description: vscode.workspace.asRelativePath(vscode.Uri.parse(target.uri)),
+              target,
+            })),
+            { placeHolder: `Declarations of "${key}"` },
+          )
+          .then((picked) => picked?.target);
+  if (!pick) return;
+  const range = new vscode.Range(pick.range.start.line, pick.range.start.character, pick.range.end.line, pick.range.end.character);
+  const editor = await vscode.window.showTextDocument(vscode.Uri.parse(pick.uri), {
+    selection: range,
+    preview: true,
+    viewColumn: vscode.ViewColumn.One,
+  });
+  editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
+}
+
 function registerViewerCommands(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand(EXPRESSSUITE_COMMANDS.showDescription, async (argument?: unknown) => {
@@ -86,7 +127,7 @@ function registerViewerCommands(context: vscode.ExtensionContext): void {
         vscode.window.showInformationMessage(`No description found for "${pathArg}".`);
         return;
       }
-      await showDescriptionPreview(context, primary, resolved.sourceUri);
+      await showDescriptionPreview(context, primary, resolved.sourceUri, goToDeclarationOfKey);
       stop(/* threshold */ 1000);
     }),
 

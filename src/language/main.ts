@@ -6,6 +6,7 @@ import type { CancellationToken } from "vscode-languageserver/node";
 import { DescribeService, isDescribeRequest } from "./annotation/describe.js";
 import type { DescribeEditResult } from "./annotation/describe.js";
 import { createExpressP11Services } from "./express-module.js";
+import type { ExpressP11DefinitionProvider } from "./express-p11-definition-provider.js";
 import { SchemaClosureDuplicateAnalyzer } from "./schema-closure-duplicates.js";
 import {
   DETECT_SCHEMA_CLOSURE_DUPLICATES_REQUEST,
@@ -99,6 +100,31 @@ connection.onRequest(
     return schemaClosureDuplicateAnalyzer.analyze(params.uri, params.position, cancelToken);
   },
 );
+
+// The declaration a description block's key names, for the "Go to declaration" link of the Show
+// Description panel. A key may hold `wr:`, `ur:` and `SELF\supertype.attribute`.
+const DESCRIPTION_KEY_RE = /^[A-Za-z_][A-Za-z0-9_.:\\]{0,511}$/;
+
+connection.onRequest("express/declarationOfKey", async (params: { key: string; uri?: string }) => {
+  if (!params || typeof params.key !== "string" || !DESCRIPTION_KEY_RE.test(params.key)) return [];
+  if (params.uri !== undefined && typeof params.uri !== "string") return [];
+  try {
+    await shared.workspace.WorkspaceManager.ready;
+  } catch {
+    return [];
+  }
+  let from;
+  if (params.uri) {
+    try {
+      from = shared.workspace.LangiumDocuments.getDocument(URI.parse(params.uri));
+    } catch {
+      from = undefined;
+    }
+  }
+  const provider = ExpressP11.lsp.DefinitionProvider as ExpressP11DefinitionProvider | undefined;
+  if (!provider) return [];
+  return provider.declarationsOfKey(params.key, from).map((link) => ({ uri: link.targetUri, range: link.targetSelectionRange }));
+});
 
 // Describe Declaration: targets, link proposals and the edit. Each waits until
 // the document is built, so offsets and the AST describe the same text.
