@@ -27,6 +27,29 @@
   that schema's interfaces. A key or cross-reference whose last part names
   nothing goes to its owner, or to the schema. Go to Definition in the EXPRESS
   of a schema is unchanged.
+- **Type-ahead in a description block.** In a keyed description block after
+  `END_SCHEMA;` the completion list offers what is valid where the cursor
+  stands; before, it offered nothing there. It opens after `"`, `.`, `:` and
+  `**`.
+  - In a key: the schema; after `schema.` its declarations, the ones that
+    have no block yet first, then the roles (`.__note`, `.__example`,
+    `.__figure`, `.__table`, and for a schema `.__expressg` and
+    `.__fund_cons`); after `schema.owner.` the owner's attributes, enumeration
+    items or parameters, its rules as `wr:label` and `ur:label`, its informal
+    propositions as `wr:IPn`, and the roles.
+  - In an `<<express:...>>` cross-reference: the schemas (this one, those it
+    interfaces, then the others); after `schema.` what the schema declares,
+    then what it reaches through `USE FROM` and `REFERENCE FROM`, written
+    under the schema that declares it; after `schema.owner.` the owner's
+    attributes, items or parameters. An accepted entry is completed with its
+    display text, the name in words, selected for typing over; in a
+    `.__expressg` block it ends `>>; ` for the area number.
+  - After `**`: the name of the block's subject.
+  - Elsewhere in the text, on Ctrl+Space only: the members of the block's
+    subject, then the names the schema declares and reaches.
+
+  An entry shows the description of its target when the target has one. The
+  completion list in the EXPRESS of a schema is unchanged.
 - The **Show Description** panel has a **Go to declaration** link under its
   heading, which opens the EXPRESS that the description is for.
 - **Find All References and Rename include the description blocks.** Until

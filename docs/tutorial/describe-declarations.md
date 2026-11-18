@@ -546,3 +546,45 @@ not start on a word of the text, on display text or on a suffix such as
 `.__note`. An attribute and the attributes that redeclare it without
 `RENAMED` are renamed together. A new name that is not an EXPRESS identifier
 is refused.
+
+## 13. Type-ahead in a description block
+
+While you write a block by hand, the editor offers the names that are valid
+where the cursor stands.
+
+1. In `demo_widgets.exp`, go to the end of the file and type `(*"`. The list
+   offers `demo_widgets`, the schema whose `END_SCHEMA;` the block follows.
+   Accept it.
+2. Type `.`. The list has the declarations of the schema. Those that have no
+   description block yet, such as `bracket`, come first; `widget`, which has
+   one, is marked "described" and comes after them. Accept `bracket` and type
+   `"`. The editor wrote a `)` when you typed `(`: delete it, and go to the
+   next line.
+3. Type `A **`. The list offers the subject of the block, and accepting it
+   writes `bracket**`.
+4. Go on with ` carries a <<express:`. The list has the schemas: this one
+   first. Accept `demo_widgets`; a dot is written and the list of its
+   declarations follows. Accept `mount`. The cross-reference is completed as
+   `<<express:demo_widgets.mount,mount>>` with the display text selected, so
+   that you can type other words over it.
+5. Finish the sentence with `.`, go to the next line and close the block
+   with `*)`.
+
+What is offered, by where the cursor is:
+
+| Cursor | Offered |
+|---|---|
+| in a key, nothing typed | the schema |
+| in a key, after `schema.` | the declarations of the schema, those without a block first; then the roles `.__expressg`, `.__fund_cons`, `.__note`, `.__example`, `.__figure`, `.__table` |
+| in a key, after `schema.owner.` | the owner's attributes, enumeration items or parameters, its rules as `wr:label` and `ur:label`, its informal propositions as `wr:IPn`; then the roles |
+| after `<<express:` | this schema, the schemas it interfaces, then the other schemas of the workspace |
+| after `<<express:schema.` | what the schema declares; then what it reaches through `USE FROM` and `REFERENCE FROM`, written under the schema that declares it |
+| after `<<express:schema.owner.` | the owner's attributes, enumeration items or parameters |
+| after `**` | the name of the block's subject |
+| elsewhere in the text, on Ctrl+Space only | the members of the block's subject, then the names the schema declares and reaches |
+
+To refer to an attribute, type the entity's name and a dot instead of
+accepting the entity from the list. A block does not offer its own subject as
+a cross-reference. In a `.__expressg` block an accepted cross-reference ends
+`>>; `, ready for the area number. Nothing of this is offered in a remark
+inside a schema, in a remark without a key, or in a long form.
