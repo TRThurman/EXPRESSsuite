@@ -19,11 +19,15 @@ Both workflows are `workflow_dispatch` — run them from the Actions tab.
    Marketplace (see *Irreversibility* below).
 2. **`Create release version`** (`release-public.yaml`) — the real release.
 
-Both accept an optional **`version`** input. Leave it blank to infer the
-increment from conventional commits. Supply it explicitly when **promoting a
-pre-release**: there are no new `feat:`/`fix:` commits since the pre-release
-tag, so the recommendation is empty and `release-it` would otherwise resolve
-the version to `null`.
+Only the release workflow takes an input, an optional **`version`**. The
+pre-release workflow has none: it infers the increment from conventional
+commits and adds the pre-release number (`0.6.0-0` before `0.6.0`).
+
+For the release, leave `version` blank to infer the increment from
+conventional commits. Supply it explicitly when **promoting a pre-release**:
+there are no new `feat:`/`fix:` commits since the pre-release tag, so the
+recommendation is empty and `release-it` would otherwise resolve the version
+to `null`.
 
 `release-it`'s `before:github:release` hook runs `vsce package`, so the
 `.vsix` attached to the GitHub Release is built once and is the artifact
