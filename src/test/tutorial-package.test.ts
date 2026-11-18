@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, posix } from "node:path";
 import { describe, expect, test } from "vitest";
 import { TUTORIAL_DEMO_FILE, TUTORIAL_DEMO_PATH, TUTORIAL_TEXT_PATH } from "../shared/tutorial.js";
 
@@ -59,7 +59,8 @@ describe("the tutorial in the package", () => {
     const text = readFileSync(join(root, ...TUTORIAL_TEXT_PATH), "utf8");
     const links = [...text.matchAll(/\]\(([^)#]+)(?:#[^)]*)?\)/g)].map((match) => match[1]).filter((link) => !/^[a-z]+:/i.test(link));
     for (const link of links) {
-      const path = join("docs/tutorial", link).replace(/\/$/, "");
+      // Paths in .vscodeignore are written with "/", on every platform.
+      const path = posix.join("docs/tutorial", link).replace(/\/$/, "");
       expect(existsSync(join(root, path)), link).toBe(true);
       expect(shipped(link.endsWith("/") ? `${path}/x` : path), link).toBe(true);
     }
