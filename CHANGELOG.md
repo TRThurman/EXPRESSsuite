@@ -4,6 +4,31 @@
 
 ### Features
 
+- **Go to Definition from a description block.** In a keyed description block
+  after `END_SCHEMA;`, Go to Definition (F12, Cmd+click or Ctrl+click, Peek
+  Definition) goes to the EXPRESS that the text under the cursor names:
+  - a part of the block's key: the schema, the declaration (entity, type,
+    function, procedure, rule, subtype constraint, constant), the attribute
+    (explicit, derived, inverse or redeclared, also written
+    `SELF\supertype.attribute`), the enumeration item, the parameter, the
+    WHERE rule (`wr:label`) or UNIQUE rule (`ur:label`). A key with `.__note`,
+    `.__example`, `.__figure` or `.__table` goes where the key without the
+    suffix goes; a schema-level block such as `.__expressg` goes to the schema;
+  - an informal proposition (`wr:IPn`): its `--IPn:` line in the entity or
+    type;
+  - an `<<express:...>>` cross-reference, its display text included, in this
+    file or any other file of the workspace;
+  - a plain name, the bold subject included: an attribute, parameter or item
+    of the block's subject, then a declaration of the schema, then one the
+    schema reaches through `USE FROM` or `REFERENCE FROM`, then one declared
+    in another schema. A name that several schemas declare lists each.
+
+  A name cited under a schema that does not declare it is followed through
+  that schema's interfaces. A key or cross-reference whose last part names
+  nothing goes to its owner, or to the schema. Go to Definition in the EXPRESS
+  of a schema is unchanged.
+- The **Show Description** panel has a **Go to declaration** link under its
+  heading, which opens the EXPRESS that the description is for.
 - **Open Tutorial** (command palette, and a walkthrough on the Welcome page):
   the tutorial for Describe Declaration and its two demo schemas are now part
   of the extension. The command copies the demo to the extension's storage

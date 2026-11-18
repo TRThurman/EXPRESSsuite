@@ -9,6 +9,7 @@ import { ExpressP11NodeKindProvider } from "./express-p11-node-kind-provider.js"
 import { ExpressDocumentValidator } from "./express-p11-document-validator.js";
 import { ExpressP11DocumentSymbolProvider } from "./express-p11-document-symbol-provider.js";
 import { ExpressP11CodeActionProvider } from "./express-p11-code-action-provider.js";
+import { ExpressP11DefinitionProvider } from "./express-p11-definition-provider.js";
 import { ExpressP11CompletionProvider } from "./express-p11-completion-provider.js";
 import { ExpressP11ScopeComputation } from "./express-p11-scope-computation.js";
 import { ExpressP11ScopeProvider } from "./express-p11-scope-provider.js";
@@ -86,6 +87,7 @@ export const ExpressP11Module: Module<ExpressP11Services, DeepPartial<ExpressP11
   lsp: {
     DocumentSymbolProvider: (services) => new ExpressP11DocumentSymbolProvider(services),
     CodeActionProvider: () => new ExpressP11CodeActionProvider(),
+    DefinitionProvider: (services) => new ExpressP11DefinitionProvider(services),
     CompletionProvider: (services) => new ExpressP11CompletionProvider(services),
   },
   references: {

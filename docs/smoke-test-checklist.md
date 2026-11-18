@@ -120,6 +120,30 @@ The refactor preview lists each change unticked with **Apply** disabled;
   new block's links render.
 - **PASS** if all of the above hold.
 
+### S8 — From a description to the EXPRESS
+
+Use `geometry_schema.exp`.
+
+- After `END_SCHEMA;`, put the cursor on `point` in the key
+  `(*"geometry_schema.point"` and press F12. Expected: the editor goes to
+  `ENTITY point`.
+- Put the cursor on `geometry_schema` in the same key and press F12. Expected:
+  the `SCHEMA` line.
+- In the text of that block, press F12 on the bold `**point**`, then on the
+  target of an `<<express:...>>` cross-reference, then on its display text.
+  Expected: `ENTITY point`, then the declaration the cross-reference names
+  (in another file when it names another schema), twice.
+- Press F12 on the last part of an attribute key (`schema.entity.attribute`)
+  and of a rule key (`schema.entity.wr:label`). Expected: the attribute, the
+  WHERE rule.
+- Press F12 on a word of the text that is no declared name. Expected: "No
+  definition found".
+- Press F12 on an entity name inside the schema. Expected: as before, the
+  declaration.
+- Right-click `point` → **Show Description**, then click **Go to declaration**
+  under the panel's heading. Expected: the editor in the first column goes to
+  `ENTITY point`; the panel stays open.
+
 ### S9 — Open Tutorial
 
 Run this on an installed package (a `.vsix` or the Marketplace), not in an

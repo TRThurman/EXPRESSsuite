@@ -6,6 +6,7 @@ export const MAX_MATH_EXPR_CHARS = 16_384;
 
 export type WebviewMessage =
   | { kind: "navigate"; targetName: string }
+  | { kind: "declaration" }
   | { kind: "insert"; text: string }
   | { kind: "log"; level: "info" | "warn" | "error"; message: string }
   | { kind: "renderMath"; id: number; expr: string; format?: "asciimath" | "latex" };
@@ -19,6 +20,9 @@ export function validateMessage(msg: unknown): WebviewMessage | null {
     case "navigate":
       if (typeof m.targetName !== "string" || !NAME_RE.test(m.targetName)) return null;
       return { kind: "navigate", targetName: m.targetName };
+    case "declaration":
+      // Carries nothing: the host knows which description the panel shows.
+      return { kind: "declaration" };
     case "insert":
       if (typeof m.text !== "string" || m.text.length > 4096) return null;
       return { kind: "insert", text: m.text };
