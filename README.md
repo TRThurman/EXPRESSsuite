@@ -42,6 +42,26 @@ lists it under Walkthroughs). It opens a copy of the demo in a window of its
 own with the tutorial beside it. The same text is in the repository:
 [`docs/tutorial/describe-declarations.md`](docs/tutorial/describe-declarations.md).
 
+### From a description to the EXPRESS
+
+In a description block after `END_SCHEMA;`, **Go to Definition** (F12,
+Cmd+click or Ctrl+click) goes to the EXPRESS that the text under the cursor
+names:
+
+| Cursor on | Goes to |
+|---|---|
+| a part of the key `(*"schema.entity.attribute"` | the schema, the entity or the attribute, by the part under the cursor |
+| a key of a type, function, procedure, rule, subtype constraint or constant | that declaration |
+| a key of an enumeration item or a parameter | the item or the parameter |
+| a key ending in `wr:label` or `ur:label` | the WHERE or UNIQUE rule |
+| a key ending in `wr:IPn` | the `--IPn:` line of the informal proposition |
+| a key ending in `.__note`, `.__example`, `.__figure`, `.__table` | where the key without the suffix goes |
+| an `<<express:schema.name,text>>` cross-reference | its target, in any file of the workspace |
+| a plain name or the bold subject `**name**` | the member, the declaration of the schema, or the one it reaches through its interfaces |
+
+The **Show Description** panel has a **Go to declaration** link under its
+heading for the same step from the rendered text.
+
 ### SC4 validation
 
 EXPRESSsuite reports additional ISO TC 184/SC 4 authoring problems in the
@@ -203,6 +223,7 @@ Open any `.exp` file with named-remark annotations (e.g. those in [wg12-step](ht
 |---|---|
 | Hover description | hover the cursor on any entity name |
 | Show Description | right-click → **Show Description** (or command palette) |
+| From a description to its EXPRESS | F12 in a description block after `END_SCHEMA;`, or **Go to declaration** in the Show Description panel |
 | Show EXPRESS-G Diagram | right-click → **Show EXPRESS-G Diagram** |
 | AsciiMath Playground | command palette → **EXPRESSsuite: Open AsciiMath Playground** |
 | Send Selection to Playground | select text in editor → right-click → **Send Selection to AsciiMath Playground** |

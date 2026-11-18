@@ -117,37 +117,46 @@ export function describeTargets(root: ExpressFile, nameProvider: NameProvider): 
  * attributes, parameters and enumeration items, and their named UNIQUE and WHERE rules.
  */
 export function declaredKeys(root: ExpressFile, nameProvider: NameProvider): Set<string> {
-  const keys = new Set<string>();
+  return new Set(keyedNodes(root, nameProvider).keys());
+}
+
+/**
+ * The node behind each key of {@link declaredKeys}, by lower-case key: the inverse of {@link annotationKeyOf}.
+ * When two nodes of a file share a key (a schema declared twice), the first in document order is kept.
+ */
+export function keyedNodes(root: ExpressFile, nameProvider: NameProvider): Map<string, AstNode> {
+  const nodes = new Map<string, AstNode>();
   for (const schema of root.schemas ?? []) {
     if (!schema.name) continue;
     const prefix = schema.name;
-    const add = (key: string): void => {
-      keys.add(key.toLowerCase());
+    const add = (key: string, node: AstNode): void => {
+      const lower = key.toLowerCase();
+      if (!nodes.has(lower)) nodes.set(lower, node);
     };
     const walk = (declaration: AstNode): void => {
       const name = declarationNameOf(declaration, nameProvider);
       if (name) {
         const owner = `${prefix}.${name}`;
-        add(owner);
+        add(owner, declaration);
         for (const member of membersOf(declaration)) {
           const memberName = memberNameOf(member.node, nameProvider);
-          if (memberName) add(`${owner}.${memberName}`);
+          if (memberName) add(`${owner}.${memberName}`, member.node);
         }
         if (isEntityDefinition(declaration)) {
-          for (const rule of declaration.body?.unique?.rules ?? []) if (rule.name) add(`${owner}.ur:${rule.name}`);
+          for (const rule of declaration.body?.unique?.rules ?? []) if (rule.name) add(`${owner}.ur:${rule.name}`, rule);
         }
-        for (const rule of whereClauseOf(declaration)?.rules ?? []) if (rule.id) add(`${owner}.wr:${rule.id}`);
+        for (const rule of whereClauseOf(declaration)?.rules ?? []) if (rule.id) add(`${owner}.wr:${rule.id}`, rule);
       }
       // Declarations and constants of an algorithm head are keyed by the schema too.
       const head = isFunctionDefinition(declaration) || isProcedureDefinition(declaration) || isRule_decl(declaration) ? declaration.algoHead : undefined;
       for (const nested of head?.declarations ?? []) walk(nested);
       for (const constant of head?.constant?.items ?? []) walk(constant);
     };
-    add(prefix);
+    add(prefix, schema);
     for (const constant of schema.body?.constant?.items ?? []) walk(constant);
     for (const declaration of schema.body?.declarations ?? []) walk(declaration);
   }
-  return keys;
+  return nodes;
 }
 
 function whereClauseOf(declaration: AstNode): Where_clause | undefined {
