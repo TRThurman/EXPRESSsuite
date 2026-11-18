@@ -77,6 +77,11 @@
     "vscode": "^1.140.0",
     "node": ">=22.12.0"
   },
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
   "categories": [
     "Programming Languages"
   ],

@@ -43,12 +43,6 @@ demo are part of the installed extension:
    **Walkthroughs**, as "EXPRESSsuite tutorial".
 2. A new window opens with a copy of the demo folder: `demo_widgets.exp` on
    the left and this text on the right.
-3. The first time, VS Code may open that folder in Restricted Mode, where
-   EXPRESSsuite does not run: the schema shows as plain text and no tutorial
-   appears. If VS Code asks whether you trust the folder, answer yes;
-   otherwise click **Restricted Mode** in the status bar and choose **Trust**.
-   The folder is the copy the extension has just made. The tutorial then opens
-   beside the schema.
 
 The copy is yours to edit; it is in the storage folder that VS Code keeps for
 the extension, and an update of the extension does not change it. Run the

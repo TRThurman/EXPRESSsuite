@@ -9,9 +9,12 @@
   of the extension. The command copies the demo to the extension's storage
   folder and opens it in a window of its own, with the tutorial beside the
   schema; run again, it continues with that copy or starts over with a fresh
-  one. VS Code opens the copy in Restricted Mode the first time; the command
-  says so before it opens the window, and the tutorial appears once the folder
-  is trusted. The package grows by about 40 KB.
+  one. The package grows by about 40 KB.
+- EXPRESSsuite now runs in **Restricted Mode**, the mode in which VS Code
+  opens a folder that is not yet trusted. Until now it was switched off there:
+  an EXPRESS file showed as plain text, with no checks, and nothing said why.
+  The extension reads the files of the workspace and its own four settings; it
+  runs no program and loads no code from the workspace.
 
 ## [0.6.0](https://github.com/TRThurman/EXPRESSsuite/compare/0.5.1...0.6.0) (2026-11-16)
 
