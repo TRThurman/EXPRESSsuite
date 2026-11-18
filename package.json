@@ -110,6 +110,11 @@
         "category": "EXPRESSsuite"
       },
       {
+        "command": "expresssuite.openTutorial",
+        "title": "Open Tutorial",
+        "category": "EXPRESSsuite"
+      },
+      {
         "command": "expresssuite.showExpressG",
         "title": "Show EXPRESS-G Diagram",
         "category": "EXPRESSsuite"
@@ -123,6 +128,34 @@
         "command": "expresssuite.sendSelectionToMathPlayground",
         "title": "Send Selection to AsciiMath Playground",
         "category": "EXPRESSsuite"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "describeDeclarations",
+        "title": "EXPRESSsuite tutorial",
+        "description": "Write and check the description blocks of an EXPRESS schema, on a demo with made-up names.",
+        "steps": [
+          {
+            "id": "openTutorial",
+            "title": "Open the tutorial and its demo",
+            "description": "The tutorial opens beside a copy of the demo schemas, in a window of its own.\n[Open Tutorial](command:expresssuite.openTutorial)",
+            "media": {
+              "markdown": "docs/tutorial/walkthrough/open-tutorial.md"
+            },
+            "completionEvents": [
+              "onCommand:expresssuite.openTutorial"
+            ]
+          },
+          {
+            "id": "ownSchema",
+            "title": "Use it on your own schema",
+            "description": "Open the folder of your EXPRESS files.\n[Open Folder](command:workbench.action.files.openFolder)",
+            "media": {
+              "markdown": "docs/tutorial/walkthrough/own-schema.md"
+            }
+          }
+        ]
       }
     ],
     "menus": {

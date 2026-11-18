@@ -10,6 +10,7 @@ import { showDescriptionPreview, showExpressGPreview, openMathPlayground } from 
 import { descriptionRequest } from "./show-description-argument.js";
 import { initPlurimathPool, shutdownPlurimathPool } from "./plurimath-pool.js";
 import { registerDescribeCommand } from "./describe-command.js";
+import { registerTutorialCommand } from "./tutorial-command.js";
 import { time } from "./perf.js";
 import {
   DETECT_SCHEMA_CLOSURE_DUPLICATES_REQUEST,
@@ -30,6 +31,7 @@ export function activate(context: vscode.ExtensionContext): void {
   registerHoverProvider(context, client);
   registerViewerCommands(context);
   registerDescribeCommand(context, client);
+  registerTutorialCommand(context);
   stop(/* threshold */ 1500);
 }
 

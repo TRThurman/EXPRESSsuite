@@ -34,8 +34,13 @@ writes the description block of a declaration after `END_SCHEMA;` from a
 selected comment, typed text or the clipboard. It proposes links, appends the
 OPTIONAL sentence to optional attributes, shows the edit in the refactor
 preview, and is undone in one step. A check reports description blocks with
-undeclared links, unkeyed remarks and blocks inside a schema. Tutorial and
-demo workspace: [`docs/tutorial/describe-declarations.md`](docs/tutorial/describe-declarations.md).
+undeclared links, unkeyed remarks and blocks inside a schema.
+
+The tutorial and its demo schemas are part of the extension: run
+**EXPRESSsuite: Open Tutorial** from the command palette (the Welcome page
+lists it under Walkthroughs). It opens a copy of the demo in a window of its
+own with the tutorial beside it. The same text is in the repository:
+[`docs/tutorial/describe-declarations.md`](docs/tutorial/describe-declarations.md).
 
 ### From a description to the EXPRESS
 
@@ -222,6 +227,7 @@ Open any `.exp` file with named-remark annotations (e.g. those in [wg12-step](ht
 | Show EXPRESS-G Diagram | right-click → **Show EXPRESS-G Diagram** |
 | AsciiMath Playground | command palette → **EXPRESSsuite: Open AsciiMath Playground** |
 | Send Selection to Playground | select text in editor → right-click → **Send Selection to AsciiMath Playground** |
+| Tutorial with a demo | command palette → **EXPRESSsuite: Open Tutorial** |
 | Detect duplicate declarations | place the cursor in a schema → command palette or right-click → **Detect Duplicate Declarations in Schema Closure** |
 
 Performance and diagnostic logs land in the **Output** panel under **EXPRESSsuite**.
