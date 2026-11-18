@@ -87,6 +87,30 @@ An **anchor** holds a <<express:ref_widgets.widget>> in place.
 Another widget, not the one of ref_widgets.
 *)
 `;
+/** A derived and an inverse attribute: the grammar wraps the name of each in a second node. */
+const gauges = `SCHEMA ref_gauges;
+ENTITY gauge;
+  reading : REAL;
+  fitted_on : pipe;
+DERIVE
+  doubled : REAL := reading * 2;
+WHERE
+  positive: doubled > 0;
+END_ENTITY;
+ENTITY pipe;
+INVERSE
+  gauges : SET OF gauge FOR fitted_on;
+WHERE
+  measured: SIZEOF(gauges) > 0;
+END_ENTITY;
+END_SCHEMA;
+(*"ref_gauges.gauge.doubled"
+Twice the reading.
+*)
+(*"ref_gauges.pipe.gauges"
+See <<express:ref_gauges.gauge.doubled>>.
+*)
+`;
 
 async function workspace() {
   const { shared, ExpressP11 } = createExpressP11Services(EmptyFileSystem);
@@ -95,6 +119,7 @@ async function workspace() {
     [
       ["ref_widgets", widgets],
       ["ref_base", base],
+      ["ref_gauges", gauges],
     ] as const
   ).map(([name, text]) => {
     const document = LangiumDocumentFactory.fromString(text, URI.parse(`memory:///${name}.exp`));
@@ -132,11 +157,12 @@ async function workspace() {
     const range = (await ExpressP11.lsp.RenameProvider!.prepareRename!(document, at(document, after, needle, into))) as TextEdit["range"] | undefined;
     return range ? document.textDocument.getText(range) : undefined;
   };
-  return { widgetsDoc: documents[0], baseDoc: documents[1], references, rename, prepare };
+  return { widgetsDoc: documents[0], baseDoc: documents[1], gaugesDoc: documents[2], references, rename, prepare };
 }
 
 const W = "ref_widgets.exp";
 const B = "ref_base.exp";
+const G = "ref_gauges.exp";
 
 describe("Find All References with the description blocks", () => {
   test("from an entity: its uses in EXPRESS, the keys, the cross-references and the name in the text", async () => {
@@ -226,6 +252,32 @@ describe("Find All References with the description blocks", () => {
   test("a word of a description that names nothing has no references", async () => {
     const { widgetsDoc, references } = await workspace();
     expect(await references(widgetsDoc, "The schema of widgets", "schema")).toEqual([]);
+  });
+
+  test("a derived attribute: the same list from its use in EXPRESS, from its declaration, from its key and from a cross-reference", async () => {
+    const { gaugesDoc, references } = await workspace();
+    const expected = [
+      `${G}:06 |   [doubled] : REAL := reading * 2;`,
+      `${G}:08 |   positive: [doubled] > 0;`,
+      `${G}:17 | (*"ref_gauges.gauge.[doubled]"`,
+      `${G}:21 | See <<express:ref_gauges.gauge.[doubled]>>.`,
+    ];
+    expect(await references(gaugesDoc, "positive:", "doubled")).toEqual(expected);
+    expect(await references(gaugesDoc, "DERIVE", "doubled")).toEqual(expected);
+    expect(await references(gaugesDoc, '(*"ref_gauges.gauge.doubled"', "doubled")).toEqual(expected);
+    expect(await references(gaugesDoc, "See <<express:", "doubled")).toEqual(expected);
+  });
+
+  test("an inverse attribute: the same list from its use in EXPRESS, from its declaration and from its key", async () => {
+    const { gaugesDoc, references } = await workspace();
+    const expected = [
+      `${G}:12 |   [gauges] : SET OF gauge FOR fitted_on;`,
+      `${G}:14 |   measured: SIZEOF([gauges]) > 0;`,
+      `${G}:20 | (*"ref_gauges.pipe.[gauges]"`,
+    ];
+    expect(await references(gaugesDoc, "measured:", "gauges")).toEqual(expected);
+    expect(await references(gaugesDoc, "INVERSE", "gauges")).toEqual(expected);
+    expect(await references(gaugesDoc, '(*"ref_gauges.pipe.gauges"', ".gauges", 2)).toEqual(expected);
   });
 });
 
@@ -346,5 +398,28 @@ describe("Rename with the description blocks", () => {
     const { widgetsDoc, rename } = await workspace();
     await expect(rename(widgetsDoc, "ENTITY widget", "widget", "2 gadgets")).rejects.toThrow(/not an EXPRESS identifier/);
     await expect(rename(widgetsDoc, "ENTITY widget", "widget", "_gadget")).rejects.toThrow(/not an EXPRESS identifier/);
+  });
+
+  test("a derived attribute: the same edits from its use in EXPRESS and from its key", async () => {
+    const { gaugesDoc, rename } = await workspace();
+    const expected = [
+      `${G}:06 |   [doubled] : REAL := reading * 2;`,
+      `${G}:08 |   positive: [doubled] > 0;`,
+      `${G}:17 | (*"ref_gauges.gauge.[doubled]"`,
+      `${G}:21 | See <<express:ref_gauges.gauge.[doubled]>>.`,
+    ];
+    expect(await rename(gaugesDoc, "positive:", "doubled", "twice")).toEqual(expected);
+    expect(await rename(gaugesDoc, '(*"ref_gauges.gauge.doubled"', "doubled", "twice")).toEqual(expected);
+  });
+
+  test("an inverse attribute: the same edits from its use in EXPRESS and from its key", async () => {
+    const { gaugesDoc, rename } = await workspace();
+    const expected = [
+      `${G}:12 |   [gauges] : SET OF gauge FOR fitted_on;`,
+      `${G}:14 |   measured: SIZEOF([gauges]) > 0;`,
+      `${G}:20 | (*"ref_gauges.pipe.[gauges]"`,
+    ];
+    expect(await rename(gaugesDoc, "measured:", "gauges", "meters")).toEqual(expected);
+    expect(await rename(gaugesDoc, '(*"ref_gauges.pipe.gauges"', ".gauges", "meters", 2)).toEqual(expected);
   });
 });
