@@ -232,6 +232,19 @@ Open any `.exp` file with named-remark annotations (e.g. those in [wg12-step](ht
 
 Performance and diagnostic logs land in the **Output** panel under **EXPRESSsuite**.
 
+## Which files are read
+
+By default the extension does not read every `.exp` file of the workspace. The setting `expresssuite.useOptimizedConfiguration` (on by default) leaves out files that a STEP repository holds beside its schemas:
+
+| Setting | Leaves out | Default |
+|---|---|---|
+| `expresssuite.excludedFolders` | the files in a folder with one of these names, at any depth **inside** the workspace folder | `dvlp`, `sys`, `nav`, `css`, `doc`, `dtd`, `help`, `images`, `publication`, `utils`, `xsl`, `basic`, `library`, `resource_docs`, `business_object_models`, `ap233_system_engineering_and_design` |
+| `expresssuite.excludedFiles` | the files whose name holds one of these keywords as a part of the name | `lf`, `concatenated` |
+
+- The folders above the workspace folder do not count: a workspace kept in `/home/me/library/schemas` is read. A folder opened as a workspace folder is read whatever its name.
+- A keyword is bounded by a character that is not a letter or a digit: `lf` leaves out `mim_lf.exp` and `mim_lf_patched.exp`, not `shelf_schema.exp`. Long forms and concatenated schemas are left out because each repeats the declarations of the schemas it was built from.
+- A file that is left out shows no problems, no hover and no completion, and nothing says so. If a file seems unchecked, compare its path with the two lists, or turn `expresssuite.useOptimizedConfiguration` off to read everything.
+
 ## Privacy and confidentiality
 
 EXPRESSsuite itself makes **zero outbound network calls**. Every webview is configured with CSP `connect-src 'none'`; the extension host source contains no `fetch`, no `http(s)` import, no telemetry. Math rendering happens entirely on your machine via Plurimath (in a `node:worker_threads` worker) and MathJax (lazy-loaded for hover SVGs).

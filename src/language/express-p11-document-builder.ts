@@ -12,8 +12,8 @@ import type { LangiumSharedServices } from "langium/lsp";
 import { CancellationToken, Connection, WorkDoneProgress } from "vscode-languageserver";
 import { allowedDocuments, isAllowedFile } from "../utils/file-filter.js";
 import { EXPRESSSUITE_TOKEN } from "../shared/notifications.js";
-import { EXPRESSSUITE_CONFIGURATION_SECTION } from "../shared/commands.js";
-import { Configuration } from "./express-p11-workspace-manager.js";
+import type { WorkspaceFolder } from "vscode-languageserver";
+import { Configuration, readConfiguration } from "./express-p11-workspace-manager.js";
 import { ExpressP11BuildStrategy } from "./express-p11-build-strategy.js";
 export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
   private isFirstLoad: boolean = true;
@@ -24,8 +24,11 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
     excludedFiles: [],
     excludedFolders: [],
   };
+  /** Asked at each build: the workspace manager is created after this builder. */
+  private readonly workspaceFolders: () => readonly WorkspaceFolder[] | undefined;
   constructor(services: LangiumSharedServices) {
     super(services);
+    this.workspaceFolders = () => services.workspace.WorkspaceManager.workspaceFolders;
     this.connection = services.lsp.Connection;
     this.configurationProvider = services.workspace.ConfigurationProvider;
     this.setupSaveHandler(services);
@@ -192,10 +195,7 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
       // No LSP connection (e.g. tests, CLI) -- use defaults
       return;
     }
-    const useOptimizedConfiguration = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "useOptimizedConfiguration");
-    const excludedFolders = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFolders");
-    const excludedFiles = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFiles");
-    this.workspaceConfiguration = { useOptimizedConfiguration, excludedFiles, excludedFolders };
+    this.workspaceConfiguration = await readConfiguration(this.configurationProvider, this.workspaceFolders());
   }
   protected override async buildDocuments(
     documents: LangiumDocument[],

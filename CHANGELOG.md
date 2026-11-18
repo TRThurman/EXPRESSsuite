@@ -41,6 +41,25 @@
   The extension reads the files of the workspace and its own four settings; it
   runs no program and loads no code from the workspace.
 
+### Bug Fixes
+
+- **A workspace kept under a folder named `doc`, `library`, `utils` and the
+  like is checked again.** With `expresssuite.useOptimizedConfiguration` on
+  (the default), the names of `expresssuite.excludedFolders` were compared
+  with every folder of a file's full path, so a workspace anywhere below a
+  folder with one of the default names (for example `/home/me/library/schemas`
+  or `D:\doc\step`) got no diagnostics, hover or completion, with no message.
+  The names are now compared only with the folders inside the workspace
+  folder. Of nested workspace folders the innermost counts, and a file outside
+  every workspace folder is in no excluded folder
+  ([#120](https://github.com/TRThurman/EXPRESSsuite/issues/120)).
+- **`expresssuite.excludedFiles` no longer leaves out a file whose name only
+  contains the letters of a keyword.** A keyword is now a part of the file
+  name, bounded by a character that is not a letter or a digit: the default
+  `lf` leaves out `mim_lf.exp` and `mim_lf_patched.exp` as before, and no
+  longer `shelf_schema.exp`
+  ([#120](https://github.com/TRThurman/EXPRESSsuite/issues/120)).
+
 ## [0.6.0](https://github.com/TRThurman/EXPRESSsuite/compare/0.5.1...0.6.0) (2026-11-16)
 
 ### Features

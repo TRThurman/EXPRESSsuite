@@ -15,31 +15,68 @@ export function byUri(left: LangiumDocument, right: LangiumDocument): number {
   const r = right.uri.toString();
   return l < r ? -1 : l > r ? 1 : 0;
 }
+/**
+ * Whether the workspace reads the file. With `expresssuite.useOptimizedConfiguration` off, every
+ * file is read. With it on, a file is left out when a folder between its workspace folder and
+ * itself is named in `expresssuite.excludedFolders`, or when its name holds a keyword of
+ * `expresssuite.excludedFiles` ({@link nameHasKeyword}).
+ */
 export function isAllowedFile(filepath: URI, configuration: Configuration): boolean {
   if (!configuration.useOptimizedConfiguration) return true;
-
-  const isInAllowedFolder = isAllowedFolder(filepath, configuration);
-  if (!isInAllowedFolder) return false;
-  const filename = filepath.toString().split("/").pop();
+  if (!isAllowedFolder(filepath, configuration)) return false;
+  const filename = filepath.path.split("/").pop();
   if (!filename) return false;
-  const exception = configuration.excludedFiles.find((elt) => filename.includes(elt));
-  if (!exception) return true;
-  return false;
-  //   if (filename.includes("lf") || filename.includes("concatenated")) return false;
-  //   return true;
+  return !configuration.excludedFiles.some((keyword) => nameHasKeyword(filename, keyword));
 }
+
+/**
+ * Whether no folder between the file's workspace folder and the file is named in
+ * `expresssuite.excludedFolders`. The folders above the workspace folder do not count: where a
+ * user keeps a workspace says nothing about its content. Of nested workspace folders the innermost
+ * is taken, so a folder opened as a workspace folder is read whatever its name. A file outside
+ * every workspace folder is in no excluded folder.
+ */
 export function isAllowedFolder(path: URI, configuration: Configuration): boolean {
   if (!configuration.useOptimizedConfiguration) return true;
+  const file = path.toString();
+  let root: string | undefined;
+  for (const candidate of rootsOf(configuration.workspaceFolders)) {
+    if (file.startsWith(candidate) && (root === undefined || candidate.length > root.length)) root = candidate;
+  }
+  if (root === undefined) return true;
+  const folders = file.slice(root.length).split("/").slice(0, -1);
+  return !folders.some((folder) => configuration.excludedFolders.includes(decoded(folder)));
+}
 
-  const exception = path
-    .toString()
-    .split("/")
-    .find((elt) => configuration.excludedFolders.includes(elt));
-  if (exception) return false;
-  return true;
+/**
+ * Whether `keyword` stands in `filename` as a part of the name: where the keyword begins or ends
+ * with a letter or a digit, the name does not continue there with another one. `lf` is in
+ * `mim_lf.exp` and in `ap242_mim_lf_2026-11-11.exp`, not in `shelf_schema.exp`.
+ */
+export function nameHasKeyword(filename: string, keyword: string): boolean {
+  if (!keyword) return false;
+  const before = /^[A-Za-z0-9]/.test(keyword) ? "(?<![A-Za-z0-9])" : "";
+  const after = /[A-Za-z0-9]$/.test(keyword) ? "(?![A-Za-z0-9])" : "";
+  return new RegExp(before + keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + after).test(filename);
+}
 
-  //   if (path.toString().includes("dvlp") || path.toString().includes("nav") || path.toString().includes("sys")) {
-  //     return false;
-  //   }
-  //   return true;
+const roots = new WeakMap<readonly string[], string[]>();
+
+/** The workspace folders as URI prefixes, each ending in `/`, spelled as `URI.toString()` spells a file in them. */
+function rootsOf(folders: readonly string[] | undefined): string[] {
+  if (!folders) return [];
+  let known = roots.get(folders);
+  if (!known) {
+    known = folders.map((folder) => URI.parse(folder).toString().replace(/\/*$/, "/"));
+    roots.set(folders, known);
+  }
+  return known;
+}
+
+function decoded(segment: string): string {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return segment;
+  }
 }

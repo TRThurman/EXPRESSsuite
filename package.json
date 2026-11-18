@@ -223,7 +223,7 @@
             "resource_docs",
             "business_object_models"
           ],
-          "description": "Exclude folders that contain one of these keywords in their name."
+          "description": "With the optimized configuration on, leave out the files in a folder with one of these names. The names are compared with the folders inside the workspace folder, not with the folders above it."
         },
         "expresssuite.annotations.publicationHazards": {
           "type": "boolean",
@@ -239,7 +239,7 @@
             "lf",
             "concatenated"
           ],
-          "description": "Exclude files that contain one of these keywords in their name."
+          "description": "With the optimized configuration on, leave out the files whose name holds one of these keywords as a part of the name: `lf` leaves out `mim_lf.exp`, not `shelf_schema.exp`."
         }
       }
     },
