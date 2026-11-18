@@ -134,6 +134,18 @@ export class DescriptionTargets {
     private readonly nameProvider: NameProvider,
   ) {}
 
+  /** The keyed nodes of each file read so far: one finder serves one request, in which no file changes. */
+  private readonly keyed = new Map<ExpressFile, Map<string, AstNode>>();
+
+  private nodesOf(root: ExpressFile): Map<string, AstNode> {
+    let nodes = this.keyed.get(root);
+    if (!nodes) {
+      nodes = keyedNodes(root, this.nameProvider);
+      this.keyed.set(root, nodes);
+    }
+    return nodes;
+  }
+
   /** The targets of `reference`, read in `schema` (the schema whose description context holds the block). */
   find(reference: DescriptionReference, schema: SchemaDefinition | undefined): DescriptionTarget[] {
     if (reference.kind !== "word") return this.ofPath(reference.path);
@@ -152,7 +164,7 @@ export class DescriptionTargets {
     const [schema, ...rest] = segments;
     const targets: DescriptionTarget[] = [];
     for (const { root, text } of this.source.rootsOf(schema)) {
-      const nodes = keyedNodes(root, this.nameProvider);
+      const nodes = this.nodesOf(root);
       const base = schema.toLowerCase();
       const node = (...names: string[]): AstNode | undefined => nodes.get([base, ...names].join(".").toLowerCase());
       const schemaNode = nodes.get(base);
@@ -240,7 +252,7 @@ export class DescriptionTargets {
     const segments = pathSegments(path).map((segment) => segment.text);
     const targets: DescriptionTarget[] = [];
     for (const { root } of this.source.rootsOf(segments[0])) {
-      const found = keyedNodes(root, this.nameProvider).get(path.toLowerCase());
+      const found = this.nodesOf(root).get(path.toLowerCase());
       if (found) targets.push({ kind: "node", node: found, via: "exact" });
     }
     return targets;

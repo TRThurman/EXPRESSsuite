@@ -61,11 +61,7 @@ export class ExpressP11DefinitionProvider extends DefaultDefinitionProvider {
     const reference = descriptionReferenceAt(annotationContexts(root, text), text, offset);
     if (!reference) return undefined;
     const schema = root.schemas.find((candidate) => candidate.name === reference.block.schema);
-    const targets = new DescriptionTargets(
-      { rootsOf: (name) => this.rootsOf(name, document) },
-      new LinkResolver(this.typeContainer.getScopeIndex(), this.nameProvider),
-      this.nameProvider,
-    ).find(reference, schema);
+    const targets = this.targetsFinder(document).find(reference, schema);
     return { reference, targets };
   }
 
@@ -74,11 +70,7 @@ export class ExpressP11DefinitionProvider extends DefaultDefinitionProvider {
    * no position: the Show Description panel. `from` is the file that holds the block, read first.
    */
   declarationsOfKey(key: string, from?: LangiumDocument): LocationLink[] {
-    const targets = new DescriptionTargets(
-      { rootsOf: (name) => this.rootsOf(name, from) },
-      new LinkResolver(this.typeContainer.getScopeIndex(), this.nameProvider),
-      this.nameProvider,
-    ).ofPath(key);
+    const targets = this.targetsFinder(from).ofPath(key);
     const origin: Range = { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } };
     const links: LocationLink[] = [];
     for (const target of targets) {
@@ -90,22 +82,45 @@ export class ExpressP11DefinitionProvider extends DefaultDefinitionProvider {
     return links;
   }
 
-  /** The files that declare a schema of this name; the file of the request first. */
-  private rootsOf(name: string, current?: LangiumDocument): Array<{ root: ExpressFile; text: string }> {
-    const lower = name.toLowerCase();
-    const found: Array<{ root: ExpressFile; text: string }> = [];
-    const consider = (candidate: LangiumDocument): void => {
-      const root = candidate.parseResult?.value;
-      if (!isExpressFile(root)) return;
-      if ((root.schemas ?? []).some((schema) => schema.name?.toLowerCase() === lower)) {
-        found.push({ root, text: candidate.textDocument.getText() });
+  /**
+   * A finder of the declarations that description text names, for one request: it reads the files
+   * loaded now, and `from`, the file of the request, before any other that declares the same schema.
+   */
+  targetsFinder(from?: LangiumDocument): DescriptionTargets {
+    let roots: Map<string, Array<{ root: ExpressFile; text: string }>> | undefined;
+    const index = (): Map<string, Array<{ root: ExpressFile; text: string }>> => {
+      const bySchema = new Map<string, Array<{ root: ExpressFile; text: string }>>();
+      const consider = (candidate: LangiumDocument): void => {
+        const root = candidate.parseResult?.value;
+        if (!isExpressFile(root)) return;
+        const entry = { root, text: candidate.textDocument.getText() };
+        for (const name of new Set((root.schemas ?? []).map((schema) => schema.name?.toLowerCase()))) {
+          if (!name) continue;
+          const known = bySchema.get(name);
+          if (known) known.push(entry);
+          else bySchema.set(name, [entry]);
+        }
+      };
+      if (from) consider(from);
+      for (const candidate of this.documents.all) {
+        if (candidate !== from) consider(candidate);
       }
+      return bySchema;
     };
-    if (current) consider(current);
-    for (const candidate of this.documents.all) {
-      if (candidate !== current) consider(candidate);
-    }
-    return found;
+    return new DescriptionTargets(
+      { rootsOf: (name) => (roots ??= index()).get(name.toLowerCase()) ?? [] },
+      new LinkResolver(this.typeContainer.getScopeIndex(), this.nameProvider),
+      this.nameProvider,
+    );
+  }
+
+  /** The node of the name of a keyed declaration: where Go to Definition puts the cursor, and what Rename replaces. */
+  nameNodeOf(node: AstNode): CstNode | undefined {
+    if (isSchemaDefinition(node)) return GrammarUtils.findNodeForProperty(node.$cstNode, "name");
+    if (isRule_decl(node)) return GrammarUtils.findNodeForProperty(node.ruleHead?.$cstNode, "name");
+    if (isDomain_rule(node)) return GrammarUtils.findNodeForProperty(node.$cstNode, "id");
+    if (isUnique_rule(node)) return GrammarUtils.findNodeForProperty(node.$cstNode, "name");
+    return this.nameProvider.getNameNode(node);
   }
 
   private linkTo(target: DescriptionTarget, origin: Range): LocationLink | undefined {
@@ -123,15 +138,6 @@ export class ExpressP11DefinitionProvider extends DefaultDefinitionProvider {
     }
     const name = this.nameNodeOf(node) ?? cst;
     return LocationLink.create(uri, cst.range, name.range, origin);
-  }
-
-  /** The node of the name of a keyed declaration, where Go to Definition puts the cursor. */
-  private nameNodeOf(node: AstNode): CstNode | undefined {
-    if (isSchemaDefinition(node)) return GrammarUtils.findNodeForProperty(node.$cstNode, "name");
-    if (isRule_decl(node)) return GrammarUtils.findNodeForProperty(node.ruleHead?.$cstNode, "name");
-    if (isDomain_rule(node)) return GrammarUtils.findNodeForProperty(node.$cstNode, "id");
-    if (isUnique_rule(node)) return GrammarUtils.findNodeForProperty(node.$cstNode, "name");
-    return this.nameProvider.getNameNode(node);
   }
 }
 
