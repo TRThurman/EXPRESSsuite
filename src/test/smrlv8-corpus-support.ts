@@ -22,7 +22,7 @@ export const corpusRoot = resolve(process.cwd(), "test-fixtures", "smrlv8");
 export const baselineRoot = resolve(process.cwd(), "test-fixtures", "smrlv8-baseline");
 const updateBaselines = process.env.EXPRESS_UPDATE_SMRLV8_BASELINE === "1";
 
-export type Settings = { useOptimizedConfiguration: boolean; excludedFolders: string[]; excludedFiles: string[] };
+export type Settings = { useOptimizedConfiguration: boolean; excludedFolders: string[]; excludedFiles: string[]; workspaceFolders?: string[] };
 
 /** The extension's defaults from package.json: what a user sees with an unchanged configuration. */
 export function defaultSettings(): Settings {
@@ -32,6 +32,8 @@ export function defaultSettings(): Settings {
     useOptimizedConfiguration: props["expresssuite.useOptimizedConfiguration"].default,
     excludedFolders: props["expresssuite.excludedFolders"].default,
     excludedFiles: props["expresssuite.excludedFiles"].default,
+    // For callers of the file filter itself: a loaded workspace takes its folders from the workspace manager.
+    workspaceFolders: [URI.file(corpusRoot).toString()],
   };
 }
 

@@ -10,7 +10,6 @@ import {
   interruptAndCheck,
 } from "langium";
 import { ExpressP11Services } from "./express-module.js";
-import { EXPRESSSUITE_CONFIGURATION_SECTION } from "../shared/commands.js";
 import {
   Attribute_decl,
   Derived_attr,
@@ -29,7 +28,7 @@ import {
 import { CancellationToken } from "vscode-languageserver";
 import { allowedDocuments, byUri } from "../utils/file-filter.js";
 import { ExpressP11ScopeIndex } from "./express-p11-scope-index.js";
-import { Configuration } from "./express-p11-workspace-manager.js";
+import { Configuration, readConfiguration } from "./express-p11-workspace-manager.js";
 import {
   DefinitionType,
   ExpressConflict,
@@ -102,7 +101,9 @@ export class ExpressP11TypeContainer {
     excludedFolders: [],
   };
   private configurationProvider: ConfigurationProvider | undefined;
+  private readonly workspaceFolders: () => readonly { uri: string; name: string }[] | undefined;
   constructor(services: ExpressP11Services) {
+    this.workspaceFolders = () => services.shared.workspace.WorkspaceManager.workspaceFolders;
     this.langiumDocuments = services.shared.workspace.LangiumDocuments;
     this.nameProvider = services.references.NameProvider;
     services.shared.workspace.DocumentBuilder.onBuildPhase(DocumentState.ComputedScopes, (docs, cancelToken) =>
@@ -164,10 +165,7 @@ export class ExpressP11TypeContainer {
   }
 
   private async configureWorkspace() {
-    const useOptimizedConfiguration = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "useOptimizedConfiguration");
-    const excludedFolders = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFolders");
-    const excludedFiles = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFiles");
-    this.workspaceConfiguration = { useOptimizedConfiguration, excludedFiles, excludedFolders };
+    this.workspaceConfiguration = await readConfiguration(this.configurationProvider, this.workspaceFolders());
   }
 
   private reset() {

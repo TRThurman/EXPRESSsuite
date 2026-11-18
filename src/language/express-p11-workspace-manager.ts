@@ -15,7 +15,17 @@ export type Configuration = {
   useOptimizedConfiguration: boolean;
   excludedFolders: string[];
   excludedFiles: string[];
+  /** The URIs of the workspace folders: `excludedFolders` names folders inside them (`utils/file-filter.ts`). */
+  workspaceFolders?: readonly string[];
 };
+
+/** The settings of `utils/file-filter.ts`, as the client holds them now, with the workspace folders. */
+export async function readConfiguration(provider: ConfigurationProvider | undefined, folders: readonly WorkspaceFolder[] | undefined): Promise<Configuration> {
+  const useOptimizedConfiguration = await provider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "useOptimizedConfiguration");
+  const excludedFolders = await provider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFolders");
+  const excludedFiles = await provider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFiles");
+  return { useOptimizedConfiguration, excludedFiles, excludedFolders, workspaceFolders: folders?.map((folder) => folder.uri) };
+}
 export class ExpressP11WorkspaceManager extends DefaultWorkspaceManager {
   private readonly fullyReady = new Deferred<void>();
   private acceptingStartupDocumentChanges = true;
@@ -43,10 +53,9 @@ export class ExpressP11WorkspaceManager extends DefaultWorkspaceManager {
       title: "EXPRESSsuite loading workspace",
     });
     try {
-      const useOptimizedConfiguration = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "useOptimizedConfiguration");
-      const excludedFolders = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFolders");
-      const excludedFiles = await this.configurationProvider?.getConfiguration(EXPRESSSUITE_CONFIGURATION_SECTION, "excludedFiles");
-      this.workspaceConfiguration = { useOptimizedConfiguration, excludedFiles, excludedFolders };
+      // A caller that skips `initialize` (a test, a command-line run) names the folders only here.
+      this.folders ??= folders;
+      this.workspaceConfiguration = await readConfiguration(this.configurationProvider, this.folders);
       await super.initializeWorkspace(folders, cancelToken);
       await this.refreshOpenDocuments(cancelToken);
       this.acceptingStartupDocumentChanges = false;
