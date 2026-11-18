@@ -8,10 +8,6 @@ import { TUTORIAL_DEMO_FILE, TUTORIAL_DEMO_FOLDER, TUTORIAL_DEMO_PATH, TUTORIAL_
  * the tutorial beside the schema.
  */
 
-/** Set once the note on Restricted Mode has been shown. */
-const TRUST_EXPLAINED = "expresssuite.tutorial.trustExplained";
-const OPEN = "Open the demo";
-
 const CONTINUE = "Continue with my copy of the demo";
 const START_OVER = "Start over with a fresh copy of the demo";
 
@@ -66,23 +62,6 @@ async function openTutorial(context: vscode.ExtensionContext): Promise<void> {
     if (isOpenFolder(copy)) {
       await showTutorial(context, copy);
       return;
-    }
-    // VS Code opens a folder it has not seen before in Restricted Mode, in which this extension
-    // does not run: nothing would happen in the new window, with no word of why. Say it first.
-    const trustEnabled = vscode.workspace.getConfiguration("security.workspace.trust").get<boolean>("enabled", true);
-    if (trustEnabled && !context.globalState.get<boolean>(TRUST_EXPLAINED)) {
-      const answer = await vscode.window.showInformationMessage(
-        "The demo opens in a new window.",
-        {
-          modal: true,
-          detail:
-            "If that window shows \"Restricted Mode\" in its status bar, click it and choose Trust. " +
-            "EXPRESSsuite does not run in a folder until it is trusted.",
-        },
-        OPEN,
-      );
-      if (answer !== OPEN) return;
-      await context.globalState.update(TRUST_EXPLAINED, true);
     }
     // The schema is opened with the folder: an EXPRESS file in an editor starts the extension in
     // the new window, which finds itself on the demo copy and shows the tutorial (resumeTutorial).

@@ -37,6 +37,10 @@ describe("EXPRESSsuite extension identity", () => {
     expect(menuCommands).toEqual(expect.arrayContaining(commandsExpectedInMenus));
   });
 
+  test("runs in Restricted Mode: a folder that is not trusted is still checked", () => {
+    expect((manifest as unknown as { capabilities: { untrustedWorkspaces: { supported: unknown } } }).capabilities.untrustedWorkspaces.supported).toBe(true);
+  });
+
   test("uses product-specific settings while retaining the EXPRESS language id", () => {
     const settings = Object.keys(manifest.contributes.configuration.properties);
     expect(settings.every((setting) => setting.startsWith(`${EXPRESSSUITE_CONFIGURATION_SECTION}.`))).toBe(true);

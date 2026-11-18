@@ -150,13 +150,10 @@ Run this on an installed package (a `.vsix` or the Marketplace), not in an
 extension development host: it checks that the tutorial is in the package.
 
 - In a window with no folder open, run **EXPRESSsuite: Open Tutorial** from the
-  command palette. Expected: a note on Restricted Mode with **Open the demo**
-  (the first time only), then a new window on a folder `tutorial-demo`. In a
-  profile that has not trusted that folder, the window is in Restricted Mode
-  and shows the schema as plain text: click **Restricted Mode** in the status
-  bar and choose **Trust**. Expected then: `demo_widgets.exp` on the left and
-  the tutorial rendered on the right; the Problems panel lists four
-  `annotation-` warnings.
+  command palette. Expected: a new window opens on a folder `tutorial-demo`,
+  with `demo_widgets.exp` on the left and the tutorial rendered on the right;
+  the Problems panel lists four `annotation-` warnings, also when the status
+  bar of that window shows **Restricted Mode**.
 - Edit and save `demo_widgets.exp`, close that window, run the command again.
   Expected: a choice between **Continue with my copy of the demo** and **Start
   over with a fresh copy of the demo**; the first shows the edit, the second
