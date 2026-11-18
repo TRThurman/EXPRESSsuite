@@ -513,3 +513,36 @@ another schema) is followed through the schema's interfaces to its
 declaration. A key or cross-reference whose last part names nothing goes to
 its owner, or to the schema; `annotation-orphan-key` and
 `annotation-link-undeclared` report those.
+
+## 12. Find and rename with the descriptions
+
+Find All References and Rename reach the description blocks too.
+
+1. In `demo_widgets.exp`, put the cursor on `widget` in `ENTITY widget` and
+   press Shift+F12 (**Find All References**). The list has the entity, its two
+   uses in the schema, the key `(*"demo_widgets.widget"` and the bold
+   `**widget**` in the text of that block.
+2. Put the cursor on `reach` in `ENTITY rail` and press F2 (**Rename**). Type
+   `span` and press Shift+Enter to see the changes before they are made: the
+   attribute, and both parts of `<<express:demo_widgets.rail.reach,reach>>`,
+   the target and the display text. Apply them.
+3. Undo, then start the same rename from the description: put the cursor on
+   `reach` in the target of the cross-reference and press F2. The changes are
+   the same.
+
+What Rename changes and what it leaves:
+
+| Place | Rename |
+|---|---|
+| the declaration and its uses in EXPRESS | changed |
+| the part of a key that names it (`schema.entity.wr:label`: the label) | changed |
+| the target of an `<<express:...>>` cross-reference | changed |
+| the display text of a cross-reference | changed only when it is exactly the old name |
+| the name written in the text of a block, the bold subject included | not changed |
+
+The name in the text stays because it may be an ordinary word; Find All
+References lists those places so that you can go through them. Rename does
+not start on a word of the text, on display text or on a suffix such as
+`.__note`. An attribute and the attributes that redeclare it without
+`RENAMED` are renamed together. A new name that is not an EXPRESS identifier
+is refused.

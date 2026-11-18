@@ -29,6 +29,25 @@
   of a schema is unchanged.
 - The **Show Description** panel has a **Go to declaration** link under its
   heading, which opens the EXPRESS that the description is for.
+- **Find All References and Rename include the description blocks.** Until
+  now both stopped at `END_SCHEMA;`, so renaming an entity left the keys of its
+  descriptions and the cross-references to it behind.
+  - **Find All References** (Shift+F12) on a schema, declaration, attribute,
+    enumeration item, parameter, WHERE rule or UNIQUE rule also lists the part
+    of each key that names it (`.__note` and the other role suffixes included),
+    the `<<express:...>>` cross-references to it, and its name written in the
+    text of a block, in every file of the workspace. It starts from any of
+    those places as well as from the EXPRESS.
+  - **Rename** (F2) also updates those keys and cross-reference targets, and
+    the display text of a cross-reference when it is exactly the old name. The
+    name written in the text of a block is not changed: it may be an ordinary
+    word. Rename starts from the EXPRESS, from a key or from the target of a
+    cross-reference.
+  - An attribute and the attributes that redeclare it without `RENAMED` are
+    found and renamed together, with the descriptions of each.
+  - The label of a WHERE rule can now be renamed, from the rule or from its
+    key.
+  - Rename refuses a new name that is not an EXPRESS identifier.
 - **Open Tutorial** (command palette, and a walkthrough on the Welcome page):
   the tutorial for Describe Declaration and its two demo schemas are now part
   of the extension. The command copies the demo to the extension's storage

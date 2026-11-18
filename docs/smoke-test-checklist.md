@@ -162,6 +162,25 @@ extension development host: it checks that the tutorial is in the package.
   button that does the same.
 - **PASS** if all of the above hold.
 
+### S10 — References and Rename with the descriptions
+
+Use the demo of **Open Tutorial** (`demo_widgets.exp`), on a fresh copy.
+
+- Cursor on `widget` in `ENTITY widget`, Shift+F12. Expected: five places, among
+  them the key `(*"demo_widgets.widget"` and `**widget**` in its text.
+- Cursor on `widget` in that key, Shift+F12. Expected: the same five places.
+- Cursor on `reach` in `ENTITY rail`, F2, type `span`, Shift+Enter. Expected:
+  the preview shows three changes: the attribute, and the target and the
+  display text of `<<express:demo_widgets.rail.reach,reach>>`. Apply. Expected:
+  no new entry in the Problems panel.
+- Cursor on `span` in the target of that cross-reference, F2, type `reach`,
+  Enter. Expected: the three places are back as they were.
+- Cursor on `**rail**` in the text of a block, F2. Expected: VS Code says the
+  element cannot be renamed.
+- F2 on `ENTITY rail`, type `2 rails`, Enter. Expected: a message that this is
+  not an EXPRESS identifier; nothing changes.
+- **PASS** if all of the above hold.
+
 ## Per-schema acceptance run (DESIGN §4.2.4)
 
 After S1–S6 pass on `geometry_schema.exp`, repeat the core surfaces on

@@ -62,6 +62,25 @@ names:
 The **Show Description** panel has a **Go to declaration** link under its
 heading for the same step from the rendered text.
 
+### References and Rename with the descriptions
+
+**Find All References** (Shift+F12) and **Rename** (F2) include the
+description blocks after `END_SCHEMA;`, in every file of the workspace, and
+start from the EXPRESS, from a key or from a cross-reference.
+
+| Place that names the declaration | Find All References | Rename |
+|---|---|---|
+| EXPRESS: the declaration and its uses | listed | changed |
+| the part of a key that names it, also before `.__note` and the other suffixes | listed | changed |
+| the target of an `<<express:...>>` cross-reference | listed | changed |
+| the display text of a cross-reference | not listed | changed only when it is exactly the old name |
+| the name written in the text of a block | listed | not changed |
+
+An attribute and the attributes that redeclare it without `RENAMED` go
+together. A name in the text is listed when it would resolve to the
+declaration by the rule of Go to Definition above; for a name that is also an
+ordinary word, such as `point`, the list is long.
+
 ### SC4 validation
 
 EXPRESSsuite reports additional ISO TC 184/SC 4 authoring problems in the
@@ -224,6 +243,7 @@ Open any `.exp` file with named-remark annotations (e.g. those in [wg12-step](ht
 | Hover description | hover the cursor on any entity name |
 | Show Description | right-click → **Show Description** (or command palette) |
 | From a description to its EXPRESS | F12 in a description block after `END_SCHEMA;`, or **Go to declaration** in the Show Description panel |
+| References and Rename with the descriptions | Shift+F12 or F2 on a name, in the EXPRESS or in a key or cross-reference of a description block |
 | Show EXPRESS-G Diagram | right-click → **Show EXPRESS-G Diagram** |
 | AsciiMath Playground | command palette → **EXPRESSsuite: Open AsciiMath Playground** |
 | Send Selection to Playground | select text in editor → right-click → **Send Selection to AsciiMath Playground** |
