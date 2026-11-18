@@ -27,6 +27,13 @@
   that schema's interfaces. A key or cross-reference whose last part names
   nothing goes to its owner, or to the schema. Go to Definition in the EXPRESS
   of a schema is unchanged.
+- **The status bar says when the open file is not checked.** While the active
+  editor holds an EXPRESS file that `expresssuite.excludedFolders` or
+  `expresssuite.excludedFiles` leaves out of the workspace, the status bar
+  shows **EXPRESS: not checked**. The tooltip names the folder or the keyword
+  and the setting that lists it; a click opens these settings. Before, such a
+  file showed no problems and nothing said that it had not been read
+  ([#120](https://github.com/TRThurman/EXPRESSsuite/issues/120)).
 - The **Show Description** panel has a **Go to declaration** link under its
   heading, which opens the EXPRESS that the description is for.
 - **Find All References and Rename include the description blocks.** Until
