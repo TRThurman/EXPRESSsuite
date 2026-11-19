@@ -90,6 +90,16 @@
   The extension reads the files of the workspace and its own four settings; it
   runs no program and loads no code from the workspace.
 
+### Changes
+
+- **`unqualified-group-reference` accepts `<>`.** A group reference that is
+  not further qualified (`a\e`) is no longer reported as an operand of `<>`,
+  as it is not reported as an operand of `=`: both are entity value
+  comparison (ISO 10303-11:2004 12.2.1, 12.2.1.7), although the restriction
+  of 12.7.4 names only `=`. `:=:` and `:<>:` compare instances and are still
+  reported. No schema of SMRL v8 is affected. The Lean model follows
+  (`opAccepts`, GroupReference.lean).
+
 ### Bug Fixes
 
 - **An inherited attribute named without `SELF` is found.** In a subtype, an
