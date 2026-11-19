@@ -207,15 +207,16 @@ Use the demo of **Open Tutorial** (`demo_widgets.exp`), on a fresh copy.
 - At the end of the file type `(*"`. Expected: the list offers `demo_widgets`.
   Accept it.
 - Type `.`. Expected: the declarations of the schema, `bracket` before
-  `widget`, and `widget` marked "described". Accept `bracket`, type `"`,
-  delete the `)` that the editor added after it, Enter.
+  `widget`, and `widget` marked "described". Accept `bracket`, type `"`.
+  Expected: the line reads `(*"demo_widgets.bracket"*)`. Enter.
 - Type `A **`. Expected: the list offers `bracket`; accepting it writes
   `bracket**`.
 - Type ` carries a <<express:`. Expected: the schemas, `demo_widgets` first.
   Accept it. Expected: `demo_widgets.` is written and the list of its
   declarations opens without a key press; `bracket` is not in it.
 - Accept `mount`. Expected: `<<express:demo_widgets.mount,mount>>` with the
-  display text `mount` selected.
+  display text `mount` selected. The `*)` that the editor wrote still
+  ends the line.
 - In `ENTITY rail`, after `reach : REAL;`, type `x : ` on a new line.
   Expected: no list opens by itself. Ctrl+Space. Expected: the list of types
   as before this feature. Undo.
