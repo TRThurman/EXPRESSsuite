@@ -102,6 +102,15 @@
 
 ### Bug Fixes
 
+- **An inherited attribute named without `SELF` is found.** In a subtype, an
+  attribute of a supertype written by its plain name in a DERIVE, UNIQUE or
+  WHERE clause was reported "A reference could not be resolved" or "The
+  attribute '…' could not be found", although it is valid EXPRESS (ISO
+  10303-11:2004 9.2.3.3). It now names the inherited attribute, as
+  `SELF.name` and `SELF\supertype.name` do, so Go to Definition, Find All
+  References and Rename follow it too. In SMRL v8 this removes 377 findings
+  from the schemas and 5,447 from the long forms
+  ([#132](https://github.com/TRThurman/EXPRESSsuite/issues/132)).
 - **A change of `expresssuite.annotations.publicationHazards` shows at
   once.** The files that are open are checked again when the setting changes.
   Before, their findings stayed as they were until the file was next edited.

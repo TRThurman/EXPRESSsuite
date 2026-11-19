@@ -18,16 +18,16 @@ correctness: several of the classes below are known false positives.
 The corpus folder loaded as one workspace with the extension's default
 settings: `useOptimizedConfiguration` on, so files whose name contains `lf`
 or `concatenated` and the `business_object_models` folder are not loaded.
-1,287 of the 1,410 files load; 6,663 diagnostics
-(3,901 error, 704 information, 2,058 warning) in
-281 files. `files` maps file to code to the 1-based start
+1,287 of the 1,410 files load; 6,286 diagnostics
+(3,524 error, 704 information, 2,058 warning) in
+261 files. `files` maps file to code to the 1-based start
 line of every diagnostic. `parseErrors` lists the files with lexer or parser
 errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 26-line fragment the distribution ships beside the module, not a schema.
 
 | code                                     |  count |
 |------------------------------------------|--------|
-| linking-error                            |  3,374 |
+| linking-error                            |  2,997 |
 | (none)                                   |  1,737 |
 | declaration-name-case                    |    704 |
 | reference-name-case                      |    306 |
@@ -69,14 +69,14 @@ modules and visible together in a third (or in one of the two). The files:
 
 The 103 published long forms (`modules/*/arm_lf.exp`,
 `modules/*/mim_lf.exp`), each built alone in services of its own with the
-excludes cleared: 7,954 diagnostics in 94 files (9 long forms have none),
+excludes cleared: 2,507 diagnostics in 94 files (9 long forms have none),
 counts per file and code (no line numbers: the files are large and the
 counts are what a change moves). No long form has a parse error, a
 `duplicate-interfaced-declaration` or a `redundant-declaration`.
 
 | code                             |  count |
 |----------------------------------|--------|
-| linking-error                    |  6,967 |
+| linking-error                    |  1,520 |
 | duplicate-loop-index             |    457 |
 | unqualified-group-reference      |    406 |
 | ambiguous-attribute-reference    |     78 |
@@ -118,10 +118,10 @@ Each reported site breaks the rule:
 - `linking-error` "The attribute '…' could not be found" (also "The entity
   '…' could not be found" and "A reference could not be resolved"): an
   attribute or group reference the linker cannot bind. The largest class in
-  both baselines (3,374 of the default-settings sites, 1,487 of them
+  both baselines (2,997 of the default-settings sites, 1,470 of them
   in `resources/automotive_design/automotive_design.exp` and
   `domain_models/managed_model_based_3d_engineering_domain/DomainModel.exp`;
-  6,967 in the long forms). Not classified
+  1,520 in the long forms). Not classified
   site by site. The sampled long-form sites (AP203 ARM and MIM long forms,
   2026-10-30) are valid EXPRESS whose operand is a QUERY variable over a
   nested QUERY, a function result or an attribute path, which the linker
@@ -134,10 +134,16 @@ Each reported site breaks the rule:
   and 27,296 long-form sites; the references that then resolve are checked
   like any other, which is where the long forms' additional
   `ambiguous-attribute-reference` and `redeclaration-not-specialization`
-  sites come from (not classified).
-- `linking-error` at `resources/product_structure_schema/product_structure_schema.exp`
-  lines 192 and 194: a UNIQUE rule naming an inherited attribute and an
-  INVERSE declared in a supertype, both valid EXPRESS (verified 2026-10-30).
+  sites come from (not classified). An attribute that an entity inherits
+  and names without `SELF` binds since issue 132 (ISO 10303-11:2004
+  9.2.3.3), which removed 377 short-form and 5,447 long-form sites and
+  added none; among them the two of
+  `resources/product_structure_schema/product_structure_schema.exp` (a
+  UNIQUE rule naming an inherited attribute and an INVERSE attribute
+  declared in a supertype).
+  One reference changed its target: in `set_theory_schema`, entity
+  `proper_subset`, `subset` in `identical_sets(superset, subset)` is now
+  the inherited attribute `subset`, no longer the entity of that name.
 - `(none)`, "Attribute name should start with a lower case.": a diagnostic
   without a code yet.
 - `reference-statement-missing` is raised where a reference binds to a

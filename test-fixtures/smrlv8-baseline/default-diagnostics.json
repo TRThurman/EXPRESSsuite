@@ -1,8 +1,8 @@
 {
   "documents": 1287,
-  "diagnostics": 6663,
+  "diagnostics": 6286,
   "bySeverity": {
-    "error": 3901,
+    "error": 3524,
     "information": 704,
     "warning": 2058
   },
@@ -16,7 +16,7 @@
     "informal-proposition-malformed-signature": 7,
     "informal-proposition-misplaced-signature": 3,
     "informal-proposition-missing-annotation": 6,
-    "linking-error": 3374,
+    "linking-error": 2997,
     "parsing-error": 2,
     "redeclaration-not-specialization": 9,
     "reference-name-case": 306,
@@ -2469,8 +2469,6 @@
         6888
       ],
       "linking-error": [
-        2960,
-        2960,
         3144,
         3157,
         3702,
@@ -2500,11 +2498,6 @@
       ],
       "reference-name-case": [
         42
-      ]
-    },
-    "modules/altered_part/arm.exp": {
-      "linking-error": [
-        17
       ]
     },
     "modules/analysis_product_relationships/mim.exp": {
@@ -2723,9 +2716,6 @@
       ]
     },
     "modules/assembly_component/arm.exp": {
-      "linking-error": [
-        23
-      ],
       "reference-statement-missing": [
         21,
         24,
@@ -2869,11 +2859,6 @@
       "reference-name-case": [
         63,
         65
-      ]
-    },
-    "modules/associative_text/arm.exp": {
-      "linking-error": [
-        61
       ]
     },
     "modules/bare_die/arm.exp": {
@@ -3087,7 +3072,6 @@
     },
     "modules/characteristic/arm.exp": {
       "linking-error": [
-        122,
         210,
         210
       ]
@@ -3358,10 +3342,6 @@
     },
     "modules/extended_measure_representation/mim.exp": {
       "linking-error": [
-        26,
-        26,
-        27,
-        28,
         60,
         60,
         61,
@@ -3476,7 +3456,6 @@
         194,
         195,
         195,
-        244,
         416,
         416
       ],
@@ -3530,7 +3509,6 @@
     },
     "modules/footprint_definition/arm.exp": {
       "linking-error": [
-        43,
         64,
         64,
         66,
@@ -3619,15 +3597,6 @@
         73
       ]
     },
-    "modules/functional_usage_view/mim.exp": {
-      "linking-error": [
-        60,
-        60,
-        61,
-        61,
-        69
-      ]
-    },
     "modules/general_design_connectivity/arm.exp": {
       "redeclaration-not-specialization": [
         176,
@@ -3644,8 +3613,6 @@
     },
     "modules/geometric_constraints/arm.exp": {
       "linking-error": [
-        192,
-        193,
         385
       ],
       "reference-name-case": [
@@ -3686,15 +3653,6 @@
         375,
         378,
         381
-      ]
-    },
-    "modules/geometric_tolerance/mim.exp": {
-      "linking-error": [
-        109,
-        109,
-        110,
-        110,
-        110
       ]
     },
     "modules/group/mim.exp": {
@@ -3960,9 +3918,7 @@
         40,
         42,
         42,
-        68,
         80,
-        82,
         82,
         83,
         88,
@@ -4044,16 +4000,11 @@
         1468
       ],
       "linking-error": [
-        188,
-        200,
-        201,
         218,
         218,
         219,
         219,
-        293,
         379,
-        401,
         478,
         478,
         478,
@@ -4067,7 +4018,6 @@
         619,
         620,
         620,
-        994,
         1020,
         1023,
         1024,
@@ -4291,15 +4241,6 @@
         95
       ]
     },
-    "modules/manufacturing_configuration_effectivity/arm.exp": {
-      "linking-error": [
-        35,
-        35,
-        37,
-        37,
-        37
-      ]
-    },
     "modules/mechanical_design_features_and_requirements/arm.exp": {
       "linking-error": [
         65,
@@ -4338,18 +4279,9 @@
         55
       ]
     },
-    "modules/mechanical_design_presentation_representation_with_draughting/mim.exp": {
-      "linking-error": [
-        42
-      ]
-    },
     "modules/mesh_connectivity/arm.exp": {
       "linking-error": [
-        28,
         31,
-        31,
-        32,
-        33,
         96
       ],
       "reference-name-case": [
@@ -4366,14 +4298,10 @@
       "linking-error": [
         54,
         55,
-        84,
         109,
         109,
-        120,
         129,
         129,
-        129,
-        130,
         130,
         130,
         140,
@@ -4578,12 +4506,6 @@
         138
       ]
     },
-    "modules/part_definition_relationship/mim.exp": {
-      "linking-error": [
-        19,
-        19
-      ]
-    },
     "modules/part_feature_function/arm.exp": {
       "linking-error": [
         20
@@ -4746,7 +4668,6 @@
         17,
         75,
         77,
-        81,
         140,
         140,
         140,
@@ -5030,8 +4951,7 @@
         177,
         204,
         205,
-        205,
-        256
+        205
       ],
       "reference-name-case": [
         205
@@ -5265,9 +5185,6 @@
       ]
     },
     "modules/product_occurrence/arm.exp": {
-      "linking-error": [
-        86
-      ],
       "reference-statement-missing": [
         64
       ]
@@ -5388,12 +5305,6 @@
     },
     "modules/sequential_laminate_assembly_design/arm.exp": {
       "linking-error": [
-        39,
-        40,
-        40,
-        41,
-        42,
-        42,
         69
       ],
       "reference-statement-missing": [
@@ -5418,7 +5329,6 @@
       "linking-error": [
         32,
         32,
-        36,
         409,
         411,
         1011,
@@ -5632,13 +5542,9 @@
         436
       ],
       "linking-error": [
-        144,
         160,
-        198,
-        354,
         401,
-        401,
-        425
+        401
       ],
       "reference-name-case": [
         160
@@ -5674,10 +5580,6 @@
         44,
         44,
         44,
-        53,
-        54,
-        55,
-        58,
         74,
         76,
         77,
@@ -5692,19 +5594,12 @@
         115,
         115,
         115,
-        125,
         132,
         134,
         135,
         135,
         135,
         135,
-        142,
-        143,
-        144,
-        147,
-        148,
-        150,
         167,
         169,
         170,
@@ -5747,13 +5642,9 @@
         199,
         207,
         220,
-        220,
-        230,
         230,
         239,
         253,
-        253,
-        263,
         263
       ],
       "reference-name-case": [
@@ -5784,30 +5675,6 @@
         28,
         73,
         74
-      ]
-    },
-    "resources/aic_advanced_brep/aic_advanced_brep.exp": {
-      "linking-error": [
-        29,
-        29,
-        29,
-        33,
-        34,
-        34,
-        34,
-        34,
-        38,
-        38,
-        38,
-        38
-      ]
-    },
-    "resources/aic_curve_swept_solid/aic_curve_swept_solid.exp": {
-      "linking-error": [
-        74,
-        77,
-        77,
-        78
       ]
     },
     "resources/aic_draughting_elements/aic_draughting_elements.exp": {
@@ -5867,54 +5734,10 @@
         539
       ]
     },
-    "resources/aic_elementary_brep/aic_elementary_brep.exp": {
-      "linking-error": [
-        134,
-        137,
-        137,
-        139,
-        141,
-        141,
-        142,
-        142,
-        143,
-        146,
-        146,
-        147
-      ]
-    },
-    "resources/aic_faceted_brep/aic_faceted_brep.exp": {
-      "linking-error": [
-        15,
-        18,
-        22,
-        28,
-        35,
-        35,
-        35,
-        39,
-        40,
-        40,
-        40,
-        40,
-        44,
-        44,
-        44,
-        44
-      ]
-    },
     "resources/aic_machining_feature/aic_machining_feature.exp": {
       "linking-error": [
         2712,
         2859
-      ]
-    },
-    "resources/aic_manifold_subsurface/aic_manifold_subsurface.exp": {
-      "linking-error": [
-        37,
-        40,
-        40,
-        41
       ]
     },
     "resources/aic_manifold_surface/aic_manifold_surface.exp": {
@@ -5947,102 +5770,6 @@
     "resources/aic_non_manifold_surface/aic_non_manifold_surface.exp": {
       "annotation-unkeyed-remark": [
         385
-      ]
-    },
-    "resources/aic_topologically_bounded_surface/aic_topologically_bounded_surface.exp": {
-      "linking-error": [
-        12,
-        16,
-        16,
-        17,
-        17,
-        17,
-        17,
-        17,
-        21,
-        21,
-        22,
-        22,
-        22,
-        22,
-        22,
-        22,
-        26,
-        26,
-        27,
-        27,
-        27,
-        27,
-        27,
-        27,
-        27,
-        27,
-        27,
-        27,
-        27,
-        27,
-        27,
-        27,
-        27,
-        31,
-        31,
-        31,
-        32,
-        32,
-        32,
-        32,
-        36,
-        36,
-        36,
-        36,
-        36,
-        36,
-        36,
-        36,
-        36,
-        36,
-        36,
-        36,
-        39,
-        39,
-        43,
-        43,
-        44,
-        44,
-        44,
-        44,
-        44,
-        44,
-        44,
-        45,
-        45,
-        45,
-        45,
-        45,
-        46,
-        46,
-        46,
-        46,
-        46,
-        46,
-        46,
-        46,
-        46,
-        48,
-        48,
-        49,
-        49,
-        49,
-        49,
-        49,
-        49,
-        49,
-        49,
-        49,
-        49,
-        49,
-        49,
-        49
       ]
     },
     "resources/assembly_feature_relationship_schema/assembly_feature_relationship_schema.exp": {
@@ -6360,10 +6087,6 @@
         3672,
         3684,
         3693,
-        3700,
-        3702,
-        3703,
-        3706,
         3722,
         3725,
         3726,
@@ -6412,10 +6135,6 @@
         4675,
         4676,
         4733,
-        4742,
-        4743,
-        4744,
-        4744,
         4842,
         4842,
         4842,
@@ -6566,17 +6285,10 @@
         5999,
         6000,
         6000,
-        6011,
         6018,
         6021,
         6022,
         6022,
-        6352,
-        6353,
-        6354,
-        6355,
-        6445,
-        6447,
         6466,
         6469,
         6470,
@@ -7602,12 +7314,6 @@
         34
       ]
     },
-    "resources/explicit_geometric_constraint_schema/explicit_geometric_constraint_schema.exp": {
-      "linking-error": [
-        298,
-        299
-      ]
-    },
     "resources/finite_element_analysis_control_and_result_schema/finite_element_analysis_control_and_result_schema.exp": {
       "duplicate-loop-index": [
         2217,
@@ -7618,110 +7324,6 @@
       "linking-error": [
         2224,
         2369
-      ]
-    },
-    "resources/geometric_model_schema/geometric_model_schema.exp": {
-      "linking-error": [
-        244,
-        245,
-        245,
-        245,
-        245,
-        251,
-        252,
-        252,
-        252,
-        252,
-        253,
-        253,
-        253,
-        253,
-        254,
-        254,
-        254,
-        254,
-        255,
-        255,
-        255,
-        255,
-        256,
-        256,
-        256,
-        256,
-        257,
-        257,
-        257,
-        257,
-        258,
-        258,
-        258,
-        258,
-        258,
-        258,
-        258,
-        259,
-        259,
-        259,
-        259,
-        259,
-        259,
-        259,
-        260,
-        260,
-        260,
-        260,
-        260,
-        260,
-        260,
-        261,
-        261,
-        261,
-        261,
-        261,
-        261,
-        261,
-        262,
-        262,
-        262,
-        262,
-        262,
-        262,
-        262,
-        263,
-        263,
-        263,
-        263,
-        263,
-        263,
-        263,
-        696,
-        696,
-        706,
-        706,
-        752,
-        752,
-        762,
-        762
-      ]
-    },
-    "resources/geometry_schema/geometry_schema.exp": {
-      "linking-error": [
-        543,
-        543,
-        563,
-        563,
-        794,
-        794,
-        905,
-        905,
-        905,
-        905,
-        1203,
-        1203,
-        1203,
-        1203,
-        1203,
-        1203
       ]
     },
     "resources/iso13584_expressions_schema/iso13584_expressions_schema.exp": {
@@ -7780,13 +7382,6 @@
         218
       ]
     },
-    "resources/kinematic_topology_schema/kinematic_topology_schema.exp": {
-      "linking-error": [
-        64,
-        75,
-        89
-      ]
-    },
     "resources/mathematical_context_schema/mathematical_context_schema.exp": {
       "linking-error": [
         38
@@ -7801,10 +7396,6 @@
         801,
         850,
         850,
-        868,
-        868,
-        871,
-        871,
         4220,
         4221,
         4222,
@@ -7814,14 +7405,6 @@
         4616,
         4617,
         4618
-      ]
-    },
-    "resources/mesh_connectivity_schema/mesh_connectivity_schema.exp": {
-      "linking-error": [
-        35,
-        38,
-        39,
-        40
       ]
     },
     "resources/mesh_function_schema/mesh_function_schema.exp": {
@@ -7847,13 +7430,6 @@
         69
       ],
       "linking-error": [
-        147,
-        156,
-        156,
-        156,
-        157,
-        157,
-        157,
         312,
         379
       ]
@@ -7888,8 +7464,6 @@
     },
     "resources/presentation_appearance_schema/presentation_appearance_schema.exp": {
       "linking-error": [
-        526,
-        533,
         718,
         718,
         719,
@@ -7909,24 +7483,12 @@
     },
     "resources/product_property_representation_schema/product_property_representation_schema.exp": {
       "linking-error": [
-        206,
-        206,
-        206,
         206
-      ]
-    },
-    "resources/product_structure_schema/product_structure_schema.exp": {
-      "linking-error": [
-        192,
-        194
       ]
     },
     "resources/set_theory_schema/set_theory_schema.exp": {
       "duplicate-loop-index": [
         106
-      ],
-      "linking-error": [
-        52
       ]
     },
     "resources/shape_data_quality_criteria_schema/shape_data_quality_criteria_schema.exp": {
@@ -8128,11 +7690,6 @@
       "informal-proposition-missing-annotation": [
         362,
         387
-      ],
-      "linking-error": [
-        307,
-        310,
-        313
       ]
     },
     "resources/sketch_schema/sketch_schema.exp": {
@@ -8151,11 +7708,6 @@
         627,
         679,
         700
-      ],
-      "linking-error": [
-        325,
-        333,
-        342
       ]
     },
     "resources/structural_response_representation_schema/structural_response_representation_schema.exp": {
@@ -8165,12 +7717,6 @@
         2237
       ],
       "linking-error": [
-        1879,
-        1887,
-        1899,
-        1907,
-        1919,
-        1927,
         2247,
         2248
       ]
@@ -8179,19 +7725,6 @@
       "duplicate-loop-index": [
         287,
         287
-      ]
-    },
-    "resources/topology_schema/topology_schema.exp": {
-      "linking-error": [
-        268,
-        270,
-        270,
-        270,
-        271,
-        271,
-        271,
-        272,
-        272
       ]
     },
     "resources/variational_representation_schema/variational_representation_schema.exp": {
