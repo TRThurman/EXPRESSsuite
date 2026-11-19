@@ -5,7 +5,8 @@ import { URI } from "langium";
 import { NodeFileSystem } from "langium/node";
 import { afterAll, describe, expect, test } from "vitest";
 import { createExpressP11Services } from "../language/express-module.js";
-import { isAllowedFile, nameHasKeyword } from "../utils/file-filter.js";
+import { excludedFileStatus } from "../extension/excluded-file-status.js";
+import { exclusionOf, isAllowedFile, nameHasKeyword } from "../utils/file-filter.js";
 import { defaultSettings } from "./smrlv8-corpus-support.js";
 
 /**
@@ -84,6 +85,34 @@ describe("excludedFiles: a keyword is a part of the file name", () => {
     expect(nameHasKeyword("draft.baked.exp", ".bak")).toBe(false);
     expect(nameHasKeyword("a+b.exp", "a+b")).toBe(true);
     expect(nameHasKeyword("anything.exp", "")).toBe(false);
+  });
+});
+
+describe("why a file is left out, and what the status bar says of it", () => {
+  const folders = ["file:///home/me/step"];
+
+  test("the setting and the entry that the file meets; the folder is named before the keyword", () => {
+    expect(exclusionOf(URI.parse("file:///home/me/step/data/doc/a.exp"), settings(folders))).toEqual({ setting: "excludedFolders", entry: "doc" });
+    expect(exclusionOf(URI.parse("file:///home/me/step/data/mim_lf.exp"), settings(folders))).toEqual({ setting: "excludedFiles", entry: "lf" });
+    expect(exclusionOf(URI.parse("file:///home/me/step/doc/mim_lf.exp"), settings(folders))).toEqual({ setting: "excludedFolders", entry: "doc" });
+    expect(exclusionOf(URI.parse("file:///home/me/step/data/mim.exp"), settings(folders))).toBeUndefined();
+  });
+
+  test("a file that is read has no status", () => {
+    expect(excludedFileStatus("file:///home/me/step/data/mim.exp", settings(folders))).toBeUndefined();
+    expect(excludedFileStatus("file:///home/me/step/doc/a.exp", { ...settings(folders), useOptimizedConfiguration: false })).toBeUndefined();
+  });
+
+  test("a file in an excluded folder: the status names the folder and the setting", () => {
+    const status = excludedFileStatus("file:///home/me/step/doc/a.exp", settings(folders))!;
+    expect(status.text).toBe("$(circle-slash) EXPRESS: not checked");
+    expect(status.tooltip).toContain('It is in a folder named "doc", which expresssuite.excludedFolders lists.');
+    expect(status.tooltip).toContain("expresssuite.useOptimizedConfiguration");
+  });
+
+  test("a file with a keyword in its name: the status names the keyword and the setting", () => {
+    const status = excludedFileStatus("file:///home/me/step/data/mim_lf.exp", settings(folders))!;
+    expect(status.tooltip).toContain('Its name holds "lf", a keyword of expresssuite.excludedFiles.');
   });
 });
 

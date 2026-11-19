@@ -169,7 +169,8 @@ Use the demo of **Open Tutorial** (`demo_widgets.exp`), on a fresh copy.
 - Cursor on `widget` in `ENTITY widget`, Shift+F12. Expected: five places, among
   them the key `(*"demo_widgets.widget"` and `**widget**` in its text.
 - Cursor on `widget` in that key, Shift+F12. Expected: the same five places.
-- Cursor on `reach` in `ENTITY rail`, F2, type `span`, Shift+Enter. Expected:
+- Cursor on `reach` in `ENTITY rail`, F2, type `span`, Cmd+Enter (Ctrl+Enter on
+  Windows and Linux; the rename box names the key). Expected:
   the preview shows three changes: the attribute, and the target and the
   display text of `<<express:demo_widgets.rail.reach,reach>>`. Apply. Expected:
   no new entry in the Problems panel.
@@ -179,6 +180,45 @@ Use the demo of **Open Tutorial** (`demo_widgets.exp`), on a fresh copy.
   element cannot be renamed.
 - F2 on `ENTITY rail`, type `2 rails`, Enter. Expected: a message that this is
   not an EXPRESS identifier; nothing changes.
+- **PASS** if all of the above hold.
+
+### S11 — A file that is not checked
+
+Use the demo of **Open Tutorial**, on a fresh copy, with the default settings.
+
+- Copy `demo_widgets.exp` to `doc/copy.exp` and to `demo_lf.exp` in the demo
+  folder.
+- Open `demo_widgets.exp`. Expected: no **EXPRESS: not checked** in the status
+  bar.
+- Open `doc/copy.exp`. Expected: the status bar shows **EXPRESS: not checked**
+  on a warning background; the tooltip names the folder `doc` and
+  `expresssuite.excludedFolders`; the Problems panel has no entry for the file.
+- Open `demo_lf.exp`. Expected: the same, the tooltip naming the keyword `lf`
+  and `expresssuite.excludedFiles`.
+- Click the status bar entry. Expected: the Settings editor opens on the
+  excluded folders and files of EXPRESSsuite.
+- Switch back to `demo_widgets.exp`. Expected: the entry is gone.
+- **PASS** if all of the above hold.
+
+### S12 — Type-ahead in a description block
+
+Use the demo of **Open Tutorial** (`demo_widgets.exp`), on a fresh copy.
+
+- At the end of the file type `(*"`. Expected: the list offers `demo_widgets`.
+  Accept it.
+- Type `.`. Expected: the declarations of the schema, `bracket` before
+  `widget`, and `widget` marked "described". Accept `bracket`, type `"`,
+  delete the `)` that the editor added after it, Enter.
+- Type `A **`. Expected: the list offers `bracket`; accepting it writes
+  `bracket**`.
+- Type ` carries a <<express:`. Expected: the schemas, `demo_widgets` first.
+  Accept it. Expected: `demo_widgets.` is written and the list of its
+  declarations opens without a key press; `bracket` is not in it.
+- Accept `mount`. Expected: `<<express:demo_widgets.mount,mount>>` with the
+  display text `mount` selected.
+- In `ENTITY rail`, after `reach : REAL;`, type `x : ` on a new line.
+  Expected: no list opens by itself. Ctrl+Space. Expected: the list of types
+  as before this feature. Undo.
 - **PASS** if all of the above hold.
 
 ## Per-schema acceptance run (DESIGN §4.2.4)

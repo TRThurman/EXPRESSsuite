@@ -81,6 +81,24 @@ together. A name in the text is listed when it would resolve to the
 declaration by the rule of Go to Definition above; for a name that is also an
 ordinary word, such as `point`, the list is long.
 
+### Type-ahead in a description block
+
+In a keyed description block after `END_SCHEMA;` the completion list offers
+what is valid where the cursor stands. It opens by itself after `"`, `.`, `:`
+and `**`.
+
+| Cursor | Offered |
+|---|---|
+| in a key | the schema; after `schema.` its declarations, those without a block first, then the roles (`.__note`, `.__example`, ...); after `schema.owner.` the owner's members, its rules (`wr:label`, `ur:label`, `wr:IPn`) and the roles |
+| after `<<express:` | the schemas: this one, those it interfaces, then the others; after `schema.` what it declares and what it reaches through its interfaces (written under the declaring schema); after `schema.owner.` the owner's attributes, items or parameters |
+| after `**` | the name of the block's subject |
+| elsewhere in the text | on Ctrl+Space only: the members of the subject, then the names of the schema |
+
+An accepted cross-reference is completed with its display text, the name in
+words, selected for typing over: `<<express:demo_widgets.mount,mount>>`. An
+entry shows the description of its target when the target has one. The
+completion list in the EXPRESS of a schema is unchanged.
+
 ### SC4 validation
 
 EXPRESSsuite reports additional ISO TC 184/SC 4 authoring problems in the
@@ -244,6 +262,7 @@ Open any `.exp` file with named-remark annotations (e.g. those in [wg12-step](ht
 | Show Description | right-click → **Show Description** (or command palette) |
 | From a description to its EXPRESS | F12 in a description block after `END_SCHEMA;`, or **Go to declaration** in the Show Description panel |
 | References and Rename with the descriptions | Shift+F12 or F2 on a name, in the EXPRESS or in a key or cross-reference of a description block |
+| Type-ahead in a description block | type `(*"`, `.`, `<<express:` or `**` in a description block after `END_SCHEMA;` |
 | Show EXPRESS-G Diagram | right-click → **Show EXPRESS-G Diagram** |
 | AsciiMath Playground | command palette → **EXPRESSsuite: Open AsciiMath Playground** |
 | Send Selection to Playground | select text in editor → right-click → **Send Selection to AsciiMath Playground** |
@@ -263,7 +282,7 @@ By default the extension does not read every `.exp` file of the workspace. The s
 
 - The folders above the workspace folder do not count: a workspace kept in `/home/me/library/schemas` is read. A folder opened as a workspace folder is read whatever its name.
 - A keyword is bounded by a character that is not a letter or a digit: `lf` leaves out `mim_lf.exp` and `mim_lf_patched.exp`, not `shelf_schema.exp`. Long forms and concatenated schemas are left out because each repeats the declarations of the schemas it was built from.
-- A file that is left out shows no problems, no hover and no completion, and nothing says so. If a file seems unchecked, compare its path with the two lists, or turn `expresssuite.useOptimizedConfiguration` off to read everything.
+- A file that is left out shows no problems, no hover and no completion. While such a file is in the active editor, the status bar shows **EXPRESS: not checked**; its tooltip names the folder or the keyword and the setting that lists it, and a click opens these settings. Turn `expresssuite.useOptimizedConfiguration` off to read everything.
 
 ## Privacy and confidentiality
 
