@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.7.0](https://github.com/TRThurman/EXPRESSsuite/compare/0.6.0...0.7.0) (2026-11-19)
 
 ### Features
 
