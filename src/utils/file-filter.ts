@@ -15,37 +15,52 @@ export function byUri(left: LangiumDocument, right: LangiumDocument): number {
   const r = right.uri.toString();
   return l < r ? -1 : l > r ? 1 : 0;
 }
-/**
- * Whether the workspace reads the file. With `expresssuite.useOptimizedConfiguration` off, every
- * file is read. With it on, a file is left out when a folder between its workspace folder and
- * itself is named in `expresssuite.excludedFolders`, or when its name holds a keyword of
- * `expresssuite.excludedFiles` ({@link nameHasKeyword}).
- */
-export function isAllowedFile(filepath: URI, configuration: Configuration): boolean {
-  if (!configuration.useOptimizedConfiguration) return true;
-  if (!isAllowedFolder(filepath, configuration)) return false;
-  const filename = filepath.path.split("/").pop();
-  if (!filename) return false;
-  return !configuration.excludedFiles.some((keyword) => nameHasKeyword(filename, keyword));
-}
+/** Why a file is left out: the setting, and the entry of its list that the file's path or name meets. */
+export type Exclusion = { setting: "excludedFolders" | "excludedFiles"; entry: string };
 
 /**
- * Whether no folder between the file's workspace folder and the file is named in
- * `expresssuite.excludedFolders`. The folders above the workspace folder do not count: where a
- * user keeps a workspace says nothing about its content. Of nested workspace folders the innermost
- * is taken, so a folder opened as a workspace folder is read whatever its name. A file outside
- * every workspace folder is in no excluded folder.
+ * Why the workspace does not read the file, or `undefined` when it does. With
+ * `expresssuite.useOptimizedConfiguration` off, every file is read. With it on, a file is left out
+ * when a folder between its workspace folder and itself is named in `expresssuite.excludedFolders`,
+ * or when its name holds a keyword of `expresssuite.excludedFiles` ({@link nameHasKeyword}).
+ *
+ * For the folders, those above the workspace folder do not count: where a user keeps a workspace
+ * says nothing about its content. Of nested workspace folders the innermost is taken, so a folder
+ * opened as a workspace folder is read whatever its name. A file outside every workspace folder is
+ * in no excluded folder.
  */
+export function exclusionOf(filepath: URI, configuration: Configuration): Exclusion | undefined {
+  if (!configuration.useOptimizedConfiguration) return undefined;
+  const folder = excludedFolderOf(filepath, configuration);
+  if (folder !== undefined) return { setting: "excludedFolders", entry: folder };
+  const filename = filepath.path.split("/").pop();
+  if (!filename) return undefined;
+  const keyword = configuration.excludedFiles.find((entry) => nameHasKeyword(filename, entry));
+  return keyword === undefined ? undefined : { setting: "excludedFiles", entry: keyword };
+}
+
+/** Whether the workspace reads the file ({@link exclusionOf}). */
+export function isAllowedFile(filepath: URI, configuration: Configuration): boolean {
+  if (!configuration.useOptimizedConfiguration) return true;
+  if (!filepath.path.split("/").pop()) return false;
+  return exclusionOf(filepath, configuration) === undefined;
+}
+
+/** Whether no folder between the file's workspace folder and the file is named in `expresssuite.excludedFolders`. */
 export function isAllowedFolder(path: URI, configuration: Configuration): boolean {
   if (!configuration.useOptimizedConfiguration) return true;
+  return excludedFolderOf(path, configuration) === undefined;
+}
+
+function excludedFolderOf(path: URI, configuration: Configuration): string | undefined {
   const file = path.toString();
   let root: string | undefined;
   for (const candidate of rootsOf(configuration.workspaceFolders)) {
     if (file.startsWith(candidate) && (root === undefined || candidate.length > root.length)) root = candidate;
   }
-  if (root === undefined) return true;
+  if (root === undefined) return undefined;
   const folders = file.slice(root.length).split("/").slice(0, -1);
-  return !folders.some((folder) => configuration.excludedFolders.includes(decoded(folder)));
+  return folders.map(decoded).find((folder) => configuration.excludedFolders.includes(folder));
 }
 
 /**
