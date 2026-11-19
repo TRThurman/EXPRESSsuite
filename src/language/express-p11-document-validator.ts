@@ -72,7 +72,7 @@ export class ExpressDocumentValidator extends DefaultDocumentValidator {
           document as LangiumDocument<ExpressFile>,
           new LinkResolver(this.typeContainer.getScopeIndex(), this.nameProvider),
           this.nameProvider,
-          // `expresssuite.annotations.publicationHazards`, default on; read when the document is validated.
+          // `expresssuite.annotations.publicationHazards`, default on; read when the document is validated. The builder validates the open documents again when it changes.
           { publicationHazards: this.configurationProvider?.getReceivedSetting("annotations", "publicationHazards") !== false }
         )
       );

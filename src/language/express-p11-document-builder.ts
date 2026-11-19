@@ -15,6 +15,7 @@ import { EXPRESSSUITE_TOKEN } from "../shared/notifications.js";
 import type { WorkspaceFolder } from "vscode-languageserver";
 import { Configuration, readConfiguration } from "./express-p11-workspace-manager.js";
 import { ExpressP11BuildStrategy } from "./express-p11-build-strategy.js";
+import { ExpressP11ConfigurationProvider } from "./express-p11-configuration-provider.js";
 export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
   private isFirstLoad: boolean = true;
   private connection: Connection | undefined;
@@ -32,6 +33,34 @@ export class ExpressP11DocumentBuilder extends DefaultDocumentBuilder {
     this.connection = services.lsp.Connection;
     this.configurationProvider = services.workspace.ConfigurationProvider;
     this.setupSaveHandler(services);
+    this.setupSettingHandler(services);
+  }
+
+  /**
+   * The open documents are validated again when a setting that validation reads changes
+   * (`expresssuite.annotations.publicationHazards`). The other files of the workspace keep their
+   * findings until they are next built: validating a whole workspace for one setting is too much.
+   */
+  protected setupSettingHandler(services: LangiumSharedServices) {
+    const provider = services.workspace.ConfigurationProvider;
+    if (!(provider instanceof ExpressP11ConfigurationProvider)) return;
+    provider.onValidationSettingChange(() => {
+      services.workspace.WorkspaceLock.write((token) =>
+        this.revalidate(services.workspace.TextDocuments.keys().map((uri) => URI.parse(uri)), token)
+      );
+    });
+  }
+
+  /** Validates again those of `uris` that are validated; nothing is parsed or linked again. */
+  public async revalidate(uris: URI[], cancelToken: CancellationToken = CancellationToken.None): Promise<void> {
+    let any = false;
+    for (const uri of uris) {
+      const document = this.langiumDocuments.getDocument(uri);
+      if (document?.state !== DocumentState.Validated) continue;
+      this.resetToState(document, DocumentState.IndexedReferences);
+      any = true;
+    }
+    if (any) await this.update([], [], cancelToken);
   }
 
   protected setupSaveHandler(services: LangiumSharedServices) {

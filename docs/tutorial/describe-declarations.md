@@ -418,8 +418,9 @@ AsciiDoc that the current toolchain mishandles. Each message names the
 upstream issue and the versions, and the check is retired when the defect is
 fixed and the WG 12 output gate that covers it passes with the construct
 present. EXPRESSsuite never rewrites these constructs. The setting
-`expresssuite.annotations.publicationHazards` (default on) switches both off;
-the new value is read at the next validation of a document.
+`expresssuite.annotations.publicationHazards` (default on) switches both off.
+The files that are open are checked again as soon as the setting changes; a
+file that is not open shows the change when it is next opened or edited.
 
 `annotation-open-block-delimiter`. Source: metanorma/iso-10303 issue 857 (suma
 0.5.42 schema template). suma wraps each schema listing in `[source]` ...

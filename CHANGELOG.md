@@ -92,6 +92,10 @@
 
 ### Bug Fixes
 
+- **A change of `expresssuite.annotations.publicationHazards` shows at
+  once.** The files that are open are checked again when the setting changes.
+  Before, their findings stayed as they were until the file was next edited.
+  A file that is not open shows the change when it is next opened or edited.
 - **The editor knows the EXPRESS remark marks.** Toggle Line Comment writes
   `--` and Toggle Block Comment writes `(* *)`; they wrote `//` and `/* */`,
   which are not EXPRESS. Typing `(*` now gives `(* *)` with the cursor inside;
