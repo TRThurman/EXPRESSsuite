@@ -182,8 +182,9 @@ standard VS Code **Problems** view:
   `x` (ISO 10303-11:2004 12.7.3, last sentence); qualify it with a group
   reference such as `x\e.a`.
 - **Group references** — `x\e` that is not further qualified with an
-  attribute reference is reported unless it is an operand of `=` or `||`
-  (ISO 10303-11:2004 12.7.4, Rules and restrictions), as in
+  attribute reference is reported unless it is an operand of `=`, `<>` or `||`
+  (ISO 10303-11:2004 12.7.4, Rules and restrictions; `<>` is taken with `=`,
+  12.2.1.7), as in
   `the_datum : datum := ...related_shape_aspect\datum;`. A group reference
   followed by another group reference (`x\e\f.a`) or by an index (`x\e[1]`)
   is reported too: what `\e` yields is a partial complex entity value, which

@@ -19,7 +19,8 @@ SC4 validation diagnostics:
   (12.3.1 binary, 12.5.1 string, 12.6.1 aggregate).
 - `unqualified-group-reference` — ISO 10303-11:2004 12.7.4, Rules and
   restrictions: a group reference not further qualified with an attribute
-  reference shall be an operand of `=` or `||`. Decision procedure: `qualsOk`
+  reference shall be an operand of `=` or `||`; `<>` is taken with `=`
+  (12.2.1, 12.2.1.7). Decision procedure: `qualsOk`
   and `check` (GroupReference.lean); the TypeScript loop is `violatesAt`.
   `qualsOk_eq_kind` proves the restriction equal to threading the
   partial-complex-entity-value kind through the qualifiers (12.7.3, 12.7.4

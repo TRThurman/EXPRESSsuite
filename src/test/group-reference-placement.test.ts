@@ -222,8 +222,8 @@ describe("positions 12.7.4 does not allow", () => {
     expect(texts(result)).toEqual(["\\E1", "\\E1", "\\E1"]);
   });
 
-  test("<> and :=: are not the operators 12.7.4 names", async () => {
-    const result = await validate(exampleSchema("ok : BOOLEAN;", `ok := a\\E1 <> b\\E1; ok := a\\E1 :=: b\\E1;`));
+  test("<> is entity value comparison as = is (12.2.1.7); :=: is not", async () => {
+    const result = await validate(exampleSchema("ok : BOOLEAN;", `ok := a\\E1 <> b\\E1; ok := (a\\E1) <> b\\E1; ok := a\\E1 :=: b\\E1; ok := a\\E1 :<>: b\\E1;`));
     expect(texts(result)).toEqual(["\\E1", "\\E1", "\\E1", "\\E1"]);
   });
 
