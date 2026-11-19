@@ -92,6 +92,11 @@
 
 ### Bug Fixes
 
+- **The editor knows the EXPRESS remark marks.** Toggle Line Comment writes
+  `--` and Toggle Block Comment writes `(* *)`; they wrote `//` and `/* */`,
+  which are not EXPRESS. Typing `(*` now gives `(* *)` with the cursor inside;
+  it gave `(*)`, so that a description block begun with `(*"` was left with a
+  stray `)` after its key.
 - **A workspace kept under a folder named `doc`, `library`, `utils` and the
   like is checked again.** With `expresssuite.useOptimizedConfiguration` on
   (the default), the names of `expresssuite.excludedFolders` were compared

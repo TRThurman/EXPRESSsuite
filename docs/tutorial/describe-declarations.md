@@ -559,8 +559,9 @@ where the cursor stands.
 2. Type `.`. The list has the declarations of the schema. Those that have no
    description block yet, such as `bracket`, come first; `widget`, which has
    one, is marked "described" and comes after them. Accept `bracket` and type
-   `"`. The editor wrote a `)` when you typed `(`: delete it, and go to the
-   next line.
+   `"`. The editor has closed the block already: the line reads
+   `(*"demo_widgets.bracket"*)`. Press Enter; the `*)` stays behind the
+   cursor and follows what you type.
 3. Type `A **`. The list offers the subject of the block, and accepting it
    writes `bracket**`.
 4. Go on with ` carries a <<express:`. The list has the schemas: this one
@@ -568,8 +569,8 @@ where the cursor stands.
    declarations follows. Accept `mount`. The cross-reference is completed as
    `<<express:demo_widgets.mount,mount>>` with the display text selected, so
    that you can type other words over it.
-5. Finish the sentence with `.`, go to the next line and close the block
-   with `*)`.
+5. Finish the sentence with `.`. The `*)` that the editor wrote closes the
+   block; press Enter before it if you want it on a line of its own.
 
 What is offered, by where the cursor is:
 
