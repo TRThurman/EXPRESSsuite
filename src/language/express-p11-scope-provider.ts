@@ -1,4 +1,4 @@
-import { AstNode, AstNodeDescription, AstNodeDescriptionProvider, AstUtils, DefaultScopeProvider, EMPTY_SCOPE, ReferenceInfo, Scope, Stream, WorkspaceCache } from "langium";
+import { AstNode, AstNodeDescriptionProvider, AstUtils, DefaultScopeProvider, EMPTY_SCOPE, ReferenceInfo, Scope, WorkspaceCache } from "langium";
 import {
   Attribute_decl,
   Attribute_id,

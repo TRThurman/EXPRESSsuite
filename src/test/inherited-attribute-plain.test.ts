@@ -1,4 +1,4 @@
-import { AstUtils, EmptyFileSystem, type AstNode } from "langium";
+import { AstUtils, EmptyFileSystem, type AstNode, type Reference } from "langium";
 import { validationHelper } from "langium/test";
 import { describe, expect, test } from "vitest";
 import { createExpressP11Services } from "../language/express-module.js";
@@ -19,7 +19,7 @@ async function check(text: string) {
       for (const info of AstUtils.streamReferences(node)) {
         const cst = info.reference.$refNode;
         if (!cst || info.reference.$refText !== name || cst.range.start.line + 1 !== line) continue;
-        const target = info.reference.ref as (AstNode & { name?: string }) | undefined;
+        const target = (info.reference as Reference).ref as (AstNode & { name?: string }) | undefined;
         if (!target) return "unresolved";
         const owner = AstUtils.getContainerOfType(target.$container, (n): n is AstNode & { name: string } => n.$type === "EntityDefinition" || n.$type === "FunctionDefinition");
         return `${owner?.name ?? "schema"}.${source.slice(target.$cstNode!.offset, target.$cstNode!.end).split(/\W/)[0] || target.$type}`;
