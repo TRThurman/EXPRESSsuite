@@ -92,6 +92,15 @@
 
 ### Bug Fixes
 
+- **An inherited attribute named without `SELF` is found.** In a subtype, an
+  attribute of a supertype written by its plain name in a DERIVE, UNIQUE or
+  WHERE clause was reported "A reference could not be resolved" or "The
+  attribute '…' could not be found", although it is valid EXPRESS (ISO
+  10303-11:2004 9.2.3.3). It now names the inherited attribute, as
+  `SELF.name` and `SELF\supertype.name` do, so Go to Definition, Find All
+  References and Rename follow it too. In SMRL v8 this removes 377 findings
+  from the schemas and 5,447 from the long forms
+  ([#132](https://github.com/TRThurman/EXPRESSsuite/issues/132)).
 - **The editor knows the EXPRESS remark marks.** Toggle Line Comment writes
   `--` and Toggle Block Comment writes `(* *)`; they wrote `//` and `/* */`,
   which are not EXPRESS. Typing `(*` now gives `(* *)` with the cursor inside;

@@ -67,12 +67,15 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
   private readonly typeContainer: ExpressP11TypeContainer;
   /** Per schema and build: the declarations it sees through its interfaces, keyed for the case rule. */
   private readonly interfaceIndexCache: WorkspaceCache<string, CaseRuleNodeIndex>;
+  /** Per entity and build: the attributes its supertypes declare, nearest first. */
+  private readonly inheritedAttributesCache: WorkspaceCache<EntityDefinition, Attribute_decl[]>;
 
   constructor(services: ExpressP11Services) {
     super(services);
     this.astNodeDescriptionProvider = services.workspace.AstNodeDescriptionProvider;
     this.typeContainer = services.validation.TypeContainer;
     this.interfaceIndexCache = new WorkspaceCache(services.shared);
+    this.inheritedAttributesCache = new WorkspaceCache(services.shared);
   }
 
   override getScope(context: ReferenceInfo): Scope {
@@ -169,13 +172,27 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
    */
   private defaultScopeWithCaseRule(context: ReferenceInfo, longForm: boolean, schema: ExpressP11Schema): Scope {
     const referenceType = this.reflection.getReferenceType(context);
-    const layers: Array<Stream<AstNodeDescription>> = [];
+    // Innermost first; each layer is given the scope around it.
+    const layers: Array<(outer: Scope) => Scope> = [];
     const localSymbols = AstUtils.getDocument(context.container).localSymbols;
     if (localSymbols) {
       let current: AstNode | undefined = context.container;
       do {
         if (localSymbols.has(current)) {
-          layers.push(localSymbols.getStream(current).filter((description) => this.reflection.isSubtype(description.type, referenceType)));
+          const symbols = localSymbols.getStream(current).filter((description) => this.reflection.isSubtype(description.type, referenceType));
+          layers.push((outer) => new CaseRuleScope(symbols, outer, longForm));
+        }
+        if (isEntityDefinition(current) && this.reflection.isSubtype(Attribute_decl.$type, referenceType)) {
+          // The attributes the entity inherits are visible in it as its own are (ISO 10303-11:2004
+          // 9.2.3.3): after its own names, before those of the schema; the nearest supertype first.
+          const entity = current;
+          const inherited = this.inheritedAttributesCache.get(entity, () =>
+            this.typeContainer
+              .getVisibleAttributeCandidates(entity, "", false)
+              .filter((candidate) => candidate.direction === "ancestor")
+              .flatMap((candidate) => candidate.declarations)
+          );
+          if (inherited.length > 0) layers.push((outer) => this.caseRuleScope(inherited, longForm, outer));
         }
         current = current.$container;
       } while (current);
@@ -193,7 +210,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
       result
     );
     for (let i = layers.length - 1; i >= 0; i--) {
-      result = new CaseRuleScope(layers[i], result, longForm);
+      result = layers[i](result);
     }
     return result;
   }
