@@ -523,9 +523,10 @@ Find All References and Rename reach the description blocks too.
    uses in the schema, the key `(*"demo_widgets.widget"` and the bold
    `**widget**` in the text of that block.
 2. Put the cursor on `reach` in `ENTITY rail` and press F2 (**Rename**). Type
-   `span` and press Shift+Enter to see the changes before they are made: the
-   attribute, and both parts of `<<express:demo_widgets.rail.reach,reach>>`,
-   the target and the display text. Apply them.
+   `span` and press Cmd+Enter (Ctrl+Enter on Windows and Linux) to see the
+   changes before they are made: the attribute, and both parts of
+   `<<express:demo_widgets.rail.reach,reach>>`, the target and the display
+   text. Apply them.
 3. Undo, then start the same rename from the description: put the cursor on
    `reach` in the target of the cross-reference and press F2. The changes are
    the same.

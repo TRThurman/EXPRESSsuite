@@ -263,7 +263,7 @@ By default the extension does not read every `.exp` file of the workspace. The s
 
 - The folders above the workspace folder do not count: a workspace kept in `/home/me/library/schemas` is read. A folder opened as a workspace folder is read whatever its name.
 - A keyword is bounded by a character that is not a letter or a digit: `lf` leaves out `mim_lf.exp` and `mim_lf_patched.exp`, not `shelf_schema.exp`. Long forms and concatenated schemas are left out because each repeats the declarations of the schemas it was built from.
-- A file that is left out shows no problems, no hover and no completion, and nothing says so. If a file seems unchecked, compare its path with the two lists, or turn `expresssuite.useOptimizedConfiguration` off to read everything.
+- A file that is left out shows no problems, no hover and no completion. While such a file is in the active editor, the status bar shows **EXPRESS: not checked**; its tooltip names the folder or the keyword and the setting that lists it, and a click opens these settings. Turn `expresssuite.useOptimizedConfiguration` off to read everything.
 
 ## Privacy and confidentiality
 
