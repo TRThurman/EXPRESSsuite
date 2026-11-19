@@ -29,6 +29,31 @@ there are no new `feat:`/`fix:` commits since the pre-release tag, so the
 recommendation is empty and `release-it` would otherwise resolve the version
 to `null`.
 
+### At least one `feat:` or `fix:` commit since the last tag
+
+`release-it` takes the next version, and the text of the GitHub Release, from
+the conventional commits since the last tag. A commit counts only when its
+message starts with `feat:` or `fix:`; most commits of this repository name
+the component instead (`completion: ...`, `scope: ...`) and do not count. With
+none that counts, both workflows end with "No new version to release" (seen
+before 0.7.0). The commit that heads the changelog section can carry the
+prefix, as `feat: ... (0.7.0)` did.
+
+### Dry run before the workflows
+
+On the commit that `main` will have, run the tool as each workflow runs it,
+with `--dry-run`. It prints the version it would choose and the release text;
+lines that start with `!` are only printed, and nothing is written, tagged or
+pushed.
+
+```bash
+npx release-it --preRelease --ci --dry-run --no-github.release --no-git.requireUpstream
+npx release-it <version> --ci --dry-run --no-github.release --no-git.requireUpstream
+```
+
+The dry run does not exercise `vsce package`, the GitHub Release or the
+Marketplace step.
+
 `release-it`'s `before:github:release` hook runs `vsce package`, so the
 `.vsix` attached to the GitHub Release is built once and is the artifact
 everything downstream should use.
@@ -115,6 +140,8 @@ match the esbuild bundle. Publish the CI-built release asset.
 ## Checklist
 
 - [ ] CI green on `main`
+- [ ] at least one `feat:` or `fix:` commit since the previous tag, and the dry
+      run above chooses the intended version
 - [ ] `CHANGELOG.md`: the hand-written `## Unreleased` section is re-headed
       `## [<version>](https://github.com/TRThurman/EXPRESSsuite/compare/<previous>...<version>) (<date>)`
       and covers every `feat:`/`fix:` commit since the previous tag. `release-it`
@@ -122,7 +149,14 @@ match the esbuild bundle. Publish the CI-built release asset.
       commit list is the GitHub Release body only.
 - [ ] run **Create release version**, supplying `version` if promoting a pre-release
 - [ ] GitHub Release exists with the `.vsix` attached
-- [ ] Marketplace shows the new version (automatic through Trusted Publishing; if the publish step failed, upload the release asset by hand)
+- [ ] Marketplace shows the new version (automatic through Trusted Publishing; if the publish step failed, upload the release asset by hand).
+      The publish step ends when the upload is accepted; the version shows
+      some minutes later (eight for 0.6.0, nine for 0.7.0)
+- [ ] the GitHub Release text: `release-it` writes only the heading and the
+      `feat:`/`fix:` commits since the last tag, which after a pre-release is
+      the heading alone. Copy the version's section of `CHANGELOG.md` into it
+      (`gh release edit <version> --notes-file <file>`), with the wrapped
+      lines of each paragraph joined: a release text shows every line break
 - [ ] verify: the gallery query below returns the new version
 
 ```bash
