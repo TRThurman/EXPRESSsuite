@@ -28,6 +28,8 @@ const KEY_OPEN = /\(\*[\t ]*"([^"\r\n]*)$/;
 const LINK_OPEN = /<<express:([^,>\s]*)$/;
 const BOLD_OPEN = /\*\*([A-Za-z0-9_]*)$/;
 const WORD = /[A-Za-z_][A-Za-z0-9_]*$/;
+/** The rest of one part of a key or of a target after the cursor: up to the dot, the quote or whatever ends the name. */
+const NAME_PART = /^[A-Za-z0-9_:\\]*/;
 
 /**
  * The site at `offset`, or `undefined` when nothing is offered there: inside a schema, in a long
@@ -40,21 +42,22 @@ export function completionSiteAt(contexts: AnnotationContext[], text: string, of
   const before = text.slice(lineStart, offset);
 
   const key = KEY_OPEN.exec(before);
-  if (key) return { kind: "key", schema: context.schema, typed: key[1], start: offset - key[1].length, partEnd: offset + /^[^."\r\n]*/.exec(text.slice(offset))![0].length };
+  if (key) return { kind: "key", schema: context.schema, typed: key[1], start: offset - key[1].length, partEnd: offset + NAME_PART.exec(text.slice(offset))![0].length };
 
   const block = context.blocks.find((candidate) => offset > candidate.keyEnd && offset <= bodyEnd(candidate, text));
   if (!block) return undefined;
 
   const link = LINK_OPEN.exec(before);
   if (link) {
-    const rest = /^[^,>\s]*/.exec(text.slice(offset))![0];
+    // Only what a target is written with: a `*)` right after the cursor is not part of it.
+    const rest = /^[A-Za-z0-9_.:\\]*/.exec(text.slice(offset))![0];
     const after = text.slice(offset + rest.length, offset + rest.length + 2);
     return {
       kind: "link",
       block,
       typed: link[1],
       start: offset - link[1].length,
-      partEnd: offset + /^[^.,>\s]*/.exec(rest)![0].length,
+      partEnd: offset + NAME_PART.exec(rest)![0].length,
       end: offset + rest.length,
       closed: after.startsWith(",") || after === ">>",
       mapping: /\.__expressg$/i.test(block.key),

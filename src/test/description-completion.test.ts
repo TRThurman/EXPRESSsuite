@@ -176,6 +176,15 @@ describe("type-ahead in a cross-reference", () => {
     expect(accept("count_teeth")).toBe("See <<express:cmp_widgets.count_teeth,[count teeth]>>");
   });
 
+  test("the `*)` that the editor writes right after the cursor is kept", async () => {
+    const link = await offered('(*"cmp_widgets.finish_kind"\nSee <<express:cmp_widgets.|*)\n', { typed: true });
+    expect(link.accept("widget")).toBe("See <<express:cmp_widgets.widget,[widget]>>*)");
+    const bold = await offered('(*"cmp_widgets.finish_kind"\nA **|*)\n', { typed: true });
+    expect(bold.accept("finish_kind")).toBe("A **finish_kind***)");
+    const key = await offered('(*"cmp_widgets.|*)\n', { typed: true });
+    expect(key.accept("widget")).toBe('(*"cmp_widgets.widget*)');
+  });
+
   test("after an owner: its attributes, items or parameters, without rules and roles", async () => {
     const { labels, accept } = await offered(inBlock("See <<express:cmp_widgets.widget.|"), { typed: true });
     expect(labels).toEqual(["name", "teeth", "toothed"]);
@@ -191,7 +200,7 @@ describe("type-ahead in a cross-reference", () => {
   });
 
   test("in a .__expressg block the line ends with the place of the area number", async () => {
-    const { accept } = await offered("* <<express:cmp_widgets.|", { replace: "[.svgmap]\n", typed: true });
+    const { accept } = await offered("* <<express:cmp_widgets.|\n", { replace: "[.svgmap]\n", typed: true });
     expect(accept("widget")).toBe("* <<express:cmp_widgets.widget>>; ");
   });
 
