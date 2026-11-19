@@ -10,7 +10,12 @@ import {
   DefaultCompletionProvider,
   NextFeature,
 } from "langium/lsp";
-import { CompletionItemKind } from "vscode-languageserver";
+import type { CancellationToken, CompletionList, CompletionParams } from "vscode-languageserver";
+import { CompletionItemKind, CompletionTriggerKind } from "vscode-languageserver";
+import type { LangiumDocument } from "langium";
+import type { CompletionProviderOptions } from "langium/lsp";
+import type { ExpressP11Services } from "./express-module.js";
+import { DescriptionCompletion } from "./express-p11-description-completion.js";
 import {
   Attribute_decl,
   Attribute_id,
@@ -25,6 +30,29 @@ import {
 } from "./generated/ast.js";
 
 export class ExpressP11CompletionProvider extends DefaultCompletionProvider {
+  private readonly described: DescriptionCompletion;
+
+  /** The characters after which a description block offers names: of a key, `"` and `.` and `:`; of a cross-reference, `:` and `.`; of a bold name, `*`. */
+  override readonly completionOptions: CompletionProviderOptions = { triggerCharacters: ['"', ".", ":", "*"] };
+
+  constructor(services: ExpressP11Services) {
+    super(services);
+    this.described = new DescriptionCompletion(services);
+  }
+
+  /**
+   * In the description blocks after `END_SCHEMA;` the list is that of `DescriptionCompletion`.
+   * In EXPRESS it is Langium's, as before: the trigger characters are registered for the
+   * description blocks only, so a list they would open in EXPRESS is not given.
+   */
+  override async getCompletion(document: LangiumDocument, params: CompletionParams, cancelToken?: CancellationToken): Promise<CompletionList | undefined> {
+    const typed = params.context?.triggerKind === CompletionTriggerKind.TriggerCharacter;
+    const described = this.described.complete(document, document.textDocument.offsetAt(params.position), !typed);
+    if (described) return described;
+    if (typed) return undefined;
+    return super.getCompletion(document, params, cancelToken);
+  }
+
   protected override createReferenceCompletionItem(
     nodeDescription: AstNodeDescription,
     _refInfo: ReferenceInfo,
