@@ -29,7 +29,7 @@
   * `kindAfter`   the value semantics: a kind (`whole` or `part`) threaded
                   through the qualifiers, `none` when a qualifier is applied
                   to a value it cannot take.
-  `check` lifts `qualsOk` over expressions: an operand of `=` or `||` may end
+  `check` lifts `qualsOk` over expressions: an operand of `=`, `<>` or `||` may end
   in a partial value (`acc = true`), parentheses pass the position through
   (12.1: a parenthesised expression is an operand of the operator around
   it), and every other position — a unary operator, any other binary or
@@ -48,7 +48,7 @@
 
   Motivating case (EXPRESSsuite issue 102): in a DERIVE clause,
   `the_datum : datum := datum_basis_relationship[1]\shape_aspect_relationship.related_shape_aspect\datum;`
-  ends in `\datum` and is no operand of `=` or `||`; EXPRESSsuite 0.5.0
+  ends in `\datum` and is no operand of `=`, `<>` or `||`; EXPRESSsuite 0.5.0
   reported nothing.
 -/
 
@@ -62,18 +62,23 @@ inductive Qual where
   | index  -- `[i]` or `[i:j]`, 12.6.1 (12.5.1, 12.3.1)
   deriving DecidableEq, Repr
 
-/-- The binary and relational operators, collapsed to the two that 12.7.4
-names and all the others (`<>`, `:=:`, `:<>:`, `<`, `>`, `<=`, `>=`, `IN`,
-`LIKE`, `+`, `-`, `OR`, `XOR`, `*`, `/`, `DIV`, `MOD`, `AND`, `**`). -/
+/-- The binary and relational operators, collapsed to the three whose
+operands may be partial values and all the others (`:=:`, `:<>:`, `<`, `>`,
+`<=`, `>=`, `IN`, `LIKE`, `+`, `-`, `OR`, `XOR`, `*`, `/`, `DIV`, `MOD`,
+`AND`, `**`). 12.7.4 names `=` and `||`. `<>` is taken with `=`: 12.2.1
+defines the value comparison operators as equal (`=`) and not equal (`<>`)
+together, and 12.2.1.7 applies entity value comparison to both. -/
 inductive Op where
   | eq      -- `=`  entity value comparison, 12.2.1.7
+  | ne      -- `<>` entity value comparison, 12.2.1.7
   | concat  -- `||` complex entity instance constructor, 12.10
   | other
   deriving DecidableEq, Repr
 
-/-- `true` for the two operators whose operands may be partial values. -/
+/-- `true` for the three operators whose operands may be partial values. -/
 def opAccepts : Op → Bool
   | .eq     => true
+  | .ne     => true
   | .concat => true
   | .other  => false
 
@@ -96,7 +101,7 @@ inductive Expr where
 /- ── 1. The restriction, read along one qualifier list ── -/
 
 /-- Every group reference is followed by an attribute reference, or is the
-last qualifier and the primary is an operand of `=` or `||` (`acc`). -/
+last qualifier and the primary is an operand of `=`, `<>` or `||` (`acc`). -/
 def qualsOk (acc : Bool) : List Qual → Bool
   | []            => true
   | .attr  :: qs  => qualsOk acc qs
@@ -111,7 +116,7 @@ def qualsOk (acc : Bool) : List Qual → Bool
 
 /-- The check at qualifier index `i`: a group reference followed by an
 attribute reference passes, one followed by anything else is reported, and
-a final one is reported unless the primary is an operand of `=` or `||`. -/
+a final one is reported unless the primary is an operand of `=`, `<>` or `||`. -/
 def violatesAt (acc : Bool) (qs : List Qual) (i : Nat) : Bool :=
   match qs[i]?, qs[i+1]? with
   | some .group, some .attr => false
@@ -220,7 +225,7 @@ def kindAfter : Kind → List Qual → Option Kind
       | none    => none
 
 /-- Whether a position may take the resulting value: a whole value always,
-a partial value only as an operand of `=` or `||`. -/
+a partial value only as an operand of `=`, `<>` or `||`. -/
 def okKind (acc : Bool) : Option Kind → Bool
   | some .whole => true
   | some .part  => acc
@@ -253,7 +258,7 @@ theorem qualsOk_eq_kind (acc : Bool) (qs : List Qual) :
 
 mutual
 /-- Every qualifier list in `e` satisfies the restriction, where `acc` says
-whether `e` is an operand of `=` or `||`. This is the check: the TypeScript
+whether `e` is an operand of `=`, `<>` or `||`. This is the check: the TypeScript
 computes `acc` by walking up from the primary through parentheses to the
 first enclosing node. -/
 def check (acc : Bool) : Expr → Bool
@@ -294,7 +299,7 @@ theorem checkAll_eq_wellKindedAll : ∀ es : List Expr, checkAll es = wellKinded
   | e :: es => by rw [checkAll, wellKindedAll, check_eq_wellKinded false e, checkAll_eq_wellKindedAll es]
 end
 
-/-- Being an operand of `=` or `||` only relaxes the restriction. -/
+/-- Being an operand of `=`, `<>` or `||` only relaxes the restriction. -/
 theorem qualsOk_mono (qs : List Qual) (h : qualsOk false qs = true) : qualsOk true qs = true := by
   rw [qualsOk_eq_kind] at h ⊢
   cases hk : kindAfter .whole qs with
@@ -351,7 +356,9 @@ def issue102 : List Qual := [.index, .group, .attr, .group]
 #guard check false (.bin .concat (.paren (.bin .concat (p [.group]) (p [.group]))) (p [.group])) == true
 -- parentheses pass the position through: `(a\E1) = b\E1`
 #guard check false (.bin .eq (.paren (p [.group])) (p [.group])) == true
--- `<>` is not the operator 12.7.4 names
+-- `<>` is entity value comparison as `=` is (12.2.1.7): `a\E1 <> b\E1`
+#guard check false (.bin .ne (p [.group]) (p [.group])) == true
+-- `:=:` is instance comparison, not one of the three: `a\E1 :=: b\E1`
 #guard check false (.bin .other (p [.group]) (p [.group])) == false
 -- a unary operator: `NOT (a\E1) = b` puts `a\E1` under NOT
 #guard check false (.bin .eq (.unary (.paren (p [.group]))) (p [])) == false

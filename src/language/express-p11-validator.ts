@@ -147,7 +147,7 @@ export type ReferenceStatementData = {
 type NamedNode = { name: string; node: AstNode };
 
 /**
- * Whether a primary is an operand of `=` or `||`, seen through parentheses:
+ * Whether a primary is an operand of `=`, `<>` or `||`, seen through parentheses:
  * `acc` of `check` in lean/ExpressSuite/GroupReference.lean. A factor that
  * only holds the primary or a parenthesised expression is transparent; one
  * with a unary operator, and every other node, is not.
@@ -156,7 +156,7 @@ function isOperandOfEqualOrConstructor(primary: AstNode): boolean {
   const bare = (node: AstNode) => (node.$type === "Simple_factor" || node.$type === "Temp") && !(node as Simple_factor).op;
   let parent = primary.$container;
   while (parent && bare(parent)) parent = parent.$container;
-  if (parent?.$type === "Expression") return (parent as Expression).op === "=";
+  if (parent?.$type === "Expression") return (parent as Expression).op === "=" || (parent as Expression).op === "<>";
   if (parent?.$type === "BinaryExpression") return (parent as BinaryExpression).op === "||";
   return false;
 }
@@ -338,7 +338,7 @@ export class ExpressP11Validator {
       const reference = `Group reference '\\${data.entity}'`;
       const message =
         data.followedBy === "nothing"
-          ? `${reference} is not further qualified with an attribute reference, so it denotes a partial complex entity value, which may appear only as an operand of = or || (ISO 10303-11:2004 12.7.4).`
+          ? `${reference} is not further qualified with an attribute reference, so it denotes a partial complex entity value, which may appear only as an operand of =, <> or || (ISO 10303-11:2004 12.7.4, 12.2.1.7).`
           : data.followedBy === "group"
             ? `${reference} is followed by another group reference; the expression to the left of a group reference shall evaluate to a complex entity instance, which a partial complex entity value is not (ISO 10303-11:2004 12.7.4).`
             : `${reference} is followed by an index; a partial complex entity value is not an aggregate (ISO 10303-11:2004 12.7.4, 12.6.1).`;
