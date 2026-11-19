@@ -76,4 +76,4 @@ exist only on pull request 110's branch (`feat/describe-declarations`), not on `
 ## Open
 
 - A block macro on the line right after a paragraph line, with no `+`, is absorbed into the paragraph by Asciidoctor; no rule reports it yet.
-- Revalidation of open documents when `expresssuite.annotations.publicationHazards` changes; the value is read at the next validation.
+- When `expresssuite.annotations.publicationHazards` changes, the open documents are validated again (done). The other files of the workspace keep their findings until they are next built; validating them again too is open.

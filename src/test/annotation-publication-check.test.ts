@@ -81,6 +81,42 @@ describe("expresssuite.annotations.publicationHazards", () => {
   });
 });
 
+describe("a change of expresssuite.annotations.publicationHazards", () => {
+  const body = "--\ntext\n--";
+  const codes = (document: { diagnostics?: Array<{ code?: unknown }> }): string[] =>
+    (document.diagnostics ?? []).map((d) => String(d.code)).filter((code) => code.startsWith("annotation-"));
+  const change = (services: ReturnType<typeof setup>["services"], publicationHazards: boolean): Promise<void> => {
+    services.shared.workspace.ConfigurationProvider.updateConfiguration({ settings: { expresssuite: { annotations: { publicationHazards } } } });
+    // The validation runs under the workspace lock; a read waits for it (a write would cancel it).
+    return services.shared.workspace.WorkspaceLock.read(async () => undefined);
+  };
+
+  test("an open document is validated again, a document that is not open keeps its findings", async () => {
+    const { validate, services } = setup();
+    const open = (await validate(withBlock(body))).document;
+    const closed = (await validate(withBlock(body))).document;
+    services.shared.workspace.TextDocuments.keys = () => [open.textDocument.uri];
+    expect(codes(open)).toEqual(["annotation-open-block-delimiter", "annotation-open-block-delimiter"]);
+
+    await change(services, false);
+    expect(codes(open)).toEqual([]);
+    expect(codes(closed)).toEqual(["annotation-open-block-delimiter", "annotation-open-block-delimiter"]);
+
+    await change(services, true);
+    expect(codes(open)).toEqual(["annotation-open-block-delimiter", "annotation-open-block-delimiter"]);
+  });
+
+  test("a change of another setting validates nothing again", async () => {
+    const { validate, services } = setup();
+    const open = (await validate(withBlock(body))).document;
+    services.shared.workspace.TextDocuments.keys = () => [open.textDocument.uri];
+    const before = open.diagnostics;
+    services.shared.workspace.ConfigurationProvider.updateConfiguration({ settings: { expresssuite: { useOptimizedConfiguration: false } } });
+    await services.shared.workspace.WorkspaceLock.read(async () => undefined);
+    expect(open.diagnostics).toBe(before);
+  });
+});
+
 describe("a key qualified with another schema's name (XS-PUB-005)", () => {
   const { validate } = setup();
   const schemas = (extra: string): string => `SCHEMA geometric_model_schema;
