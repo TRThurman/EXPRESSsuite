@@ -1,25 +1,24 @@
 {
     "comments": {
-        // symbol used for single line comment. Remove this entry if your language does not support line comments
-        "lineComment": "//",
-        // symbols used for start and end a block comment. Remove this entry if your language does not support block comments
-        "blockComment": [ "/*", "*/" ]
+        // EXPRESS tail remark (ISO 10303-11:2004, 7.1.6.2)
+        "lineComment": "--",
+        // EXPRESS embedded remark (7.1.6.1); a description block after END_SCHEMA; is written the same way
+        "blockComment": [ "(*", "*)" ]
     },
-    // symbols used as brackets
     "brackets": [
         ["{", "}"],
         ["[", "]"],
         ["(", ")"]
     ],
-    // symbols that are auto closed when typing
     "autoClosingPairs": [
-        ["{", "}"],
-        ["[", "]"],
-        ["(", ")"],
-        ["\"", "\""],
-        ["'", "'"]
+        { "open": "{", "close": "}" },
+        { "open": "[", "close": "]" },
+        { "open": "(", "close": ")" },
+        // The "(" before the "*" has already been closed with ")": only the "*" is added, which gives "(* *)".
+        { "open": "(*", "close": "*", "notIn": ["string"] },
+        { "open": "\"", "close": "\"", "notIn": ["string"] },
+        { "open": "'", "close": "'", "notIn": ["string", "comment"] }
     ],
-    // symbols that can be used to surround a selection
     "surroundingPairs": [
         ["{", "}"],
         ["[", "]"],
