@@ -74,7 +74,7 @@ Enumeration_type: isExtensible?="EXTENSIBLE"? "ENUMERATION" (( "OF" items=Enumer
 Enumeration_items: "(" items+=Enumeration_id ( "," items+=Enumeration_id )* ")" ;
 Enumeration_extension: "BASED_ON" type=[TypeDefinition:Simple_id] ( "WITH" items=Enumeration_items )? ;
 
-Select_type: (isExtensible?="EXTENSIBLE"? "GENERIC_ENTITY"? )? "SELECT" select=(Select_list | Select_extension)? ; // withou GENERIC_ENTITY?
+Select_type: (isExtensible?="EXTENSIBLE"? isGenericEntity?="GENERIC_ENTITY"? )? "SELECT" select=(Select_list | Select_extension)? ; // withou GENERIC_ENTITY?
 Select_list: "(" types+=[NamedType:Simple_id] ( "," types+=[NamedType:Simple_id])* ")" ;
 Select_extension: "BASED_ON" type=[TypeDefinition:Simple_id] ("WITH" selectList=Select_list)? ;
 

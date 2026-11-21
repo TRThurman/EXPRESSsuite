@@ -11,6 +11,8 @@ import {
 import {
   DeclarationNameCaseData,
   ExpressP11Issues,
+  ExtensionMissingGenericEntityData,
+  GenericEntityWithoutExtensibleData,
   ReferenceStatementData,
   ReferenceNameCaseData,
   WrongReferenceLabelData,
@@ -29,6 +31,10 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
   ): MaybePromise<(Command | CodeAction)[] | undefined> {
     const result: CodeAction[] = [];
     for (const diagnostic of params.context.diagnostics) {
+      if (diagnostic.code === ExpressP11Issues.GenericEntityWithoutExtensible) {
+        result.push(...this.fixGenericEntityWithoutExtensible(diagnostic, document));
+        continue;
+      }
       const codeAction = this.createCodeAction(diagnostic, document);
       if (codeAction) {
         result.push(codeAction);
@@ -52,6 +58,8 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
         return this.fixDeclarationNameCase(diagnostic, document);
       case ExpressP11Issues.ReferenceNameCase:
         return this.fixReferenceNameCase(diagnostic, document);
+      case ExpressP11Issues.ExtensionMissingGenericEntity:
+        return this.fixExtensionMissingGenericEntity(diagnostic, document);
     }
     return this.fixAnnotation(diagnostic, document);
   }
@@ -66,6 +74,29 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
       kind: CodeActionKind.QuickFix,
       diagnostics: [diagnostic],
       edit: { changes: { [document.textDocument.uri]: [{ range: fix.range, newText: fix.newText.replace(/\n/g, eol) }] } },
+    };
+  }
+
+  /** GENERIC_ENTITY without EXTENSIBLE (8.4.2): add EXTENSIBLE, or, on an extension, drop GENERIC_ENTITY. */
+  private fixGenericEntityWithoutExtensible(diagnostic: Diagnostic, document: LangiumDocument<ExpressFile>): CodeAction[] {
+    const fixes = (diagnostic.data as GenericEntityWithoutExtensibleData | undefined)?.fixes ?? [];
+    return fixes.map((fix) => ({
+      title: fix.title,
+      kind: CodeActionKind.QuickFix,
+      diagnostics: [diagnostic],
+      edit: { changes: { [document.textDocument.uri]: [{ range: fix.range, newText: fix.newText }] } },
+    }));
+  }
+
+  /** Add GENERIC_ENTITY to an EXTENSIBLE extension of a GENERIC_ENTITY select (8.4.2, ruling 2026-11-21). */
+  private fixExtensionMissingGenericEntity(diagnostic: Diagnostic, document: LangiumDocument<ExpressFile>): CodeAction | undefined {
+    const fix = (diagnostic.data as ExtensionMissingGenericEntityData | undefined)?.fix;
+    if (!fix) return undefined;
+    return {
+      title: fix.title,
+      kind: CodeActionKind.QuickFix,
+      diagnostics: [diagnostic],
+      edit: { changes: { [document.textDocument.uri]: [{ range: fix.range, newText: fix.newText }] } },
     };
   }
 
