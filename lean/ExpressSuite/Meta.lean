@@ -8,16 +8,23 @@
   both specializations of number; integer is a specialization of real; boolean
   is a specialization of logical" — the original compared simple types by
   equality and rejected 9.2.3.4 EXAMPLE 2; see `simpLe`.
+  Amended 2026-11-21 (EXPRESSsuite): the hypothesis of `spec_trans` was a
+  closure property stated over arbitrary names and lists, which is false, so
+  the theorem held vacuously. It is now a closed supertype table `sup` with
+  `entOk sup` on each operand; `closed_of_closedB` decides closure of a finite
+  table, and Cases.lean shows the hypotheses hold for the cases encoded there.
 -/
 /-
   Meta.lean — metatheory for the `spec` relation defined in Specialisation.lean.
 
   Proves:
    • spec_refl  : ∀ t, spec t t = true                    (reflexivity, unconditional)
-   • spec_trans : well-formed a b c → spec a b → spec b c → spec a c   (transitivity)
+   • spec_trans : Closed sup → entOk sup a, b, c → spec a b → spec b c → spec a c
+                  (transitivity)
 
-  Transitivity needs a well-formedness invariant: entity supertype lists must be
-  transitively closed (otherwise A<:B, B<:C does not give A<:C).
+  Transitivity needs a well-formedness invariant: every entity in a, b and c
+  carries the supertype list of one transitively closed table `sup` of the
+  schema's entities (otherwise A<:B, B<:C does not give A<:C).
 -/
 import ExpressSuite.Specialisation
 
@@ -149,81 +156,170 @@ theorem boundsOk_trans {loA loB loC : Nat} {hiA hiB hiC : Option Nat} :
   cases hiA <;> cases hiB <;> cases hiC <;>
     simp_all [boundsOk, Nat.ble_eq] <;> omega
 
-/-- Well-formedness invariant needed for entity transitivity: the entity
-    subtype-name relation is transitively closed (a schema-level property —
-    a's supertype set contains b and all of b's supertypes whenever a <: b). -/
-def EntTrans : Prop :=
-  ∀ (an : String) (as bs : List String) (bn cn : String),
-    ((bn == an) || as.contains bn) = true →
-    ((cn == bn) || bs.contains cn) = true →
-    ((cn == an) || as.contains cn) = true
+/- ── The entity table: the well-formedness transitivity and soundness need ──
 
-/-- Transitivity of `spec`, modulo the entity-closure invariant `EntTrans`. -/
-theorem spec_trans (hE : EntTrans) : ∀ a b c,
+   A `Ty.ent n s` carries the supertype names `s` of entity `n`. Transitivity
+   and soundness need these lists to come from ONE transitively closed table
+   of the schema's entities. Stating the closure over arbitrary lists (as an
+   earlier version of this file did) is false: an entity named "a" with no
+   supertypes and another type also named "a" with supertype "c" satisfy the
+   premises and not the conclusion. -/
+
+/-- A supertype table: entity name ↦ the names of all its supertypes. -/
+abbrev Table := String → List String
+
+/-- The table is transitively closed: a supertype of a supertype of `a` is a
+    supertype of `a`. -/
+def Closed (sup : Table) : Prop :=
+  ∀ a b c, ((b == a) || (sup a).contains b) = true →
+           ((c == b) || (sup b).contains c) = true →
+           ((c == a) || (sup a).contains c) = true
+
+mutual
+/-- Every entity occurring in the type carries the list the table gives its name. -/
+def entOk (sup : Table) : Ty → Bool
+  | .ent n s => s == sup n
+  | .defn _ u => entOk sup u
+  | .sel _ ms => entOkAll sup ms
+  | .agg _ _ _ e => entOk sup e
+  | .simp _ => true
+  | .gen => true
+  termination_by t => sizeOf t
+  decreasing_by all_goals (simp_wf; omega)
+
+def entOkAll (sup : Table) : List Ty → Bool
+  | [] => true
+  | m :: t => entOk sup m && entOkAll sup t
+  termination_by ms => sizeOf ms
+  decreasing_by all_goals (simp_wf; omega)
+end
+
+theorem entOkAll_true (sup : Table) : ∀ ms, entOkAll sup ms = true ↔ ∀ m ∈ ms, entOk sup m = true
+  | [] => by simp [entOkAll]
+  | a :: t => by rw [entOkAll, Bool.and_eq_true, entOkAll_true sup t]; simp
+
+/-- A table given as a finite list of entries; a name not listed has no supertypes. -/
+def ofList (t : List (String × List String)) : Table :=
+  fun n => ((t.find? (fun e => e.1 == n)).map (·.2)).getD []
+
+/-- The finite closure check: for each entry `a`, every supertype of each of its
+    supertypes is `a` or among `a`'s supertypes. -/
+def closedB (t : List (String × List String)) : Bool :=
+  t.all fun e => e.2.all fun b => (ofList t b).all fun c => (c == e.1) || e.2.contains c
+
+theorem ofList_entry {t : List (String × List String)} {a : String} {x : String}
+    (h : (ofList t a).contains x = true) : ∃ e ∈ t, e.1 = a ∧ e.2 = ofList t a := by
+  unfold ofList at h ⊢
+  cases hf : t.find? (fun e => e.1 == a) with
+  | none => simp [hf] at h
+  | some e =>
+      refine ⟨e, List.mem_of_find?_eq_some hf, ?_, by simp⟩
+      have := List.find?_some hf
+      simpa using this
+
+/-- The finite check decides closure of the table it describes. -/
+theorem closed_of_closedB (t : List (String × List String)) (h : closedB t = true) :
+    Closed (ofList t) := by
+  intro a b c hab hbc
+  simp only [Bool.or_eq_true, beq_iff_eq] at hab hbc ⊢
+  rcases hab with rfl | hab
+  · exact hbc
+  · obtain ⟨e, he, hea, hes⟩ := ofList_entry hab
+    rcases hbc with rfl | hbc
+    · exact Or.inr hab
+    · simp only [closedB, List.all_eq_true] at h
+      have hb : b ∈ e.2 := by rw [hes]; simpa using hab
+      have hc : c ∈ ofList t b := by simpa using hbc
+      have := h e he b hb c hc
+      simp only [Bool.or_eq_true, beq_iff_eq] at this
+      rcases this with h1 | h1
+      · exact Or.inl (h1.trans hea)
+      · exact Or.inr (by rw [← hes]; exact h1)
+
+/-- Transitivity of `spec` for types whose entities come from one transitively
+    closed supertype table. -/
+theorem spec_trans (sup : Table) (hT : Closed sup) : ∀ a b c,
+    entOk sup a = true → entOk sup b = true → entOk sup c = true →
     spec a b = true → spec b c = true → spec a c = true
   -- strip defined-type / GENERIC on the RIGHT operand (universal in a,b)
-  | a, b, .defn _ uc, hab, hbc => by
-      rw [spec_orig_defn] at hbc ⊢; exact spec_trans hE a b uc hab hbc
-  | a, b, .gen, _, _ => spec_top a
+  | a, b, .defn _ uc, ha, hb, hc, hab, hbc => by
+      simp only [entOk] at hc
+      rw [spec_orig_defn] at hbc ⊢; exact spec_trans sup hT a b uc ha hb hc hab hbc
+  | a, b, .gen, _, _, _, _, _ => spec_top a
   -- resolve the LEFT operand (universal in b,c)
-  | .defn _ w, b, c, hab, hbc => by
-      simp only [spec] at hab ⊢; exact spec_trans hE w b c hab hbc
-  | .sel _ ms, b, c, hab, hbc => by
+  | .defn _ w, b, c, ha, hb, hc, hab, hbc => by
+      simp only [entOk] at ha
+      simp only [spec] at hab ⊢; exact spec_trans sup hT w b c ha hb hc hab hbc
+  | .sel _ ms, b, c, ha, hb, hc, hab, hbc => by
+      simp only [entOk] at ha; rw [entOkAll_true] at ha
       simp only [spec] at hab ⊢; rw [specAll_true] at hab ⊢
-      exact fun m hm => spec_trans hE m b c (hab m hm) hbc
+      exact fun m hm => spec_trans sup hT m b c (ha m hm) hb hc (hab m hm) hbc
   -- strip a defined-type on the MIDDLE operand (a stays abstract via universal rewrite)
-  | a, .defn _ ub, c, hab, hbc => by
+  | a, .defn _ ub, c, ha, hb, hc, hab, hbc => by
+      simp only [entOk] at hb
       rw [spec_orig_defn] at hab; simp only [spec] at hbc
-      exact spec_trans hE a ub c hab hbc
+      exact spec_trans sup hT a ub c ha hb hc hab hbc
   -- b a SELECT  (a concrete, split for the head)
-  | .simp _, .sel _ ms, c, hab, hbc | .gen, .sel _ ms, c, hab, hbc
-  | .ent _ _, .sel _ ms, c, hab, hbc | .agg _ _ _ _, .sel _ ms, c, hab, hbc => by
+  | .simp _, .sel _ ms, c, ha, hb, hc, hab, hbc | .gen, .sel _ ms, c, ha, hb, hc, hab, hbc
+  | .ent _ _, .sel _ ms, c, ha, hb, hc, hab, hbc | .agg _ _ _ _, .sel _ ms, c, ha, hb, hc, hab, hbc => by
+      simp only [entOk] at hb; rw [entOkAll_true] at hb
       simp only [spec] at hab hbc
       rw [specAny_true] at hab; rw [specAll_true] at hbc
       obtain ⟨mb, hmb, hs⟩ := hab
-      exact spec_trans hE _ mb c hs (hbc mb hmb)
+      exact spec_trans sup hT _ mb c ha (hb mb hmb) hc hs (hbc mb hmb)
   -- a = GENERIC, b = GENERIC : goal is exactly hbc
-  | .gen, .gen, c, _, hbc => hbc
+  | .gen, .gen, c, _, _, _, _, hbc => hbc
   -- a = GENERIC, b concrete non-gen : spec gen b = false, hab impossible
-  | .gen, .simp _, _, hab, _ | .gen, .ent _ _, _, hab, _
-  | .gen, .agg _ _ _ _, _, hab, _ => by simp [spec] at hab
+  | .gen, .simp _, _, _, _, _, hab, _ | .gen, .ent _ _, _, _, _, _, hab, _
+  | .gen, .agg _ _ _ _, _, _, _, _, hab, _ => by simp [spec] at hab
   -- a concrete non-gen, b = GENERIC, c a SELECT : witness via spec gen c
-  | .simp _, .gen, .sel _ ms, _, hbc | .ent _ _, .gen, .sel _ ms, _, hbc
-  | .agg _ _ _ _, .gen, .sel _ ms, _, hbc => by
+  | .simp _, .gen, .sel _ ms, ha, _, hc, _, hbc | .ent _ _, .gen, .sel _ ms, ha, _, hc, _, hbc
+  | .agg _ _ _ _, .gen, .sel _ ms, ha, _, hc, _, hbc => by
+      simp only [entOk] at hc; rw [entOkAll_true] at hc
       simp only [spec] at hbc ⊢; rw [specAny_true] at hbc ⊢
       obtain ⟨m, hm, hs⟩ := hbc
-      exact ⟨m, hm, spec_trans hE _ Ty.gen m (spec_top _) hs⟩
+      exact ⟨m, hm, spec_trans sup hT _ Ty.gen m ha (by simp [entOk]) (hc m hm) (spec_top _) hs⟩
   -- a concrete non-gen, b = GENERIC, c concrete : spec gen c = false, hbc impossible
-  | .simp _, .gen, .simp _, _, hbc | .simp _, .gen, .ent _ _, _, hbc | .simp _, .gen, .agg _ _ _ _, _, hbc
-  | .ent _ _, .gen, .simp _, _, hbc | .ent _ _, .gen, .ent _ _, _, hbc | .ent _ _, .gen, .agg _ _ _ _, _, hbc
-  | .agg _ _ _ _, .gen, .simp _, _, hbc | .agg _ _ _ _, .gen, .ent _ _, _, hbc
-  | .agg _ _ _ _, .gen, .agg _ _ _ _, _, hbc => by simp [spec] at hbc
+  | .simp _, .gen, .simp _, _, _, _, _, hbc | .simp _, .gen, .ent _ _, _, _, _, _, hbc
+  | .simp _, .gen, .agg _ _ _ _, _, _, _, _, hbc
+  | .ent _ _, .gen, .simp _, _, _, _, _, hbc | .ent _ _, .gen, .ent _ _, _, _, _, _, hbc
+  | .ent _ _, .gen, .agg _ _ _ _, _, _, _, _, hbc
+  | .agg _ _ _ _, .gen, .simp _, _, _, _, _, hbc | .agg _ _ _ _, .gen, .ent _ _, _, _, _, _, hbc
+  | .agg _ _ _ _, .gen, .agg _ _ _ _, _, _, _, _, hbc => by simp [spec] at hbc
   -- a, b concrete non-gen, c a SELECT : witness via spec b c
-  | .simp _, .simp _, .sel _ ms, hab, hbc | .simp _, .ent _ _, .sel _ ms, hab, hbc | .simp _, .agg _ _ _ _, .sel _ ms, hab, hbc
-  | .ent _ _, .simp _, .sel _ ms, hab, hbc | .ent _ _, .ent _ _, .sel _ ms, hab, hbc | .ent _ _, .agg _ _ _ _, .sel _ ms, hab, hbc
-  | .agg _ _ _ _, .simp _, .sel _ ms, hab, hbc | .agg _ _ _ _, .ent _ _, .sel _ ms, hab, hbc
-  | .agg _ _ _ _, .agg _ _ _ _, .sel _ ms, hab, hbc => by
+  | .simp _, .simp _, .sel _ ms, ha, hb, hc, hab, hbc | .simp _, .ent _ _, .sel _ ms, ha, hb, hc, hab, hbc
+  | .simp _, .agg _ _ _ _, .sel _ ms, ha, hb, hc, hab, hbc
+  | .ent _ _, .simp _, .sel _ ms, ha, hb, hc, hab, hbc | .ent _ _, .ent _ _, .sel _ ms, ha, hb, hc, hab, hbc
+  | .ent _ _, .agg _ _ _ _, .sel _ ms, ha, hb, hc, hab, hbc
+  | .agg _ _ _ _, .simp _, .sel _ ms, ha, hb, hc, hab, hbc | .agg _ _ _ _, .ent _ _, .sel _ ms, ha, hb, hc, hab, hbc
+  | .agg _ _ _ _, .agg _ _ _ _, .sel _ ms, ha, hb, hc, hab, hbc => by
+      simp only [entOk] at hc; rw [entOkAll_true] at hc
       simp only [spec] at hbc ⊢; rw [specAny_true] at hbc ⊢
       obtain ⟨mc, hmc, hs⟩ := hbc
-      exact ⟨mc, hmc, spec_trans hE _ _ mc hab hs⟩
+      exact ⟨mc, hmc, spec_trans sup hT _ _ mc ha hb (hc mc hmc) hab hs⟩
   -- base: all three concrete, matching kinds
-  | .simp a', .simp b', .simp c', hab, hbc => by
+  | .simp a', .simp b', .simp c', _, _, _, hab, hbc => by
       simp only [spec] at hab hbc ⊢
       exact simpLe_trans hab hbc
-  | .ent an as, .ent bn bs, .ent cn cs, hab, hbc => by
-      simp only [spec] at hab hbc ⊢; exact hE an as bs bn cn hab hbc
-  | .agg ka la ha ea, .agg kb lb hb eb, .agg kc lc hc ec, hab, hbc => by
+  | .ent an as, .ent bn bs, .ent cn cs, ha, hb, _, hab, hbc => by
+      simp only [entOk, beq_iff_eq] at ha hb
+      subst ha; subst hb
+      simp only [spec] at hab hbc ⊢; exact hT an bn cn hab hbc
+  | .agg ka la ua ea, .agg kb lb ub eb, .agg kc lc uc ec, ha, hb, hc, hab, hbc => by
+      simp only [entOk] at ha hb hc
       simp only [spec, Bool.and_eq_true] at hab hbc ⊢
       obtain ⟨⟨hk1, hbd1⟩, he1⟩ := hab
       obtain ⟨⟨hk2, hbd2⟩, he2⟩ := hbc
-      exact ⟨⟨aggLe_trans hk1 hk2, boundsOk_trans hbd1 hbd2⟩, spec_trans hE ea eb ec he1 he2⟩
+      exact ⟨⟨aggLe_trans hk1 hk2, boundsOk_trans hbd1 hbd2⟩, spec_trans sup hT ea eb ec ha hb hc he1 he2⟩
   -- base: all three concrete, mismatched kinds (spec a b or spec b c is false)
-  | .simp _, .ent _ _, _, hab, _ | .simp _, .agg _ _ _ _, _, hab, _
-  | .ent _ _, .simp _, _, hab, _ | .ent _ _, .agg _ _ _ _, _, hab, _
-  | .agg _ _ _ _, .simp _, _, hab, _ | .agg _ _ _ _, .ent _ _, _, hab, _ => by simp [spec] at hab
-  | .simp _, .simp _, .ent _ _, _, hbc | .simp _, .simp _, .agg _ _ _ _, _, hbc
-  | .ent _ _, .ent _ _, .simp _, _, hbc | .ent _ _, .ent _ _, .agg _ _ _ _, _, hbc
-  | .agg _ _ _ _, .agg _ _ _ _, .simp _, _, hbc | .agg _ _ _ _, .agg _ _ _ _, .ent _ _, _, hbc => by
+  | .simp _, .ent _ _, _, _, _, _, hab, _ | .simp _, .agg _ _ _ _, _, _, _, _, hab, _
+  | .ent _ _, .simp _, _, _, _, _, hab, _ | .ent _ _, .agg _ _ _ _, _, _, _, _, hab, _
+  | .agg _ _ _ _, .simp _, _, _, _, _, hab, _ | .agg _ _ _ _, .ent _ _, _, _, _, _, hab, _ => by
+      simp [spec] at hab
+  | .simp _, .simp _, .ent _ _, _, _, _, _, hbc | .simp _, .simp _, .agg _ _ _ _, _, _, _, _, hbc
+  | .ent _ _, .ent _ _, .simp _, _, _, _, _, hbc | .ent _ _, .ent _ _, .agg _ _ _ _, _, _, _, _, hbc
+  | .agg _ _ _ _, .agg _ _ _ _, .simp _, _, _, _, _, hbc
+  | .agg _ _ _ _, .agg _ _ _ _, .ent _ _, _, _, _, _, hbc => by
       simp [spec] at hbc
 termination_by a b c => sizeOf a + sizeOf b + sizeOf c
 decreasing_by
@@ -232,3 +328,6 @@ decreasing_by
     | (first
         | (have := List.sizeOf_lt_of_mem ‹_ ∈ _›; omega)
         | (rename_i h _ _; have := List.sizeOf_lt_of_mem h; omega)))
+
+#print axioms spec_trans
+#print axioms closed_of_closedB

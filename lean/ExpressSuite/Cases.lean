@@ -17,6 +17,7 @@
   each of them and rejects the two negative controls.
 -/
 import ExpressSuite.Specialisation
+import ExpressSuite.Meta
 
 namespace Cases
 
@@ -173,5 +174,44 @@ def widget : Ty := .ent "widget" []
 #guard spec (.simp .number) (.simp .int) == false
 #guard spec (.simp .logical) (.simp .bool) == false
 #guard spec (.simp .str) (.simp .number) == false
+
+
+/- ── The hypotheses of `spec_trans` and `spec_sound` hold for these cases ──
+   One supertype table for every entity encoded above, with the supertype list
+   each one carries. A supertype name that is not itself encoded as an entity
+   here has no entry (no supertypes). `closedB` holds, so the table is closed
+   (`closed_of_closedB`, a theorem), and every type of the cases is `entOk` for
+   it (`#guard`, by evaluation): the two theorems apply to these cases, so their
+   hypotheses are satisfiable. -/
+def table : List (String × List String) :=
+  [("representation_item", []),
+   ("geometric_representation_item", ["representation_item"]),
+   ("point", ["geometric_representation_item", "representation_item"]),
+   ("direction", ["geometric_representation_item", "representation_item"]),
+   ("point_and_vector", ["compound_representation_item", "geometric_representation_item", "representation_item"]),
+   ("integer_representation_item", ["representation_item", "int_literal", "literal_number",
+      "simple_numeric_expression", "generic_literal"]),
+   ("circular_area", primitive_2d_supers), ("elliptic_area", primitive_2d_supers),
+   ("rectangular_area", primitive_2d_supers), ("polygonal_area", primitive_2d_supers),
+   ("area_with_outer_boundary", "half_space_2d" :: primitive_2d_supers),
+   ("path_area_with_parameters", "complex_area" :: "mapped_item" :: primitive_2d_supers),
+   ("product_definition", []), ("generic_product_definition_reference", []),
+   ("product_definition_occurrence", []),
+   ("product_definition_occurrence_reference", ["product_definition_reference", "generic_product_definition_reference"]),
+   ("thing", []), ("widget", [])]
+
+theorem table_closed : Closed (ofList table) := closed_of_closedB table (by decide)
+#print axioms table_closed
+
+#guard [compound_item_definition, point_and_vector_members, point_array_members,
+        location_in_aggregate_item, point_path_members, compound_inner_area_boundary,
+        product_definition_occurrence_or_reference, product_definition_or_reference_or_occurrence,
+        real_list, Ty.agg .list 0 none representation_item,
+        Ty.agg .list 3 none thing, Ty.agg .set 1 (some 5) widget, Ty.agg .bag 0 none widget].all
+        (entOk (ofList table))
+
+-- What the old hypothesis let through is now excluded: an entity that carries another
+-- supertype list than the table gives its name is not `entOk`.
+#guard entOk (ofList table) (.ent "point" []) == false
 
 end Cases

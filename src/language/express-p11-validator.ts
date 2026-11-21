@@ -249,7 +249,9 @@ export class ExpressP11Validator {
    * ISO 10303-11:2004 9.2.3.4 a): the type of a redeclared attribute shall be the
    * same as, or a specialization (9.2.7) of, the original attribute's type. The
    * relation is `spec` from the type model, proved sound in
-   * lean/ExpressSuite/Soundness.lean; defined types and selects are seen
+   * lean/ExpressSuite/Soundness.lean for entity supertype lists drawn from one
+   * transitively closed table (`Closed`, `entOk`), which `supertypesOf` gives
+   * unless two entities of one comparison share a name; defined types and selects are seen
    * through on both sides, and select extensions in the workspace are folded in.
    * Nothing is reported when either type lies outside the proved domain.
    */
