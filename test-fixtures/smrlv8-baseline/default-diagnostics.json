@@ -1,10 +1,10 @@
 {
   "documents": 1287,
-  "diagnostics": 6286,
+  "diagnostics": 6326,
   "bySeverity": {
-    "error": 3524,
+    "error": 3525,
     "information": 704,
-    "warning": 2058
+    "warning": 2097
   },
   "byCode": {
     "(none)": 1737,
@@ -16,11 +16,11 @@
     "informal-proposition-malformed-signature": 7,
     "informal-proposition-misplaced-signature": 3,
     "informal-proposition-missing-annotation": 6,
-    "linking-error": 2997,
+    "linking-error": 3038,
     "parsing-error": 2,
     "redeclaration-not-specialization": 9,
-    "reference-name-case": 306,
-    "reference-statement-missing": 176,
+    "reference-name-case": 345,
+    "reference-statement-missing": 136,
     "unqualified-group-reference": 30
   },
   "parseErrors": {
@@ -2511,18 +2511,18 @@
     "modules/analytical_model/arm.exp": {
       "linking-error": [
         100,
+        100,
+        101,
         101,
         102,
         102,
         123
       ],
       "reference-name-case": [
+        100,
+        101,
         102,
         123
-      ],
-      "reference-statement-missing": [
-        100,
-        101
       ]
     },
     "modules/annotated_3d_model_equivalence_assembly/mim.exp": {
@@ -2780,9 +2780,10 @@
     },
     "modules/assembly_module_usage_view/arm.exp": {
       "linking-error": [
+        38,
         38
       ],
-      "reference-statement-missing": [
+      "reference-name-case": [
         38
       ]
     },
@@ -2800,14 +2801,17 @@
     "modules/assembly_module_with_macro_component/arm.exp": {
       "linking-error": [
         16,
+        16,
         18,
         18,
         18,
         18
       ],
+      "reference-name-case": [
+        16
+      ],
       "reference-statement-missing": [
         14,
-        16,
         18
       ]
     },
@@ -2864,21 +2868,21 @@
     "modules/bare_die/arm.exp": {
       "linking-error": [
         35,
+        35,
         36,
         36,
         86,
         86,
         107,
+        107,
         118
       ],
       "reference-name-case": [
+        35,
         36,
         86,
+        107,
         118
-      ],
-      "reference-statement-missing": [
-        35,
-        107
       ]
     },
     "modules/basic_geometric_topology/arm.exp": {
@@ -2934,9 +2938,10 @@
     },
     "modules/cable/arm.exp": {
       "linking-error": [
+        24,
         24
       ],
-      "reference-statement-missing": [
+      "reference-name-case": [
         24
       ]
     },
@@ -3109,9 +3114,11 @@
     "modules/component_grouping/arm.exp": {
       "linking-error": [
         24,
+        24,
+        53,
         53
       ],
-      "reference-statement-missing": [
+      "reference-name-case": [
         24,
         53
       ]
@@ -3286,11 +3293,13 @@
         460,
         460,
         490,
+        490,
         497,
         497,
         507,
         584,
         584,
+        597,
         597,
         611,
         611,
@@ -3320,18 +3329,16 @@
         431,
         447,
         460,
+        490,
         497,
         507,
         584,
+        597,
         611,
         645,
         652,
         679,
         693
-      ],
-      "reference-statement-missing": [
-        490,
-        597
       ]
     },
     "modules/extended_geometric_tolerance/mim.exp": {
@@ -3574,9 +3581,10 @@
     },
     "modules/functional_specification/arm.exp": {
       "linking-error": [
+        42,
         42
       ],
-      "reference-statement-missing": [
+      "reference-name-case": [
         42
       ]
     },
@@ -3695,31 +3703,36 @@
     },
     "modules/interconnect_module_connection_routing/arm.exp": {
       "linking-error": [
+        39,
         39
       ],
-      "reference-statement-missing": [
+      "reference-name-case": [
         39
       ]
     },
     "modules/interconnect_module_to_assembly_module_relationship/arm.exp": {
       "linking-error": [
+        69,
         69
       ],
-      "reference-statement-missing": [
+      "reference-name-case": [
         69
       ]
     },
     "modules/interconnect_module_with_macros/arm.exp": {
       "linking-error": [
         20,
+        20,
         22,
         22,
         22,
         22
       ],
+      "reference-name-case": [
+        20
+      ],
       "reference-statement-missing": [
         18,
-        20,
         22
       ]
     },
@@ -3732,28 +3745,29 @@
         182,
         182,
         183,
+        183,
         185,
         185,
         237,
         237,
+        238,
         238,
         240,
         240
       ],
       "reference-name-case": [
         182,
-        237
-      ],
-      "reference-statement-missing": [
         183,
+        237,
         238
       ]
     },
     "modules/interface_component/arm.exp": {
       "linking-error": [
+        26,
         26
       ],
-      "reference-statement-missing": [
+      "reference-name-case": [
         26
       ]
     },
@@ -4005,6 +4019,7 @@
         219,
         219,
         379,
+        379,
         478,
         478,
         478,
@@ -4023,6 +4038,7 @@
         1024,
         1024,
         1024,
+        1031,
         1031,
         1032,
         1032,
@@ -4048,18 +4064,22 @@
         1108,
         1108,
         1119,
+        1119,
         1424
       ],
       "reference-name-case": [
         218,
         219,
+        379,
         566,
         592,
         619,
         620,
         1020,
         1023,
+        1031,
         1032,
+        1119,
         1424
       ],
       "reference-statement-missing": [
@@ -4067,7 +4087,6 @@
         207,
         216,
         290,
-        379,
         406,
         431,
         487,
@@ -4080,8 +4099,6 @@
         814,
         954,
         1009,
-        1031,
-        1119,
         1128,
         1160,
         1180,
@@ -4093,15 +4110,13 @@
     },
     "modules/layered_interconnect_module_design/mim.exp": {
       "linking-error": [
+        38,
         39,
         40
       ],
       "reference-name-case": [
         39,
         40
-      ],
-      "reference-statement-missing": [
-        38
       ]
     },
     "modules/layered_interconnect_module_with_printed_component_design/arm.exp": {
@@ -4131,6 +4146,8 @@
         52,
         53,
         239,
+        239,
+        259,
         259,
         349,
         349,
@@ -4142,11 +4159,9 @@
       "reference-name-case": [
         52,
         53,
-        450
-      ],
-      "reference-statement-missing": [
         239,
-        259
+        259,
+        450
       ]
     },
     "modules/layered_interconnect_simple_template/mim.exp": {
@@ -4159,9 +4174,10 @@
     },
     "modules/layout_macro_definition/arm.exp": {
       "linking-error": [
+        50,
         50
       ],
-      "reference-statement-missing": [
+      "reference-name-case": [
         50
       ]
     },
@@ -4282,16 +4298,16 @@
     "modules/mesh_connectivity/arm.exp": {
       "linking-error": [
         31,
+        57,
+        57,
         96
       ],
       "reference-name-case": [
+        57,
         64,
         65,
         71,
         102
-      ],
-      "reference-statement-missing": [
-        57
       ]
     },
     "modules/mesh_topology/arm.exp": {
@@ -4381,14 +4397,13 @@
         54,
         54,
         55,
+        55,
         104
       ],
       "reference-name-case": [
         54,
+        55,
         104
-      ],
-      "reference-statement-missing": [
-        55
       ]
     },
     "modules/numeric_expression/arm.exp": {
@@ -4436,27 +4451,29 @@
     "modules/package/arm.exp": {
       "linking-error": [
         74,
+        74,
         102,
         106,
+        206,
         206,
         223,
         227
       ],
       "reference-name-case": [
-        102,
-        106
-      ],
-      "reference-statement-missing": [
         74,
+        102,
+        106,
         206
       ]
     },
     "modules/packaged_connector_model/arm.exp": {
       "linking-error": [
         28,
+        28,
+        46,
         46
       ],
-      "reference-statement-missing": [
+      "reference-name-case": [
         28,
         46
       ]
@@ -4465,12 +4482,11 @@
       "linking-error": [
         19,
         35,
+        41,
         41
       ],
       "reference-name-case": [
-        19
-      ],
-      "reference-statement-missing": [
+        19,
         41
       ]
     },
@@ -4763,12 +4779,11 @@
     "modules/part_template_3d_shape/arm.exp": {
       "linking-error": [
         31,
+        37,
         37
       ],
       "reference-name-case": [
-        31
-      ],
-      "reference-statement-missing": [
+        31,
         37
       ]
     },
@@ -4799,16 +4814,17 @@
         93,
         102,
         104,
+        104,
         133,
         134,
         177
       ],
       "reference-name-case": [
+        104,
         133
       ],
       "reference-statement-missing": [
         38,
-        104,
         133,
         134
       ]
@@ -4938,8 +4954,12 @@
     "modules/printed_physical_layout_template/arm.exp": {
       "linking-error": [
         58,
+        58,
+        155,
         155,
         161,
+        161,
+        168,
         168,
         171,
         171,
@@ -4949,19 +4969,20 @@
         175,
         177,
         177,
+        204,
         204,
         205,
         205
       ],
       "reference-name-case": [
-        205
-      ],
-      "reference-statement-missing": [
         58,
         155,
         161,
         168,
         204,
+        205
+      ],
+      "reference-statement-missing": [
         230,
         259
       ]
@@ -5504,9 +5525,10 @@
     },
     "modules/signal/arm.exp": {
       "linking-error": [
+        20,
         20
       ],
-      "reference-statement-missing": [
+      "reference-name-case": [
         20
       ]
     },

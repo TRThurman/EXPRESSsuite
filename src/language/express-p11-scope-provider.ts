@@ -82,7 +82,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     try {
       const schemaNode = AstUtils.getContainerOfType(context.container, isSchemaDefinition);
       if (!schemaNode || !schemaNode.name) return EMPTY_SCOPE;
-      const schema = this.typeContainer.getSchemas().get(schemaNode.name);
+      const schema = this.typeContainer.getSchemaOf(schemaNode);
       if (!schema) return EMPTY_SCOPE;
       // Every scope below binds under the case rule (see express-p11-case-rule-scope.ts).
       const longForm = isLongFormSchemaName(schemaNode.name);
@@ -199,7 +199,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     }
     let result = this.getGlobalScope(referenceType, context);
     const interfaced = this.interfaceIndexCache.get(
-      `${schema.getName()}\u0000${longForm ? "lf" : "sf"}`,
+      `${this.typeContainer.domainKeyOf(context.container) ?? ""}\u0000${schema.getName()}\u0000${longForm ? "lf" : "sf"}`,
       () => new CaseRuleNodeIndex(this.visibleDeclarations(schema), this.nameProvider, longForm)
     );
     result = new IndexedCaseRuleScope(
@@ -215,12 +215,26 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     return result;
   }
 
-  /** The index as a scope under the case rule, in document-URI order, cached per reference type and form. */
+  /**
+   * The index as a scope under the case rule, in document-URI order, cached per domain, reference
+   * type and form. Only the declarations of the referencing document's domain are in it
+   * (express-p11-domains.ts): a same-named declaration in a concatenated copy, a long form or
+   * another checkout is never found.
+   */
   protected override getGlobalScope(referenceType: string, context: ReferenceInfo): Scope {
     const schemaNode = AstUtils.getContainerOfType(context.container, isSchemaDefinition);
     const longForm = schemaNode?.name ? isLongFormSchemaName(schemaNode.name) : false;
-    return this.globalScopeCache.get(`${referenceType}\u0000${longForm ? "lf" : "sf"}`, () =>
-      new CaseRuleScope(this.indexManager.allElements(referenceType).toArray().sort(byDescriptionUri), undefined, longForm)
+    const domain = this.typeContainer.domainKeyOf(context.container);
+    return this.globalScopeCache.get(`${domain ?? ""}\u0000${referenceType}\u0000${longForm ? "lf" : "sf"}`, () =>
+      new CaseRuleScope(
+        this.indexManager
+          .allElements(referenceType)
+          .filter((description) => this.typeContainer.domainKeyOfUri(description.documentUri.toString()) === domain)
+          .toArray()
+          .sort(byDescriptionUri),
+        undefined,
+        longForm
+      )
     );
   }
 
@@ -244,7 +258,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
   getQualifierOperand(qualifier: Attribute_qualifier | Group_qualifier): { nodes: AstNode[]; type: ScopeType } | undefined {
     const schemaNode = AstUtils.getContainerOfType(qualifier, isSchemaDefinition);
     if (!schemaNode?.name) return undefined;
-    const schema = this.typeContainer.getSchemas().get(schemaNode.name);
+    const schema = this.typeContainer.getSchemaOf(schemaNode);
     if (!schema) return undefined;
     try {
       return this.qualifierOperand(qualifier, schema);
@@ -487,7 +501,7 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
           const namePath = resolveFullyQualifiedAttributeName(fullyQualifiedAttributeName);
           if (!namePath) return { nodes: [], type: ScopeType.Empty };
           if (namePath.length !== 3) return { nodes: [], type: ScopeType.Empty };
-          const entity = this.typeContainer.findEntityByInsensitiveName(namePath[0], namePath[1]);
+          const entity = this.typeContainer.findEntityByInsensitiveName(namePath[0], namePath[1], primary);
           if (!entity) return { nodes: [], type: ScopeType.Empty };
           return { nodes: [entity.getNode()], type: ScopeType.Entities };
         }

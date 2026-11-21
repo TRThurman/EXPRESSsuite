@@ -52,12 +52,22 @@ export function isAllowedFolder(path: URI, configuration: Configuration): boolea
   return excludedFolderOf(path, configuration) === undefined;
 }
 
-function excludedFolderOf(path: URI, configuration: Configuration): string | undefined {
+/**
+ * The workspace folder the file is in, as a URI prefix ending in `/`; of nested workspace folders
+ * the innermost. `undefined` for a file outside every workspace folder.
+ */
+export function workspaceFolderOf(path: URI, workspaceFolders: readonly string[] | undefined): string | undefined {
   const file = path.toString();
   let root: string | undefined;
-  for (const candidate of rootsOf(configuration.workspaceFolders)) {
+  for (const candidate of rootsOf(workspaceFolders)) {
     if (file.startsWith(candidate) && (root === undefined || candidate.length > root.length)) root = candidate;
   }
+  return root;
+}
+
+function excludedFolderOf(path: URI, configuration: Configuration): string | undefined {
+  const file = path.toString();
+  const root = workspaceFolderOf(path, configuration.workspaceFolders);
   if (root === undefined) return undefined;
   const folders = file.slice(root.length).split("/").slice(0, -1);
   return folders.map(decoded).find((folder) => configuration.excludedFolders.includes(folder));
