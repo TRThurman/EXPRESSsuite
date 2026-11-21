@@ -143,17 +143,31 @@ export class ExpressTypeBuilder {
   /**
    * The declared type of attribute `name` as seen from `entity`
    * (ISO 10303-11:2004 12.7.3: declared in that entity data type, a supertype or
-   * a subtype of it). The entity and its supertypes are searched nearest first,
-   * so a redeclaration wins over the original; two candidates at the same depth
-   * are ambiguous (12.7.3: indeterminate) and give `undefined`. Subtypes are
-   * consulted only when nothing nearer declares the name, and only when they
-   * agree on one type. The workspace linker may bind a qualified attribute to a
-   * same-named attribute of a sibling entity, so this lookup never trusts the
-   * linker's target for an attribute qualifier.
+   * a subtype of it). The reference is ambiguous (12.7.3: indeterminate) and
+   * gives `undefined` when two or more entities among `entity` and its
+   * supertypes, at any depth, declare the name (ruling 2026-11-21, the rule of
+   * `ambiguous-attribute-reference` and `resolve_ambiguous_iff` in
+   * lean/ExpressSuite/Inheritance.lean; a redeclaration without RENAMED declares
+   * no new name). Otherwise the entity and its supertypes are searched nearest
+   * first, so a redeclaration wins over the original. Subtypes are consulted
+   * only when nothing above declares the name, and only when they agree on one
+   * type. The workspace linker may bind a qualified attribute to a same-named
+   * attribute of a sibling entity, so this lookup never trusts the linker's
+   * target for an attribute qualifier.
    */
   attributeTypeIn(entity: EntityDefinition, name: string): Ty | undefined {
     if (this.typeContainer.hasUnresolvedSupertypes(entity)) return undefined;
     const candidates = this.typeContainer.getVisibleAttributeCandidates(entity, name);
+    const owners = new Set<EntityDefinition>();
+    for (const level of candidates) {
+      if (level.direction === "descendant") continue;
+      for (const attribute of level.declarations) {
+        if (isRedeclared_attribute(attribute) && !attribute.isRenamed) continue;
+        const owner = AstUtils.getContainerOfType(attribute, isEntityDefinition);
+        if (owner) owners.add(owner);
+      }
+    }
+    if (owners.size > 1) return undefined;
     for (const level of candidates) {
       if (level.direction === "descendant") break;
       if (level.declarations.length === 1) return this.ofAttribute(level.declarations[0]);

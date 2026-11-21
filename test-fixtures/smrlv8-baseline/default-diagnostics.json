@@ -1,14 +1,13 @@
 {
   "documents": 1287,
-  "diagnostics": 6326,
+  "diagnostics": 6322,
   "bySeverity": {
     "error": 3525,
     "information": 704,
-    "warning": 2097
+    "warning": 2093
   },
   "byCode": {
     "(none)": 1737,
-    "ambiguous-attribute-reference": 4,
     "annotation-unkeyed-remark": 4,
     "declaration-name-case": 704,
     "duplicate-interfaced-declaration": 229,
@@ -7715,12 +7714,6 @@
       ]
     },
     "resources/sketch_schema/sketch_schema.exp": {
-      "ambiguous-attribute-reference": [
-        268,
-        272,
-        278,
-        279
-      ],
       "duplicate-loop-index": [
         257
       ]

@@ -4,8 +4,10 @@ Machine-checked ground truth for the attribute-reference scope and for four
 SC4 validation diagnostics:
 
 - attribute and group reference scope — ISO 10303-11:2004 12.7.3 (`x.a`: the
-  entity, a supertype or a subtype; after `x\E`: E's own declaration; two
-  declarations at the nearest depth: ambiguous, `ambiguous-attribute-reference`)
+  entity, a supertype or a subtype; after `x\E`: E's own declaration;
+  ambiguous, `ambiguous-attribute-reference`, when two entities among the
+  entity and its supertypes declare the name, at any depth; declarations in
+  subtypes never make it ambiguous, ruling 2026-11-21)
   and 12.7.4 (`x\E`: any entity in the same subtype/supertype graph).
   Definitions: `visible`, `component`, `resolve`, `resolveAfterGroup`
   (Inheritance.lean); the TypeScript walk is `ExpressP11Entity.getVisibleLevels`.
@@ -55,7 +57,7 @@ cited in `src/`, `docs/` and this README occurs in the Lean code
 | `ExpressSuite/Cases.lean` | the five wg12-step redeclarations (PRs #233 to #237) encoded from the published SMRLv8 text, the negative controls, and the standard's 9.2.3.4 EXAMPLE 2 and EXAMPLE 3 | `#guard`, build-checked |
 | `ExpressSuite/FpReproGt.lean` | two further valid narrowings (geometric_tolerance ARM) that a relation resolving only the NEW operand rejects | `#guard`, build-checked |
 | `ExpressSuite/Interfaces.lean` | schema scopes (10.1 b, clause 11): `Export` (USE re-export), `Visible`, `Clash`; `step`/`iterate` (the implementation's loop), `visibleIn`, `clashesIn`; `iterate_sound`, `export_complete`, `export_of_stable` (the stop condition is exact), `export_ignores_reference` (11.3), `mem_visibleIn_iff`, `clash_iff` | proved, no `sorry`; the 3074 shape, 11.3 EXAMPLE 2 (plain and chained), lists, renames (including onto a listed name), three-way clashes, propagation by USE, REFERENCE and listed item, USE-plus-REFERENCE routes, function-versus-rule referenceability, cycles and the case rules `#guard` |
-| `ExpressSuite/Inheritance.lean` | finite inheritance graph; `Visible` (12.7.3) and `SameGraph` (12.7.4) as reachability; `visible` (ancestors then descendants, breadth-first, duplicate-free) and `component`; `mem_visible_iff`, `component_is_group_scope`, `visible_sub_component`, `visible_mono`, `resolve_unique`, `resolve_ambiguous`, `resolveAfterGroup_unique`, `visible_head`; termination of the fuelled closure by a pigeonhole lemma | proved, no `sorry`; b_spline, 9.2.3.3 and 12.7.3 examples `#guard` |
+| `ExpressSuite/Inheritance.lean` | finite inheritance graph; `Visible` (12.7.3) and `SameGraph` (12.7.4) as reachability; `visible` (ancestors then descendants, breadth-first, duplicate-free) and `component`; `mem_visible_iff`, `component_is_group_scope`, `visible_sub_component`, `visible_mono`, `resolve_unique`, `resolve_ambiguous_iff` (ambiguous exactly when two entities among the entity and its supertypes declare the name, at any depth), `resolve_below`, `ambiguous_stable` (a further subtype never changes whether a reference is ambiguous), `resolveAfterGroup_unique`, `visible_head`; termination of the fuelled closure by a pigeonhole lemma | proved, no `sorry`; b_spline, 9.2.3.3 and 12.7.3 examples `#guard` |
 
 Axioms (`#print axioms`): `propext`, `Classical.choice`, `Quot.sound` only.
 

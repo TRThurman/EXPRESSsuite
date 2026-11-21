@@ -18,8 +18,8 @@ correctness: several of the classes below are known false positives.
 The corpus folder loaded as one workspace with the extension's default
 settings: `useOptimizedConfiguration` on, so files whose name contains `lf`
 or `concatenated` and the `business_object_models` folder are not loaded.
-1,287 of the 1,410 files load; 6,326 diagnostics
-(3,525 error, 704 information, 2,097 warning) in
+1,287 of the 1,410 files load; 6,322 diagnostics
+(3,525 error, 704 information, 2,093 warning) in
 261 files. `files` maps file to code to the 1-based start
 line of every diagnostic. `parseErrors` lists the files with lexer or parser
 errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
@@ -38,7 +38,6 @@ errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 | redeclaration-not-specialization         |      9 |
 | informal-proposition-malformed-signature |      7 |
 | informal-proposition-missing-annotation  |      6 |
-| ambiguous-attribute-reference            |      4 |
 | annotation-unkeyed-remark                |      4 |
 | informal-proposition-misplaced-signature |      3 |
 | parsing-error                            |      2 |
@@ -69,7 +68,7 @@ modules and visible together in a third (or in one of the two). The files:
 
 The 103 published long forms (`modules/*/arm_lf.exp`,
 `modules/*/mim_lf.exp`), each built alone in services of its own with the
-excludes cleared: 2,507 diagnostics in 94 files (9 long forms have none),
+excludes cleared: 2,429 diagnostics in 94 files (9 long forms have none),
 counts per file and code (no line numbers: the files are large and the
 counts are what a change moves). No long form has a parse error, a
 `duplicate-interfaced-declaration` or a `redundant-declaration`.
@@ -79,7 +78,6 @@ counts are what a change moves). No long form has a parse error, a
 | linking-error                    |  1,520 |
 | duplicate-loop-index             |    457 |
 | unqualified-group-reference      |    406 |
-| ambiguous-attribute-reference    |     78 |
 | redeclaration-not-specialization |     35 |
 | declaration-name-case            |     11 |
 
@@ -133,8 +131,15 @@ Each reported site breaks the rule:
   names everywhere; every name in a long form), which removed 78 short-form
   and 27,296 long-form sites; the references that then resolve are checked
   like any other, which is where the long forms' additional
-  `ambiguous-attribute-reference` and `redeclaration-not-specialization`
-  sites come from (not classified). An attribute that an entity inherits
+  `redeclaration-not-specialization` sites come from (not classified).
+- `ambiguous-attribute-reference` (ruling 2026-11-21): reported when two or
+  more entities among the operand's type and its supertypes, at any depth,
+  declare the name (ISO 10303-11:2004 9.2.3.3 b, 12.7.3); declarations in
+  subtypes are never reported, since further subtypes can always be added.
+  No SMRL v8 site meets it. The rule it replaces (two declarations at the
+  nearest depth, subtypes included) gave 4 short-form and 78 long-form
+  warnings, every one from subtypes, for example `curve.basis_surface`,
+  `group_assignment.items` and `Join_relationship.network_topology`. An attribute that an entity inherits
   and names without `SELF` binds since issue 132 (ISO 10303-11:2004
   9.2.3.3), which removed 377 short-form and 5,447 long-form sites and
   added none; among them the two of

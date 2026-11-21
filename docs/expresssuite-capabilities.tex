@@ -244,7 +244,7 @@
     \textbf{Diagnostic code} & \textbf{Clause} & \textbf{What it reports} \\
     \midrule
     \code{duplicate-interfaced-\newline declaration} & 10.1 b, cl.\ 11 & one name, two declarations in one schema scope \\[2pt]
-    \code{ambiguous-attribute-\newline reference}   & 12.7.3 & \code{x.a} where two entities declare \code{a} at the same depth \\[2pt]
+    \code{ambiguous-attribute-\newline reference}   & 12.7.3 & \code{x.a} where two entities among \code{x}'s type and its supertypes declare \code{a} \\[2pt]
     \code{redeclaration-not-\newline specialization} & 9.2.3.4, 9.2.7 & a redeclared attribute widens the original type \\[2pt]
     \code{index-on-non-\newline aggregate}          & 12.6.1 & \code{x[1]} where \code{x} can never be an aggregate \\[2pt]
     \code{reference-statement-\newline missing}     & cl.\ 11 & a name is used but not interfaced \\
@@ -299,16 +299,15 @@ END_SCHEMA;
   the declared type of \code{x}, then in its supertypes and subtypes, nearest first.
   Never in a sibling entity.
 \begin{lstlisting}
-ENTITY curve; END_ENTITY;
-ENTITY offset_curve_2d SUBTYPE OF (curve);
-  basis_curve : curve; END_ENTITY;
-ENTITY offset_curve_3d SUBTYPE OF (curve);
-  basis_curve : curve; END_ENTITY;
+ENTITY e1; attr : STRING; END_ENTITY;
+ENTITY e2; attr : STRING; END_ENTITY;
+ENTITY e12 SUBTYPE OF (e1, e2); END_ENTITY;
 
--- somewhere: c : curve;  ...  c.basis_curve
+-- somewhere: x : e12;  ...  x.attr
 \end{lstlisting}
-  \diag{ambiguous-attribute-reference (warning): 'basis\_curve' is declared by offset\_curve\_2d and offset\_curve\_3d at the same depth}
-  Write \code{c\textbackslash offset\_curve\_2d.basis\_curve} to say which one you mean.
+  \diag{ambiguous-attribute-reference (warning): 'attr' is declared in e1 and e2, among e12 and its supertypes}
+  Write \code{x\textbackslash e1.attr} to say which one you mean. Declarations
+  in subtypes are never reported: further subtypes can always be added.
 \end{frame}
 
 %--------------------------------------------------------------------
@@ -441,7 +440,7 @@ END_ENTITY;
     \toprule
     \textbf{Check} & \textbf{Clause} & \textbf{What is proved} \\
     \midrule
-    reference scope (\code{x.a}, \code{x\textbackslash e}) & 12.7.3, 12.7.4 & \code{mem\_visible\_iff}, \code{resolve\_unique}, \code{resolve\_ambiguous}: the walk finds exactly the 12.7.3 set; ambiguity exactly when two entities at the nearest depth declare the name \\[4pt]
+    reference scope (\code{x.a}, \code{x\textbackslash e}) & 12.7.3, 12.7.4 & \code{mem\_visible\_iff}, \code{resolve\_unique}, \code{resolve\_ambiguous\_iff}, \code{ambiguous\_stable}: the walk finds exactly the 12.7.3 set; ambiguity exactly when two entities among the entity and its supertypes declare the name, and no further subtype changes that \\[4pt]
     schema scope and clashes & 10.1 b, cl.\ 11 & \code{iterate\_sound}, \code{export\_complete}, \code{clash\_iff}: the loop computes exactly the clause 11 scope; a clash exactly when one name denotes two declarations \\
     \bottomrule
   \end{tabular}
