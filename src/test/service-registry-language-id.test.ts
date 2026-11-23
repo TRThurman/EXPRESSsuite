@@ -15,7 +15,7 @@ describe("service registry honors the language id of an open document", () => {
   test("open document with a non-.exp extension and languageId express", () => {
     const { shared } = createExpressP11Services(EmptyFileSystem);
     const uri = URI.parse("file:///tmp/schema.exp.origin");
-    (shared.workspace.TextDocuments as any).set(TextDocument.create(uri.toString(), "express", 1, text));
+    (shared.workspace.TextDocuments as unknown as { set(doc: TextDocument): void }).set(TextDocument.create(uri.toString(), "express", 1, text));
     expect(shared.ServiceRegistry.hasServices(uri)).toBe(true);
     expect(() => shared.ServiceRegistry.getServices(uri)).not.toThrow();
   });
