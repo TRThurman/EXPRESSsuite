@@ -1,10 +1,10 @@
 {
   "documents": 1287,
-  "diagnostics": 6352,
+  "diagnostics": 6356,
   "bySeverity": {
-    "error": 3555,
+    "error": 3566,
     "information": 704,
-    "warning": 2093
+    "warning": 2086
   },
   "byCode": {
     "(none)": 1737,
@@ -18,7 +18,7 @@
     "informal-proposition-missing-annotation": 6,
     "linking-error": 3038,
     "parsing-error": 2,
-    "redeclaration-not-specialization": 9,
+    "redeclaration-not-specialization": 13,
     "reference-name-case": 345,
     "reference-statement-missing": 136,
     "unqualified-group-reference": 30
@@ -3621,6 +3621,12 @@
         108
       ]
     },
+    "modules/functional_decomposition_to_design/arm.exp": {
+      "redeclaration-not-specialization": [
+        89,
+        90
+      ]
+    },
     "modules/functional_specification/arm.exp": {
       "linking-error": [
         42,
@@ -3990,6 +3996,9 @@
         104,
         104
       ],
+      "redeclaration-not-specialization": [
+        25
+      ],
       "reference-name-case": [
         40,
         80,
@@ -4113,6 +4122,9 @@
         1119,
         1119,
         1424
+      ],
+      "redeclaration-not-specialization": [
+        466
       ],
       "reference-name-case": [
         218,
@@ -4612,11 +4624,6 @@
         104,
         106,
         106
-      ]
-    },
-    "modules/part_shape/arm.exp": {
-      "redeclaration-not-specialization": [
-        36
       ]
     },
     "modules/part_template/mim.exp": {
@@ -5573,6 +5580,9 @@
       ]
     },
     "modules/shape_property_assignment/arm.exp": {
+      "redeclaration-not-specialization": [
+        84
+      ],
       "unqualified-group-reference": [
         131,
         141
