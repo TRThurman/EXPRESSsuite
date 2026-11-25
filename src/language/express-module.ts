@@ -67,7 +67,7 @@ export const ExpressP11SharedModule: Module<ExpressP11SharedServices, DeepPartia
     ExecuteCommandHandler: (services) => new ExpressP11ExecuteComandHandler(services),
     DocumentUpdateHandler: (services) => new ExpressP11DocumentUpdateHandler(services),
   },
-  ServiceRegistry: () => new ExpressP11ServiceRegistry(),
+  ServiceRegistry: (services) => new ExpressP11ServiceRegistry(services),
 };
 /**
  * Union of Langium default services and your custom services - use this as constructor parameter
