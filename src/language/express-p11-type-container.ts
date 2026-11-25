@@ -365,7 +365,7 @@ export class ExpressP11DomainTypeContainer {
 
   /**
    * The same candidates grouped by depth and direction, for the ambiguity check
-   * (two declarations at the first non-empty depth) and the type builder. When
+   * (the operand's type and its supertypes, every depth) and the type builder. When
    * the type container's entity for the node is a different node (duplicate
    * schema names across files), the walk falls back to the AST and covers the
    * entity and its supertypes only.

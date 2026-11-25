@@ -23,13 +23,25 @@
 
   Proved:  mem_visible_iff      x ∈ visible g e ↔ Visible g e x
            visible_sub_component Visible g e x → x ∈ component g e
-           resolve_unique        a `unique` verdict names the one entity in
-                                 the 12.7.3 set declaring the attribute
+           resolve_unique        a `unique` verdict names the one entity among
+                                 e and its supertypes declaring the attribute
+           resolve_ambiguous_iff `ambiguous` exactly when two distinct
+                                 entities among e and its supertypes declare it
+           resolve_below         `below`: declared only in proper subtypes
+           ambiguous_stable      adding an entity the graph does not mention
+                                 yet (a further subtype) never changes whether
+                                 a reference is ambiguous
            visible_head          the entity itself is consulted first
   Build-checked (#guard): the b_spline_geometry witness from the published
   SMRLv8 ARM (Rational_b_spline_curve is in the component of
   Rational_b_spline_surface but not in its 12.7.3 set), the standard's
   9.2.3.3 ambiguity example, and the 12.7.3 point/coloured_point example.
+
+  Ambiguity (ruling 2026-11-21): a reference is ambiguous only when the name is
+  declared by two or more entities among e and its supertypes, at any depth
+  (9.2.3.3 b). Declarations in subtypes never make it ambiguous: EXPRESS
+  cannot guarantee that further subtypes will not be added, so a verdict that
+  depended on them could change with no change to e or its supertypes.
 
   Modelling decisions:
   * `Decl.attrs` lists NEW attribute names only (explicit, DERIVE, INVERSE).
@@ -421,63 +433,175 @@ theorem visible_head (g : Graph) (e : String) : (visible g e).head? = some e := 
 
 /- ───────────── resolution of `x.a` with x : e ───────────── -/
 
+/-- The verdict on `x.a` with `x : e`. Ruling (2026-11-21): the reference is
+    ambiguous only when two or more entities among `e` and its supertypes, at
+    any depth, declare `a` (9.2.3.3 b). Declarations in subtypes never make it
+    ambiguous: EXPRESS cannot guarantee that further subtypes will not be
+    added, so a verdict that depended on them could change with no change to
+    `e` or its supertypes (`ambiguous_stable` below). A name declared only in
+    subtypes is `below`: which declaration applies depends on the instance. -/
 inductive Verdict
   | notFound
   | unique (owner : String)
   | ambiguous
+  | below (owners : List String)
 deriving Repr, DecidableEq
 
-def candidates (g : Graph) (e a : String) : List String :=
-  (visible g e).filter (fun x => (attrsOf g x).contains a)
+/-- the entities among `e` and its supertypes that declare `a`, nearest first -/
+def candidatesAbove (g : Graph) (e a : String) : List String :=
+  (ancestors g e).filter (fun x => (attrsOf g x).contains a)
+
+/-- the proper subtypes of `e` that declare `a`, nearest first -/
+def candidatesBelow (g : Graph) (e a : String) : List String :=
+  (descendants g e).filter (fun x => x != e && (attrsOf g x).contains a)
 
 def resolve (g : Graph) (e a : String) : Verdict :=
-  match candidates g e a with
-  | [] => .notFound
+  match candidatesAbove g e a with
   | [x] => .unique x
-  | _ => .ambiguous
+  | _ :: _ :: _ => .ambiguous
+  | [] => if (candidatesBelow g e a).isEmpty then .notFound else .below (candidatesBelow g e a)
 
-theorem mem_candidates_iff (g : Graph) (e a x : String) :
-    x ∈ candidates g e a ↔ Visible g e x ∧ a ∈ attrsOf g x := by
-  simp only [candidates, List.mem_filter, mem_visible_iff, List.contains_iff_mem]
+theorem mem_candidatesAbove_iff (g : Graph) (e a x : String) :
+    x ∈ candidatesAbove g e a ↔ Reach (supersOf g) e x ∧ a ∈ attrsOf g x := by
+  simp only [candidatesAbove, List.mem_filter, mem_ancestors_iff, List.contains_iff_mem]
 
-/-- a `unique` verdict names the one entity in the 12.7.3 set that declares `a` -/
+theorem candidatesAbove_nodup (g : Graph) (e a : String) : (candidatesAbove g e a).Nodup :=
+  List.Nodup.sublist List.filter_sublist (closure_nodup (supersOf g) (e :: names g) e)
+
+/-- a `unique` verdict names the one entity among `e` and its supertypes declaring `a` -/
 theorem resolve_unique (g : Graph) (e a x : String) (h : resolve g e a = .unique x) :
-    Visible g e x ∧ a ∈ attrsOf g x ∧ ∀ y, Visible g e y → a ∈ attrsOf g y → y = x := by
+    Reach (supersOf g) e x ∧ a ∈ attrsOf g x ∧
+      ∀ y, Reach (supersOf g) e y → a ∈ attrsOf g y → y = x := by
   unfold resolve at h
-  generalize hc : candidates g e a = cs at h
+  generalize hc : candidatesAbove g e a = cs at h
   match cs, h with
-  | [], h => cases h
+  | [], h => by_cases hb : (candidatesBelow g e a).isEmpty <;> simp [hb] at h
   | [z], h =>
     injection h with hzx
     subst hzx
-    have hz : z ∈ candidates g e a := by rw [hc]; exact List.mem_singleton.2 rfl
-    obtain ⟨hv, ha⟩ := (mem_candidates_iff g e a z).1 hz
+    have hz : z ∈ candidatesAbove g e a := by rw [hc]; exact List.mem_singleton.2 rfl
+    obtain ⟨hv, ha⟩ := (mem_candidatesAbove_iff g e a z).1 hz
     refine ⟨hv, ha, ?_⟩
     intro y hvy hay
-    have hy : y ∈ candidates g e a := (mem_candidates_iff g e a y).2 ⟨hvy, hay⟩
+    have hy : y ∈ candidatesAbove g e a := (mem_candidatesAbove_iff g e a y).2 ⟨hvy, hay⟩
     rw [hc] at hy
     exact List.mem_singleton.1 hy
   | _ :: _ :: _, h => cases h
 
-/-- an `ambiguous` verdict means at least two entities in the 12.7.3 set declare `a` -/
-theorem resolve_ambiguous (g : Graph) (e a : String) (h : resolve g e a = .ambiguous) :
-    ∃ x y, x ≠ y ∧ Visible g e x ∧ a ∈ attrsOf g x ∧ Visible g e y ∧ a ∈ attrsOf g y := by
-  have hnd : (candidates g e a).Nodup := List.Nodup.sublist List.filter_sublist (visible_nodup g e)
+/-- `ambiguous` exactly when two distinct entities among `e` and its supertypes declare `a` -/
+theorem resolve_ambiguous_iff (g : Graph) (e a : String) :
+    resolve g e a = .ambiguous ↔
+      ∃ x y, x ≠ y ∧ Reach (supersOf g) e x ∧ a ∈ attrsOf g x ∧
+        Reach (supersOf g) e y ∧ a ∈ attrsOf g y := by
+  constructor
+  · intro h
+    have hnd := candidatesAbove_nodup g e a
+    unfold resolve at h
+    generalize hc : candidatesAbove g e a = cs at h hnd
+    match cs, h, hnd with
+    | [], h, _ => by_cases hb : (candidatesBelow g e a).isEmpty <;> simp [hb] at h
+    | [_], h, _ => cases h
+    | x :: y :: _, _, hn =>
+      rw [List.nodup_cons] at hn
+      have hx : x ∈ candidatesAbove g e a := by rw [hc]; exact List.mem_cons.2 (Or.inl rfl)
+      have hy : y ∈ candidatesAbove g e a := by
+        rw [hc]; exact List.mem_cons.2 (Or.inr (List.mem_cons.2 (Or.inl rfl)))
+      obtain ⟨hvx, hax⟩ := (mem_candidatesAbove_iff g e a x).1 hx
+      obtain ⟨hvy, hay⟩ := (mem_candidatesAbove_iff g e a y).1 hy
+      refine ⟨x, y, ?_, hvx, hax, hvy, hay⟩
+      intro hxy
+      exact hn.1 (by rw [hxy]; exact List.mem_cons.2 (Or.inl rfl))
+  · rintro ⟨x, y, hxy, hvx, hax, hvy, hay⟩
+    have hx := (mem_candidatesAbove_iff g e a x).2 ⟨hvx, hax⟩
+    have hy := (mem_candidatesAbove_iff g e a y).2 ⟨hvy, hay⟩
+    unfold resolve
+    generalize candidatesAbove g e a = cs at hx hy
+    match cs, hx, hy with
+    | [], hx, _ => exact absurd hx (List.not_mem_nil)
+    | [z], hx, hy =>
+      exact absurd ((List.mem_singleton.1 hx).trans (List.mem_singleton.1 hy).symm) hxy
+    | _ :: _ :: _, _, _ => rfl
+
+/-- `below`: no entity among `e` and its supertypes declares `a`; the owners are
+    proper subtypes of `e` that do -/
+theorem resolve_below (g : Graph) (e a : String) (xs : List String) (h : resolve g e a = .below xs) :
+    (∀ x, Reach (supersOf g) e x → a ∉ attrsOf g x) ∧
+      ∀ x, x ∈ xs → Reach (supersOf g) x e ∧ x ≠ e ∧ a ∈ attrsOf g x := by
   unfold resolve at h
-  generalize hc : candidates g e a = cs at h hnd
-  match cs, h, hnd with
-  | [], h, _ => cases h
-  | [_], h, _ => cases h
-  | x :: y :: l', _, hn =>
-    rw [List.nodup_cons] at hn
-    have hx : x ∈ candidates g e a := by rw [hc]; exact List.mem_cons.2 (Or.inl rfl)
-    have hy : y ∈ candidates g e a := by
-      rw [hc]; exact List.mem_cons.2 (Or.inr (List.mem_cons.2 (Or.inl rfl)))
-    obtain ⟨hvx, hax⟩ := (mem_candidates_iff g e a x).1 hx
-    obtain ⟨hvy, hay⟩ := (mem_candidates_iff g e a y).1 hy
-    refine ⟨x, y, ?_, hvx, hax, hvy, hay⟩
-    intro hxy
-    exact hn.1 (by rw [hxy]; exact List.mem_cons.2 (Or.inl rfl))
+  generalize hc : candidatesAbove g e a = cs at h
+  match cs, h with
+  | [_], h => cases h
+  | _ :: _ :: _, h => cases h
+  | [], h =>
+    by_cases hb : (candidatesBelow g e a).isEmpty
+    · simp [hb] at h
+    · have hxs : candidatesBelow g e a = xs := by simp [hb] at h; exact h
+      subst hxs
+      refine ⟨fun x hx ha => ?_, fun x hx => ?_⟩
+      · have : x ∈ candidatesAbove g e a := (mem_candidatesAbove_iff g e a x).2 ⟨hx, ha⟩
+        rw [hc] at this; exact List.not_mem_nil this
+      · simp only [candidatesBelow, List.mem_filter, Bool.and_eq_true, bne_iff_ne, ne_eq,
+          List.contains_iff_mem, mem_descendants_iff] at hx
+        exact ⟨hx.1, hx.2.1, hx.2.2⟩
+
+/- ───────────── the ruling's reason: new subtypes change no ambiguity verdict ───────────── -/
+
+theorem supersOf_append_sub (g : Graph) (d : Decl) (y x : String) (h : x ∈ supersOf g y) :
+    x ∈ supersOf (g ++ [d]) y := by
+  simp only [supersOf, List.filter_append, List.flatMap_append, List.mem_append]
+  exact Or.inl h
+
+theorem supersOf_append_ne (g : Graph) (d : Decl) (y : String) (hy : y ≠ d.name) :
+    supersOf (g ++ [d]) y = supersOf g y := by
+  have hb : (d.name == y) = false := by simp only [beq_eq_false_iff_ne, ne_eq]; exact fun h => hy h.symm
+  simp [supersOf, List.filter_append, hb]
+
+theorem attrsOf_append_ne (g : Graph) (d : Decl) (x : String) (hx : x ≠ d.name) :
+    attrsOf (g ++ [d]) x = attrsOf g x := by
+  have hb : (d.name == x) = false := by simp only [beq_eq_false_iff_ne, ne_eq]; exact fun h => hx h.symm
+  simp [attrsOf, List.filter_append, hb]
+
+/-- adding an entity the graph does not mention yet (a further subtype, or any
+    other new declaration) leaves the supertypes of every existing entity as
+    they were -/
+theorem reach_append_new (g : Graph) (d : Decl) (e x : String)
+    (hn : d.name ∉ names g) (he : e ≠ d.name) :
+    Reach (supersOf (g ++ [d])) e x ↔ Reach (supersOf g) e x := by
+  constructor
+  · intro r
+    have key : Reach (supersOf g) e x ∧ x ≠ d.name := by
+      induction r with
+      | refl => exact ⟨Reach.refl, he⟩
+      | step _ hz ih =>
+        obtain ⟨ry, hy⟩ := ih
+        rw [supersOf_append_ne g d _ hy] at hz
+        exact ⟨Reach.step ry hz, fun h => hn (h ▸ supersOf_sub g _ _ hz)⟩
+    exact key.1
+  · exact Reach.mono (supersOf_append_sub g d)
+
+/-- the ruling's reason: whether `x.a` with `x : e` is ambiguous does not change
+    when an entity the graph does not mention yet is added, whatever it declares
+    and whichever existing entities it names as supertypes -/
+theorem ambiguous_stable (g : Graph) (d : Decl) (e a : String)
+    (hn : d.name ∉ names g) (he : e ≠ d.name) :
+    resolve (g ++ [d]) e a = .ambiguous ↔ resolve g e a = .ambiguous := by
+  have hne : ∀ x, Reach (supersOf g) e x → x ≠ d.name := by
+    intro x r
+    cases r with
+    | refl => exact he
+    | step _ hz => exact fun h => hn (h ▸ supersOf_sub g _ _ hz)
+  rw [resolve_ambiguous_iff, resolve_ambiguous_iff]
+  constructor
+  · rintro ⟨x, y, hxy, rx, ax, ry, ay⟩
+    rw [reach_append_new g d e x hn he] at rx
+    rw [reach_append_new g d e y hn he] at ry
+    rw [attrsOf_append_ne g d x (hne x rx)] at ax
+    rw [attrsOf_append_ne g d y (hne y ry)] at ay
+    exact ⟨x, y, hxy, rx, ax, ry, ay⟩
+  · rintro ⟨x, y, hxy, rx, ax, ry, ay⟩
+    refine ⟨x, y, hxy, (reach_append_new g d e x hn he).2 rx, ?_, (reach_append_new g d e y hn he).2 ry, ?_⟩
+    · rw [attrsOf_append_ne g d x (hne x rx)]; exact ax
+    · rw [attrsOf_append_ne g d y (hne y ry)]; exact ay
 
 /- ───────────── 12.7.4 group references: the exception ───────────── -/
 
@@ -550,7 +674,7 @@ def bspline : Graph := [
 #guard (component bspline "Rational_b_spline_surface").length = 11
 #guard (visible bspline "Rational_b_spline_surface").length = 5
 -- downward direction: x : B_spline_surface, x.weight_values is declared in a subtype
-#guard resolve bspline "B_spline_surface" "weight_values" = .unique "Rational_b_spline_surface"
+#guard resolve bspline "B_spline_surface" "weight_values" = .below ["Rational_b_spline_surface"]
 #guard visible bspline "B_spline_surface" =
   ["B_spline_surface", "Bounded_surface", "Surface", "Detailed_geometric_model_element",
    "Rational_b_spline_surface", "Surface_with_explicit_knots"]
@@ -558,8 +682,10 @@ def bspline : Graph := [
 #guard resolve bspline "Rational_b_spline_surface" "u_degree" = .unique "B_spline_surface"
 -- not declared anywhere in the set
 #guard resolve bspline "Rational_b_spline_surface" "knot_values" = .notFound
--- from the common root both declarations are visible: ambiguous, as 12.7.3 says
-#guard resolve bspline "Detailed_geometric_model_element" "weight_values" = .ambiguous
+-- from the common root both declarations are in subtypes: not ambiguous (ruling 2026-11-21);
+-- which one applies depends on the instance
+#guard resolve bspline "Detailed_geometric_model_element" "weight_values" =
+  .below ["Rational_b_spline_curve", "Rational_b_spline_surface"]
 -- 12.7.4: bss\Rational_b_spline_curve is a legal group reference (same graph) ...
 #guard SameGraphB bspline "Rational_b_spline_surface" "Rational_b_spline_curve"
 -- ... and bss\Rational_b_spline_curve.weight_values then resolves in the curve alone
@@ -582,7 +708,39 @@ def ex1273 : Graph := [
   ⟨"coloured_point", ["point"], ["colour"]⟩
 ]
 #guard resolve ex1273 "coloured_point" "x" = .unique "point"
-#guard resolve ex1273 "point" "colour" = .unique "coloured_point"
+#guard resolve ex1273 "point" "colour" = .below ["coloured_point"]
+
+/-- the name declared in two supertypes at different depths: e SUBTYPE OF (s1, s2),
+    s2 SUBTYPE OF (ss); s1 and ss declare x. Ambiguous at any depth (9.2.3.3 b). -/
+def depths : Graph := [
+  ⟨"s1", [], ["x"]⟩,
+  ⟨"ss", [], ["x"]⟩,
+  ⟨"s2", ["ss"], []⟩,
+  ⟨"e", ["s1", "s2"], []⟩
+]
+#guard resolve depths "e" "x" = .ambiguous
+#guard resolve depths "s2" "x" = .unique "ss"
+
+/-- a diamond: one declaration reached along two paths is not ambiguous -/
+def diamond : Graph := [
+  ⟨"t", [], ["x"]⟩,
+  ⟨"l", ["t"], []⟩,
+  ⟨"r", ["t"], []⟩,
+  ⟨"e", ["l", "r"], []⟩
+]
+#guard resolve diamond "e" "x" = .unique "t"
+
+/-- declared only in subtypes, two or three of them, at one or several depths:
+    never ambiguous; adding a further subtype changes the owners, not the verdict -/
+def below2 : Graph := [
+  ⟨"r", [], []⟩,
+  ⟨"a", ["r"], ["d"]⟩,
+  ⟨"c", ["r"], []⟩,
+  ⟨"b", ["c"], ["d"]⟩
+]
+#guard resolve below2 "r" "d" = .below ["a", "b"]
+#guard resolve (below2 ++ [⟨"n", ["r"], ["d"]⟩]) "r" "d" = .below ["a", "n", "b"]
+#guard resolve below2 "a" "d" = .unique "a"
 
 /-- duplicate declarations of one name: supertype lists are unioned -/
 def dup : Graph := [
@@ -603,5 +761,8 @@ def cyc : Graph := [ ⟨"a", ["b"], ["p"]⟩, ⟨"b", ["a"], ["q"]⟩ ]
 #print axioms component_is_group_scope
 #print axioms visible_mono
 #print axioms resolveAfterGroup_unique
+#print axioms resolve_ambiguous_iff
+#print axioms resolve_below
+#print axioms ambiguous_stable
 
 end Inheritance

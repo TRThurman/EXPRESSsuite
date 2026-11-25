@@ -206,14 +206,19 @@ export class ExpressP11Validator {
   /**
    * ISO 10303-11:2004 12.7.3, last sentence: "If two or more attributes are
    * found with the same name then the reference is ambiguous and indeterminate
-   * (?) is returned." Reported for an entity-typed operand when the nearest
-   * depth of the 12.7.3 walk that declares the name holds declarations in two
-   * or more entities (multiple inheritance); a diamond inheriting one
-   * declaration along two paths is not ambiguous. The linker still binds the
-   * first candidate so that hover and navigation keep working. The NOTE of
-   * 12.7.3 recommends a group reference to select one. Select-typed operands
-   * are not reported: a select of entities with same-named attributes is the
-   * common case in SMRL and the standard's own NOTE names it.
+   * (?) is returned", read with 9.2.3.3 b) (ruling 2026-11-21): reported for an
+   * entity-typed operand when two or more entities among the operand's type and
+   * its supertypes, at any depth, declare the name. A redeclaration without
+   * RENAMED declares no new name; a diamond inheriting one declaration along two
+   * paths is one entity. Declarations in subtypes are never reported: EXPRESS
+   * cannot guarantee that further subtypes will not be added, so a verdict that
+   * depended on them could change with no change to the operand's type or its
+   * supertypes. Proved as `resolve_ambiguous_iff` and `ambiguous_stable` in
+   * lean/ExpressSuite/Inheritance.lean. The linker still binds the nearest
+   * candidate so that hover and navigation keep working. The NOTE of 12.7.3
+   * recommends a group reference to select one. Select-typed operands are not
+   * reported: a select of entities with same-named attributes is the common
+   * case in SMRL and the standard's own NOTE names it.
    */
   checkAmbiguousAttributeReference(qualifier: Attribute_qualifier, accept: ValidationAcceptor): void {
     const operand = this.scopeProvider.getQualifierOperand(qualifier);
@@ -221,21 +226,21 @@ export class ExpressP11Validator {
     const entities = operand.nodes.filter(isEntityDefinition);
     if (entities.length !== 1) return;
     const name = qualifier.target.$refText;
-    const nearest = this.typeContainer
-      .getVisibleAttributeCandidates(entities[0], name)
-      .map((level) => level.declarations.filter((declaration) => this.nameProvider.getName(declaration) === name))
-      .find((declarations) => declarations.length > 0);
-    if (!nearest) return;
     const owners = new Map<EntityDefinition, string>();
-    for (const declaration of nearest) {
-      const owner = AstUtils.getContainerOfType(declaration, isEntityDefinition);
-      if (owner) owners.set(owner, owner.name);
+    // includeDescendants false: the operand's type and its supertypes only, every depth.
+    for (const level of this.typeContainer.getVisibleAttributeCandidates(entities[0], name, false)) {
+      for (const declaration of level.declarations) {
+        if (this.nameProvider.getName(declaration) !== name) continue;
+        if (isRedeclared_attribute(declaration) && !declaration.isRenamed) continue;
+        const owner = AstUtils.getContainerOfType(declaration, isEntityDefinition);
+        if (owner) owners.set(owner, owner.name);
+      }
     }
     if (owners.size < 2) return;
     const data: AmbiguousAttributeData = { attribute: name, operand: entities[0].name, declaredIn: [...owners.values()] };
     accept(
       "warning",
-      `Attribute reference '${name}' is ambiguous for an operand of type ${data.operand}: it is declared in ${data.declaredIn.join(" and ")} at the same depth, so the reference evaluates to indeterminate (ISO 10303-11:2004 12.7.3). Qualify it with a group reference, as in x\\${data.declaredIn[0]}.${name}.`,
+      `Attribute reference '${name}' is ambiguous for an operand of type ${data.operand}: it is declared in ${data.declaredIn.join(" and ")}, among ${data.operand} and its supertypes, so the reference evaluates to indeterminate (ISO 10303-11:2004 9.2.3.3 b, 12.7.3). Qualify it with a group reference, as in x\\${data.declaredIn[0]}.${name}.`,
       { node: qualifier, property: "target", code: ExpressP11Issues.AmbiguousAttributeReference, data }
     );
   }
