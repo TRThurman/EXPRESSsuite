@@ -1,5 +1,6 @@
 import { AstNode, AstUtils, GrammarUtils, LangiumDocument } from "langium";
 import { byUri } from "../utils/file-filter.js";
+import { ImplicitInterfaceIndex, buildImplicitInterfaceIndex, implicitClosure } from "./express-p11-implicit-interfaces.js";
 import type { Range } from "vscode-languageserver";
 import {
   Named_type_or_rename,
@@ -121,6 +122,8 @@ export class ExpressP11ScopeIndex {
   private declIds = new WeakMap<AstNode, number>();
   private nextDeclId = 0;
   private clashCache = new Map<SchemaDefinition, ScopeClash[]>();
+  private specificationCache = new Map<SchemaDefinition, ReadonlySet<AstNode>>();
+  private implicitIndex: ImplicitInterfaceIndex | undefined;
 
   /**
    * `domainOf` gives each document its domain (express-p11-domains.ts); an interface specification
@@ -135,6 +138,8 @@ export class ExpressP11ScopeIndex {
     this.declIds = new WeakMap();
     this.nextDeclId = 0;
     this.clashCache = new Map();
+    this.specificationCache = new Map();
+    this.implicitIndex = undefined;
     for (const document of [...documents].sort(byUri)) {
       const file = document.parseResult.value;
       if (!isExpressFile(file)) continue;
@@ -254,6 +259,44 @@ export class ExpressP11ScopeIndex {
       }
     }
     return arrivals;
+  }
+
+  /**
+   * The schema-level declarations of `schema`'s specification: those visible in
+   * it (`visibleIn`, 11.1 to 11.3) and those implicitly interfaced (11.4),
+   * drawn from the schemas it reaches through its interface specifications
+   * (`implicitClosure`). This is what the schema means, as opposed to what the
+   * workspace happens to contain. Cached until the next build.
+   */
+  specificationOf(schema: SchemaDefinition): ReadonlySet<AstNode> {
+    const cached = this.specificationCache.get(schema);
+    if (cached) return cached;
+    const record = this.records.get(schema);
+    if (!record) return new Set();
+    if (!this.implicitIndex) this.implicitIndex = buildImplicitInterfaceIndex([...this.records.values()].flatMap((r) => r.locals.map((decl) => decl.node)));
+    const universe = new Set<AstNode>();
+    for (const reached of this.reachableSchemas(record)) for (const decl of reached.locals) universe.add(decl.node);
+    const seed = this.visibleIn(schema).map((arrival) => arrival.decl.node);
+    const specification = implicitClosure(seed, universe, this.implicitIndex);
+    this.specificationCache.set(schema, specification);
+    return specification;
+  }
+
+  /** The schema and every schema it reaches through USE and REFERENCE specifications, transitively. */
+  private reachableSchemas(start: SchemaRecord): SchemaRecord[] {
+    const reached = new Set<SchemaRecord>([start]);
+    const queue = [start];
+    while (queue.length > 0) {
+      const record = queue.pop()!;
+      for (const spec of record.specs) {
+        const target = this.resolveTarget(record, spec.schema.$refText);
+        if (target && !reached.has(target)) {
+          reached.add(target);
+          queue.push(target);
+        }
+      }
+    }
+    return [...reached];
   }
 
   clashesIn(schema: SchemaDefinition): ScopeClash[] {

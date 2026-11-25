@@ -20,8 +20,7 @@ export type Ty =
    *  `node` is TypeScript-only bookkeeping for attribute lookup; the Lean relation has no such field */
   | { kind: "ent"; name: string; supers: string[]; node?: unknown }
   | { kind: "defn"; name: string; under: Ty }
-  /** `extensible` is TypeScript-only bookkeeping (the Lean relation ignores it); see mentionsExtensibleSelect */
-  | { kind: "sel"; name: string; members: Ty[]; extensible?: boolean }
+  | { kind: "sel"; name: string; members: Ty[] }
   /** hi === undefined encodes the unbounded upper bound `?` */
   | { kind: "agg"; k: AggK; lo: number; hi: number | undefined; elem: Ty };
 
@@ -86,28 +85,6 @@ export function notIndexable(t: Ty): boolean {
       return notIndexable(t.under);
     case "sel":
       return t.members.every(notIndexable);
-  }
-}
-
-/**
- * The open-world guard for the validator: an EXTENSIBLE select may gain
- * indexable members in schemas outside the workspace, so a chain that passes
- * through one is not reported. Strictly stronger than `notIndexable`.
- */
-export function notIndexableClosed(t: Ty): boolean {
-  return notIndexable(t) && !mentionsExtensibleSelect(t);
-}
-
-export function mentionsExtensibleSelect(t: Ty): boolean {
-  switch (t.kind) {
-    case "sel":
-      return Boolean(t.extensible) || t.members.some(mentionsExtensibleSelect);
-    case "defn":
-      return mentionsExtensibleSelect(t.under);
-    case "agg":
-      return mentionsExtensibleSelect(t.elem);
-    default:
-      return false;
   }
 }
 

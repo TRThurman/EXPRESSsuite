@@ -18,8 +18,8 @@ correctness: several of the classes below are known false positives.
 The corpus folder loaded as one workspace with the extension's default
 settings: `useOptimizedConfiguration` on, so files whose name contains `lf`
 or `concatenated` and the `business_object_models` folder are not loaded.
-1,287 of the 1,410 files load; 6,352 diagnostics
-(3,555 error, 704 information, 2,093 warning) in
+1,287 of the 1,410 files load; 6,356 diagnostics
+(3,566 error, 704 information, 2,086 warning) in
 266 files. `files` maps file to code to the 1-based start
 line of every diagnostic. `parseErrors` lists the files with lexer or parser
 errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
@@ -36,12 +36,54 @@ errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 | duplicate-loop-index                     |     72 |
 | unqualified-group-reference              |     30 |
 | extension-missing-generic-entity         |     30 |
-| redeclaration-not-specialization         |      9 |
+| redeclaration-not-specialization         |     13 |
 | informal-proposition-malformed-signature |      7 |
 | informal-proposition-missing-annotation  |      6 |
 | annotation-unkeyed-remark                |      4 |
 | informal-proposition-misplaced-signature |      3 |
 | parsing-error                            |      2 |
+
+The 13 `redeclaration-not-specialization` sites are errors. Both types are
+read in the specification of the schema that holds the redeclaration
+(ISO 10303-11:2004 clause 11): the declarations visible in it and those
+implicitly interfaced (11.4), drawn from the schemas it reaches through its
+USE and REFERENCE specifications. A select holds those of its own items that
+are in that specification (11.4.2), the items its bases declare, and the
+items of the extensions of it in that specification (8.4.2, 13.3.2); an
+extension does not hold the items the other extensions of its base add.
+Five sites follow from that reading:
+
+- `modules/functional_decomposition_to_design/arm.exp` lines 89 and 90:
+  `Functional_unit_terminal_node_assignment` redeclares
+  `change_management_object`, an EXTENSIBLE GENERIC_ENTITY SELECT without
+  items. Among the schemas `Functional_decomposition_to_design_arm` reaches,
+  its only extension is the schema's own `fdtd_change_management_object`
+  (`Design_functional_unit_allocation_to_assembly_component`,
+  `Design_functional_unit_allocation_to_reference_functional_unit`).
+- `modules/kinematic_topology/arm.exp` line 25: `Part_view_definition`
+  redeclares `property_assignment_select`. The only extension of it that
+  `Kinematic_topology_arm` reaches is `spa_property_assignment_select` of
+  `Shape_property_assignment_arm` (`Product_occurrence_definition_relationship`,
+  `Shape_element`, `Shape_element_relationship`); the extension that lists
+  `Part_view_definition` is in `Single_part_representation_arm`, which it
+  does not reach.
+- `modules/shape_property_assignment/arm.exp` line 84:
+  `assigned_shape_property_select` redeclares `property_assignment_select`,
+  whose only extension in reach is the schema's own
+  `spa_property_assignment_select`; `Product_view_definition` and
+  `View_definition_relationship` are not among its items.
+- `modules/layered_interconnect_module_design/arm.exp` line 466:
+  `accessed_interface : Laminate_component_interface_terminal` redeclares
+  `causal_item : OPTIONAL limd_restriction_basis_item`, and
+  `limd_restriction_basis_item = SELECT BASED_ON restriction_basis_item WITH
+  (stratum_concept)` admits neither `Laminate_component_interface_terminal`
+  nor a supertype of it; the items of the other extensions of
+  `restriction_basis_item` are not its items.
+
+`modules/part_shape/arm.exp` line 36 is not reported: the extension of
+`part_view_definition_or_part_shape_element_select` that adds
+`Product_specification` is in `General_design_connectivity_arm`, which
+`Part_shape_arm` does not reach.
 
 ## default-duplicate-declarations.json
 

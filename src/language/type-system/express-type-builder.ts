@@ -8,6 +8,7 @@ import {
   Inverse_attr,
   Parameter_type,
   Qualifier,
+  Select_type,
   TypeDefinition,
   Underlying_type,
   isAggregate_type,
@@ -54,6 +55,7 @@ import {
 } from "../generated/ast.js";
 import type { ExpressP11TypeContainer } from "../express-p11-type-container.js";
 import type { ExpressP11SelectExtensionIndex } from "../express-p11-select-extension-index.js";
+import { schemaLevelDeclaration } from "../express-p11-implicit-interfaces.js";
 import { AggK, Ty, elementType } from "./express-type-model.js";
 
 /**
@@ -63,11 +65,19 @@ import { AggK, Ty, elementType } from "./express-type-model.js";
  * unresolved references, non-literal bounds, cyclic defined types. Callers
  * treat `undefined` as "unknown" and report nothing, so every diagnostic rests
  * on a type the Lean model covers.
+ *
+ * A builder serves one schema: `specification` holds the declarations of that
+ * schema's specification (visible, ISO 10303-11:2004 11.1 to 11.3, or
+ * implicitly interfaced, 11.4; see express-p11-implicit-interfaces.ts), and
+ * only the select extensions among them count. The extension index lists what
+ * the workspace holds, which is a search space and not the schema's
+ * specification.
  */
 export class ExpressTypeBuilder {
   constructor(
     private readonly typeContainer: ExpressP11TypeContainer,
-    private readonly selectExtensions: ExpressP11SelectExtensionIndex
+    private readonly selectExtensions: ExpressP11SelectExtensionIndex,
+    private readonly specification: ReadonlySet<AstNode>
   ) {}
 
   /** The declared type of an attribute, parameter, variable or constant. */
@@ -238,9 +248,9 @@ export class ExpressTypeBuilder {
     try {
       const underlying = definition.underlyingType;
       if (isSelect_type(underlying)) {
-        const members = this.selectMembers(definition, visiting, new Set());
+        const members = this.selectMembers(definition, visiting);
         if (!members) return undefined;
-        return { kind: "defn", name: definition.name, under: { kind: "sel", name: definition.name, members: members.types, extensible: members.extensible } };
+        return { kind: "defn", name: definition.name, under: { kind: "sel", name: definition.name, members } };
       }
       const under = this.ofType(underlying, visiting);
       return under ? { kind: "defn", name: definition.name, under } : undefined;
@@ -250,54 +260,103 @@ export class ExpressTypeBuilder {
   }
 
   /**
-   * The effective member list of a SELECT: its own list, the list of the select
-   * it is BASED_ON (transitively), and the lists of every select BASED_ON it
-   * (transitively) that the workspace holds. Enumeration members or unresolved
-   * references make the whole select unknown.
+   * The domain of a SELECT in the schema this builder serves (ISO 10303-11:2004
+   * 8.4.1, 8.4.2, 13.3.2): the items it declares; for an extension
+   * (`SELECT BASED_ON base WITH (...)`), the items its base declares, up the
+   * chain of bases; and the items that the selects BASED_ON it add,
+   * transitively, for the extensions in the schema's specification (13.3.2,
+   * clause 11). An extension outside the specification adds nothing, whatever
+   * the workspace holds. The other extensions of a base are not part of an
+   * extension's domain: an extension is based on its base as declared and
+   * knows nothing of the other selects based on that base. Enumeration members
+   * or unresolved references make the whole select unknown.
+   *
+   * Lean model (lean/ExpressSuite/SelectExtension.lean): this computes
+   * `domainFollow`, which follows each BASED_ON reference to its base and takes
+   * the extensions in the specification; `domainFollow_eq` proves it equal to
+   * `domainIn`, the domain over the specification's own declarations, for a
+   * specification closed under 11.4 (`closed_of_stable`). `declared_append`
+   * proves that a further select never changes what another select declares.
    */
-  private selectMembers(
-    definition: TypeDefinition,
-    visiting: Set<TypeDefinition>,
-    seen: Set<TypeDefinition>
-  ): { types: Ty[]; extensible: boolean } | undefined {
-    if (seen.has(definition)) return { types: [], extensible: false };
+  private selectMembers(definition: TypeDefinition, visiting: Set<TypeDefinition>): Ty[] | undefined {
+    const underlying = definition.underlyingType;
+    if (!isSelect_type(underlying)) return undefined;
+    const seen = new Set<TypeDefinition>();
+    const declared = this.declaredSelectMembers(definition, visiting, seen);
+    if (!declared) return undefined;
+    const added = this.extensionSelectMembers(definition, visiting, seen);
+    if (!added) return undefined;
+    return [...declared, ...added];
+  }
+
+  /** The items a select declares, after those its base declares (up the BASED_ON chain). */
+  private declaredSelectMembers(definition: TypeDefinition, visiting: Set<TypeDefinition>, seen: Set<TypeDefinition>): Ty[] | undefined {
+    if (seen.has(definition)) return [];
     seen.add(definition);
     const underlying = definition.underlyingType;
     if (!isSelect_type(underlying)) return undefined;
     const types: Ty[] = [];
-    let extensible = Boolean(underlying.isExtensible);
-    const lists = [];
-    if (isSelect_list(underlying.select)) lists.push(underlying.select);
     if (isSelect_extension(underlying.select)) {
-      if (underlying.select.selectList) lists.push(underlying.select.selectList);
       const base = underlying.select.type.ref;
       if (!base) return undefined;
-      const inherited = this.selectMembers(base, visiting, seen);
+      const inherited = this.declaredSelectMembers(base, visiting, seen);
       if (!inherited) return undefined;
-      types.push(...inherited.types);
-      extensible = extensible || inherited.extensible;
+      types.push(...inherited);
     }
-    for (const list of lists) {
-      for (const reference of list.types) {
-        const target = reference.ref;
-        if (!target) return undefined;
-        if (isEntityDefinition(target)) {
-          const member = this.ofEntity(target);
-          if (!member) return undefined;
-          types.push(member);
-        } else if (isTypeDefinition(target)) {
-          const member = this.ofTypeDefinition(target, visiting);
-          if (!member) return undefined;
-          types.push(member);
-        } else return undefined;
-      }
-    }
+    const own = this.ownSelectMembers(underlying, visiting);
+    if (!own) return undefined;
+    types.push(...own);
+    return types;
+  }
+
+  /**
+   * The items the selects BASED_ON a select declare, transitively down the
+   * extensions, for the extensions in the schema's specification. The
+   * specification is closed under 11.4.2 (an interfaced extension interfaces
+   * its base), so an extension outside it has none inside it below.
+   */
+  private extensionSelectMembers(definition: TypeDefinition, visiting: Set<TypeDefinition>, seen: Set<TypeDefinition>): Ty[] | undefined {
+    const types: Ty[] = [];
     for (const extension of this.selectExtensions.extensionsOf(definition)) {
-      const added = this.selectMembers(extension, visiting, seen);
-      if (!added) return undefined;
-      types.push(...added.types);
+      if (seen.has(extension) || !this.specification.has(extension)) continue;
+      seen.add(extension);
+      const underlying = extension.underlyingType;
+      if (!isSelect_type(underlying)) return undefined;
+      const own = this.ownSelectMembers(underlying, visiting);
+      if (!own) return undefined;
+      const below = this.extensionSelectMembers(extension, visiting, seen);
+      if (!below) return undefined;
+      types.push(...own, ...below);
     }
-    return { types, extensible };
+    return types;
+  }
+
+  /**
+   * The items written in a select's own list (`SELECT (...)` or the `WITH (...)`
+   * of an extension) that are in the schema's specification. Interfacing a
+   * select does not interface its selectable items (ISO 10303-11:2004 11.4.2),
+   * so an item that the schema neither interfaces nor reaches by 11.4 is not
+   * part of the select in that schema. Filtering each list keeps what filtering
+   * the whole domain keeps (`domainPruned` in lean/ExpressSuite/SelectExtension.lean).
+   */
+  private ownSelectMembers(underlying: Select_type, visiting: Set<TypeDefinition>): Ty[] | undefined {
+    const list = isSelect_list(underlying.select) ? underlying.select : isSelect_extension(underlying.select) ? underlying.select.selectList : undefined;
+    const types: Ty[] = [];
+    for (const reference of list?.types ?? []) {
+      const target = reference.ref;
+      if (!target) return undefined;
+      if (!this.specification.has(schemaLevelDeclaration(target) ?? target)) continue;
+      if (isEntityDefinition(target)) {
+        const member = this.ofEntity(target);
+        if (!member) return undefined;
+        types.push(member);
+      } else if (isTypeDefinition(target)) {
+        const member = this.ofTypeDefinition(target, visiting);
+        if (!member) return undefined;
+        types.push(member);
+      } else return undefined;
+    }
+    return types;
   }
 
   private aggregate(

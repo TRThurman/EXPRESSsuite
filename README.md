@@ -174,7 +174,11 @@ standard VS Code **Problems** view:
   (ISO 10303-11:2004 9.2.3.4, 9.2.7). Defined types and selects are seen
   through on both sides, so narrowing `compound_item_definition` to a
   `LIST [2:3] OF point_and_vector_member` is accepted, while `LIST OF REAL` is
-  not. The relation is proved sound in `lean/`.
+  not. Both types are read as the schema of the redeclaration specifies them,
+  select extensions included (see
+  [Searching the workspace and resolving a schema](#searching-the-workspace-and-resolving-a-schema)),
+  and a failed check is an error whether or not a select is EXTENSIBLE. The
+  relation is proved sound in `lean/`.
 - **Index qualifiers** — `x[1]` is reported when the declared type of `x` can
   never hold an aggregate value (ISO 10303-11:2004 12.6.1).
 - **Ambiguous attribute references** — `x.a` is reported when `a` is declared
@@ -284,6 +288,73 @@ By default the extension does not read every `.exp` file of the workspace. The s
 - The folders above the workspace folder do not count: a workspace kept in `/home/me/library/schemas` is read. A folder opened as a workspace folder is read whatever its name.
 - A keyword is bounded by a character that is not a letter or a digit: `lf` leaves out `mim_lf.exp` and `mim_lf_patched.exp`, not `shelf_schema.exp`. Long forms and concatenated schemas are left out because each repeats the declarations of the schemas it was built from.
 - A file that is left out shows no problems, no hover and no completion. While such a file is in the active editor, the status bar shows **EXPRESS: not checked**; its tooltip names the folder or the keyword and the setting that lists it, and a click opens these settings. Turn `expresssuite.useOptimizedConfiguration` off to read everything.
+
+## Searching the workspace and resolving a schema
+
+EXPRESSsuite uses the files it reads in two different ways.
+
+The files are first split into domains that never see each other: the ARM
+short forms of a workspace folder, its other files (the MIM short forms with
+the resource schemas), each concatenated file and each long form.
+
+**Searching**, for your convenience. A name in the EXPRESS that the schema's
+interfaces do not bring in is still looked up in the other files of its
+domain, so that Go to Definition finds the declaration and the problem
+`reference-statement-missing` offers to add the interface. The links of the
+description blocks after `END_SCHEMA;` reach every file that is read.
+
+**Resolving**, which decides the type checks: whether a redeclared
+attribute's type is a specialization of the original, and whether an indexed
+operand can be indexed. For these a schema means what ISO 10303-11:2004
+clause 11 gives it, and nothing else: its own declarations, what its USE and
+REFERENCE specifications bring in (11.1 to 11.3), and what those
+declarations implicitly interface (11.4), drawn from the schemas it reaches
+through its interface specifications. A schema that it does not reach, even
+one that is open or one that interfaces it, changes none of these verdicts.
+
+This matters most for the extensions of an `EXTENSIBLE GENERIC_ENTITY SELECT`.
+In a schema S, a select holds:
+
+- the items of its own list that are in S's specification: interfacing a
+  select does not interface its selectable items (11.4.2);
+- for an extension (`SELECT BASED_ON base WITH (...)`), the items its base
+  declares, up the chain of bases (8.4.2);
+- the items of the extensions of it that are in S's specification (13.3.2).
+  An extension is in S's specification when S interfaces it, when S
+  interfaces an item that its WITH list names (11.4.3), or when it is the
+  base of another extension that is (11.4.2).
+
+An extension does not hold the items that the other extensions of its base
+add. So `SELF\holder.item : b` is accepted in a schema that interfaces an
+extension adding `b`, and reported as not a specialization in a schema that
+does not, even when that extension is in an open file:
+
+```express
+SCHEMA base_schema;
+  ENTITY a; END_ENTITY;
+  ENTITY b; END_ENTITY;
+  TYPE base_select = EXTENSIBLE GENERIC_ENTITY SELECT (a); END_TYPE;
+  ENTITY holder; item : base_select; END_ENTITY;
+END_SCHEMA;
+
+SCHEMA extension_schema;
+  USE FROM base_schema;
+  TYPE wider_select = SELECT BASED_ON base_select WITH (b); END_TYPE;
+END_SCHEMA;
+
+SCHEMA without_extension;      -- reported: base_select holds a only here
+  USE FROM base_schema;
+  ENTITY narrow SUBTYPE OF (holder); SELF\holder.item : b; END_ENTITY;
+END_SCHEMA;
+
+SCHEMA with_extension;         -- accepted: wider_select adds b
+  USE FROM base_schema;
+  USE FROM extension_schema (wider_select);
+  ENTITY narrow_too SUBTYPE OF (holder); SELF\holder.item : b; END_ENTITY;
+END_SCHEMA;
+```
+
+A long form is a single schema, so there every extension written in it counts.
 
 ## Privacy and confidentiality
 

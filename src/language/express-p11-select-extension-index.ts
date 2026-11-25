@@ -6,8 +6,9 @@ import { TypeDefinition, isExpressFile, isSelect_extension, isSelect_type, isTyp
  * Which TYPE declarations extend a given SELECT with `SELECT BASED_ON base`.
  * ISO 10303-11:2004 13.3.2 counts "items added to that domain by other select
  * data types based on the select data type" as members of the base, so a type
- * check on an EXTENSIBLE select must fold its extensions in. Rebuilt lazily
- * after each workspace build phase that recomputes scopes.
+ * check on an EXTENSIBLE select must fold its extensions in (but not into the
+ * other extensions of the same base). Rebuilt lazily after each workspace build
+ * phase that recomputes scopes.
  */
 export class ExpressP11SelectExtensionIndex {
   private readonly documents: LangiumDocuments;

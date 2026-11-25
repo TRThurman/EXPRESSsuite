@@ -197,6 +197,39 @@ describe("index qualifier on a non-aggregate operand", () => {
     expectNoIssues(result, { code });
   });
 
+  test("an EXTENSIBLE select is indexed by what the schema specifies: its own items and the extensions in its specification", async () => {
+    const result = await validationHelper(createExpressP11Services(EmptyFileSystem).ExpressP11)(`
+      SCHEMA base_schema;
+      ENTITY part; END_ENTITY;
+      TYPE part_list = LIST [1:?] OF part; END_TYPE;
+      TYPE open_select = EXTENSIBLE SELECT (part); END_TYPE;
+      END_SCHEMA;
+
+      SCHEMA list_extension_schema;
+      USE FROM base_schema;
+      TYPE listed_select = SELECT BASED_ON open_select WITH (part_list); END_TYPE;
+      END_SCHEMA;
+
+      SCHEMA without_extension;
+      USE FROM base_schema;
+      ENTITY holder; x : open_select; WHERE WR1 : EXISTS(x[1]); END_ENTITY;
+      END_SCHEMA;
+
+      SCHEMA with_extension;
+      USE FROM base_schema;
+      USE FROM list_extension_schema (listed_select);
+      ENTITY holder_too; x : open_select; WHERE WR1 : EXISTS(x[1]); END_ENTITY;
+      END_SCHEMA;
+    `);
+    // without_extension: open_select holds part only, which cannot be indexed;
+    // with_extension: listed_select adds part_list, an aggregate.
+    const found = result.diagnostics.filter((d) => d.code === code);
+    const lineOf = (line: number) => result.document.textDocument.getText({ start: { line, character: 0 }, end: { line: line + 1, character: 0 } }).trim();
+    expect(found.map((d) => [lineOf(d.range.start.line), d.data])).toEqual([
+      ["ENTITY holder; x : open_select; WHERE WR1 : EXISTS(x[1]); END_ENTITY;", { operandType: "open_select" }],
+    ]);
+  });
+
   test("unknown operand types are not reported", async () => {
     const result = await validate(`
       SCHEMA unknown_types;

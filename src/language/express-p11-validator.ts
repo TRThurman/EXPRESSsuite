@@ -66,7 +66,8 @@ import { isLongForm } from "./express-p11-type-utilities.js";
 import { foldsCase } from "./express-p11-case-rule-scope.js";
 import { ExpressP11ScopeProvider, ScopeType } from "./express-p11-scope-provider.js";
 import { ExpressTypeBuilder } from "./type-system/express-type-builder.js";
-import { mentionsExtensibleSelect, notIndexableClosed, renderType, spec } from "./type-system/express-type-model.js";
+import type { ExpressP11SelectExtensionIndex } from "./express-p11-select-extension-index.js";
+import { notIndexable, renderType, spec } from "./type-system/express-type-model.js";
 
 /**
  * Register custom validation checks.
@@ -210,7 +211,7 @@ export class ExpressP11Validator {
   protected readonly documents: LangiumDocuments;
   protected readonly nameProvider: NameProvider;
   protected readonly typeContainer: ExpressP11TypeContainer;
-  protected readonly typeBuilder: ExpressTypeBuilder;
+  protected readonly selectExtensions: ExpressP11SelectExtensionIndex;
   protected readonly scopeProvider: ExpressP11ScopeProvider;
 
   constructor(services: ExpressP11Services) {
@@ -218,7 +219,7 @@ export class ExpressP11Validator {
     this.documents = services.shared.workspace.LangiumDocuments;
     this.nameProvider = services.references.NameProvider;
     this.typeContainer = services.validation.TypeContainer;
-    this.typeBuilder = new ExpressTypeBuilder(services.validation.TypeContainer, services.shared.workspace.SelectExtensionIndex);
+    this.selectExtensions = services.shared.workspace.SelectExtensionIndex;
     this.scopeProvider = services.references.ScopeProvider as ExpressP11ScopeProvider;
   }
 
@@ -278,6 +279,17 @@ export class ExpressP11Validator {
   }
 
   /**
+   * A type builder for the schema that holds `node`: it sees the declarations
+   * of that schema's specification (visible, 11.1 to 11.3, or implicitly
+   * interfaced, 11.4), not everything the workspace holds.
+   */
+  protected typeBuilderFor(node: AstNode): ExpressTypeBuilder {
+    const schema = AstUtils.getContainerOfType(node, isSchemaDefinition);
+    const specification = schema ? this.typeContainer.getScopeIndex().specificationOf(schema) : new Set<AstNode>();
+    return new ExpressTypeBuilder(this.typeContainer, this.selectExtensions, specification);
+  }
+
+  /**
    * ISO 10303-11:2004 12.7.3, last sentence: "If two or more attributes are
    * found with the same name then the reference is ambiguous and indeterminate
    * (?) is returned", read with 9.2.3.3 b) (ruling 2026-11-21): reported for an
@@ -326,11 +338,17 @@ export class ExpressP11Validator {
    * lean/ExpressSuite/Soundness.lean for entity supertype lists drawn from one
    * transitively closed table (`Closed`, `entOk`), which `supertypesOf` gives
    * unless two entities of one comparison share a name; defined types and selects are seen
-   * through on both sides, and select extensions in the workspace are folded in.
-   * Nothing is reported when either type lies outside the proved domain.
+   * through on both sides. Both types are taken as the schema of the entity
+   * specifies them (clause 11): a select's domain includes the items that its
+   * extensions in that schema's specification add (13.3.2); an extension's domain is
+   * its base's as declared plus its own, without the other extensions of that
+   * base (8.4.2). The verdict is definite, EXTENSIBLE or not: nothing outside
+   * the schema's specification can change it. Nothing is reported when either
+   * type lies outside the proved domain.
    */
   checkRedeclaredAttributeTypes(entity: EntityDefinition, accept: ValidationAcceptor): void {
     if (!entity.body) return;
+    const typeBuilder = this.typeBuilderFor(entity);
     const owners: Array<{ node: AstNode; declarations: Attribute_decl[]; type: unknown }> = [];
     for (const explicit of entity.body.attributes) owners.push({ node: explicit, declarations: explicit.attributes, type: explicit.type });
     for (const derived of entity.body.derived?.attributes ?? []) owners.push({ node: derived, declarations: [derived.attribute], type: derived.type });
@@ -341,17 +359,14 @@ export class ExpressP11Validator {
         if (!original || !isAttribute_decl(original)) continue;
         const originalOwner = original.$container;
         if (!isExplicit_attr(originalOwner) && !isDerived_attr(originalOwner) && !isInverse_attr(originalOwner)) continue;
-        const newType = this.typeBuilder.ofType(owner.type as Parameters<ExpressTypeBuilder["ofType"]>[0]);
-        const originalType = this.typeBuilder.ofAttribute(original);
+        const newType = typeBuilder.ofType(owner.type as Parameters<ExpressTypeBuilder["ofType"]>[0]);
+        const originalType = typeBuilder.ofAttribute(original);
         if (!newType || !originalType) continue;
         if (spec(newType, originalType)) continue;
         const attributeName = declaration.name ?? declaration.qualifiedAttribute.attribute.target.$refText;
         const data: RedeclarationData = { attribute: attributeName, newType: renderType(newType), originalType: renderType(originalType) };
-        // An EXTENSIBLE select may have extensions outside the workspace that
-        // would admit the new type, so the verdict is then only a warning.
-        const severity = mentionsExtensibleSelect(originalType) ? "warning" : "error";
         accept(
-          severity,
+          "error",
           `Redeclared attribute '${attributeName}' has type ${data.newType}, which is not a specialization of the original type ${data.originalType} (ISO 10303-11:2004 9.2.3.4, 9.2.7).`,
           { node: owner.node, property: "type", code: ExpressP11Issues.RedeclarationNotSpecialization, data }
         );
@@ -362,22 +377,23 @@ export class ExpressP11Validator {
   /**
    * ISO 10303-11:2004 12.6.1 (aggregate), 12.5.1 (string) and 12.3.1 (binary)
    * indexing: the indexed operand shall be an aggregate, string or binary
-   * value. Reported only when the declared type of the operand can hold none
-   * of these (`notIndexable` in lean/ExpressSuite/IndexOperand.lean) and no
-   * EXTENSIBLE select is involved; unknown types are not reported.
+   * value. Reported when the declared type of the operand, as the schema of the
+   * expression specifies it (clause 11), can hold none of these (`notIndexable`
+   * in lean/ExpressSuite/IndexOperand.lean); unknown types are not reported.
    */
   checkIndexQualifierOperands(body: Complex_Primary_body | Assignment_stmt_body, accept: ValidationAcceptor): void {
     const qualifiers = body.qualifiers ?? [];
     if (!qualifiers.some(isIndex_qualifier)) return;
+    const typeBuilder = this.typeBuilderFor(body);
     const head = isProcedure_call_Or_Assigment_stmt_reference(body.$container.head) ? body.$container.head.to.ref : body.$container.head;
     let current =
       typeof head === "string" || head === undefined
-        ? this.typeBuilder.ofHead(head ?? "", "parameterList" in body && Boolean(body.parameterList), body)
+        ? typeBuilder.ofHead(head ?? "", "parameterList" in body && Boolean(body.parameterList), body)
         : isProcedure_call_Or_Assigment_stmt_reference(body.$container.head)
-          ? this.typeBuilder.ofDeclaration(head)
-          : this.typeBuilder.ofHead(body.$container.head as Parameters<ExpressTypeBuilder["ofHead"]>[0], "parameterList" in body && Boolean(body.parameterList), body);
+          ? typeBuilder.ofDeclaration(head)
+          : typeBuilder.ofHead(body.$container.head as Parameters<ExpressTypeBuilder["ofHead"]>[0], "parameterList" in body && Boolean(body.parameterList), body);
     qualifiers.forEach((qualifier, index) => {
-      if (isIndex_qualifier(qualifier) && current && notIndexableClosed(current)) {
+      if (isIndex_qualifier(qualifier) && current && notIndexable(current)) {
         const data: IndexOperandData = { operandType: renderType(current) };
         accept("error", `Index applied to an operand of type ${data.operandType}, which is neither an aggregate nor a string or binary value (ISO 10303-11:2004 12.6.1, 12.5.1, 12.3.1).`, {
           node: body,
@@ -387,7 +403,7 @@ export class ExpressP11Validator {
           data,
         });
       }
-      current = this.typeBuilder.afterQualifier(current, qualifier);
+      current = typeBuilder.afterQualifier(current, qualifier);
     });
   }
 

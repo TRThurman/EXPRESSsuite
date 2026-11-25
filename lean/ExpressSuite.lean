@@ -7,3 +7,4 @@ import ExpressSuite.IndexOperand
 import ExpressSuite.Inheritance
 import ExpressSuite.Interfaces
 import ExpressSuite.GroupReference
+import ExpressSuite.SelectExtension
