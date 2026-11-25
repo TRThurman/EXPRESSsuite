@@ -1,8 +1,8 @@
 {
   "documents": 1287,
-  "diagnostics": 6322,
+  "diagnostics": 6352,
   "bySeverity": {
-    "error": 3525,
+    "error": 3555,
     "information": 704,
     "warning": 2093
   },
@@ -12,6 +12,7 @@
     "declaration-name-case": 704,
     "duplicate-interfaced-declaration": 229,
     "duplicate-loop-index": 72,
+    "extension-missing-generic-entity": 30,
     "informal-proposition-malformed-signature": 7,
     "informal-proposition-misplaced-signature": 3,
     "informal-proposition-missing-annotation": 6,
@@ -2680,13 +2681,29 @@
       ]
     },
     "modules/ap239_task_specification_resourced/arm.exp": {
+      "extension-missing-generic-entity": [
+        237
+      ],
       "linking-error": [
         296
       ]
     },
     "modules/ap239_task_specification_resourced/mim.exp": {
+      "extension-missing-generic-entity": [
+        281
+      ],
       "linking-error": [
         330
+      ]
+    },
+    "modules/ap239_work_definition/arm.exp": {
+      "extension-missing-generic-entity": [
+        151
+      ]
+    },
+    "modules/ap239_work_definition/mim.exp": {
+      "extension-missing-generic-entity": [
+        179
       ]
     },
     "modules/ap242_managed_model_based_3d_engineering/mim.exp": {
@@ -2945,6 +2962,17 @@
       ]
     },
     "modules/catalog_data_information/arm.exp": {
+      "extension-missing-generic-entity": [
+        26,
+        64,
+        70,
+        87,
+        91,
+        121,
+        158,
+        179,
+        201
+      ],
       "linking-error": [
         16,
         43,
@@ -2974,6 +3002,21 @@
       ]
     },
     "modules/catalog_data_information/mim.exp": {
+      "extension-missing-generic-entity": [
+        34,
+        63,
+        114,
+        121,
+        142,
+        222,
+        252,
+        277,
+        312,
+        319,
+        344,
+        394,
+        435
+      ],
       "linking-error": [
         16,
         47,
@@ -3774,6 +3817,11 @@
       "linking-error": [
         14,
         20
+      ]
+    },
+    "modules/issue_management/mim.exp": {
+      "extension-missing-generic-entity": [
+        596
       ]
     },
     "modules/kinematic_analysis_control_and_result/arm.exp": {
@@ -5179,6 +5227,11 @@
         17
       ]
     },
+    "modules/product_group/arm.exp": {
+      "extension-missing-generic-entity": [
+        37
+      ]
+    },
     "modules/product_identification_extension/arm.exp": {
       "duplicate-interfaced-declaration": [
         10,
@@ -5288,6 +5341,9 @@
       ]
     },
     "modules/risk_definition/arm.exp": {
+      "extension-missing-generic-entity": [
+        37
+      ],
       "linking-error": [
         65
       ],
@@ -5569,6 +5625,11 @@
       ],
       "reference-name-case": [
         160
+      ]
+    },
+    "modules/state_characterized/arm.exp": {
+      "extension-missing-generic-entity": [
+        77
       ]
     },
     "modules/stock_material/mim.exp": {

@@ -11,6 +11,7 @@ import {
   ValidationAcceptor,
   ValidationChecks,
   isNamed,
+  GrammarUtils,
 } from "langium";
 import {
   Assignment_stmt_body,
@@ -24,6 +25,8 @@ import {
   Local_decl,
   Reference_clause,
   SchemaDefinition,
+  Select_extension,
+  Select_type,
   Simple_factor,
   Use_clause,
   isAttribute_decl,
@@ -48,6 +51,7 @@ import {
   isResource_or_rename,
   isSelect_extension,
   isSelect_list,
+  isSelect_type,
   isSchemaDefinition,
   isTypeDefinition,
   isUse_clause,
@@ -57,6 +61,7 @@ import { schemaHasDeclarations } from "../utils/schema-helpers.js";
 import { getReferenceSpecifications, getUseSpecifications } from "../utils/interface-helpers.js";
 import { ExpressP11TypeContainer } from "./express-p11-type-container.js";
 import { ScopeClash, declarationNameRange } from "./express-p11-scope-index.js";
+import type { Range } from "vscode-languageserver";
 import { isLongForm } from "./express-p11-type-utilities.js";
 import { foldsCase } from "./express-p11-case-rule-scope.js";
 import { ExpressP11ScopeProvider, ScopeType } from "./express-p11-scope-provider.js";
@@ -76,6 +81,8 @@ export function registerValidationChecks(services: ExpressP11Services) {
     Complex_Primary_body: [validator.checkIndexQualifierOperands, validator.checkGroupReferencePlacement],
     EntityDefinition: validator.checkRedeclaredAttributeTypes,
     Local_decl: validator.checkLocalVariablesDoNotDuplicateLoopIndices,
+    Select_extension: validator.checkExtensionOfGenericEntitySelect,
+    Select_type: validator.checkGenericEntityNeedsExtensible,
     SchemaDefinition: [
       validator.checkDuplicateInterfacedDeclarations,
       validator.checkReferencesAreImported,
@@ -97,6 +104,8 @@ export enum ExpressP11Issues {
   IndexOnNonAggregate = "index-on-non-aggregate",
   UnqualifiedGroupReference = "unqualified-group-reference",
   AmbiguousAttributeReference = "ambiguous-attribute-reference",
+  ExtensionMissingGenericEntity = "extension-missing-generic-entity",
+  GenericEntityWithoutExtensible = "generic-entity-without-extensible",
   DuplicateInterfacedDeclaration = "duplicate-interfaced-declaration",
   RedundantDeclaration = "redundant-declaration",
 }
@@ -129,6 +138,16 @@ export type AmbiguousAttributeData = {
 
 export type WrongReferenceLabelData = {
   expectedReference: string;
+};
+
+export type ExtensionMissingGenericEntityData = {
+  extension: string;
+  base: string;
+  fix: { title: string; newText: string; range: Range };
+};
+
+export type GenericEntityWithoutExtensibleData = {
+  fixes: { title: string; newText: string; range: Range }[];
 };
 
 export type ReferenceNameCaseData = {
@@ -201,6 +220,61 @@ export class ExpressP11Validator {
     this.typeContainer = services.validation.TypeContainer;
     this.typeBuilder = new ExpressTypeBuilder(services.validation.TypeContainer, services.shared.workspace.SelectExtensionIndex);
     this.scopeProvider = services.references.ScopeProvider as ExpressP11ScopeProvider;
+  }
+
+  /**
+   * ISO 10303-11:2004 8.4.2, syntax: select_type = [ EXTENSIBLE [ GENERIC_ENTITY ] ] SELECT ...
+   * GENERIC_ENTITY is allowed only after EXTENSIBLE; the parser accepts it alone so that this can
+   * be reported with a correction. With the ruling of 2026-11-21 an extension need not be
+   * EXTENSIBLE, so for a SELECT BASED_ON two corrections are offered: make it EXTENSIBLE (it then
+   * is GENERIC_ENTITY, as an EXTENSIBLE extension of a GENERIC_ENTITY select shall be), or drop
+   * GENERIC_ENTITY (a closed extension). A select list keeps its GENERIC_ENTITY: only EXTENSIBLE
+   * is offered.
+   */
+  checkGenericEntityNeedsExtensible(select: Select_type, accept: ValidationAcceptor): void {
+    if (!select.isGenericEntity || select.isExtensible || !select.$cstNode) return;
+    const generic = GrammarUtils.findNodeForKeyword(select.$cstNode, "GENERIC_ENTITY");
+    const keyword = GrammarUtils.findNodeForKeyword(select.$cstNode, "SELECT");
+    if (!generic || !keyword) return;
+    const fixes: GenericEntityWithoutExtensibleData["fixes"] = [
+      { title: "Add EXTENSIBLE", newText: "EXTENSIBLE ", range: { start: generic.range.start, end: generic.range.start } },
+    ];
+    if (isSelect_extension(select.select)) {
+      fixes.push({ title: "Remove GENERIC_ENTITY", newText: "", range: { start: generic.range.start, end: keyword.range.start } });
+    }
+    accept(
+      "error",
+      "GENERIC_ENTITY is allowed only after EXTENSIBLE (ISO 10303-11:2004 8.4.2): write EXTENSIBLE GENERIC_ENTITY SELECT" +
+        (isSelect_extension(select.select) ? ", or SELECT BASED_ON without GENERIC_ENTITY for an extension that is not EXTENSIBLE." : "."),
+      { node: select, keyword: "GENERIC_ENTITY", code: ExpressP11Issues.GenericEntityWithoutExtensible, data: { fixes } satisfies GenericEntityWithoutExtensibleData }
+    );
+  }
+
+  /**
+   * ISO 10303-11:2004 8.4.2, as ruled on 2026-11-21: "an extension does not itself need to be
+   * extensible. If a developer choosed to make it extensible, then it shall also be
+   * generic_entity." Reported on an EXTENSIBLE SELECT BASED_ON a select declared GENERIC_ENTITY
+   * that does not say GENERIC_ENTITY itself. An extension that is not EXTENSIBLE is not reported.
+   */
+  checkExtensionOfGenericEntitySelect(extension: Select_extension, accept: ValidationAcceptor): void {
+    const base = extension.type?.ref;
+    if (!base || !isSelect_type(base.underlyingType) || !base.underlyingType.isGenericEntity) return;
+    const select = extension.$container;
+    if (!isSelect_type(select) || !select.isExtensible || select.isGenericEntity) return;
+    const declaration = AstUtils.getContainerOfType(extension, isTypeDefinition);
+    const start = select.$cstNode?.range.start;
+    const keyword = select.$cstNode ? GrammarUtils.findNodeForKeyword(select.$cstNode, "SELECT") : undefined;
+    if (!declaration || !start || !keyword) return;
+    const data: ExtensionMissingGenericEntityData = {
+      extension: declaration.name,
+      base: base.name,
+      fix: { title: "Add GENERIC_ENTITY", newText: "EXTENSIBLE GENERIC_ENTITY SELECT", range: { start, end: keyword.range.end } },
+    };
+    accept(
+      "error",
+      `The select type '${declaration.name}' is EXTENSIBLE and extends '${base.name}', which is GENERIC_ENTITY, so it shall also be GENERIC_ENTITY (ISO 10303-11:2004 8.4.2). An extension that is not EXTENSIBLE need not say GENERIC_ENTITY.`,
+      { node: declaration, property: "name", code: ExpressP11Issues.ExtensionMissingGenericEntity, data }
+    );
   }
 
   /**
