@@ -1,5 +1,80 @@
 # Changelog
 
+## [0.8.0](https://github.com/TRThurman/EXPRESSsuite/compare/0.7.0...0.8.0) (2026-11-25)
+
+### Changes to the findings of an existing workspace
+
+Two fixes below change which findings a workspace shows, with no change to
+the files. After the update some findings appear and some disappear; this is
+the intended result, not a regression.
+
+- **Names resolve inside one domain.** A stepmod or SMRL module tree holds
+  several domains that reuse the same schema names: the `arm.exp` short
+  forms, the `mim.exp` short forms with the resource schemas, each
+  concatenated file, each long form, and each checkout opened as its own
+  workspace folder. A reference now binds only to a declaration of its own
+  document's domain; before, a same-named schema of another domain could
+  replace it, or a reference could bind to a declaration of another domain.
+  In SMRL v8, 40 references in 26 files that spell an entity name in another
+  case than its declaration were bound to an exact-case entity of the other
+  domain. They are now reported as a reference that cannot be resolved, and
+  as `reference-name-case` where that check applies. Each of the 40 was
+  checked. Long forms, each loaded alone, are unchanged.
+- **An attribute reference is ambiguous only through the supertypes.**
+  `ambiguous-attribute-reference` follows ISO 10303-11:2004 12.7.3 read with
+  9.2.3.3 b): `x.a` with `x : e` is ambiguous when two or more of `e` and its
+  supertypes, at any depth, declare `a`. Declarations in subtypes no longer
+  make it ambiguous, since a subtype added later would otherwise change the
+  verdict with no change to `e` or its supertypes; two supertypes at
+  different depths now do. In SMRL v8 the 4 short-form and 78 long-form
+  warnings that came from subtypes are gone, and no site meets the new rule.
+  A reference that is ambiguous gives no type.
+
+### Features
+
+- **A select extension that omits `GENERIC_ENTITY` is reported.** ISO
+  10303-11:2004 8.4.2: an extension need not be extensible, but one that is
+  `EXTENSIBLE` shall also be `GENERIC_ENTITY` when its base is. The new error
+  `extension-missing-generic-entity` reports such a `SELECT BASED_ON`, with
+  the quick fix "Add GENERIC_ENTITY"; an extension that is not `EXTENSIBLE`
+  is not reported. The new error `generic-entity-without-extensible` reports
+  `GENERIC_ENTITY` without `EXTENSIBLE`, which the syntax of 8.4.2 does not
+  admit, with the quick fixes "Add EXTENSIBLE" and, on a `SELECT BASED_ON`,
+  "Remove GENERIC_ENTITY". SMRL v8 has 30 sites of the first (14 in `arm.exp`
+  files, 16 in `mim.exp` files) and none of the second.
+
+### Bug Fixes
+
+- **No more "no services for the extension" toast on a file with an unusual
+  name.** The language client sends every file in EXPRESS mode to the server,
+  and the server looked a file up by its extension alone, so a file such as
+  `schema.exp.origin` failed Go to Definition, Find All References, Document
+  Highlight and Code Action with "The service registry contains no services
+  for the extension '.origin'" (error -32603). The server now uses the
+  language id of an open document first. A file that is not open and has an
+  unknown extension is still refused
+  ([#136](https://github.com/TRThurman/EXPRESSsuite/issues/136)).
+- **A failed redeclaration check against an `EXTENSIBLE` select is an
+  error.** The type checks of a redeclared attribute (9.2.3.4, 9.2.7) and of
+  an index operand (12.6.1) read the domain of a select in the specification
+  of the schema (clause 11), not from every extension the workspace holds, and
+  no longer treat an `EXTENSIBLE` select as open to items from outside the
+  schema. In SMRL v8 `redeclaration-not-specialization` goes from 9 to 13
+  sites, all errors (7 were warnings); one site is no longer reported
+  (`part_shape/arm.exp` 36).
+- **An enumeration item may be prefixed by an alias of its enumeration
+  type.** `TYPE alias = base;` is accepted as the prefix in `alias.item`
+  (12.7.2). The long-form procedure writes every extending enumeration that
+  way (G.5.3.1), so each such item was reported "The attribute '...' could
+  not be found."
+
+### Proofs
+
+- The Lean statement of the specialization hypothesis is over a closed
+  supertype table; `spec_trans` and `spec_sound` had held vacuously. New
+  proofs for the ambiguity rule (`resolve_unique`, `resolve_ambiguous_iff`,
+  `ambiguous_stable`) and for the domain of a select (`SelectExtension.lean`).
+
 ## [0.7.0](https://github.com/TRThurman/EXPRESSsuite/compare/0.6.0...0.7.0) (2026-11-19)
 
 ### Features
