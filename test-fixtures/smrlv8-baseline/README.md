@@ -18,8 +18,8 @@ correctness: several of the classes below are known false positives.
 The corpus folder loaded as one workspace with the extension's default
 settings: `useOptimizedConfiguration` on, so files whose name contains `lf`
 or `concatenated` and the `business_object_models` folder are not loaded.
-1,287 of the 1,410 files load; 6,286 diagnostics
-(3,524 error, 704 information, 2,058 warning) in
+1,287 of the 1,410 files load; 6,326 diagnostics
+(3,525 error, 704 information, 2,097 warning) in
 261 files. `files` maps file to code to the 1-based start
 line of every diagnostic. `parseErrors` lists the files with lexer or parser
 errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
@@ -27,12 +27,12 @@ errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 
 | code                                     |  count |
 |------------------------------------------|--------|
-| linking-error                            |  2,997 |
+| linking-error                            |  3,038 |
 | (none)                                   |  1,737 |
 | declaration-name-case                    |    704 |
-| reference-name-case                      |    306 |
+| reference-name-case                      |    345 |
 | duplicate-interfaced-declaration         |    229 |
-| reference-statement-missing              |    176 |
+| reference-statement-missing              |    136 |
 | duplicate-loop-index                     |     72 |
 | unqualified-group-reference              |     30 |
 | redeclaration-not-specialization         |      9 |
@@ -149,4 +149,23 @@ Each reported site breaks the rule:
 - `reference-statement-missing` is raised where a reference binds to a
   declaration outside the schema's interface closure. A name the closure
   holds binds there first; a name outside it binds to the first declaration
-  in document-URI order, so the sites are the same on every file system.
+  of the referencing document's domain in document-URI order, so the sites
+  are the same on every file system.
+- Domains (`src/language/express-p11-domains.ts`): a name resolves only among
+  the documents of the referencing document's domain. In this workspace the
+  arm.exp files are one domain and every other loaded file (mim.exp, the
+  resource schemas) another. Before the split, 40 references in 26 files
+  (39 in arm.exp files, 1 in a mim.exp file) whose entity name differs in
+  case from the declaration in their own domain bound to an exact-case
+  entity of the other domain (an ARM reference to a MIM or resource entity,
+  a MIM reference to an ARM entity) and were reported
+  `reference-statement-missing`, which proposed interfacing a schema of the
+  other domain. They now get what any reference spelled with another case
+  gets inside its domain: the linking error, and `reference-name-case` where
+  that check applies (39; the one in
+  `modules/layered_interconnect_module_design/mim.exp:38` is a
+  SUBTYPE_CONSTRAINT `FOR` reference, which that check does not cover).
+  Example: `modules/analytical_model/arm.exp:100` writes
+  `analytical_model_port`; the ARM declares `Analytical_model_port`, and the
+  reference used to bind to `analytical_model_port` of
+  `modules/analytical_model/mim.exp`.

@@ -89,6 +89,8 @@ type SchemaRecord = {
   node: SchemaDefinition;
   name: string;
   uri: string;
+  /** The domain of the schema's document (express-p11-domains.ts). */
+  domain: string;
   locals: ScopeDecl[];
   /** The first local declaration of each lower-case name. */
   localsByLowerName: Map<string, ScopeDecl>;
@@ -114,14 +116,22 @@ export class ExpressP11ScopeIndex {
   private byName = new Map<string, SchemaRecord[]>();
   /** Records per lower-case schema name, in document order. */
   private byLowerName = new Map<string, SchemaRecord[]>();
+  /** Records per domain and schema name, in document order: an interface specification names a schema of its own domain. */
+  private byDomainName = new Map<string, SchemaRecord[]>();
   private declIds = new WeakMap<AstNode, number>();
   private nextDeclId = 0;
   private clashCache = new Map<SchemaDefinition, ScopeClash[]>();
 
-  build(documents: LangiumDocument[]): void {
+  /**
+   * `domainOf` gives each document its domain (express-p11-domains.ts); an interface specification
+   * is resolved only among the schemas of the referencing schema's domain. Without it every
+   * document is in one domain.
+   */
+  build(documents: LangiumDocument[], domainOf: (document: LangiumDocument) => string = () => ""): void {
     this.records = new Map();
     this.byName = new Map();
     this.byLowerName = new Map();
+    this.byDomainName = new Map();
     this.declIds = new WeakMap();
     this.nextDeclId = 0;
     this.clashCache = new Map();
@@ -141,6 +151,7 @@ export class ExpressP11ScopeIndex {
           node: schema,
           name: schema.name,
           uri,
+          domain: domainOf(document),
           locals,
           localsByLowerName,
           specs: (schema.body?.specifications ?? []).filter(
@@ -156,6 +167,10 @@ export class ExpressP11ScopeIndex {
         const lowerNamed = this.byLowerName.get(lowerName);
         if (lowerNamed) lowerNamed.push(record);
         else this.byLowerName.set(lowerName, [record]);
+        const domainKey = `${record.domain}\u0000${schema.name}`;
+        const inDomain = this.byDomainName.get(domainKey);
+        if (inDomain) inDomain.push(record);
+        else this.byDomainName.set(domainKey, [record]);
       }
     }
     this.computeExports();
@@ -187,18 +202,19 @@ export class ExpressP11ScopeIndex {
     return this.byLowerName.has(name.toLowerCase());
   }
 
-  /** Names declared by more than one schema in the workspace (concatenated copies, duplicated files). */
+  /** Names declared by more than one schema of one domain (a duplicated file, such as a kept previous version). */
   get shadowedSchemaNames(): string[] {
-    return [...this.byName.entries()].filter(([, records]) => records.length > 1).map(([name]) => name);
+    const names = new Set<string>();
+    for (const records of this.byDomainName.values()) if (records.length > 1) names.add(records[0].name);
+    return [...names];
   }
 
   /**
-   * The schema an interface specification names: a same-named schema in the
-   * same document first (a concatenated file interfaces its own copies), else
-   * the first in workspace order.
+   * The schema an interface specification names, among the schemas of the referencing schema's
+   * domain: a same-named schema in the same document first, else the first in workspace order.
    */
   private resolveTarget(from: SchemaRecord, name: string): SchemaRecord | undefined {
-    const candidates = this.byName.get(name);
+    const candidates = this.byDomainName.get(`${from.domain}\u0000${name}`);
     if (!candidates || candidates.length === 0) return undefined;
     return candidates.find((candidate) => candidate.uri === from.uri) ?? candidates[0];
   }

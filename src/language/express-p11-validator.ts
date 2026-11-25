@@ -578,7 +578,7 @@ export class ExpressP11Validator {
           .map((specification) => specification.schema.$refText)
       );
       const currentSchemaName = schema.name;
-      const currentSchema = this.typeContainer.getSchemas().get(currentSchemaName);
+      const currentSchema = this.typeContainer.getSchemaOf(schema);
       const visibleDefinitions = new Set<AstNode>();
       if (currentSchema) {
         for (const definitions of this.typeContainer.getAllRessourcesFrom(currentSchema, true).resources.values()) {

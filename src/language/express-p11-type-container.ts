@@ -24,10 +24,12 @@ import {
   isSchemaDefinition,
   isTypeDefinition,
   isUse_clause,
+  SchemaDefinition,
 } from "./generated/ast.js";
 import { CancellationToken } from "vscode-languageserver";
 import { allowedDocuments, byUri } from "../utils/file-filter.js";
 import { ExpressP11ScopeIndex } from "./express-p11-scope-index.js";
+import { domainOf } from "./express-p11-domains.js";
 import { Configuration, readConfiguration } from "./express-p11-workspace-manager.js";
 import {
   DefinitionType,
@@ -73,14 +75,14 @@ type ExpressSink = {
   imports: MultiMap<string, SubSuperTypeDefinition>;
 };
 
-export class ExpressP11TypeContainer {
+/**
+ * The schemas, entities and types of one domain (express-p11-domains.ts), keyed by schema name: a
+ * name is unique only inside a domain. {@link ExpressP11TypeContainer} holds one per domain.
+ */
+export class ExpressP11DomainTypeContainer {
   protected conflictManager: ExpressP11ConflictManager = new ExpressP11ConflictManager();
   protected memoPool: ExpressP11MemoPool = new ExpressP11MemoPool();
-  /** Schema scopes (10.1 b, clause 11) for the duplicate-interfaced-declaration check and the closure command. */
-  protected readonly scopeIndex: ExpressP11ScopeIndex = new ExpressP11ScopeIndex();
   protected schemas: Map<string, ExpressP11Schema> = new Map();
-  protected readonly langiumDocuments: LangiumDocuments;
-  protected readonly nameProvider: NameProvider;
   protected localEntities = new MultiMap<string, ConcreteType>();
   protected localPartialUseFrom = new MultiMap<string, SubSuperTypeDefinition>();
   protected localPartialReferenceFrom = new MultiMap<string, SubSuperTypeDefinition>();
@@ -95,21 +97,7 @@ export class ExpressP11TypeContainer {
 
   protected resolveAttributeTypeCall: number = 0;
 
-  private workspaceConfiguration: Configuration = {
-    useOptimizedConfiguration: true,
-    excludedFiles: [],
-    excludedFolders: [],
-  };
-  private configurationProvider: ConfigurationProvider | undefined;
-  private readonly workspaceFolders: () => readonly { uri: string; name: string }[] | undefined;
-  constructor(services: ExpressP11Services) {
-    this.workspaceFolders = () => services.shared.workspace.WorkspaceManager.workspaceFolders;
-    this.langiumDocuments = services.shared.workspace.LangiumDocuments;
-    this.nameProvider = services.references.NameProvider;
-    services.shared.workspace.DocumentBuilder.onBuildPhase(DocumentState.ComputedScopes, (docs, cancelToken) =>
-      this.build(docs, cancelToken)
-    );
-  }
+  constructor(protected readonly nameProvider: NameProvider) {}
 
   public getSchemas(): Map<string, ExpressP11Schema> {
     return this.schemas;
@@ -119,18 +107,13 @@ export class ExpressP11TypeContainer {
     return this.conflictManager.getConflicts();
   }
 
-  public getScopeIndex(): ExpressP11ScopeIndex {
-    return this.scopeIndex;
-  }
-  protected async build(documents: LangiumDocument[], cancelToken: CancellationToken): Promise<void> {
+  /** Builds the domain from its documents, which the caller gives in URI order. */
+  public async build(validDocs: LangiumDocument[], cancelToken: CancellationToken): Promise<void> {
     this.reset();
-    await this.configureWorkspace();
     const sink: ExpressSink = {
       imports: new MultiMap<string, SubSuperTypeDefinition>(),
       localTypes: new MultiMap<string, ConcreteType>(),
     };
-    const validDocs = allowedDocuments(this.langiumDocuments.all.toArray(), this.workspaceConfiguration).sort(byUri);
-    this.scopeIndex.build(validDocs);
 
     await this.loadSchemas(validDocs, cancelToken, sink);
 
@@ -162,10 +145,6 @@ export class ExpressP11TypeContainer {
         await this.extractEntities(value, sink, cancelToken);
       }
     }
-  }
-
-  private async configureWorkspace() {
-    this.workspaceConfiguration = await readConfiguration(this.configurationProvider, this.workspaceFolders());
   }
 
   private reset() {
@@ -703,5 +682,181 @@ export class ExpressP11TypeContainer {
     }
     // this.memoizedAllDefinitionsFromCall.set(schema, entitiesInScope);
     return entitiesInScope;
+  }
+}
+
+/**
+ * The type container of the workspace: one {@link ExpressP11DomainTypeContainer} per domain
+ * (express-p11-domains.ts), so that a schema name is looked up only among the schemas of the
+ * referencing document's domain. A concatenated copy, a long form or a second checkout of the same
+ * schemas no longer replaces a same-named schema of another domain.
+ *
+ * Every method that takes a node answers from the domain of the node's document; a node whose
+ * document is not in the build (an excluded file) gets the answer of an empty domain.
+ */
+export class ExpressP11TypeContainer {
+  /** Schema scopes (10.1 b, clause 11) for the duplicate-interfaced-declaration check and the closure command. */
+  protected readonly scopeIndex: ExpressP11ScopeIndex = new ExpressP11ScopeIndex();
+  protected readonly langiumDocuments: LangiumDocuments;
+  protected readonly nameProvider: NameProvider;
+  private readonly emptyDomain: ExpressP11DomainTypeContainer;
+  private domains = new Map<string, ExpressP11DomainTypeContainer>();
+  private keyOfUri = new Map<string, string>();
+  private domainOfSchema = new WeakMap<ExpressP11Schema, ExpressP11DomainTypeContainer>();
+
+  private workspaceConfiguration: Configuration = {
+    useOptimizedConfiguration: true,
+    excludedFiles: [],
+    excludedFolders: [],
+  };
+  private configurationProvider: ConfigurationProvider | undefined;
+  private readonly workspaceFolders: () => readonly { uri: string; name: string }[] | undefined;
+  constructor(services: ExpressP11Services) {
+    this.workspaceFolders = () => services.shared.workspace.WorkspaceManager.workspaceFolders;
+    this.langiumDocuments = services.shared.workspace.LangiumDocuments;
+    this.nameProvider = services.references.NameProvider;
+    this.emptyDomain = new ExpressP11DomainTypeContainer(this.nameProvider);
+    services.shared.workspace.DocumentBuilder.onBuildPhase(DocumentState.ComputedScopes, (docs, cancelToken) =>
+      this.build(docs, cancelToken)
+    );
+  }
+
+  protected async build(_documents: LangiumDocument[], cancelToken: CancellationToken): Promise<void> {
+    this.workspaceConfiguration = await readConfiguration(this.configurationProvider, this.workspaceFolders());
+    const validDocs = allowedDocuments(this.langiumDocuments.all.toArray(), this.workspaceConfiguration).sort(byUri);
+    const folders = this.workspaceConfiguration.workspaceFolders;
+    const keyOfUri = new Map<string, string>();
+    const documentsOf = new Map<string, LangiumDocument[]>();
+    for (const document of validDocs) {
+      const key = domainOf(document, folders);
+      keyOfUri.set(document.uri.toString(), key);
+      const members = documentsOf.get(key);
+      if (members) members.push(document);
+      else documentsOf.set(key, [document]);
+    }
+    this.keyOfUri = keyOfUri;
+    this.scopeIndex.build(validDocs, (document) => keyOfUri.get(document.uri.toString()) ?? "");
+    this.domains = new Map();
+    this.domainOfSchema = new WeakMap();
+    for (const [key, members] of documentsOf) {
+      const domain = new ExpressP11DomainTypeContainer(this.nameProvider);
+      this.domains.set(key, domain);
+      await domain.build(members, cancelToken);
+      for (const schema of domain.getSchemas().values()) this.domainOfSchema.set(schema, domain);
+    }
+  }
+
+  /** The domain of the node's document, or an empty domain when the document is not in the build. */
+  protected domainOf(node: AstNode): ExpressP11DomainTypeContainer {
+    let uri: string;
+    try {
+      uri = AstUtils.getDocument(node).uri.toString();
+    } catch {
+      return this.emptyDomain;
+    }
+    const key = this.keyOfUri.get(uri);
+    return (key === undefined ? undefined : this.domains.get(key)) ?? this.emptyDomain;
+  }
+
+  /** The domain key of a document (express-p11-domains.ts), or `undefined` when it is not in the build. */
+  public domainKeyOf(node: AstNode): string | undefined {
+    try {
+      return this.keyOfUri.get(AstUtils.getDocument(node).uri.toString());
+    } catch {
+      return undefined;
+    }
+  }
+
+  /** The domain key of the document with that URI (as `URI.toString()` spells it), or `undefined` when it is not in the build. */
+  public domainKeyOfUri(uri: string): string | undefined {
+    return this.keyOfUri.get(uri);
+  }
+
+  /** The type container's schema for a schema declaration, from the declaration's own domain. */
+  public getSchemaOf(schema: SchemaDefinition): ExpressP11Schema | undefined {
+    if (!schema.name) return undefined;
+    return this.domainOf(schema).getSchemas().get(schema.name);
+  }
+
+  /** The schema named `name` in the domain of the document that holds `from`. */
+  public getSchemaNamed(name: string, from: AstNode): ExpressP11Schema | undefined {
+    return this.domainOf(from).getSchemas().get(name);
+  }
+
+  /**
+   * Every domain's schemas by name, for a workspace of one domain (the tests); where two domains
+   * hold a schema of the same name, the one of the domain built first. Code that resolves a
+   * reference uses {@link getSchemaOf} or {@link getSchemaNamed}.
+   */
+  public getSchemas(): Map<string, ExpressP11Schema> {
+    const all = new Map<string, ExpressP11Schema>();
+    for (const domain of this.domains.values()) {
+      for (const [name, schema] of domain.getSchemas()) if (!all.has(name)) all.set(name, schema);
+    }
+    return all;
+  }
+
+  public getConflicts(): ExpressConflict[] {
+    return [...this.domains.values()].flatMap((domain) => domain.getConflicts());
+  }
+
+  public getScopeIndex(): ExpressP11ScopeIndex {
+    return this.scopeIndex;
+  }
+
+  public resolveAttribute(attribute: Explicit_attr | Derived_attr | Inverse_attr): ExpressP11ParameterTypeResolution {
+    return this.domainOf(attribute).resolveAttribute(attribute);
+  }
+
+  /** The entity `schema.entity` (names compared without regard to case) in the domain of `from`. */
+  public findEntityByInsensitiveName(schema: string, entity: string, from: AstNode): ExpressP11Entity | undefined {
+    return this.domainOf(from).findEntityByInsensitiveName(schema, entity);
+  }
+
+  public getVisibleAttributes(entity: EntityDefinition, filter: string = "", includeDescendants: boolean = true): Attribute_decl[] {
+    return this.domainOf(entity).getVisibleAttributes(entity, filter, includeDescendants);
+  }
+
+  public getVisibleAttributeCandidates(entity: EntityDefinition, filter: string = "", includeDescendants: boolean = true): VisibleAttributeCandidates[] {
+    return this.domainOf(entity).getVisibleAttributeCandidates(entity, filter, includeDescendants);
+  }
+
+  public hasUnresolvedSupertypes(entity: EntityDefinition): boolean {
+    return this.domainOf(entity).hasUnresolvedSupertypes(entity);
+  }
+
+  public getAttributesV2(entity: EntityDefinition): Attribute_decl[] {
+    return this.domainOf(entity).getAttributesV2(entity);
+  }
+
+  public getSuperTypesFromDefinition(entity: EntityDefinition): EntityDefinition[] {
+    return this.domainOf(entity).getSuperTypesFromDefinition(entity);
+  }
+
+  public getSubTypesFromDefinition(entity: EntityDefinition): EntityDefinition[] {
+    return this.domainOf(entity).getSubTypesFromDefinition(entity);
+  }
+
+  public getGraphKey(entity: EntityDefinition): string {
+    return this.domainOf(entity).getGraphKey(entity);
+  }
+
+  public getAllRessourcesFrom(schema: ExpressP11Schema, includeReference: boolean): ExpressP11OptimizedResourceList {
+    return (this.domainOfSchema.get(schema) ?? this.emptyDomain).getAllRessourcesFrom(schema, includeReference);
+  }
+
+  getExpressP11EntityFrom(entity: EntityDefinition): ExpressP11Entity | undefined {
+    return this.domainOf(entity).getExpressP11EntityFrom(entity);
+  }
+
+  public getFullSubSuperGraph(entity: EntityDefinition, filter: string = ""): readonly EntityDefinition[] {
+    return this.domainOf(entity).getFullSubSuperGraph(entity, filter);
+  }
+
+  /** The subtype and supertype graphs of every domain; each graph's key is unique across domains. */
+  public getAllGraphs(): Map<string, MultiMap<string, EntityDefinition>> {
+    const all = new Map<string, MultiMap<string, EntityDefinition>>();
+    for (const domain of this.domains.values()) for (const [key, graph] of domain.getAllGraphs()) all.set(key, graph);
+    return all;
   }
 }
