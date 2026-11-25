@@ -23,8 +23,9 @@
 
   Main theorem `spec_sound`: if `spec new orig` holds then every value of type
   `new` is a value of type `orig` — i.e. `spec` never wrongly accepts a
-  redeclaration.  Entities use the same `EntTrans` well-formedness invariant as
-  transitivity.
+  redeclaration.  Entities use the same well-formedness as transitivity: a
+  transitively closed supertype table `sup` (`Closed`) and `entOk sup` on both
+  operands (Meta.lean; amended 2026-11-21, the earlier hypothesis was false).
 -/
 import ExpressSuite.Specialisation
 import ExpressSuite.Meta
@@ -67,42 +68,50 @@ theorem boundsOk_sound {la lb len : Nat} {ha hb : Option Nat} :
   intro hbo hla hha
   cases ha <;> cases hb <;> simp_all [boundsOk, Nat.ble_eq] <;> omega
 
-/-- SOUNDNESS: if `spec new orig` then every value of type `new` is of type `orig`. -/
-theorem spec_sound (hE : EntTrans) : ∀ (new orig : Ty),
+/-- SOUNDNESS: if `spec new orig` then every value of type `new` is of type `orig`,
+    for types whose entities come from one transitively closed supertype table. -/
+theorem spec_sound (sup : Table) (hT : Closed sup) : ∀ (new orig : Ty),
+    entOk sup new = true → entOk sup orig = true →
     spec new orig = true → ∀ v, TypeP v new → TypeP v orig
   -- resolve the LEFT operand
-  | .defn _ w, orig, h, v, hv => by
-      simp only [spec] at h; simp only [TypeP] at hv; exact spec_sound hE w orig h v hv
-  | .sel _ ms, orig, h, v, hv => by
+  | .defn _ w, orig, hn, ho, h, v, hv => by
+      simp only [entOk] at hn
+      simp only [spec] at h; simp only [TypeP] at hv; exact spec_sound sup hT w orig hn ho h v hv
+  | .sel _ ms, orig, hn, ho, h, v, hv => by
+      simp only [entOk] at hn; rw [entOkAll_true] at hn
       simp only [spec] at h; rw [specAll_true] at h
       simp only [TypeP] at hv; rw [TypePAny_iff] at hv
       obtain ⟨m, hm, hvm⟩ := hv
-      exact spec_sound hE m orig (h m hm) v hvm
+      exact spec_sound sup hT m orig (hn m hm) ho (h m hm) v hvm
   -- new concrete; resolve the RIGHT operand
-  | new, .defn _ u, h, v, hv => by
-      rw [spec_orig_defn] at h; simp only [TypeP]; exact spec_sound hE new u h v hv
-  | new, .gen, _, v, _ => by simp only [TypeP]
+  | new, .defn _ u, hn, ho, h, v, hv => by
+      simp only [entOk] at ho
+      rw [spec_orig_defn] at h; simp only [TypeP]; exact spec_sound sup hT new u hn ho h v hv
+  | new, .gen, _, _, _, v, _ => by simp only [TypeP]
   -- new concrete, orig a SELECT
-  | .simp _, .sel _ ms, h, v, hv | .gen, .sel _ ms, h, v, hv
-  | .ent _ _, .sel _ ms, h, v, hv | .agg _ _ _ _, .sel _ ms, h, v, hv => by
+  | .simp _, .sel _ ms, hn, ho, h, v, hv | .gen, .sel _ ms, hn, ho, h, v, hv
+  | .ent _ _, .sel _ ms, hn, ho, h, v, hv | .agg _ _ _ _, .sel _ ms, hn, ho, h, v, hv => by
+      simp only [entOk] at ho; rw [entOkAll_true] at ho
       simp only [spec] at h; rw [specAny_true] at h
       obtain ⟨m, hm, hs⟩ := h
       simp only [TypeP]; rw [TypePAny_iff]
-      exact ⟨m, hm, spec_sound hE _ m hs v hv⟩
+      exact ⟨m, hm, spec_sound sup hT _ m hn (ho m hm) hs v hv⟩
   -- base: both concrete
-  | .simp a', .simp b', h, v, hv => by
+  | .simp a', .simp b', _, _, h, v, hv => by
       simp only [spec] at h
       cases v with
       | vsimp s => simp only [TypeP] at hv ⊢; exact simpLe_trans hv h
       | vent _ => simp only [TypeP] at hv
       | vaggr _ _ _ => simp only [TypeP] at hv
-  | .ent an asup, .ent bn bsup, h, v, hv => by
+  | .ent an asup, .ent bn bsup, hn, ho, h, v, hv => by
+      simp only [entOk, beq_iff_eq] at hn ho
+      subst hn; subst ho
       simp only [spec] at h
       cases v with
       | vent inh =>
           simp only [TypeP] at hv ⊢
           obtain ⟨ha, hs⟩ := hv
-          have key : ∀ x, ((x == an) || asup.contains x) = true → x ∈ inh := by
+          have key : ∀ x, ((x == an) || (sup an).contains x) = true → x ∈ inh := by
             intro x hx
             simp only [Bool.or_eq_true, beq_iff_eq] at hx
             rcases hx with rfl | hx
@@ -110,13 +119,14 @@ theorem spec_sound (hE : EntTrans) : ∀ (new orig : Ty),
             · exact hs x (by simpa using hx)
           refine ⟨key bn h, ?_⟩
           intro s hsb
-          have hb : ((s == bn) || bsup.contains s) = true := by
-            have hc : bsup.contains s = true := by simpa using hsb
+          have hb : ((s == bn) || (sup bn).contains s) = true := by
+            have hc : (sup bn).contains s = true := by simpa using hsb
             simp only [hc, Bool.or_true]
-          exact key s (hE an asup bsup bn s h hb)
+          exact key s (hT an bn s h hb)
       | vsimp _ => simp only [TypeP] at hv
       | vaggr _ _ _ => simp only [TypeP] at hv
-  | .agg ka la ha ea, .agg kb lb hb eb, h, v, hv => by
+  | .agg ka la ha ea, .agg kb lb hb eb, hn, ho, h, v, hv => by
+      simp only [entOk] at hn ho
       simp only [spec, Bool.and_eq_true] at h
       obtain ⟨⟨hk, hbd⟩, he⟩ := h
       cases v with
@@ -125,19 +135,21 @@ theorem spec_sound (hE : EntTrans) : ∀ (new orig : Ty),
           obtain ⟨hkv, hlo, hhi, hel⟩ := hv
           have hb2 := boundsOk_sound hbd hlo hhi
           refine ⟨aggLe_trans hkv hk, hb2.1, hb2.2, ?_⟩
-          intro x hx; exact spec_sound hE ea eb he x (hel x hx)
+          intro x hx; exact spec_sound sup hT ea eb hn ho he x (hel x hx)
       | vsimp _ => simp only [TypeP] at hv
       | vent _ => simp only [TypeP] at hv
   -- new = GENERIC, orig concrete non-gen/sel : spec false
-  | .gen, .simp _, h, _, _ | .gen, .ent _ _, h, _, _ | .gen, .agg _ _ _ _, h, _, _ => by
+  | .gen, .simp _, _, _, h, _, _ | .gen, .ent _ _, _, _, h, _, _ | .gen, .agg _ _ _ _, _, _, h, _, _ => by
       simp [spec] at h
   -- mismatched concrete kinds : spec false
-  | .simp _, .ent _ _, h, _, _ | .simp _, .agg _ _ _ _, h, _, _
-  | .ent _ _, .simp _, h, _, _ | .ent _ _, .agg _ _ _ _, h, _, _
-  | .agg _ _ _ _, .simp _, h, _, _ | .agg _ _ _ _, .ent _ _, h, _, _ => by
+  | .simp _, .ent _ _, _, _, h, _, _ | .simp _, .agg _ _ _ _, _, _, h, _, _
+  | .ent _ _, .simp _, _, _, h, _, _ | .ent _ _, .agg _ _ _ _, _, _, h, _, _
+  | .agg _ _ _ _, .simp _, _, _, h, _, _ | .agg _ _ _ _, .ent _ _, _, _, h, _, _ => by
       simp [spec] at h
 termination_by new orig => sizeOf new + sizeOf orig
 decreasing_by
   all_goals (simp_wf; first
     | omega
     | (have := List.sizeOf_lt_of_mem ‹_ ∈ _›; omega))
+
+#print axioms spec_sound

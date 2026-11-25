@@ -50,11 +50,11 @@ cited in `src/`, `docs/` and this README occurs in the Lean code
 | File | Content | Status |
 |------|---------|--------|
 | `ExpressSuite/Specialisation.lean` | `Ty` type domain; `simpLe`, `aggLe`, `boundsOk`; `spec`/`specAll`/`specAny` (NEW operand resolved first, then ORIGINAL) | definitions, termination by construction |
-| `ExpressSuite/Meta.lean` | `spec_refl`, `spec_top`, `spec_trans` (modulo `EntTrans`, the transitive closure of entity supertype lists) | proved, no `sorry` |
-| `ExpressSuite/Soundness.lean` | `TypeP` value membership (eengine `kernel/type-p.lisp` transcription); `spec_sound`: if `spec new orig` then every value of `new` is a value of `orig` | proved, no `sorry` |
+| `ExpressSuite/Meta.lean` | `spec_refl`, `spec_top`; `spec_trans` for operands whose entities carry the supertype lists of one transitively closed table (`Closed`, `entOk`); `closedB` and `closed_of_closedB` decide closure of a finite table | proved, no `sorry` |
+| `ExpressSuite/Soundness.lean` | `TypeP` value membership (eengine `kernel/type-p.lisp` transcription); `spec_sound`: if `spec new orig` then every value of `new` is a value of `orig`, under the same hypotheses as `spec_trans` | proved, no `sorry` |
 | `ExpressSuite/IndexOperand.lean` | `indexableSimple`, `notIndexable`; `notIndexable_sound`: if `notIndexable t` then no value of `t` is indexable (binary, string or aggregate) | proved, no `sorry` |
 | `ExpressSuite/GroupReference.lean` | qualifier lists and expressions abstracted to what 12.7.4 decides; `qualsOk` (the restriction), `violatesAt`/`reported` (the TypeScript loop), `kindAfter`/`okKind` (partial-value semantics), `check`/`wellKinded` over expressions; `qualsOk_iff_forall`, `reported_eq_nil_iff`, `reported_is_group`, `qualsOk_eq_kind`, `check_eq_wellKinded`, `qualsOk_mono`, `qualsOk_of_groupsAttrQualified` | proved, no `sorry`; issue 102, 12.7.4 EXAMPLE 1, `\|\|`, parentheses, `<>`, unary, parameters, chains and indexes `#guard` |
-| `ExpressSuite/Cases.lean` | the five wg12-step redeclarations (PRs #233 to #237) encoded from the published SMRLv8 text, the negative controls, and the standard's 9.2.3.4 EXAMPLE 2 and EXAMPLE 3 | `#guard`, build-checked |
+| `ExpressSuite/Cases.lean` | the five wg12-step redeclarations (PRs #233 to #237) encoded from the published SMRLv8 text, the negative controls, and the standard's 9.2.3.4 EXAMPLE 2 and EXAMPLE 3; one supertype table for all of them, proved closed (`table_closed`), with every case type `entOk` for it | `#guard`, build-checked |
 | `ExpressSuite/FpReproGt.lean` | two further valid narrowings (geometric_tolerance ARM) that a relation resolving only the NEW operand rejects | `#guard`, build-checked |
 | `ExpressSuite/Interfaces.lean` | schema scopes (10.1 b, clause 11): `Export` (USE re-export), `Visible`, `Clash`; `step`/`iterate` (the implementation's loop), `visibleIn`, `clashesIn`; `iterate_sound`, `export_complete`, `export_of_stable` (the stop condition is exact), `export_ignores_reference` (11.3), `mem_visibleIn_iff`, `clash_iff` | proved, no `sorry`; the 3074 shape, 11.3 EXAMPLE 2 (plain and chained), lists, renames (including onto a listed name), three-way clashes, propagation by USE, REFERENCE and listed item, USE-plus-REFERENCE routes, function-versus-rule referenceability, cycles and the case rules `#guard` |
 | `ExpressSuite/Inheritance.lean` | finite inheritance graph; `Visible` (12.7.3) and `SameGraph` (12.7.4) as reachability; `visible` (ancestors then descendants, breadth-first, duplicate-free) and `component`; `mem_visible_iff`, `component_is_group_scope`, `visible_sub_component`, `visible_mono`, `resolve_unique`, `resolve_ambiguous_iff` (ambiguous exactly when two entities among the entity and its supertypes declare the name, at any depth), `resolve_below`, `ambiguous_stable` (a further subtype never changes whether a reference is ambiguous), `resolveAfterGroup_unique`, `visible_head`; termination of the fuelled closure by a pigeonhole lemma | proved, no `sorry`; b_spline, 9.2.3.3 and 12.7.3 examples `#guard` |
@@ -67,7 +67,8 @@ Axioms (`#print axioms`): `propext`, `Classical.choice`, `Quot.sound` only.
 vendored from a private Lean workstream (commit 5846f3b), where the relation
 was written to decide redeclaration compatibility with both operands resolved.
 Two amendments were made here on 2026-10-29, each found by
-testing the check against the standard's own examples:
+testing the check against the standard's own examples, and a third on
+2026-11-21, found by an independent review of the proofs:
 
 1. `aggLe`: "SET OF item is a specialization of BAG OF item" (9.2.7). The
    original required equal aggregate kinds and rejected 9.2.3.4 EXAMPLE 3.
@@ -77,6 +78,20 @@ testing the check against the standard's own examples:
 
 Both amendments change `TypeP` accordingly and re-prove `spec_refl`,
 `spec_trans` and `spec_sound`.
+
+3. 2026-11-21: the hypothesis of `spec_trans` and `spec_sound`. As vendored it
+   was a closure property stated over arbitrary entity names and supertype
+   lists. That property is false (an entity named "a" with no supertypes and
+   another type named "a" with supertype "c" satisfy its premises, not its
+   conclusion), so both theorems held vacuously. The hypothesis is now a
+   supertype table `sup` that is transitively closed (`Closed`), with every
+   entity in the operands carrying the list `sup` gives its name (`entOk`).
+   `Cases.lean` proves one table closed (`table_closed`) and checks that every
+   case type satisfies `entOk`, so the hypotheses can be met. The TypeScript
+   builder gives each entity the transitive closure of its declared supertypes
+   (`supertypesOf` in `src/language/type-system/express-type-builder.ts`),
+   which is closed by construction; two entities of the same name declared in
+   different schemas and met in one comparison are outside the hypothesis.
 
 ## What the model leaves out (by design, all in the permissive direction)
 
