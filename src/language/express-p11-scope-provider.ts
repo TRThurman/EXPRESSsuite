@@ -29,6 +29,7 @@ import {
   isEntityRef,
   isEnumeration_id,
   isEnumeration_type,
+  isNamed_types,
   isExplicit_attr,
   isFunctionDefinition,
   isGroup_qualifier,
@@ -440,14 +441,23 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
         }
         return { nodes, type: ScopeType.Entities };
 
-      case TypeDefinition.$type:
-        if (!isEnumeration_type((leftNode as TypeDefinition).underlyingType)) return { nodes: [], type: ScopeType.Empty };
-        const type = schema.getAllResources().findByName((leftNode as TypeDefinition).name);
+      case TypeDefinition.$type: {
+        const enumeration = this.aliasedEnumeration(leftNode as TypeDefinition);
+        if (!enumeration) return { nodes: [], type: ScopeType.Empty };
+        // A prefix that names the enumeration itself is looked up in the referencing schema, as
+        // before. Through an alias, the items come from the schema that declares the
+        // enumeration the chain ends in: the alias may be interfaced from another schema, where
+        // the enumeration's name is not interfaced into the referencing schema or names a
+        // declaration of its own there.
+        const owner = enumeration === leftNode ? undefined : AstUtils.getContainerOfType(enumeration, isSchemaDefinition);
+        const lookupSchema = owner ? this.typeContainer.getSchemaOf(owner) : schema;
+        const type = lookupSchema?.getAllResources().findByName(enumeration.name);
         if (!type || type.type !== DefinitionType.EnumType) return { nodes: [], type: ScopeType.Empty };
         const enums = type.resource.getValues();
 
         nodes = enums.map((e) => e.node);
         return { nodes, type: ScopeType.Enums };
+      }
 
       case FunctionDefinition.$type:
         if (!(leftNode as FunctionDefinition).head?.returnType) return { nodes: [], type: ScopeType.Empty };
@@ -459,6 +469,27 @@ export class ExpressP11ScopeProvider extends DefaultScopeProvider {
     }
     return { nodes: [], type: ScopeType.Empty };
   }
+  /**
+   * The enumeration a type prefix stands for (ISO 10303-11:2004 12.7.2): the type
+   * itself when it is an ENUMERATION, or the enumeration that a chain of renaming
+   * declarations `TYPE alias = base;` ends in (9.1, 8.3.2). The long-form procedure
+   * writes every extending enumeration that way (G.5.3.1 EXAMPLE 2 and EXAMPLE 3).
+   * Accepting such a prefix is a reading of 12.7.2: 8.4.1 NOTE 3 says a type_id that
+   * qualifies an enumeration_id is always an enumeration data type. A chain that ends
+   * elsewhere, or loops, gives none.
+   */
+  private aliasedEnumeration(type: TypeDefinition): TypeDefinition | undefined {
+    const seen = new Set<TypeDefinition>();
+    let current: TypeDefinition | undefined = type;
+    while (current && !seen.has(current)) {
+      if (isEnumeration_type(current.underlyingType)) return current;
+      seen.add(current);
+      const next: AstNode | undefined = isNamed_types(current.underlyingType) ? current.underlyingType.of?.ref : undefined;
+      current = isTypeDefinition(next) ? next : undefined;
+    }
+    return undefined;
+  }
+
   private getSimpleExpressionType(expression: Simple_expression, schema: ExpressP11Schema): { nodes: AstNode[]; type: ScopeType } {
     if (isSimple_factor(expression)) {
       if (expression.primary) {
