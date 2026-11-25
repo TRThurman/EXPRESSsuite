@@ -225,6 +225,12 @@ describe("describe edit: new blocks", () => {
     expect(after).toBe(`${DEMO}\n\n(*"demo_schema.widget.size"\n${text}\n*)\n`);
   });
 
+  test("another wording of the sentence that the value need not be given is not followed by a second one", async () => {
+    const text = "The size. A value need not be supplied.";
+    const { after } = await describeTyped(DEMO, { key: "demo_schema.widget.size", text });
+    expect(after).toBe(`${DEMO}\n\n(*"demo_schema.widget.size"\n${text}\n*)\n`);
+  });
+
   test("member texts get blocks of their own after the owner's, in member order; an empty one gets none", async () => {
     const { after } = await describeTyped(DEMO, {
       key: "demo_schema.f",

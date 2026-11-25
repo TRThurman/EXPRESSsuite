@@ -34,6 +34,18 @@ export enum AnnotationIssues {
 
 export const OPTIONAL_SENTENCE = "The value of this attribute need not be specified.";
 
+/**
+ * The last sentence of the body says that the value need not be given: the standard sentence, or
+ * another that ends "need not be specified | supplied | provided | given | present | populated"
+ * (also "does not need to be ..."), in any case. The check asks for this statement, not for one
+ * wording of it.
+ */
+const OPTIONAL_STATEMENT_RE = /\b(?:need not be|does not need to be|do not need to be)\s+(?:specified|supplied|provided|given|present|populated)\s*[.!]?$/i;
+
+export function endsWithOptionalStatement(body: string): boolean {
+  return OPTIONAL_STATEMENT_RE.test(body.trimEnd());
+}
+
 export interface BlockFinding {
   code: AnnotationIssues;
   /** Offsets in the body. */
@@ -114,8 +126,8 @@ export function checkBlock(
         }
       }
     }
-    if (target.kind === "explicit-attribute" && target.optional && !body.trimEnd().endsWith(OPTIONAL_SENTENCE)) {
-      findings.push(finding(AnnotationIssues.OptionalSentence, 0, body.length, `The description of an OPTIONAL attribute ends with "${OPTIONAL_SENTENCE}".`));
+    if (target.kind === "explicit-attribute" && target.optional && !endsWithOptionalStatement(body)) {
+      findings.push(finding(AnnotationIssues.OptionalSentence, 0, body.length, `The description of an OPTIONAL attribute ends with a sentence that says the value need not be specified, such as "${OPTIONAL_SENTENCE}".`));
     }
     if (target.kind === "entity" && target.supertypes && target.supertypes.length > 0 && BARE_SUBTYPE_RE.test(body.replace(/\s+/g, " ").trim())) {
       findings.push(finding(AnnotationIssues.BareSubtype, 0, body.length, "The description only restates the supertype."));

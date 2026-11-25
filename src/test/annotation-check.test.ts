@@ -61,6 +61,26 @@ describe("annotation check", () => {
     expect(await codeList(demo(CLEAN))).toEqual([]);
   });
 
+  test("an OPTIONAL attribute: another wording of the standard sentence is accepted", async () => {
+    const note = (text: string) => demo(CLEAN.replace("A remark. The value of this attribute need not be specified.", text));
+    for (const ok of [
+      "A remark. The value of this attribute need not be supplied.",
+      "A remark. A value need not be provided.",
+      "A remark. the value of this attribute NEED NOT BE GIVEN",
+      "A remark. This attribute does not need to be specified.",
+      "A remark. The value of this attribute need not be specified.  ",
+    ]) {
+      expect(await codeList(note(ok)), ok).toEqual([]);
+    }
+  });
+
+  test("an OPTIONAL attribute: a description that does not say it is still reported", async () => {
+    const note = (text: string) => demo(CLEAN.replace("A remark. The value of this attribute need not be specified.", text));
+    for (const bad of ["A remark.", "A remark. The value need not be specified for a gadget, and then it is empty.", "A remark. The value must be specified."]) {
+      expect(await codeList(note(bad)), bad).toEqual(["annotation-optional-sentence"]);
+    }
+  });
+
   test("undeclared link", async () => {
     expect(await codeList(demo(`(*"demo_schema.widget"\nSee <<express:support_schema.nope,x>>.\n*)`))).toEqual(["annotation-link-undeclared"]);
   });

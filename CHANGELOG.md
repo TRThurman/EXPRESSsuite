@@ -62,6 +62,15 @@ the intended result, not a regression.
   schema. In SMRL v8 `redeclaration-not-specialization` goes from 9 to 13
   sites, all errors (7 were warnings); one site is no longer reported
   (`part_shape/arm.exp` 36).
+- **An OPTIONAL attribute's description may word the standard sentence
+  differently.** `annotation-optional-sentence` asked for the exact sentence
+  `The value of this attribute need not be specified.` and reported a
+  description that ended with the same statement in other words, such as
+  `A value need not be supplied.` It now accepts a last sentence that says the
+  value `need not be` (or `does not need to be`) `specified`, `supplied`,
+  `provided`, `given`, `present` or `populated`, in any case. A description
+  that does not end with such a statement is still reported, and the Describe
+  Declaration command no longer adds the standard sentence after one.
 - **An enumeration item may be prefixed by an alias of its enumeration
   type.** `TYPE alias = base;` is accepted as the prefix in `alias.item`
   (12.7.2). The long-form procedure writes every extending enumeration that
