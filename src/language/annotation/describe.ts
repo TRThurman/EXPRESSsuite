@@ -8,7 +8,7 @@ import type { ExpressP11Services } from "../express-module.js";
 import type { ExpressP11TypeContainer } from "../express-p11-type-container.js";
 import { annotationContexts } from "./blocks.js";
 import type { AnnotationBlock, AnnotationContext } from "./blocks.js";
-import { checkBlock, OPTIONAL_SENTENCE } from "./check.js";
+import { checkBlock, endsWithOptionalStatement, OPTIONAL_SENTENCE } from "./check.js";
 import type { BlockFinding } from "./check.js";
 import { annotationKeyOf, describeTargets } from "./keys.js";
 import type { DescribeTarget } from "./keys.js";
@@ -226,7 +226,7 @@ export class DescribeService {
   private body(text: string, accepted: ReadonlyArray<LinkProposal>, target: DescribeTarget, role: BlockRole, schema: SchemaDefinition, eol: string): string {
     const spans = acceptedSpans(this.propose(text, target, schema), accepted);
     let body = applyLinks(text, spans).trim();
-    if (role === "description" && target.kind === "explicit-attribute" && target.optional && !body.endsWith(OPTIONAL_SENTENCE)) {
+    if (role === "description" && target.kind === "explicit-attribute" && target.optional && !endsWithOptionalStatement(body)) {
       body = `${body} ${OPTIONAL_SENTENCE}`;
     }
     return body.replace(/\r\n|\r|\n/g, eol);

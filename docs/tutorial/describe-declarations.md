@@ -140,7 +140,7 @@ are information:
 | `annotation-unkeyed-remark` | a plain remark after `END_SCHEMA;` |
 | `annotation-non-ascii` | a character outside ASCII in the text |
 | `annotation-first-sentence-attribute-link` | the first sentence of a declaration's description links an attribute of an entity, its own or any other |
-| `annotation-optional-sentence` | the description of an OPTIONAL attribute does not end with the sentence above |
+| `annotation-optional-sentence` | the description of an OPTIONAL attribute does not end with a sentence that says the value need not be specified: the sentence above, or the same statement in other words (`need not be supplied`, `provided`, `given`, `present`, `populated`, `does not need to be specified`) |
 | `annotation-bare-subtype` | the description of an entity only says "A **x** is a type of <<express:...>>." |
 | `annotation-inside-schema` | a keyed block between `SCHEMA` and `END_SCHEMA;` |
 | `annotation-continuation-without-list` | a `+` line whose continuation chain does not start at a list item |
