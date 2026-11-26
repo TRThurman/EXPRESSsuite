@@ -339,7 +339,7 @@ END_SCHEMA;
 
 SCHEMA extension_schema;
   USE FROM base_schema;
-  TYPE wider_select = SELECT BASED_ON base_select WITH (b); END_TYPE;
+  TYPE wider_select = EXTENSIBLE GENERIC_ENTITY SELECT BASED_ON base_select WITH (b); END_TYPE;
 END_SCHEMA;
 
 SCHEMA without_extension;      -- reported: base_select holds a only here

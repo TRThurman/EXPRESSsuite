@@ -1,8 +1,8 @@
 {
   "documents": 1287,
-  "diagnostics": 6356,
+  "diagnostics": 6936,
   "bySeverity": {
-    "error": 3566,
+    "error": 4146,
     "information": 704,
     "warning": 2086
   },
@@ -12,7 +12,7 @@
     "declaration-name-case": 704,
     "duplicate-interfaced-declaration": 229,
     "duplicate-loop-index": 72,
-    "extension-missing-generic-entity": 30,
+    "extension-missing-generic-entity": 610,
     "informal-proposition-malformed-signature": 7,
     "informal-proposition-misplaced-signature": 3,
     "informal-proposition-missing-annotation": 6,
@@ -2482,6 +2482,21 @@
         6759
       ]
     },
+    "modules/activity_characterized/arm.exp": {
+      "extension-missing-generic-entity": [
+        68
+      ]
+    },
+    "modules/activity_structure_and_classification/arm.exp": {
+      "extension-missing-generic-entity": [
+        28
+      ]
+    },
+    "modules/activity_structure_and_classification/mim.exp": {
+      "extension-missing-generic-entity": [
+        28
+      ]
+    },
     "modules/advanced_boundary_representation/arm.exp": {
       "linking-error": [
         28,
@@ -2500,6 +2515,11 @@
         42
       ]
     },
+    "modules/alternative_solution/mim.exp": {
+      "extension-missing-generic-entity": [
+        28
+      ]
+    },
     "modules/analysis_product_relationships/mim.exp": {
       "linking-error": [
         10
@@ -2509,6 +2529,10 @@
       ]
     },
     "modules/analytical_model/arm.exp": {
+      "extension-missing-generic-entity": [
+        26,
+        30
+      ],
       "linking-error": [
         100,
         100,
@@ -2523,6 +2547,11 @@
         101,
         102,
         123
+      ]
+    },
+    "modules/analytical_model/mim.exp": {
+      "extension-missing-generic-entity": [
+        31
       ]
     },
     "modules/annotated_3d_model_equivalence_assembly/mim.exp": {
@@ -2547,6 +2576,22 @@
         11,
         33
       ],
+      "extension-missing-generic-entity": [
+        56,
+        60,
+        72,
+        77,
+        84,
+        95,
+        104,
+        118,
+        136,
+        144,
+        158,
+        171,
+        200,
+        204
+      ],
       "linking-error": [
         42,
         184,
@@ -2556,6 +2601,24 @@
       ]
     },
     "modules/ap203_configuration_controlled_3d_design_of_mechanical_parts_and_assemblies/mim.exp": {
+      "extension-missing-generic-entity": [
+        89,
+        93,
+        108,
+        134,
+        177,
+        193,
+        238,
+        245,
+        253,
+        257,
+        262,
+        272,
+        285,
+        328,
+        346,
+        351
+      ],
       "linking-error": [
         97
       ]
@@ -2570,6 +2633,13 @@
       "linking-error": [
         12,
         13
+      ]
+    },
+    "modules/ap210_electronic_assembly_interconnect_and_packaging_design/arm.exp": {
+      "extension-missing-generic-entity": [
+        47,
+        52,
+        56
       ]
     },
     "modules/ap210_electronic_assembly_interconnect_and_packaging_design/mim.exp": {
@@ -2611,6 +2681,19 @@
         168
       ]
     },
+    "modules/ap239_activity_recording/arm.exp": {
+      "extension-missing-generic-entity": [
+        20,
+        42,
+        57,
+        94
+      ]
+    },
+    "modules/ap239_activity_recording/mim.exp": {
+      "extension-missing-generic-entity": [
+        73
+      ]
+    },
     "modules/ap239_document_management/arm.exp": {
       "linking-error": [
         22,
@@ -2629,11 +2712,17 @@
       ]
     },
     "modules/ap239_management_resource_information/mim.exp": {
+      "extension-missing-generic-entity": [
+        48
+      ],
       "linking-error": [
         31
       ]
     },
     "modules/ap239_part_definition_information/arm.exp": {
+      "extension-missing-generic-entity": [
+        381
+      ],
       "linking-error": [
         28,
         354
@@ -2662,6 +2751,48 @@
       ]
     },
     "modules/ap239_product_life_cycle_support/arm.exp": {
+      "extension-missing-generic-entity": [
+        48,
+        58,
+        71,
+        121,
+        134,
+        164,
+        177,
+        183,
+        204,
+        224,
+        485,
+        490,
+        495,
+        503,
+        517,
+        537,
+        720,
+        796,
+        821,
+        833,
+        866,
+        901,
+        905,
+        917,
+        925,
+        963,
+        1231,
+        1243,
+        1265,
+        1283,
+        1287,
+        1296,
+        1301,
+        1307,
+        1399,
+        1410,
+        1417,
+        1424,
+        1447,
+        1451
+      ],
       "linking-error": [
         312,
         331,
@@ -2676,8 +2807,57 @@
       ]
     },
     "modules/ap239_product_life_cycle_support/mim.exp": {
+      "extension-missing-generic-entity": [
+        48,
+        70,
+        77,
+        114,
+        126,
+        132,
+        138,
+        155,
+        169,
+        330,
+        344,
+        349,
+        386,
+        507,
+        555,
+        585,
+        625,
+        632,
+        652,
+        665,
+        676,
+        684,
+        690,
+        717,
+        724,
+        887,
+        892,
+        907,
+        922,
+        926,
+        930,
+        938,
+        945,
+        953,
+        958,
+        1039,
+        1046
+      ],
       "linking-error": [
         657
+      ]
+    },
+    "modules/ap239_properties/arm.exp": {
+      "extension-missing-generic-entity": [
+        63
+      ]
+    },
+    "modules/ap239_properties/mim.exp": {
+      "extension-missing-generic-entity": [
+        137
       ]
     },
     "modules/ap239_task_specification_resourced/arm.exp": {
@@ -2690,7 +2870,16 @@
     },
     "modules/ap239_task_specification_resourced/mim.exp": {
       "extension-missing-generic-entity": [
-        281
+        101,
+        148,
+        281,
+        370,
+        448,
+        468,
+        476,
+        485,
+        494,
+        554
       ],
       "linking-error": [
         330
@@ -2698,15 +2887,103 @@
     },
     "modules/ap239_work_definition/arm.exp": {
       "extension-missing-generic-entity": [
-        151
+        28,
+        151,
+        175,
+        195,
+        202,
+        223,
+        295,
+        304
       ]
     },
     "modules/ap239_work_definition/mim.exp": {
       "extension-missing-generic-entity": [
-        179
+        179,
+        203,
+        223,
+        271,
+        282
+      ]
+    },
+    "modules/ap242_managed_model_based_3d_engineering/arm.exp": {
+      "extension-missing-generic-entity": [
+        95,
+        103,
+        111,
+        227,
+        344,
+        395,
+        399,
+        589,
+        708,
+        731,
+        757,
+        762,
+        906,
+        913,
+        922,
+        1007,
+        1013,
+        1022,
+        1027,
+        1031,
+        1133,
+        1143,
+        1186,
+        1229,
+        1433,
+        1451,
+        1746,
+        1777,
+        1868,
+        1974,
+        1985,
+        2021,
+        2184,
+        2192,
+        2205,
+        2324,
+        2598,
+        2602
       ]
     },
     "modules/ap242_managed_model_based_3d_engineering/mim.exp": {
+      "extension-missing-generic-entity": [
+        215,
+        294,
+        312,
+        465,
+        470,
+        499,
+        533,
+        617,
+        626,
+        647,
+        671,
+        737,
+        839,
+        905,
+        943,
+        1063,
+        1159,
+        1259,
+        1270,
+        1360,
+        1399,
+        1534,
+        1662,
+        1822,
+        1862,
+        1933,
+        1994,
+        2002,
+        2212,
+        2340,
+        2429,
+        2439,
+        2588
+      ],
       "linking-error": [
         2808,
         2809,
@@ -2725,6 +3002,11 @@
         2922
       ]
     },
+    "modules/appearance_assignment/mim.exp": {
+      "extension-missing-generic-entity": [
+        35
+      ]
+    },
     "modules/assembly_2d_shape/arm.exp": {
       "linking-error": [
         37,
@@ -2739,6 +3021,9 @@
       ]
     },
     "modules/assembly_component_placement_requirements/arm.exp": {
+      "extension-missing-generic-entity": [
+        25
+      ],
       "linking-error": [
         151,
         151,
@@ -2751,6 +3036,12 @@
         151,
         158,
         181
+      ]
+    },
+    "modules/assembly_component_placement_requirements/mim.exp": {
+      "extension-missing-generic-entity": [
+        18,
+        24
       ]
     },
     "modules/assembly_constraints/arm.exp": {
@@ -2781,6 +3072,16 @@
         42,
         43,
         43
+      ]
+    },
+    "modules/assembly_functional_interface_requirement/arm.exp": {
+      "extension-missing-generic-entity": [
+        15
+      ]
+    },
+    "modules/assembly_functional_interface_requirement/mim.exp": {
+      "extension-missing-generic-entity": [
+        12
       ]
     },
     "modules/assembly_module_macro_definition/arm.exp": {
@@ -2869,7 +3170,24 @@
         46
       ]
     },
+    "modules/assembly_physical_requirement_allocation/arm.exp": {
+      "extension-missing-generic-entity": [
+        14
+      ]
+    },
+    "modules/assembly_physical_requirement_allocation/mim.exp": {
+      "extension-missing-generic-entity": [
+        13,
+        18
+      ]
+    },
     "modules/assembly_technology/arm.exp": {
+      "extension-missing-generic-entity": [
+        17,
+        22,
+        26,
+        30
+      ],
       "linking-error": [
         63,
         63,
@@ -2881,7 +3199,21 @@
         65
       ]
     },
+    "modules/assembly_technology/mim.exp": {
+      "extension-missing-generic-entity": [
+        18,
+        22
+      ]
+    },
+    "modules/associative_text/arm.exp": {
+      "extension-missing-generic-entity": [
+        16
+      ]
+    },
     "modules/bare_die/arm.exp": {
+      "extension-missing-generic-entity": [
+        18
+      ],
       "linking-error": [
         35,
         35,
@@ -2909,7 +3241,20 @@
         28
       ]
     },
+    "modules/behaviour_identification_and_version/arm.exp": {
+      "extension-missing-generic-entity": [
+        14
+      ]
+    },
+    "modules/behaviour_view_definition/arm.exp": {
+      "extension-missing-generic-entity": [
+        14
+      ]
+    },
     "modules/building_component/mim.exp": {
+      "extension-missing-generic-entity": [
+        14
+      ],
       "linking-error": [
         40,
         40
@@ -2933,6 +3278,9 @@
       ]
     },
     "modules/building_structure/arm.exp": {
+      "extension-missing-generic-entity": [
+        20
+      ],
       "linking-error": [
         29,
         33,
@@ -2940,6 +3288,10 @@
       ]
     },
     "modules/building_structure/mim.exp": {
+      "extension-missing-generic-entity": [
+        20,
+        24
+      ],
       "linking-error": [
         33,
         33,
@@ -2959,6 +3311,11 @@
       ],
       "reference-name-case": [
         24
+      ]
+    },
+    "modules/camera_view_3d/arm.exp": {
+      "extension-missing-generic-entity": [
+        26
       ]
     },
     "modules/catalog_data_information/arm.exp": {
@@ -3118,12 +3475,33 @@
       ]
     },
     "modules/characteristic/arm.exp": {
+      "extension-missing-generic-entity": [
+        36
+      ],
       "linking-error": [
         210,
         210
       ]
     },
+    "modules/characteristic/mim.exp": {
+      "extension-missing-generic-entity": [
+        17
+      ]
+    },
+    "modules/characterizable_object/arm.exp": {
+      "extension-missing-generic-entity": [
+        18
+      ]
+    },
+    "modules/characterizable_object/mim.exp": {
+      "extension-missing-generic-entity": [
+        16
+      ]
+    },
     "modules/characterized_representation/arm.exp": {
+      "extension-missing-generic-entity": [
+        16
+      ],
       "linking-error": [
         33,
         34,
@@ -3151,6 +3529,22 @@
     "modules/class_of_product_library/arm.exp": {
       "declaration-name-case": [
         13
+      ]
+    },
+    "modules/classification_with_attributes/mim.exp": {
+      "extension-missing-generic-entity": [
+        42,
+        47
+      ]
+    },
+    "modules/component_feature/arm.exp": {
+      "extension-missing-generic-entity": [
+        13
+      ]
+    },
+    "modules/component_feature/mim.exp": {
+      "extension-missing-generic-entity": [
+        12
       ]
     },
     "modules/component_grouping/arm.exp": {
@@ -3197,6 +3591,11 @@
         15
       ]
     },
+    "modules/constructive_solid_geometry_2d/mim.exp": {
+      "extension-missing-generic-entity": [
+        26
+      ]
+    },
     "modules/containment_of_individual_product/mim.exp": {
       "linking-error": [
         14,
@@ -3212,6 +3611,9 @@
       ]
     },
     "modules/default_tolerance/mim.exp": {
+      "extension-missing-generic-entity": [
+        22
+      ],
       "linking-error": [
         58,
         58,
@@ -3229,12 +3631,72 @@
         92
       ]
     },
+    "modules/derived_shape_element/arm.exp": {
+      "extension-missing-generic-entity": [
+        15
+      ]
+    },
+    "modules/derived_shape_element/mim.exp": {
+      "extension-missing-generic-entity": [
+        29
+      ]
+    },
     "modules/design_management/mim.exp": {
       "linking-error": [
         13
       ],
       "reference-name-case": [
         13
+      ]
+    },
+    "modules/design_material_aspects/arm.exp": {
+      "extension-missing-generic-entity": [
+        16
+      ]
+    },
+    "modules/design_product_data_management/arm.exp": {
+      "extension-missing-generic-entity": [
+        25,
+        48,
+        53,
+        73,
+        80,
+        85,
+        93,
+        160,
+        174,
+        187,
+        193,
+        208,
+        212,
+        221,
+        230,
+        248
+      ]
+    },
+    "modules/design_product_data_management/mim.exp": {
+      "extension-missing-generic-entity": [
+        31,
+        95,
+        122,
+        164,
+        239,
+        257,
+        265,
+        278,
+        283,
+        374,
+        418,
+        444,
+        483,
+        496,
+        527,
+        548,
+        556,
+        590,
+        601,
+        634,
+        646
       ]
     },
     "modules/device_marking/arm.exp": {
@@ -3244,6 +3706,53 @@
       ],
       "reference-name-case": [
         67
+      ]
+    },
+    "modules/dimension_and_tolerance_callouts/arm.exp": {
+      "extension-missing-generic-entity": [
+        34
+      ]
+    },
+    "modules/dimension_tolerance/arm.exp": {
+      "extension-missing-generic-entity": [
+        58
+      ]
+    },
+    "modules/dimension_tolerance/mim.exp": {
+      "extension-missing-generic-entity": [
+        33,
+        37,
+        42
+      ]
+    },
+    "modules/document_definition/arm.exp": {
+      "extension-missing-generic-entity": [
+        19
+      ]
+    },
+    "modules/document_definition/mim.exp": {
+      "extension-missing-generic-entity": [
+        22
+      ]
+    },
+    "modules/document_properties/arm.exp": {
+      "extension-missing-generic-entity": [
+        27
+      ]
+    },
+    "modules/draughting_annotation/arm.exp": {
+      "extension-missing-generic-entity": [
+        12
+      ]
+    },
+    "modules/draughting_element/arm.exp": {
+      "extension-missing-generic-entity": [
+        19
+      ]
+    },
+    "modules/drawing_definition/arm.exp": {
+      "extension-missing-generic-entity": [
+        13
       ]
     },
     "modules/elemental_topology/arm.exp": {
@@ -3262,6 +3771,18 @@
     "modules/elemental_topology/mim.exp": {
       "annotation-unkeyed-remark": [
         26
+      ]
+    },
+    "modules/envelope/mim.exp": {
+      "extension-missing-generic-entity": [
+        31,
+        43,
+        47
+      ]
+    },
+    "modules/experience/arm.exp": {
+      "extension-missing-generic-entity": [
+        48
       ]
     },
     "modules/expression/mim.exp": {
@@ -3401,11 +3922,34 @@
         77
       ]
     },
+    "modules/external_class/arm.exp": {
+      "extension-missing-generic-entity": [
+        17
+      ]
+    },
+    "modules/external_class/mim.exp": {
+      "extension-missing-generic-entity": [
+        29
+      ]
+    },
     "modules/external_properties/mim.exp": {
+      "extension-missing-generic-entity": [
+        27
+      ],
       "reference-statement-missing": [
         42,
         42,
         43
+      ]
+    },
+    "modules/external_representation_item/mim.exp": {
+      "extension-missing-generic-entity": [
+        14
+      ]
+    },
+    "modules/external_unit/mim.exp": {
+      "extension-missing-generic-entity": [
+        17
       ]
     },
     "modules/externally_conditioned_data_quality_criteria/arm.exp": {
@@ -3494,6 +4038,9 @@
         659,
         660
       ],
+      "extension-missing-generic-entity": [
+        35
+      ],
       "linking-error": [
         160,
         160,
@@ -3520,6 +4067,23 @@
       ],
       "reference-name-case": [
         66
+      ]
+    },
+    "modules/feature_and_connection_zone/arm.exp": {
+      "extension-missing-generic-entity": [
+        14
+      ]
+    },
+    "modules/file_identification/arm.exp": {
+      "extension-missing-generic-entity": [
+        12,
+        16
+      ]
+    },
+    "modules/file_identification/mim.exp": {
+      "extension-missing-generic-entity": [
+        27,
+        31
       ]
     },
     "modules/finite_element_analysis/arm.exp": {
@@ -3604,18 +4168,59 @@
         66
       ]
     },
+    "modules/function_based_behaviour/arm.exp": {
+      "extension-missing-generic-entity": [
+        245,
+        317
+      ]
+    },
+    "modules/function_based_behaviour/mim.exp": {
+      "extension-missing-generic-entity": [
+        217
+      ]
+    },
     "modules/functional_assignment_to_part/arm.exp": {
       "duplicate-loop-index": [
         113,
         129
+      ],
+      "extension-missing-generic-entity": [
+        14,
+        18
+      ]
+    },
+    "modules/functional_assignment_to_part/mim.exp": {
+      "extension-missing-generic-entity": [
+        14,
+        18
+      ]
+    },
+    "modules/functional_data/arm.exp": {
+      "extension-missing-generic-entity": [
+        15,
+        30
       ]
     },
     "modules/functional_data/mim.exp": {
+      "extension-missing-generic-entity": [
+        15,
+        31
+      ],
       "linking-error": [
         49
       ]
     },
+    "modules/functional_data_and_schematic_representation/arm.exp": {
+      "extension-missing-generic-entity": [
+        63,
+        82
+      ]
+    },
     "modules/functional_data_and_schematic_representation/mim.exp": {
+      "extension-missing-generic-entity": [
+        66,
+        86
+      ],
       "linking-error": [
         34,
         108
@@ -3627,7 +4232,21 @@
         90
       ]
     },
+    "modules/functional_decomposition_to_design/mim.exp": {
+      "extension-missing-generic-entity": [
+        20
+      ]
+    },
+    "modules/functional_decomposition_with_nodal_representation_to_packaged_mapping/mim.exp": {
+      "extension-missing-generic-entity": [
+        12
+      ]
+    },
     "modules/functional_specification/arm.exp": {
+      "extension-missing-generic-entity": [
+        15,
+        19
+      ],
       "linking-error": [
         42,
         42
@@ -3637,6 +4256,10 @@
       ]
     },
     "modules/functional_specification/mim.exp": {
+      "extension-missing-generic-entity": [
+        15,
+        19
+      ],
       "linking-error": [
         13
       ],
@@ -3654,6 +4277,9 @@
       ]
     },
     "modules/general_design_connectivity/arm.exp": {
+      "extension-missing-generic-entity": [
+        62
+      ],
       "redeclaration-not-specialization": [
         176,
         177,
@@ -3665,6 +4291,11 @@
       "reference-statement-missing": [
         188,
         205
+      ]
+    },
+    "modules/general_model_parameter/arm.exp": {
+      "extension-missing-generic-entity": [
+        26
       ]
     },
     "modules/geometric_constraints/arm.exp": {
@@ -3721,6 +4352,11 @@
         17
       ]
     },
+    "modules/incomplete_data_reference_mechanism/arm.exp": {
+      "extension-missing-generic-entity": [
+        15
+      ]
+    },
     "modules/independent_property_definition/mim.exp": {
       "unqualified-group-reference": [
         37,
@@ -3736,6 +4372,17 @@
       "linking-error": [
         15,
         16
+      ]
+    },
+    "modules/information_rights/mim.exp": {
+      "extension-missing-generic-entity": [
+        22,
+        27,
+        31,
+        35,
+        39,
+        44,
+        48
       ]
     },
     "modules/integral_shield/arm.exp": {
@@ -3768,6 +4415,9 @@
       ]
     },
     "modules/interconnect_module_with_macros/arm.exp": {
+      "extension-missing-generic-entity": [
+        12
+      ],
       "linking-error": [
         20,
         20,
@@ -3828,6 +4478,16 @@
     "modules/issue_management/mim.exp": {
       "extension-missing-generic-entity": [
         596
+      ]
+    },
+    "modules/item_definition_structure/arm.exp": {
+      "extension-missing-generic-entity": [
+        14
+      ]
+    },
+    "modules/item_definition_structure/mim.exp": {
+      "extension-missing-generic-entity": [
+        19
       ]
     },
     "modules/kinematic_analysis_control_and_result/arm.exp": {
@@ -3954,6 +4614,9 @@
       ]
     },
     "modules/kinematic_structure/arm.exp": {
+      "extension-missing-generic-entity": [
+        29
+      ],
       "linking-error": [
         90,
         90,
@@ -4040,6 +4703,11 @@
       ]
     },
     "modules/layered_interconnect_complex_template/arm.exp": {
+      "extension-missing-generic-entity": [
+        22,
+        28,
+        32
+      ],
       "linking-error": [
         97,
         97,
@@ -4062,12 +4730,24 @@
     "modules/layered_interconnect_module_3d_design/arm.exp": {
       "duplicate-loop-index": [
         69
+      ],
+      "extension-missing-generic-entity": [
+        14,
+        18
       ]
     },
     "modules/layered_interconnect_module_design/arm.exp": {
       "duplicate-loop-index": [
         1443,
         1468
+      ],
+      "extension-missing-generic-entity": [
+        45,
+        50,
+        90,
+        106,
+        111,
+        121
       ],
       "linking-error": [
         218,
@@ -4168,6 +4848,9 @@
       ]
     },
     "modules/layered_interconnect_module_design/mim.exp": {
+      "extension-missing-generic-entity": [
+        86
+      ],
       "linking-error": [
         38,
         39,
@@ -4181,6 +4864,9 @@
     "modules/layered_interconnect_module_with_printed_component_design/arm.exp": {
       "duplicate-loop-index": [
         205
+      ],
+      "extension-missing-generic-entity": [
+        15
       ],
       "linking-error": [
         88,
@@ -4201,6 +4887,11 @@
       ]
     },
     "modules/layered_interconnect_simple_template/arm.exp": {
+      "extension-missing-generic-entity": [
+        39,
+        43,
+        47
+      ],
       "linking-error": [
         52,
         53,
@@ -4248,6 +4939,11 @@
         11
       ]
     },
+    "modules/location_assignment_characterized/arm.exp": {
+      "extension-missing-generic-entity": [
+        51
+      ]
+    },
     "modules/location_in_building/mim.exp": {
       "linking-error": [
         23,
@@ -4293,11 +4989,17 @@
       ]
     },
     "modules/machining_features/arm.exp": {
+      "extension-missing-generic-entity": [
+        38
+      ],
       "reference-name-case": [
         934
       ]
     },
     "modules/machining_features/mim.exp": {
+      "extension-missing-generic-entity": [
+        18
+      ],
       "linking-error": [
         13,
         20,
@@ -4316,7 +5018,16 @@
         95
       ]
     },
+    "modules/manufacturing_configuration_effectivity/mim.exp": {
+      "extension-missing-generic-entity": [
+        21
+      ]
+    },
     "modules/mechanical_design_features_and_requirements/arm.exp": {
+      "extension-missing-generic-entity": [
+        31,
+        42
+      ],
       "linking-error": [
         65,
         65,
@@ -4346,7 +5057,16 @@
         87
       ]
     },
+    "modules/mechanical_design_features_and_requirements/mim.exp": {
+      "extension-missing-generic-entity": [
+        35,
+        47
+      ]
+    },
     "modules/mechanical_design_presentation_representation_with_draughting/arm.exp": {
+      "extension-missing-generic-entity": [
+        20
+      ],
       "linking-error": [
         54,
         54,
@@ -4401,7 +5121,20 @@
         237
       ]
     },
+    "modules/message/mim.exp": {
+      "extension-missing-generic-entity": [
+        46,
+        58,
+        62,
+        70
+      ]
+    },
     "modules/model_based_3d_geometrical_dimensioning_and_tolerancing_representation/arm.exp": {
+      "extension-missing-generic-entity": [
+        28,
+        32,
+        36
+      ],
       "linking-error": [
         38
       ],
@@ -4410,11 +5143,22 @@
       ]
     },
     "modules/model_parameter/arm.exp": {
+      "extension-missing-generic-entity": [
+        17,
+        21,
+        25
+      ],
       "linking-error": [
         85
       ],
       "reference-name-case": [
         85
+      ]
+    },
+    "modules/model_parameter/mim.exp": {
+      "extension-missing-generic-entity": [
+        23,
+        27
       ]
     },
     "modules/modified_swept_solid/arm.exp": {
@@ -4426,6 +5170,9 @@
       ]
     },
     "modules/network_functional_design_view/arm.exp": {
+      "extension-missing-generic-entity": [
+        30
+      ],
       "linking-error": [
         65,
         65,
@@ -4444,6 +5191,9 @@
       ]
     },
     "modules/network_functional_design_view/mim.exp": {
+      "extension-missing-generic-entity": [
+        19
+      ],
       "linking-error": [
         14
       ],
@@ -4452,6 +5202,10 @@
       ]
     },
     "modules/non_feature_shape_element/arm.exp": {
+      "extension-missing-generic-entity": [
+        13,
+        17
+      ],
       "linking-error": [
         54,
         54,
@@ -4507,7 +5261,28 @@
         291
       ]
     },
+    "modules/observation/arm.exp": {
+      "extension-missing-generic-entity": [
+        26,
+        30,
+        55
+      ]
+    },
+    "modules/observation/mim.exp": {
+      "extension-missing-generic-entity": [
+        41,
+        45,
+        62,
+        66,
+        71,
+        75
+      ]
+    },
     "modules/package/arm.exp": {
+      "extension-missing-generic-entity": [
+        23,
+        28
+      ],
       "linking-error": [
         74,
         74,
@@ -4525,6 +5300,11 @@
         206
       ]
     },
+    "modules/package/mim.exp": {
+      "extension-missing-generic-entity": [
+        24
+      ]
+    },
     "modules/packaged_connector_model/arm.exp": {
       "linking-error": [
         28,
@@ -4538,6 +5318,9 @@
       ]
     },
     "modules/packaged_part_black_box_model/arm.exp": {
+      "extension-missing-generic-entity": [
+        22
+      ],
       "linking-error": [
         19,
         35,
@@ -4626,7 +5409,15 @@
         106
       ]
     },
+    "modules/part_template/arm.exp": {
+      "extension-missing-generic-entity": [
+        13
+      ]
+    },
     "modules/part_template/mim.exp": {
+      "extension-missing-generic-entity": [
+        18
+      ],
       "linking-error": [
         12
       ],
@@ -4831,6 +5622,10 @@
       ]
     },
     "modules/part_template_3d_shape/arm.exp": {
+      "extension-missing-generic-entity": [
+        17,
+        21
+      ],
       "linking-error": [
         31,
         37,
@@ -4909,11 +5704,28 @@
         148,
         159,
         176
+      ],
+      "extension-missing-generic-entity": [
+        19,
+        24,
+        30
+      ]
+    },
+    "modules/physical_connectivity_definition/mim.exp": {
+      "extension-missing-generic-entity": [
+        17,
+        21,
+        26
       ]
     },
     "modules/physical_connectivity_layout_topology_requirement/arm.exp": {
       "duplicate-loop-index": [
         60
+      ]
+    },
+    "modules/physical_connectivity_layout_topology_requirement/mim.exp": {
+      "extension-missing-generic-entity": [
+        11
       ]
     },
     "modules/physical_layout_template/arm.exp": {
@@ -4950,6 +5762,9 @@
         19,
         24
       ],
+      "extension-missing-generic-entity": [
+        19
+      ],
       "linking-error": [
         17
       ],
@@ -4979,22 +5794,69 @@
         46
       ]
     },
+    "modules/physical_unit_2d_shape/arm.exp": {
+      "extension-missing-generic-entity": [
+        21,
+        25,
+        32,
+        36,
+        40,
+        44
+      ]
+    },
     "modules/physical_unit_3d_design_view/arm.exp": {
       "reference-statement-missing": [
         46,
         48
       ]
     },
+    "modules/physical_unit_3d_shape/arm.exp": {
+      "extension-missing-generic-entity": [
+        15,
+        20,
+        38,
+        42
+      ]
+    },
     "modules/physical_unit_design_view/arm.exp": {
+      "extension-missing-generic-entity": [
+        32,
+        37
+      ],
       "reference-statement-missing": [
         71,
         75
+      ]
+    },
+    "modules/physical_unit_design_view/mim.exp": {
+      "extension-missing-generic-entity": [
+        24,
+        29
       ]
     },
     "modules/physical_unit_interconnect_definition/arm.exp": {
       "reference-statement-missing": [
         34,
         36
+      ]
+    },
+    "modules/physical_unit_usage_view/arm.exp": {
+      "extension-missing-generic-entity": [
+        28,
+        32,
+        37
+      ]
+    },
+    "modules/physical_unit_usage_view/mim.exp": {
+      "extension-missing-generic-entity": [
+        21,
+        25,
+        30
+      ]
+    },
+    "modules/planned_characteristic/arm.exp": {
+      "extension-missing-generic-entity": [
+        33
       ]
     },
     "modules/planned_characteristic/mim.exp": {
@@ -5005,7 +5867,21 @@
         15
       ]
     },
+    "modules/plib_class_reference/mim.exp": {
+      "extension-missing-generic-entity": [
+        20,
+        24
+      ]
+    },
+    "modules/possession_of_property/arm.exp": {
+      "extension-missing-generic-entity": [
+        15
+      ]
+    },
     "modules/printed_physical_layout_template/arm.exp": {
+      "extension-missing-generic-entity": [
+        14
+      ],
       "linking-error": [
         58,
         58,
@@ -5042,6 +5918,9 @@
       ]
     },
     "modules/printed_physical_layout_template/mim.exp": {
+      "extension-missing-generic-entity": [
+        14
+      ],
       "linking-error": [
         19,
         20
@@ -5049,6 +5928,16 @@
       "reference-name-case": [
         19,
         20
+      ]
+    },
+    "modules/probability_distribution/arm.exp": {
+      "extension-missing-generic-entity": [
+        18
+      ]
+    },
+    "modules/probability_distribution/mim.exp": {
+      "extension-missing-generic-entity": [
+        31
       ]
     },
     "modules/process_plan/arm.exp": {
@@ -5128,12 +6017,45 @@
         121
       ]
     },
+    "modules/product_and_manufacturing_information_view_context/mim.exp": {
+      "extension-missing-generic-entity": [
+        15
+      ]
+    },
     "modules/product_and_manufacturing_information_with_nominal_3d_models/arm.exp": {
+      "extension-missing-generic-entity": [
+        24
+      ],
       "informal-proposition-malformed-signature": [
         58
       ],
       "informal-proposition-misplaced-signature": [
         58
+      ]
+    },
+    "modules/product_as_individual/arm.exp": {
+      "extension-missing-generic-entity": [
+        21
+      ]
+    },
+    "modules/product_as_individual/mim.exp": {
+      "extension-missing-generic-entity": [
+        30
+      ]
+    },
+    "modules/product_as_individual_assembly_and_test/arm.exp": {
+      "extension-missing-generic-entity": [
+        16
+      ]
+    },
+    "modules/product_as_individual_assembly_and_test/mim.exp": {
+      "extension-missing-generic-entity": [
+        18
+      ]
+    },
+    "modules/product_breakdown/arm.exp": {
+      "extension-missing-generic-entity": [
+        20
       ]
     },
     "modules/product_categorization/arm.exp": {
@@ -5142,6 +6064,11 @@
       ]
     },
     "modules/product_class/arm.exp": {
+      "extension-missing-generic-entity": [
+        23,
+        27,
+        32
+      ],
       "linking-error": [
         24
       ],
@@ -5156,6 +6083,40 @@
         131,
         131,
         132
+      ]
+    },
+    "modules/product_data_management/arm.exp": {
+      "extension-missing-generic-entity": [
+        34,
+        50,
+        57,
+        61,
+        140,
+        149,
+        156,
+        160,
+        164,
+        168,
+        187
+      ]
+    },
+    "modules/product_data_management/mim.exp": {
+      "extension-missing-generic-entity": [
+        34,
+        41,
+        48,
+        55,
+        84,
+        88,
+        184,
+        193,
+        199,
+        203,
+        208,
+        212,
+        241,
+        252,
+        263
       ]
     },
     "modules/product_data_quality_criteria/arm.exp": {
@@ -5236,7 +6197,15 @@
     },
     "modules/product_group/arm.exp": {
       "extension-missing-generic-entity": [
+        26,
+        31,
         37
+      ]
+    },
+    "modules/product_group/mim.exp": {
+      "extension-missing-generic-entity": [
+        54,
+        59
       ]
     },
     "modules/product_identification_extension/arm.exp": {
@@ -5274,7 +6243,20 @@
         22
       ]
     },
+    "modules/product_structure/arm.exp": {
+      "extension-missing-generic-entity": [
+        29
+      ]
+    },
+    "modules/product_structure_and_classification/arm.exp": {
+      "extension-missing-generic-entity": [
+        30
+      ]
+    },
     "modules/product_structure_and_classification/mim.exp": {
+      "extension-missing-generic-entity": [
+        30
+      ],
       "linking-error": [
         15,
         23
@@ -5306,6 +6288,11 @@
         326,
         326
       ],
+      "extension-missing-generic-entity": [
+        20,
+        24,
+        51
+      ],
       "linking-error": [
         52,
         328,
@@ -5324,10 +6311,42 @@
         314
       ]
     },
+    "modules/property_assignment/arm.exp": {
+      "extension-missing-generic-entity": [
+        17
+      ]
+    },
+    "modules/property_assignment/mim.exp": {
+      "extension-missing-generic-entity": [
+        31
+      ]
+    },
+    "modules/property_space/arm.exp": {
+      "extension-missing-generic-entity": [
+        16
+      ]
+    },
     "modules/property_space/mim.exp": {
       "unqualified-group-reference": [
         48,
         48
+      ]
+    },
+    "modules/reference_data_library/arm.exp": {
+      "extension-missing-generic-entity": [
+        20,
+        77
+      ]
+    },
+    "modules/reference_data_library/mim.exp": {
+      "extension-missing-generic-entity": [
+        20,
+        80
+      ]
+    },
+    "modules/required_resource/mim.exp": {
+      "extension-missing-generic-entity": [
+        38
       ]
     },
     "modules/requirement_decomposition/arm.exp": {
@@ -5345,6 +6364,11 @@
       ],
       "reference-name-case": [
         18
+      ]
+    },
+    "modules/requirement_identification_and_version/arm.exp": {
+      "extension-missing-generic-entity": [
+        15
       ]
     },
     "modules/risk_definition/arm.exp": {
@@ -5381,18 +6405,48 @@
         503
       ]
     },
+    "modules/schematic_and_symbolization/arm.exp": {
+      "extension-missing-generic-entity": [
+        16
+      ]
+    },
+    "modules/schematic_and_symbolization/mim.exp": {
+      "extension-missing-generic-entity": [
+        16
+      ]
+    },
     "modules/schematic_element/arm.exp": {
       "linking-error": [
         37
       ]
     },
+    "modules/scheme/arm.exp": {
+      "extension-missing-generic-entity": [
+        29
+      ]
+    },
     "modules/sequential_laminate_assembly_design/arm.exp": {
+      "extension-missing-generic-entity": [
+        12
+      ],
       "linking-error": [
         69
       ],
       "reference-statement-missing": [
         85,
         92
+      ]
+    },
+    "modules/sequential_laminate_assembly_design/mim.exp": {
+      "extension-missing-generic-entity": [
+        13
+      ]
+    },
+    "modules/shape_appearance_layers/arm.exp": {
+      "extension-missing-generic-entity": [
+        19,
+        25,
+        32
       ]
     },
     "modules/shape_composition/mim.exp": {
@@ -5562,6 +6616,14 @@
         17
       ]
     },
+    "modules/shape_feature/arm.exp": {
+      "extension-missing-generic-entity": [
+        16,
+        21,
+        25,
+        29
+      ]
+    },
     "modules/shape_feature/mim.exp": {
       "linking-error": [
         12,
@@ -5580,6 +6642,10 @@
       ]
     },
     "modules/shape_property_assignment/arm.exp": {
+      "extension-missing-generic-entity": [
+        37,
+        53
+      ],
       "redeclaration-not-specialization": [
         84
       ],
@@ -5612,6 +6678,17 @@
         16
       ]
     },
+    "modules/single_part_representation/arm.exp": {
+      "extension-missing-generic-entity": [
+        24,
+        39
+      ]
+    },
+    "modules/single_part_representation/mim.exp": {
+      "extension-missing-generic-entity": [
+        24
+      ]
+    },
     "modules/sketch/arm.exp": {
       "linking-error": [
         119,
@@ -5637,6 +6714,45 @@
         160
       ]
     },
+    "modules/specification_based_configuration/arm.exp": {
+      "extension-missing-generic-entity": [
+        27
+      ]
+    },
+    "modules/specification_control/arm.exp": {
+      "extension-missing-generic-entity": [
+        29,
+        38
+      ]
+    },
+    "modules/specification_control/mim.exp": {
+      "extension-missing-generic-entity": [
+        22
+      ]
+    },
+    "modules/specification_document/arm.exp": {
+      "extension-missing-generic-entity": [
+        16,
+        23
+      ]
+    },
+    "modules/specified_product/mim.exp": {
+      "extension-missing-generic-entity": [
+        21
+      ]
+    },
+    "modules/state_based_behaviour/arm.exp": {
+      "extension-missing-generic-entity": [
+        43,
+        47
+      ]
+    },
+    "modules/state_based_behaviour/mim.exp": {
+      "extension-missing-generic-entity": [
+        46,
+        50
+      ]
+    },
     "modules/state_characterized/arm.exp": {
       "extension-missing-generic-entity": [
         77
@@ -5653,6 +6769,12 @@
     "modules/support_resource/arm.exp": {
       "duplicate-loop-index": [
         23
+      ]
+    },
+    "modules/surface_conditions/arm.exp": {
+      "extension-missing-generic-entity": [
+        19,
+        30
       ]
     },
     "modules/surface_conditions/mim.exp": {
@@ -5701,6 +6823,9 @@
       ]
     },
     "modules/surface_visual_texture/arm.exp": {
+      "extension-missing-generic-entity": [
+        13
+      ],
       "linking-error": [
         55,
         55
@@ -5727,6 +6852,9 @@
       ]
     },
     "modules/tessellated_geometry/arm.exp": {
+      "extension-missing-generic-entity": [
+        63
+      ],
       "linking-error": [
         145,
         160,
@@ -5749,6 +6877,26 @@
         239
       ]
     },
+    "modules/textual_expression_representation/arm.exp": {
+      "extension-missing-generic-entity": [
+        25
+      ]
+    },
+    "modules/textual_expression_representation/mim.exp": {
+      "extension-missing-generic-entity": [
+        27
+      ]
+    },
+    "modules/verification_and_validation/arm.exp": {
+      "extension-missing-generic-entity": [
+        26
+      ]
+    },
+    "modules/verification_and_validation/mim.exp": {
+      "extension-missing-generic-entity": [
+        23
+      ]
+    },
     "modules/vertex_colours_for_tessellated_geometry/arm.exp": {
       "linking-error": [
         37,
@@ -5767,6 +6915,40 @@
         28,
         73,
         74
+      ]
+    },
+    "modules/wiring_harness_assembly_design/arm.exp": {
+      "extension-missing-generic-entity": [
+        104,
+        109
+      ]
+    },
+    "modules/work_order_characterized/arm.exp": {
+      "extension-missing-generic-entity": [
+        28
+      ]
+    },
+    "modules/work_order_characterized/mim.exp": {
+      "extension-missing-generic-entity": [
+        32
+      ]
+    },
+    "modules/work_request_characterized/arm.exp": {
+      "extension-missing-generic-entity": [
+        33
+      ]
+    },
+    "modules/work_request_characterized/mim.exp": {
+      "extension-missing-generic-entity": [
+        38
+      ]
+    },
+    "resources/action_schema/action_schema.exp": {
+      "extension-missing-generic-entity": [
+        53,
+        56,
+        59,
+        62
       ]
     },
     "resources/aic_draughting_elements/aic_draughting_elements.exp": {
@@ -5862,6 +7044,18 @@
     "resources/aic_non_manifold_surface/aic_non_manifold_surface.exp": {
       "annotation-unkeyed-remark": [
         385
+      ]
+    },
+    "resources/application_context_schema/application_context_schema.exp": {
+      "extension-missing-generic-entity": [
+        52,
+        56
+      ]
+    },
+    "resources/approval_schema/approval_schema.exp": {
+      "extension-missing-generic-entity": [
+        49,
+        53
       ]
     },
     "resources/assembly_feature_relationship_schema/assembly_feature_relationship_schema.exp": {
@@ -7379,6 +8573,12 @@
         177
       ]
     },
+    "resources/configuration_management_schema/configuration_management_schema.exp": {
+      "extension-missing-generic-entity": [
+        61,
+        64
+      ]
+    },
     "resources/counterbore_countersink_schema/counterbore_countersink_schema.exp": {
       "linking-error": [
         59,
@@ -7390,9 +8590,20 @@
         273
       ]
     },
+    "resources/date_time_schema/date_time_schema.exp": {
+      "extension-missing-generic-entity": [
+        48
+      ]
+    },
     "resources/domain_schema/domain_schema.exp": {
       "reference-name-case": [
         44
+      ]
+    },
+    "resources/effectivity_schema/effectivity_schema.exp": {
+      "extension-missing-generic-entity": [
+        53,
+        57
       ]
     },
     "resources/explicit_constraint_schema/explicit_constraint_schema.exp": {
@@ -7406,6 +8617,11 @@
         34
       ]
     },
+    "resources/external_reference_schema/external_reference_schema.exp": {
+      "extension-missing-generic-entity": [
+        43
+      ]
+    },
     "resources/finite_element_analysis_control_and_result_schema/finite_element_analysis_control_and_result_schema.exp": {
       "duplicate-loop-index": [
         2217,
@@ -7416,6 +8632,11 @@
       "linking-error": [
         2224,
         2369
+      ]
+    },
+    "resources/group_schema/group_schema.exp": {
+      "extension-missing-generic-entity": [
+        43
       ]
     },
     "resources/iso13584_expressions_schema/iso13584_expressions_schema.exp": {
@@ -7474,6 +8695,11 @@
         218
       ]
     },
+    "resources/management_resources_schema/management_resources_schema.exp": {
+      "extension-missing-generic-entity": [
+        54
+      ]
+    },
     "resources/mathematical_context_schema/mathematical_context_schema.exp": {
       "linking-error": [
         38
@@ -7497,6 +8723,16 @@
         4616,
         4617,
         4618
+      ]
+    },
+    "resources/measure_schema/measure_schema.exp": {
+      "extension-missing-generic-entity": [
+        42
+      ]
+    },
+    "resources/mechanical_design_schema/mechanical_design_schema.exp": {
+      "extension-missing-generic-entity": [
+        133
       ]
     },
     "resources/mesh_function_schema/mesh_function_schema.exp": {
@@ -7554,6 +8790,15 @@
         66
       ]
     },
+    "resources/person_organization_schema/person_organization_schema.exp": {
+      "extension-missing-generic-entity": [
+        64,
+        72,
+        76,
+        81,
+        86
+      ]
+    },
     "resources/presentation_appearance_schema/presentation_appearance_schema.exp": {
       "linking-error": [
         718,
@@ -7573,9 +8818,35 @@
         541
       ]
     },
+    "resources/product_definition_schema/product_definition_schema.exp": {
+      "extension-missing-generic-entity": [
+        63,
+        66
+      ]
+    },
+    "resources/product_property_definition_schema/product_property_definition_schema.exp": {
+      "extension-missing-generic-entity": [
+        75
+      ]
+    },
     "resources/product_property_representation_schema/product_property_representation_schema.exp": {
+      "extension-missing-generic-entity": [
+        72,
+        77
+      ],
       "linking-error": [
         206
+      ]
+    },
+    "resources/product_structure_schema/product_structure_schema.exp": {
+      "extension-missing-generic-entity": [
+        55
+      ]
+    },
+    "resources/representation_schema/representation_schema.exp": {
+      "extension-missing-generic-entity": [
+        51,
+        55
       ]
     },
     "resources/set_theory_schema/set_theory_schema.exp": {
@@ -7774,7 +9045,15 @@
         79
       ]
     },
+    "resources/shape_dimension_schema/shape_dimension_schema.exp": {
+      "extension-missing-generic-entity": [
+        67
+      ]
+    },
     "resources/shape_tolerance_schema/shape_tolerance_schema.exp": {
+      "extension-missing-generic-entity": [
+        78
+      ],
       "informal-proposition-malformed-signature": [
         362,
         387
@@ -7796,6 +9075,11 @@
         700
       ]
     },
+    "resources/state_observed_schema/state_observed_schema.exp": {
+      "extension-missing-generic-entity": [
+        48
+      ]
+    },
     "resources/structural_response_representation_schema/structural_response_representation_schema.exp": {
       "duplicate-loop-index": [
         2124,
@@ -7807,10 +9091,20 @@
         2248
       ]
     },
+    "resources/systems_engineering_representation_schema/systems_engineering_representation_schema.exp": {
+      "extension-missing-generic-entity": [
+        62
+      ]
+    },
     "resources/topology_based_identification_schema/topology_based_identification_schema.exp": {
       "duplicate-loop-index": [
         287,
         287
+      ]
+    },
+    "resources/topology_schema/topology_schema.exp": {
+      "extension-missing-generic-entity": [
+        74
       ]
     },
     "resources/variational_representation_schema/variational_representation_schema.exp": {

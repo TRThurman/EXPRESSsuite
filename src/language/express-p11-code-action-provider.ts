@@ -77,7 +77,7 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
     };
   }
 
-  /** GENERIC_ENTITY without EXTENSIBLE (8.4.2): add EXTENSIBLE, or, on an extension, drop GENERIC_ENTITY. */
+  /** GENERIC_ENTITY without EXTENSIBLE (8.4.2): add EXTENSIBLE, or, on an extension of a select that is not GENERIC_ENTITY, drop GENERIC_ENTITY. */
   private fixGenericEntityWithoutExtensible(diagnostic: Diagnostic, document: LangiumDocument<ExpressFile>): CodeAction[] {
     const fixes = (diagnostic.data as GenericEntityWithoutExtensibleData | undefined)?.fixes ?? [];
     return fixes.map((fix) => ({
@@ -88,7 +88,7 @@ export class ExpressP11CodeActionProvider implements CodeActionProvider {
     }));
   }
 
-  /** Add GENERIC_ENTITY to an EXTENSIBLE extension of a GENERIC_ENTITY select (8.4.2, ruling 2026-11-21). */
+  /** Make an extension of a GENERIC_ENTITY select EXTENSIBLE GENERIC_ENTITY (8.4.2, ruling 2026-11-26). */
   private fixExtensionMissingGenericEntity(diagnostic: Diagnostic, document: LangiumDocument<ExpressFile>): CodeAction | undefined {
     const fix = (diagnostic.data as ExtensionMissingGenericEntityData | undefined)?.fix;
     if (!fix) return undefined;
