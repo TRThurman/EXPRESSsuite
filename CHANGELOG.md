@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+### Changes to the findings of an existing workspace
+
+- **Every extension of a `GENERIC_ENTITY` select in a short form schema shall
+  be `EXTENSIBLE GENERIC_ENTITY`.** ISO 10303-11:2004 8.4.2: "All extensions of
+  that select data type shall be generic-entity select data types and shall
+  specify the GENERIC_ENTITY reserved word", and the syntax admits
+  `GENERIC_ENTITY` only after `EXTENSIBLE`. `extension-missing-generic-entity`
+  now also reports a `SELECT BASED_ON` that is not `EXTENSIBLE`, which 0.8.0
+  accepted, with the quick fix "Add EXTENSIBLE GENERIC_ENTITY"; EXPRESS Data
+  Manager 10.2.6 reports the same declarations (error C3142). On an extension
+  of a `GENERIC_ENTITY` select, `generic-entity-without-extensible` no longer
+  offers "Remove GENERIC_ENTITY", whose result would be reported. SMRL v8 now
+  has 610 sites of `extension-missing-generic-entity` (30 before), SMRL v12
+  rc7 682 (23 before). The long forms have none: a long form is written in
+  the language of ISO 10303-11:1994 (Annex G.5), which has no `EXTENSIBLE`,
+  `GENERIC_ENTITY` or `BASED_ON`.
+
 ## [0.8.0](https://github.com/TRThurman/EXPRESSsuite/compare/0.7.0...0.8.0) (2026-11-25)
 
 ### Changes to the findings of an existing workspace

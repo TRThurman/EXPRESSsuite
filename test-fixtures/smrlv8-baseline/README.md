@@ -18,9 +18,9 @@ correctness: several of the classes below are known false positives.
 The corpus folder loaded as one workspace with the extension's default
 settings: `useOptimizedConfiguration` on, so files whose name contains `lf`
 or `concatenated` and the `business_object_models` folder are not loaded.
-1,287 of the 1,410 files load; 6,356 diagnostics
-(3,566 error, 704 information, 2,086 warning) in
-266 files. `files` maps file to code to the 1-based start
+1,287 of the 1,410 files load; 6,936 diagnostics
+(4,146 error, 704 information, 2,086 warning) in
+414 files. `files` maps file to code to the 1-based start
 line of every diagnostic. `parseErrors` lists the files with lexer or parser
 errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 26-line fragment the distribution ships beside the module, not a schema.
@@ -30,12 +30,12 @@ errors: only `modules/solid_with_local_modification/Revisedent.exp`, a
 | linking-error                            |  3,038 |
 | (none)                                   |  1,737 |
 | declaration-name-case                    |    704 |
+| extension-missing-generic-entity         |    610 |
 | reference-name-case                      |    345 |
 | duplicate-interfaced-declaration         |    229 |
 | reference-statement-missing              |    136 |
 | duplicate-loop-index                     |     72 |
 | unqualified-group-reference              |     30 |
-| extension-missing-generic-entity         |     30 |
 | redeclaration-not-specialization         |     13 |
 | informal-proposition-malformed-signature |      7 |
 | informal-proposition-missing-annotation  |      6 |
@@ -194,14 +194,23 @@ Each reported site breaks the rule:
   the inherited attribute `subset`, no longer the entity of that name.
 - `(none)`, "Attribute name should start with a lower case.": a diagnostic
   without a code yet.
-- `extension-missing-generic-entity` (ruling 2026-11-21 on 8.4.2): an
-  EXTENSIBLE SELECT BASED_ON a select declared GENERIC_ENTITY that is not
-  GENERIC_ENTITY itself; an extension that is not EXTENSIBLE need not be.
-  30 sites, 14 in arm.exp files and 16 in mim.exp files, 22 of them in
-  `modules/catalog_data_information`. Example:
-  `modules/product_group/arm.exp:37`, `product_group_property_assignment_select
-  = EXTENSIBLE SELECT BASED_ON property_assignment_select`. The long forms have
-  none.
+- `extension-missing-generic-entity` (ruling 2026-11-26 on 8.4.2, replacing
+  that of 2026-11-21): a SELECT BASED_ON a select declared GENERIC_ENTITY
+  that is not EXTENSIBLE GENERIC_ENTITY itself. 610 sites: 30 EXTENSIBLE
+  without GENERIC_ENTITY (14 in arm.exp files, 16 in mim.exp files, 22 of
+  them in `modules/catalog_data_information`; the sites of the 2026-11-21
+  rule, e.g. `modules/product_group/arm.exp:37`,
+  `product_group_property_assignment_select = EXTENSIBLE SELECT BASED_ON
+  property_assignment_select`) and 580 neither EXTENSIBLE nor GENERIC_ENTITY
+  (297 in arm.exp files, 247 in mim.exp files, 36 in resource and domain
+  model schemas; e.g. `modules/activity_characterized/arm.exp:68`,
+  `actchar_property_assignment_select = SELECT BASED_ON
+  property_assignment_select`). A count from the source text, matching base
+  names across all loaded files, finds 613: the 610, and three that
+  EXPRESSsuite rightly does not report (two extend the ARM `project_item`,
+  which is not GENERIC_ENTITY, where the text count took the MIM one; one,
+  `ap239_product_life_cycle_support/arm.exp:1275`, names a base that does
+  not resolve in the ARM domain). The long forms have none.
 - `reference-statement-missing` is raised where a reference binds to a
   declaration outside the schema's interface closure. A name the closure
   holds binds there first; a name outside it binds to the first declaration
